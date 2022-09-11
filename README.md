@@ -1,8 +1,7 @@
 [![IronPython](https://img.shields.io/badge/ironpython-2.7-red.svg)](https://github.com/IronLanguages/ironpython2/releases/tag/ipy-2.7.8/)
+# honeybee-grasshopper-ph v1 (Release | ______ _, 2022)
 
-# honeybee-grasshopper-ph
-
-Honeybee-PH plugin for Grasshopper.
+Honeybee-PH plugins and components for Rhino / Grasshopper.
 
 This repository contains all PH (Passive House) modeling Grasshopper components for the Honeybee-PH
 plugin. The package includes both the userobjects (`.ghuser`) and the Python
