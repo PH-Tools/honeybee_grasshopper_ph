@@ -31,6 +31,7 @@ following repositories to be installed in order to work correctly:
 
 * [ladybug-grasshopper](https://github.com/ladybug-tools/ladybug-grasshopper)
 * [honeybee-grasshopper-core](https://github.com/ladybug-tools/honeybee-grasshopper-core)
+* [honeybee-grasshopper-energy](https://github.com/ladybug-tools/honeybee-grasshopper-energy)
 
 ## Installation
 
