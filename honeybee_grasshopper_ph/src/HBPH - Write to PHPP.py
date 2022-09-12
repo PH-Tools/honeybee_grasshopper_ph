@@ -23,7 +23,7 @@
 Convert an existing HBJSON file to a Passive House Exchange (PHX) model and write out 
 the model data to a PHPP document. 
 NOTE:
-    - You must have a valid PHPP document to write to. The PHPP is not part of the 
+    - You must have a valid PHPP document to write to. The PHPP is *NOT* part of the 
     honeybee-ph plugin and must be purchased from PHI or your local reseller. For more 
     information, see: "https://passivehouse.com/04_phpp/04_phpp.htm"
     - The PHPP document you would like to write to should be open alongside Rhino, 
@@ -35,18 +35,17 @@ NOTE:
     be sure to save your PHPP file with the new data to the appropriate location on 
     your computer.
 -
-EM August 1, 2022
+EM Septembber 12, 2022
     Args:
         _hbjson_file: (str) The full file path to the HBJSON you would like to write 
             out to PHPP.
         
-        _phpp_version_: (str) Optional 4-letter code for the PHPP version to use.
-        Currently supported versions include
-        - "ENSI" (English SI units) [default]
-        - "ENIP" (English IP units)
-        - "ESSI" (Espanol SI units)
-        - "DESI" (Deutsch SI units)
-            
+        _activate_variants: (bool) Default="False", Set True if you would like to 
+            connect all of the various PHPP inputs to the 'Variants' worksheet. This
+            is used when testing various combinations of attributes during the 
+            early design phase. Note that if activated, any inputs will get overwritten
+            when the connection to the 'Variants' worksheet is made.
+            Note: Args must be strings, not actual boolean True/False.
             
         _write: (bool) Set True to run the PHPP writer.
             
@@ -64,7 +63,7 @@ import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Write to PHPP"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='AUG_1_2022')
+honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='SEP_12_2022')
 if DEV:
     reload(PHX.run)
 
@@ -77,7 +76,7 @@ if os.name != 'nt':
 #-------------------------------------------------------------------------------
 if _write and _hbjson_file:
     hb_python_site_packages = honeybee.config.folders.python_package_path
-    PHX.run.write_hbjson_to_phpp(_hbjson_file, hb_python_site_packages)
+    PHX.run.write_hbjson_to_phpp(_hbjson_file, hb_python_site_packages, _activate_variants or "False")
 else:
     msg = "Open a valid PHPP file in Excel, and set _write to True."
     ghenv.Component.AddRuntimeMessage(ghK.GH_RuntimeMessageLevel.Warning, msg)
