@@ -1,4 +1,3 @@
-[![IronPython](https://img.shields.io/badge/ironpython-2.7-red.svg)](https://github.com/IronLanguages/ironpython2/releases/tag/ipy-2.7.8/)
 # honeybee-grasshopper-ph v1 (Release | ______ _, 2022)
 
 Honeybee-PH plugins and components for Rhino / Grasshopper.
@@ -38,3 +37,6 @@ following repositories to be installed in order to work correctly:
 See the [Wiki of the lbt-grasshopper repository](https://github.com/ladybug-tools/lbt-grasshopper/wiki)
 for the installation instructions for the entire Ladybug Tools Grasshopper plugin
 (including this repository).
+
+
+[![IronPython](https://img.shields.io/badge/ironpython-2.7-red.svg)](https://github.com/IronLanguages/ironpython2/releases/tag/ipy-2.7.8/)
