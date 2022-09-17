@@ -1,4 +1,4 @@
-baseURL = "https://ph-tools.github.io/honeybee_grasshopper_ph/docs/public/"
+baseURL = "https://ph-tools.github.io/honeybee_grasshopper_ph/docs/"
 title = "PH-Tools.honeybee-grasshopper-ph"
 theme = "ph_tools"
 
