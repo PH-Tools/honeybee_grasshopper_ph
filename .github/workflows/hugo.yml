@@ -54,12 +54,12 @@ jobs:
         run: |
           hugo \
             --minify \
-            --baseURL "${{ steps.pages.outputs.base_url }}/docs/"
+            --baseURL "${{ steps.pages.outputs.base_url }}/docs/public/"
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
-          path: ./docs/public
+          path: ./docs
 
   # Deployment job
   deploy:
