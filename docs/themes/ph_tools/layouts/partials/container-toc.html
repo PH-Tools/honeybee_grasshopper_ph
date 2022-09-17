@@ -1,0 +1,23 @@
+<!-- 
+    Page with Side bar (automatically generated from similar pages)
+    ---------------------------------------------------------------------------
+    |       link        /                                                     |
+    |       link        /                                                     |
+    |       link        /                     content                         |
+    |                   /                                                     |
+    |                   /                                                     |
+    ---------------------------------------------------------------------------
+ -->
+<div class="container-fluid">
+    <div class="row-fluid">
+        <!--Nav Bar -->
+        <nav class="sidebar">
+            {{ partial "sidebar.html" . }}
+        </nav>
+
+        <!--Main Content -->
+        <div class="side-content">
+            {{ .Content }}
+        </div>
+    </div>
+</div>

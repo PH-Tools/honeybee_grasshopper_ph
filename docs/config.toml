@@ -1,0 +1,27 @@
+baseURL = "https://mynewhugosite.com"
+title = "PH-Tools.honeybee-grasshopper-ph"
+theme = "ph_tools"
+
+[Params]
+  author = "PH-Tools"
+  copyright = "bldgtyp, llc"
+  contact = "phtools@bldgtyp.com"
+  github_url = "https://github.com/PH-Tools/honeybee_grasshopper_ph"
+  youtube_url = "https://www.youtube.com/channel/UCADxgnNCFNZ3uhaSvezReQA/playlists"
+  package_name = "PHX"
+  
+[menu]
+  [[menu.main]]
+    identifier = "quick_start"
+    name = "Quick Start"
+    url = "/quick_start"
+
+  [[menu.main]]
+    identifier = "learn_more"
+    name = "Learn More"
+    url = "/learn_more"
+
+  [[menu.main]]
+    identifier = "contact"
+    name = "Contact & Help"
+    url = "/contact"

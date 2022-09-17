@@ -1,0 +1,32 @@
+:root {
+    --html-font-family: sans-serif;
+    --html-font-line-height: 1.15;
+    --base-font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        "Helvetica Neue",
+        Arial,
+        "Noto Sans",
+        sans-serif,
+        "Apple Color Emoji",
+        "Segoe UI Emoji",
+        "Segoe UI Symbol",
+        "Noto Color Emoji";
+    --base-font-size: 16px;
+    --base-font-weight: 400;
+    --base-font-line-height: 1.5;
+
+    --small-font-size: var(--base-font-size) * 0.875;
+    --small-font-weight: 200;
+    --small-font-line-height: var(--base-font-line-height) * 0.875;
+
+    --nav-link-font-size: 1rem;
+    --nav-link-font-weight: 400;
+
+    --sidebar-font-size: 13px;
+    --sidebar-font-weight: 400;
+
+    --spacing-unit: 20px;
+}

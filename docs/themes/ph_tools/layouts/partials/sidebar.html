@@ -1,0 +1,9 @@
+<!--
+    Populates the sidebar by grabbing all the pages that match
+    the categories, language, and version of the current page
+-->
+
+<ul class="nav scrollbar">
+    <a class="sidebar-section-head" href="{{ .Permalink }}">{{ .Page.Title }}</a>
+    {{ .TableOfContents }}
+</ul>
