@@ -55,7 +55,7 @@ jobs:
         run: |
           hugo \
             --minify \
-            --baseURL "${{ steps.pages.outputs.base_url }}/"
+            --baseURL "${{ steps.pages.outputs.base_url }}/honeybee_grasshopper_ph/"
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
