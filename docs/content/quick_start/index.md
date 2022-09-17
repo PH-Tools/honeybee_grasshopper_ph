@@ -5,7 +5,7 @@ weight: 20
 # Quick Start
 This guide will help you get up and running quickly with the Honeybee-PH toolkit for [Rhino / Grasshopper](https://www.rhino3d.com/). The Honeybee-PH toolkit is designed to allow users to add Passive House style data to their Honeybee models, and then export those models out to the Passive House modeling platforms WUFI-Passive and PHPP.
 
-![Basic Usage Diagram](/img/quick_start/quick_start_diagram.svg)
+![Basic Usage Diagram](img/quick_start/quick_start_diagram.svg)
 
 The simplest usage of the Honeybee-PH toolkit is demonstrated below. For detailed tutorials on full Passive House modeling and the use of all the new Honeybee-PH tools, check out [Learn More](/learn_more/).
 

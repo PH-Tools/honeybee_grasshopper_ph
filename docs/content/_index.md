@@ -6,4 +6,4 @@ title: "Home"
 
 This is the landing page....
 
-![Tux, the Linux mascot](/img/burger.svg)
+![Tux, the Linux mascot](img/burger.svg)
