@@ -32,4 +32,4 @@ If you run into any errors or trouble during install:
 ![HB Check Versions](/honeybee_grasshopper_ph/img/install/hb_config.png)
 - Are you using vanilla Ladybug-Tools, or are you using [Pollination](https://www.pollination.cloud/)? If you are using Pollination on Windows, it is possible that your Ladybug-Tools are installed in a different directory than normal. This means you may need additional permissions before you can install Honeybee-PH. If you run into any permissions issues, try running Rhino 'Run as administrator' from your Start Menu and then running the Installation.
 ![Run as Admin](/honeybee_grasshopper_ph/img/install/run_admin.png)
-- Still having trouble? Check out the [Contact](/contact/) page for additional resources.
+- Still having trouble? Check out the [Contact](/{{< gh_pages_name >}}/contact/) page for additional resources.

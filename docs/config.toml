@@ -10,6 +10,7 @@ theme = "ph_tools"
   youtube_url = "https://www.youtube.com/channel/UCADxgnNCFNZ3uhaSvezReQA/playlists"
   package_name = "PHX"
   gh_pages_name = "honeybee_grasshopper_ph"
+  installer_download_url = "https://github.com/PH-Tools/honeybee_grasshopper_ph/raw/main/hbph_installer.gh"
   
 [menu]
   [[menu.main]]

@@ -20,6 +20,14 @@
     float: left;
 }
 
+.site-logo img {
+    margin-top: 12px;
+    margin-bottom: 0;
+    margin-left: 10px;
+    height: 36px;
+    float: left;
+}
+
 .site-nav {
     float: right;
     line-height: 60px;

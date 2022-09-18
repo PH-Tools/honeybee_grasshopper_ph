@@ -8,16 +8,20 @@
     |                   /                                                     |
     ---------------------------------------------------------------------------
  -->
-<div class="container-fluid">
-    <div class="row-fluid">
-        <!--Nav Bar -->
-        <nav class="sidebar">
-            {{ partial "sidebar.html" . }}
-        </nav>
+<div class="container">
+    <main class="content">
+        <div class="container-fluid">
+            <div class="row-fluid">
+                <!--Nav Bar -->
+                <nav class="sidebar">
+                    {{ partial "sidebar.html" . }}
+                </nav>
 
-        <!--Main Content -->
-        <div class="side-content">
-            {{ .Content }}
+                <!--Main Content -->
+                <div class="side-content">
+                    {{ .Content }}
+                </div>
+            </div>
         </div>
-    </div>
+    </main>
 </div>

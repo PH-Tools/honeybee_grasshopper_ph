@@ -2,7 +2,6 @@ html {
     font-family: var(--html-font-family);
     line-height: var(--html-font-line-height);
     scroll-behavior: smooth;
-
 }
 
 body {
@@ -12,6 +11,7 @@ body {
         from page to page and is annoying
      */
     overflow: scroll;
+    margin: 0px;
 }
 
 .content {
@@ -20,7 +20,6 @@ body {
     too close to header or sidebar when page is empty
     */
     min-height: 50em;
-
 }
 
 .row-fluid {
@@ -43,4 +42,13 @@ body {
     padding-left: 15px;
     margin-right: auto;
     margin-left: auto;
+}
+
+.container-full {
+    width: 100%;
+}
+
+.footer {
+    margin-top: 100px;
+    margin-bottom: 25px;
 }

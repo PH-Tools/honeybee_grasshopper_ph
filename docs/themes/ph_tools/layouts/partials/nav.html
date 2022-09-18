@@ -2,11 +2,15 @@
   <!-- Logo -->
 
   <!-- Title -->
+  <a id="cat_homelogo" class="site-logo" href="{{ .Site.BaseURL }}">
+    <img src="/{{ .Site.Params.gh_pages_name }}/img/PHT_Logo_28x28_circle.svg">
+  </a>
   <a id="cat_homelink" class="site-title" href="{{ .Site.BaseURL }}">{{ .Site.Title }}</a>
 
   <nav class="site-nav">
 
     <img class="menu-icon" src="/honeybee_grasshopper_ph/img/burger.svg" />
+
     <div class="trigger">
       <!-- Build the Nav, set the active page class (for styling) -->
       {{ $this_page_title := .Title }}

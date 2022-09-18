@@ -9,8 +9,8 @@ PH-Tools is the umbrella project encompassing all of the various software tools 
 
 ## Get Help...
 Having trouble and can't find the answer? Try:
-- Check our the [Learn More](/learn_more/) page for detailed how-to guides and tutorials.
-- Installation Issues? Check our the [Install](/install/#install-trouble) page.
+- Check our the [Learn More](/{{< gh_pages_name >}}/learn_more/) page for detailed how-to guides and tutorials.
+- Installation Issues? Check our the [Install](/{{< gh_pages_name >}}/install/#install-trouble) page.
 - Rhino or Grasshopper Trouble? Check out the [Rhino Forum](https://discourse.mcneel.com/)
 - Ladybug-Tools or Honeybee Trouble? Check out the [Ladybug-Tools Forum](https://discourse.ladybug.tools/)
 - If you can't find the answer anywhere above, try posting a question to the [Ladybug-Tools Forum](https://discourse.ladybug.tools/). For most questions, we encourage you to ask them publicly on the forum, that way when we are able the answer them they become a resource for future users who run into the same issue.

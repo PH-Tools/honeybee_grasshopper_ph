@@ -4,6 +4,7 @@
 @import "_layout_header.css";
 @import "_layout_sidebar.css";
 @import "_layout_content.css";
+@import "_layout_home.css";
 
 /* -- MAIN -- */
 body {
@@ -35,7 +36,8 @@ h2 {
 }
 
 h3 {
-  font-size: 22px;
+  font-size: 20px;
+  font-weight: 500;
   margin-top: 30px;
   margin-bottom: 10px;
 }
@@ -137,6 +139,7 @@ a:visited {
 
 /* -- FOOTER -- */
 .footer {
+  border-top: 0.5px solid var(--color-ph-tools-light);
   text-align: center;
   font-size: 13px;
   color: var(--color-grey);
@@ -167,4 +170,20 @@ a.button {
   text-decoration: none;
   display: inline-block;
   font-size: 16px;
+}
+
+/* -- Homepage -- */
+.home-contents h1 {
+  font-weight: 800;
+  font-size: 3.5rem;
+  color: #111;
+  margin-bottom: 5px;
+}
+
+.home-contents h3 {
+  margin-top: 0px;
+  font-weight: 500;
+  color: #111;
+  font-size: 20px;
+  text-shadow: 2px 2px 8px rgb(255, 255, 255);
 }

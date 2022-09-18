@@ -42,3 +42,7 @@ coming soon...
 ## PDF Reports
 coming soon...
 
+## FAQ:
+### Can Honeybee-PH models be used for certification?
+
+### Can Honeybee-PH be used alongside DesignPH?
