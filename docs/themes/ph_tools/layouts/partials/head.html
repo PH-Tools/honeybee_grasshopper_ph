@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>{{ if not .IsHome }}{{ .Title }} | {{ end }}{{ .Site.Title }}</title>
-    <link rel="stylesheet" href="/honeybee_grasshopper_ph/css/style.css" type="text/css" media="all" />
+    <link rel="stylesheet" href="/{{ .Site.Params.gh_pages_name }}/css/style.css" type="text/css" media="all" />
 
     {{ with .OutputFormats.Get "rss" -}}
     {{ printf `

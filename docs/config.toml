@@ -9,6 +9,7 @@ theme = "ph_tools"
   github_url = "https://github.com/PH-Tools/honeybee_grasshopper_ph"
   youtube_url = "https://www.youtube.com/channel/UCADxgnNCFNZ3uhaSvezReQA/playlists"
   package_name = "PHX"
+  gh_pages_name = "honeybee_grasshopper_ph"
   
 [menu]
   [[menu.main]]
