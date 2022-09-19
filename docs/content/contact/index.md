@@ -4,7 +4,7 @@ weight: 40
 ---
 
 ## PH-Tools?
-PH-Tools is the umbrella project encompassing all of the various software tools we've been building to make Passive House energy modeling faster, easier and more fun. In the past we've made plugins for DesignPH, and standalone tools like IDF2PH and LBT2PH. The Honeybee-PH plugin is the new 'official' plugin for Honeybee, written from the ground up to work seamlessly with Ladybug-Tools and Honeybee using their plugin-architecture. If you have questions on Honeybee-PH, or any of the other PH-Tools, check out the links and references below.
+[PH-Tools](http://www.passivehousetools.com/) is the umbrella project encompassing all of the various software tools we've been building to make Passive House energy modeling faster, easier and more fun. In the past we've made plugins for DesignPH, and standalone tools like LBT2PH. The Honeybee-PH plugin is our newest plugin, written for Honeybee from the ground up to work seamlessly with Ladybug-Tools using their plugin-architecture. If you have questions on Honeybee-PH, or any of the other [PH-Tools](http://www.passivehousetools.com/), check out the links and references below.
 
 
 ## Get Help...
