@@ -18,8 +18,9 @@ from honeybee_ph_rhino.gh_compo_io import ghio_validators
 
 class IDHWBranchPipe(object):
     """Interface for collect and clean DHW Branch Piping user-inputs"""
-    diameter = ghio_validators.UnitM("diameter")
-    display_name = ghio_validators.HBName("display_name")
+    diameter = ghio_validators.UnitM("diameter", default=0.0127)
+    display_name = ghio_validators.HBName(
+        "display_name", default="_unnamed_branch_pipe_")
 
     def __init__(self, IGH, _geometry, _name, _diameter):
         # type: (gh_io.IGH, Union[Polyline3D, LineSegment3D], str, float) -> None
@@ -74,11 +75,12 @@ class IDHWBranchPipe(object):
 
 class IDHWRecircPipe(object):
     """Interface for collect and clean DHW Recirculation Piping user-inputs"""
-    diameter = ghio_validators.UnitM("diameter")
-    display_name = ghio_validators.HBName("display_name")
-    insul_thickness = ghio_validators.UnitM("insul_thickness")
-    insul_conductivity = ghio_validators.UnitW_MK("insul_conductivity")
-    daily_period = ghio_validators.FloatMax24("daily_period")
+    diameter = ghio_validators.UnitM("diameter", default=0.0254)
+    display_name = ghio_validators.HBName(
+        "display_name", default="_unnamed_recirc_pipe_")
+    insul_thickness = ghio_validators.UnitM("insul_thickness", default=0.0254)
+    insul_conductivity = ghio_validators.UnitW_MK("insul_conductivity", default=0.04)
+    daily_period = ghio_validators.FloatMax24("daily_period", default=24)
 
     def __init__(self, IGH, _geometry, _name="_unnamed_", _diameter=0.0254, _insul_thickness=0.0254, _insul_conductivity=0.04, _insul_reflective=True, _insul_quality=None, _daily_period=24.0):
         # type: (gh_io.IGH, Union[Polyline3D, LineSegment3D], str, float, float, float, bool, None, float) -> None
