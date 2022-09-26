@@ -28,8 +28,8 @@ class ICreateSHWSystem(object):
     efficiency = ghio_validators.FloatPercentage("efficiency")
     loss_coeff = ghio_validators.UnitW_K("loss_coeff")
 
-    def __init__(self, sys_type, display_name, efficiency, condition, loss_coeff, tank_1, tank_2, buffer_tank, solar_tank, heaters, branch_piping, recirc_piping):
-        # type: (str, str, Optional[float], Union[None, Room, int], Union[None, float, str], Optional[hot_water.PhSHWTank], Optional[hot_water.PhSHWTank], Optional[hot_water.PhSHWTank], Optional[hot_water.PhSHWTank], List, List, List) -> None
+    def __init__(self, sys_type, display_name, efficiency, condition, loss_coeff, tank_1, tank_2, buffer_tank, solar_tank, heaters, branch_piping, _num_tap_points, recirc_piping):
+        # type: (str, str, Optional[float], Union[None, Room, int], Union[None, float, str], Optional[hot_water.PhSHWTank], Optional[hot_water.PhSHWTank], Optional[hot_water.PhSHWTank], Optional[hot_water.PhSHWTank], List, List, Optional[int], List) -> None
         self.sys_type = sys_type
         self.display_name = display_name
         self.efficiency = efficiency
@@ -41,6 +41,7 @@ class ICreateSHWSystem(object):
         self.solar_tank = solar_tank
         self.heaters = heaters
         self.branch_piping = branch_piping
+        self.number_tap_points = _num_tap_points
         self.recirc_piping = recirc_piping
 
     @property
@@ -89,5 +90,7 @@ class ICreateSHWSystem(object):
             shw_sys.properties.ph.add_branch_piping(branch_piping)  # type: ignore
         for recirc_piping in self.recirc_piping:
             shw_sys.properties.ph.add_recirc_piping(recirc_piping)  # type: ignore
+
+        shw_sys.properties.ph.number_tap_points = self.number_tap_points
 
         return shw_sys

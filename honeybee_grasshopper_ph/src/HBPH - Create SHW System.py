@@ -25,7 +25,7 @@ using the 'Apply SHW System' component. Note that many elements here replicate t
 Honeybee-Energy "HB SHW System" component, but allow for additional HB-PH elements such as 
 piping and storage tanks to be added as well.
 -
-EM August 18, 2022
+EM September 26, 2022
 
     Args:
         _system_type: [str] Text for the specific type of service hot water system and equipment.
@@ -68,25 +68,33 @@ EM August 18, 2022
         _branch_piping: List[PhPipeElement] A List of any Branch Piping elements to
             add to the SHW System.
         
+        _num_tap_points_: (Optional[int]) Allows for manual setting of the number 
+            of 'tap points' (faucets or sim.) in the system. If None is input here, 
+            will use the number of Branch-Piping elements as the number of tap-points. 
+            ie: if you input 5 Branch Piping Curves, will set tap-points = 5
+            
         _recirc_piping: List[PhPipeElement] A List of any Recirculation Piping elements to
             add to the SHW System.
     
     Returns:
         hb_shw_: [SHWSystem] A new Honeybee SHW System object which can be applied 
-            to one or more Honeybee Rooms using the 'Apply SHW SYstem' component.
+            to one or more Honeybee Rooms using the 'Apply SHW System' component.
 """
 
 from honeybee_ph_rhino.gh_compo_io import ghio_create_shw
+from honeybee_ph_utils import preview
 
 #-------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create SHW System"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='AUG_18_2022')
+honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='SEP_26_2022')
 if DEV:
     #from honeybee_ph_rhino.gh_compo_io import ghio_validators
     #reload(ghio_validators)
+    #from honeybee_energy_ph.properties.hot_water import hw_system
+    #reload(hw_system)
     #reload(ghio_create_shw)
     #from honeybee_ph_utils import units
     #reload(units)
@@ -105,7 +113,12 @@ if _system_type:
         _solar_tank_,
         _heaters, 
         _branch_piping,
-        _recirc_piping
+        _num_tap_points_,
+        _recirc_piping,
     )
 
     hb_shw_ = shw_sys.create_hb_shw_obj()
+
+#-------------------------------------------------------------------------------
+if hb_shw_:
+    preview.object_preview(hb_shw_.properties.ph)
