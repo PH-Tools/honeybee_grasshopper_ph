@@ -25,6 +25,8 @@ class ICreateSDConst(object):
 
     def _cleanup_input_lists(self):
         """Make sure the input list lengths align."""
+        if not self.names or not self.u_values:
+            return
 
         if len(self.names) < len(self.u_values):
             for _ in range(len(self.u_values)-len(self.names)):
