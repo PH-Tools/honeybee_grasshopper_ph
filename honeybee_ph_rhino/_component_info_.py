@@ -248,6 +248,18 @@ COMPONENT_PARAMS = {
         "Category": CATEGORY,
         "SubCategory": 1,
     },
+    "HBPH - Create PH Glazing": {
+        "NickName": "Create Glazing",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
+    "HBPH - Create SD Constructions": {
+        "NickName": "Create SD Const.",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
     "HBPH - PHI Certification": {
         "NickName": "PHI Cert.",
         "Message": RELEASE_VERSION,
