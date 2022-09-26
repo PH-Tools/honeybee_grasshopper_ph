@@ -20,23 +20,50 @@
 # @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 #
 """
-This component installs/updates the 'Honeybee-PH' plugin libraries for Ladybug Tools.
-Please make sure that you gave Ladybug Tools with Honeybee-Energy fully installed before
+This component installs/updates all of the 'Honeybee-PH' plugin libraries for Ladybug Tools.
+Please make sure that you have Ladybug-Tools with Honeybee-Energy ALREADY fully installed BEFORE
 proceeding with this installation. Make sure you are connected to the internet in 
 order to download the latest version of the plugin libraries and components.
 -
-This tool will download and install several new libraries into the Ladybug Tools
-python interpreter, and will download and install new Grasshopper components.
+This tool will download and install several new libraries into the Ladybug-Tools
+python interpreter, and will download and install new Grasshopper components which
+will be added to your Rhino / Grasshopper installation.
 -
-EM June 10, 2022
+EM September 26, 2022
     Args:
         _install: (bool) Set to True to install Honeybee-PH on your computer.
-        _branch_: (str) Optional branch to download. Default = 'main'
+        
+        _hbph_branch: (str) Default='Main' Optional GitHub repo branch name for
+            the honeybee-ph package to install (https://github.com/PH-Tools/honeybee_ph).
+            If None is specified, will install the package from PIP. If you don't 
+            know what branch or package you want, leave this input empty and the 
+            default will be installed.
+        
+        _hbph_gh_branch: (str) Default='Main' Optional GitHub repo branch name for
+            the honeybee-grasshopper-ph package to install (https://github.com/PH-Tools/honeybee_grasshopper_ph).
+            If None is specified, will install the 'Main' branch of the repo. If you don't 
+            know what branch or package you want, leave this input empty and the 
+            default will be installed.
+        
+        _phx_branch: (str) Default='Main' Optional GitHub repo branch name for
+            the PHX (Passive House Exchange) package to install (https://github.com/PH-Tools/PHX).
+            If None is specified, will install the package from PIP. If you don't 
+            know what branch or package you want, leave this input empty and the 
+            default will be installed.
+            
+            
+        _hbph_ver: (str): The Version number of the Honeybee-PH package to install from PIP.
+            Note that if you leave this input empty, the latest version will be installed. For 
+            more details on honeybee-ph version, see https://pypi.org/project/honeybee-ph/
+       
+        _phx_ver: (str): The Version number of the PHX package to install from PIP.
+            Note that if you leave this input empty, the latest version will be installed. For 
+            more details on honeybee-ph version, see https://pypi.org/project/PHX/
 """
 
 ghenv.Component.Name = 'HBPH Installer'
 ghenv.Component.NickName = 'HBPHInstall'
-ghenv.Component.Message = 'DEV | JUN_10_2022'
+ghenv.Component.Message = 'DEV | SEP_26_2022'
 ghenv.Component.Category = 'Honeybee-PH'
 ghenv.Component.SubCategory = '0 | Installer'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -62,8 +89,22 @@ except ImportError as e:
     hb_loaded = False
     msg = 'Failed to import honeybee:> Please be sure you have installed Ladybug Tools before proceeding.'
     raise ImportError('{}{}'.format(msg, e))
-    
-    
+
+
+def get_python_exe():
+    """Get the path to the Python installed in the ladybug_tools folder.
+
+    Will be None if Python is not installed.
+    """
+    home_folder = os.getenv('HOME') or os.path.expanduser('~')
+    py_install = os.path.join(home_folder, 'ladybug_tools', 'python')
+    py_exe_file = os.path.join(py_install, 'python.exe') if os.name == 'nt' else \
+        os.path.join(py_install, 'bin', 'python3')
+    py_site_pack = os.path.join(py_install, 'Lib', 'site-packages') if os.name == 'nt' else \
+        os.path.join(py_install, 'lib', 'python3.7', 'site-packages')
+    if os.path.isfile(py_exe_file):
+        return py_exe_file, py_site_pack
+    return None, None
 
 def nukedir(target_dir, rmdir=False):
     # type: (str, bool) -> None
@@ -167,6 +208,7 @@ def check_rhino_version(_min_version_allowed):
     print msg
     raise Exception(msg)
 
+
 def check_lbt_version(_min_version_allowed):
     # type: (Tuple[int, int, int]) -> Tuple[int, int, int]
     try:
@@ -191,6 +233,7 @@ def check_lbt_version(_min_version_allowed):
             ghenv.Component.AddRuntimeMessage(Message.Error,msg)
             break
     return lbt_version_installed
+
 
 def download_repo_from_github(_download_url, _download_file):
     # type: (str, str) -> str
@@ -269,7 +312,7 @@ def copy_honeybee_ph_ghcomponents(_unzipped_src_dir, _gh_user_objects_folder):
     
     if not os.path.isdir(hbph_gh_source_folder):
         return 
-        
+    
     target = os.path.join(_gh_user_objects_folder[0], 'honeybee_grasshopper_ph')
     
     print '- '*25
@@ -322,7 +365,8 @@ def update_libraries_pip(python_exe, package_name, version=None, target=None):
     stdout, stderr = output
     
     return stderr
-    
+
+
 def give_warning(message):
     """Give a warning message (turning the component orange).
 
@@ -332,7 +376,7 @@ def give_warning(message):
     ghenv.Component.AddRuntimeMessage(Message.Warning, message)
 
 
-def copy_from_github_repo(_github_repo_name, _branch, _repo_version):
+def copy_from_github_repo(_github_repo_name, _branch):
     # --------------------------------------------------------------------------
     # -- download the repo from github
     download_url, download_file = get_paths(_github_repo_name, _branch)
@@ -342,29 +386,56 @@ def copy_from_github_repo(_github_repo_name, _branch, _repo_version):
     
     # --------------------------------------------------------------------------
     copy_repo_contents_to_site_packages(unzipped_folder, _github_repo_name)
-
+    
     
     # --------------------------------------------------------------------------
     # -- copy repo grasshopper component
     copy_honeybee_ph_ghcomponents(unzipped_folder, UserObjectFolders)
     
-
     
     # --------------------------------------------------------------------------
     # remove the downloaded folder
     nukedir(unzipped_folder, True)
     os.remove(download_file)
-    
-    
-# Dependancy versions
+
+
+def update_libraries_pip(python_exe, package_name, version=None, target=None):
+    """Update Python libraries using pip.
+
+    Args:
+        python_exe: The path to the Python executable to be used for installation.
+        
+        package_name: The name of the PyPI package to install
+        
+        version: An optional string for the version of the package to install.
+        
+        target: An optional target directory into which the package will be installed.
+        """
+    # build up the command using the inputs
+    if version is not None:
+        package_name = '{}=={}'.format(package_name, version)
+    cmds = [python_exe, '-m', 'pip', 'install', package_name]
+    if target is not None:
+        cmds.extend(['--target', target, '--upgrade'])
+
+    # execute the command and print any errors
+    print('Installing {} via pip using{}'.format(package_name, python_exe))
+    use_shell = True if os.name == 'nt' else False
+    process = subprocess.Popen(
+        cmds, shell=use_shell, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    output = process.communicate()
+    stdout, stderr = output
+    return stderr
+
+# Package versions
+honeybee_ph_version =_hbph_ver # None defaults to newest
+PHX_version = _phx_ver # None defaults to newest
 rich_version = "12.4.1"
 xlwings_version = "0.27.7"
 
-# versions
+# required versions
 rhino_min_version = (7,18)
 lbt_min_version = (1, 51, 11)
-honeybee_ph_version = '0.1'
-phx_version = '0.1'
 
 # --------------------------------------------------------------------------
 # -- Check version compatibility
@@ -374,9 +445,91 @@ print "Rhino version: {}.{} found.".format(*rh_version_installed)
 lbt_version_installed = check_lbt_version(lbt_min_version)
 print "Ladybug Tools version: {}.{}.{} found.".format(*lbt_version_installed)
 
-if _install:
+if _install and not (_hbph_branch or _phx_branch or _hbph_gh_branch):
+    # -- Install the PIP version
+    
     # --------------------------------------------------------------------------
-    # install the Rich dependancy
+    # Ensure that Python has been installed in the ladybug_tools folder
+    home_folder = os.getenv('HOME') or os.path.expanduser('~')
+    try:
+        home_folder.decode('ascii')
+    except UnicodeDecodeError:
+        msg = 'Your username folder "{}" contains non-ASCII characters' \
+            'While the latest version of Ladybug Tools supports most non-ASCII ' \
+            'characters, there are some characters that can still cause issues.' \
+            'To avoid all poential problems, you can create a new username with ' \
+            'non-ASCII characters and install Ladybug Tools from that'.format(home_folder)
+        print(msg)
+        give_warning(msg)
+    py_exe, py_lib = get_python_exe()
+    assert py_exe is not None, \
+        'No Python instalation was found at: {}.This is a requirement in ' \
+        'order to contine with installation'.format(
+            os.path.join(home_folder, 'ladybug_tools', 'python'))
+    
+    # --------------------------------------------------------------------------
+    # Install the Honeybee-PH package
+    
+    print('Installing Honeybee-PH Python libraries.')
+    stderr = update_libraries_pip(py_exe, 'honeybee-ph', honeybee_ph_version)
+    if os.path.isdir(os.path.join(py_lib, 'honeybee-ph-{}.dist-info'.format(honeybee_ph_version))):
+        print('Honeybee-PH Python libraries successfully installed! ')
+    else:
+        give_warning(stderr)
+        print (stderr)
+    
+    
+    # --------------------------------------------------------------------------
+    # Install the PHX package
+    print('Installing PHX (Passive House Exchange) Python libraries.')
+    stderr = update_libraries_pip(py_exe, 'phx', PHX_version)
+    if os.path.isdir(os.path.join(py_lib, 'phx-{}.dist-info'.format(PHX_version))):
+        print('PHX Python libraries successfully installed! ')
+    else:
+        give_warning(stderr)
+        print (stderr)
+    
+    
+    # --------------------------------------------------------------------------
+    # -- Install the Rhino / Grasshopper Components and Libraries
+    copy_from_github_repo('honeybee_grasshopper_ph', _hbph_gh_branch or 'main')
+    
+    
+    # --------------------------------------------------------------------------
+    # give a success message
+    success_msg = 'Honeybee-PH has been successfully installed'
+    restart_msg = 'RESTART RHINO to load the new components + library.'
+    for msg in (success_msg, restart_msg):
+        print(msg)
+    give_popup_message(''.join([success_msg, restart_msg]), 'Installation Successful!')
+    
+    
+elif _install and (_hbph_branch or _phx_branch or _hbph_gh_branch):
+    # -- Install the GitHub version
+    # -- In this case, manually install the XLWings dependancy
+    
+    # --------------------------------------------------------------------------
+    # Ensure that Python has been installed in the ladybug_tools folder
+    home_folder = os.getenv('HOME') or os.path.expanduser('~')
+    try:
+        home_folder.decode('ascii')
+    except UnicodeDecodeError:
+        msg = 'Your username folder "{}" contains non-ASCII characters' \
+            'While the latest version of Ladybug Tools supports most non-ASCII ' \
+            'characters, there are some characters that can still cause issues.' \
+            'To avoid all poential problems, you can create a new username with ' \
+            'non-ASCII characters and install Ladybug Tools from that'.format(home_folder)
+        print(msg)
+        give_warning(msg)
+    py_exe, py_lib = get_python_exe()
+    assert py_exe is not None, \
+        'No Python instalation was found at: {}.This is a requirement in ' \
+        'order to contine with installation'.format(
+            os.path.join(home_folder, 'ladybug_tools', 'python'))
+    
+    
+    # --------------------------------------------------------------------------
+    # Install the Rich dependancy
     print 'Installing Python package: Rich.'
     py_exe = honeybee.config.folders.python_exe_path
     py_lib = honeybee.config.folders.python_package_path
@@ -390,7 +543,7 @@ if _install:
     
     
     # --------------------------------------------------------------------------
-    # install the XLwings dependancy
+    # Install the XLwings dependancy
     print 'Installing Python package: XLWings.'
     py_exe = honeybee.config.folders.python_exe_path
     py_lib = honeybee.config.folders.python_package_path
@@ -404,22 +557,22 @@ if _install:
     
     
     # --------------------------------------------------------------------------
-    copy_from_github_repo('honeybee_ph', _hbph_branch or 'main', honeybee_ph_version)
-    copy_from_github_repo('PHX', _phx_branch or 'main', phx_version)
+    copy_from_github_repo('honeybee_ph', _hbph_branch or 'main')
+    copy_from_github_repo('PHX', _phx_branch or 'main')
+    copy_from_github_repo('honeybee_grasshopper_ph', _hbph_gh_branch or 'main')
     
-
-    # ------------------------------------------------------------------------------------------
+    
+    # --------------------------------------------------------------------------
     # give a success message
-    success_msg = 'HBPH has been successfully installed'
+    success_msg = 'Honeybee-PH has been successfully installed'
     restart_msg = 'RESTART RHINO to load the new components + library.'
     for msg in (success_msg, restart_msg):
         print(msg)
     give_popup_message(''.join([success_msg, restart_msg]), 'Installation Successful!')
-
+    
     
 else:  # give a message to the user about what to do
     if hb_loaded:
         check_lbt_version(lbt_min_version)
     print 'Please:- Be sure you have already installed Ladybug Tools.- Are connected to '\
-    'the internet.- Set _install to "True" to install Honeybee-PH on this system.'   
-    
+    'the internet.- Set _install to "True" to install Honeybee-PH and all dependencies on this system.'   
