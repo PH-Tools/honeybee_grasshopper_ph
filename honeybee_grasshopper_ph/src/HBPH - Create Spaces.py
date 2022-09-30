@@ -34,7 +34,7 @@ a wall.
 Each Volume is made of one or more floor-segments. Each floor-segment can have a
 'weighting factor' applied for calculating the TFA/iCFA for Passive House certification.
 -
-EM July 11, 2022
+EM September 30, 2022
     Args:
         _flr_seg_geom: (Tree[Geometry]) The Rhino geometry that you would like to use 
             to create the Floor-Segments of the various Spaces. Each branch should be a list 
@@ -74,21 +74,22 @@ import rhinoscriptsyntax as rs
 import ghpythonlib.components as ghc
 import Grasshopper as gh
 
-from honeybee_ph_rhino.gh_compo_io import ghio_spc_create
-from honeybee_ph_rhino import gh_io
+from honeybee_ph_rhino import gh_io, gh_compo_io
 
 # ------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create Spaces"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='JUL_11_2022')
+honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='SEP_30_2022')
 if DEV:
-    reload(ghio_spc_create)
+    reload(gh_compo_io)
 
+# ------------------------------------------------------------------------------
 if _volume_geometry.BranchCount != 0:
     msg = " Sorry - Detailed input using '_volume_geometry' is not implemented just yet. Coming soon."
     raise NotImplementedError(msg)
+
 
 # ------------------------------------------------------------------------------
 # -- GH Interface
@@ -96,7 +97,7 @@ IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 
 
 # ------------------------------------------------------------------------------
-ghio_obj = ghio_spc_create.ICreateSpaces(
+gh_compo_interface = gh_compo_io.GHCompo_CreatePHSpaces(
     IGH,
     _flr_seg_geom,
     _weighting_factors,
@@ -106,4 +107,4 @@ ghio_obj = ghio_spc_create.ICreateSpaces(
     _space_numbers,
     _space_ph_vent_rates,
     )
-error_, floor_breps_, volume_breps_, spaces_ = ghio_obj.create_output()
+error_, floor_breps_, volume_breps_, spaces_ = gh_compo_interface.run()

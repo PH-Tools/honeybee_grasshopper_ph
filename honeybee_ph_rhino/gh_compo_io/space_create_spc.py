@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 # -*- Python Version: 2.7 -*-
 
-"""Grasshopper Component Interface for HBPH - Create Spaces"""
-
+"""GHCompo Interface: HBPH - Create Spaces."""
 
 try:
     from typing import Tuple
@@ -19,14 +18,17 @@ try:
 except:
     pass  # outside .NET
 
-from ladybug_rhino.fromgeometry import from_face3d
+try:
+    from ladybug_rhino.fromgeometry import from_face3d
+except ImportError as e:
+    raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
 from honeybee_ph import space
 from honeybee_ph_rhino import gh_io
 from honeybee_ph_rhino.make_spaces import make_floor, make_volume
 
 
-class ICreateSpaces(object):
+class GHCompo_CreatePHSpaces(object):
 
     def __init__(self,
                  _IGH,
@@ -61,7 +63,7 @@ class ICreateSpaces(object):
                 new_tree.Add(default, pth(i))
         return new_tree
 
-    def create_output(self):
+    def run(self):
         # type: () -> Tuple
         # ------------------------------------------------------------------------------
         # -- Organize the input trees, lists, lengths, defaults
@@ -102,9 +104,9 @@ class ICreateSpaces(object):
             # -- Add any user-determined vent flow rates, if any
             try:
                 flow_rate_obj = sum(vent_rates.Branch(i))
-                new_space.properties.ph._v_sup = flow_rate_obj.v_sup
-                new_space.properties.ph._v_eta = flow_rate_obj.v_eta
-                new_space.properties.ph._v_tran = flow_rate_obj.v_tran
+                new_space.properties.ph._v_sup = flow_rate_obj.v_sup # type: ignore
+                new_space.properties.ph._v_eta = flow_rate_obj.v_eta # type: ignore
+                new_space.properties.ph._v_tran = flow_rate_obj.v_tran # type: ignore
             except TypeError:
                 pass
 

@@ -23,7 +23,7 @@
 Create a List or Tree of new SpacePhVentFlowRates objects which can be used to 
 set the PH-Style ventilation flow rates for a Space.
 -
-EM June 11, 2022
+EM September 30, 2022
     Args:
         _v_sup: (float): A list or Tree of Supply-air ventilation flow rates (m3/s).
         
@@ -41,21 +41,28 @@ import rhinoscriptsyntax as rs
 import ghpythonlib.components as ghc
 import Grasshopper as gh
 
-from honeybee_ph_rhino.gh_compo_io import ghio_spc_vent
+from honeybee_ph_rhino import gh_compo_io
 
 # ------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create Space PH Ventilation"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='JUN_11_2022')
+honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='SEP_30_2022')
 if DEV:
-    reload(ghio_spc_vent)
+    reload(gh_compo_io)
+
 
 # ------------------------------------------------------------------------------
 # -- GH Interface
 IGH = honeybee_ph_rhino.gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 
+
 # ------------------------------------------------------------------------------
-ghio_obj = ghio_spc_vent.ISpacePhVentFlows(IGH, _v_sup, _v_eta, _v_tran)
-space_ph_vent_ = ghio_obj.create_output()
+ghio_obj = gh_compo_io.GHCompo_CreateSpaceVent(
+        IGH,
+        _v_sup,
+        _v_eta,
+        _v_tran
+    )
+space_ph_vent_ = ghio_obj.run()

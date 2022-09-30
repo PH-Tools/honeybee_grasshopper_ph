@@ -15,8 +15,8 @@ from honeybee_ph import space
 SpaceData = namedtuple('SpaceData', ['space', 'reference_points'])
 
 
-def offset_space_reference_points(IGH, _space, _dist=0):
-    # type (gh_io.IGH, space.Space) -> space.Space
+def offset_space_reference_points(IGH, _space, _dist=0.0):
+    # type (gh_io.IGH, space.Space, float) -> space.Space
     """Move the Space's floor segments 'up' in the world-Z some distance. This is
         useful since if the reference point is directly 'on' the honeybee-Room's floor 
         surface, sometimes it will not test as 'inside' correctly. Tolerance issue?

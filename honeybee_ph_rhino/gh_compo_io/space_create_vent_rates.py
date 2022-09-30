@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # -*- Python Version: 2.7 -*-
 
-"""Grasshopper Component Interface for Create SpacePhVentFlows"""
+"""GHCompo Interface: HBPH - Create Space PH Ventilation."""
 
 try:
     from Grasshopper import DataTree
@@ -56,11 +56,8 @@ class SpacePhVentFlowRates(object):
     def ToString(self):
         return str(self)
 
-# -----------------------------------------------------------------------------
-# -- Component Interface
 
-
-class ISpacePhVentFlows(object):
+class GHCompo_CreateSpaceVent(object):
 
     def __init__(self, _IGH, _v_sups, _v_etas, _v_trans):
         # type: (gh_io.IGH, DataTree, DataTree, DataTree) -> None
@@ -69,7 +66,7 @@ class ISpacePhVentFlows(object):
         self.v_eta_tree = _v_etas
         self.v_tran_tree = _v_trans
 
-    def create_output(self):
+    def run(self):
         # type: () -> DataTree
         output = self.IGH.Grasshopper.DataTree[SpacePhVentFlowRates]()
         pth = self.IGH.Grasshopper.Kernel.Data.GH_Path

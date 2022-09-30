@@ -25,7 +25,7 @@ This is only useful if you  have assigned detailed space numbers and names to th
 floor-segment geometry back in the Rhino scene. This component will help gather and 
 organize this data so that it can be passed along to the 'Create Spaces' component.
 -
-EM June 11, 2022
+EM September 30, 2022
     Args:
         _group_by_name: (bool): If True, will attempt to group the Floor Segments 
             found based on their number/name
@@ -51,17 +51,16 @@ import rhinoscriptsyntax as rs
 import ghpythonlib.components as ghc
 import Grasshopper as gh
 
-from honeybee_ph_rhino.gh_compo_io import ghio_get_flr_seg_data
-from honeybee_ph_rhino import gh_io
+from honeybee_ph_rhino import gh_io, gh_compo_io
 
 # ------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Get FloorSegment Data"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='JUN_11_2022')
+honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='SEP_30_2022')
 if DEV:
-    reload(ghio_get_flr_seg_data)
+    reload(gh_compo_io)
 
 
 # ------------------------------------------------------------------------------
@@ -70,5 +69,9 @@ IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 
 
 # ------------------------------------------------------------------------------
-ghio_obj = ghio_get_flr_seg_data.IGetFloorSegData(IGH, _group_by_name, _floor_seg_geom)
-srfcs_, weighting_factors_, names_, numbers_, vent_rates_ = ghio_obj.create_output()
+gh_compo_interface = gh_compo_io.GHCompo_GetFloorSegData(
+            IGH,
+            _group_by_name,
+            _floor_seg_geom
+        )
+srfcs_, weighting_factors_, names_, numbers_, vent_rates_ = gh_compo_interface.run()

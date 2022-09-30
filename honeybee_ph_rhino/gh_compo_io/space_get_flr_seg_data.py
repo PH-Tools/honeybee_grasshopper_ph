@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # -*- Python Version: 2.7 -*-
 
-"""Grasshopper Component Interface for Get FloorSegment Data."""
+"""GHCompo Interface: HBPH - Get FloorSegment Data."""
 
 try:
     from System import Object
@@ -15,7 +15,7 @@ except ImportError:
 
 from collections import namedtuple, defaultdict
 from honeybee_ph_rhino import gh_io
-from honeybee_ph_rhino.gh_compo_io.ghio_spc_vent import SpacePhVentFlowRates
+from honeybee_ph_rhino.gh_compo_io.space_create_vent_rates import SpacePhVentFlowRates
 
 
 # -- Temporary dataclasses to organize input data
@@ -43,7 +43,7 @@ class FloorSegmentData(object):
 
 # -- Component Interface
 
-class IGetFloorSegData(object):
+class GHCompo_GetFloorSegData(object):
 
     def __init__(self, _IGH, _group_by_name, _input_geom):
         # type: (gh_io.IGH, bool, List) -> None
@@ -103,7 +103,7 @@ class IGetFloorSegData(object):
 
         return floor_segment_input_data
 
-    def create_output(self):
+    def run(self):
         # type: () -> Tuple
         """Sort out all the data and create the Output DataTrees.
 
