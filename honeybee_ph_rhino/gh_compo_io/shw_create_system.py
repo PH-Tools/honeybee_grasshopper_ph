@@ -1,7 +1,7 @@
 # -*- Python Version: 2.7 -*-
 # -*- coding: utf-8 -*-
 
-"""HBPH Create SHW Mech System Interface"""
+"""GHCompo Interface: HBPH - Create SHW System."""
 
 try:
     from typing import List, Optional, Union
@@ -22,7 +22,7 @@ from honeybee_energy_ph.hvac import hot_water
 from honeybee_ph_rhino.gh_compo_io import ghio_validators
 
 
-class ICreateSHWSystem(object):
+class GHCompo_CreateSHWSystem(object):
     """Interface for collect and clean SHW System user-inputs."""
     display_name = ghio_validators.HBName("display_name", default="SHW System")
     efficiency = ghio_validators.FloatPercentage("efficiency")
@@ -65,8 +65,10 @@ class ICreateSHWSystem(object):
                     'tank is located [C].\nGot {}.'.format(type(_in))
                 )
 
-    def create_hb_shw_obj(self):
+    def run(self):
         # type: () -> shw.SHWSystem
+        """Create a new HB-Energy SHW System object."""
+
 
         # -- Create the basic HB-Energy object
         shw_sys = shw.SHWSystem(self.display_name, self.sys_type,

@@ -25,7 +25,7 @@ using the 'Apply SHW System' component. Note that many elements here replicate t
 Honeybee-Energy "HB SHW System" component, but allow for additional HB-PH elements such as 
 piping and storage tanks to be added as well.
 -
-EM September 26, 2022
+EM September 30, 2022
 
     Args:
         _system_type: [str] Text for the specific type of service hot water system and equipment.
@@ -81,7 +81,7 @@ EM September 26, 2022
             to one or more Honeybee Rooms using the 'Apply SHW System' component.
 """
 
-from honeybee_ph_rhino.gh_compo_io import ghio_create_shw
+from honeybee_ph_rhino import gh_compo_io
 from honeybee_ph_utils import preview
 
 #-------------------------------------------------------------------------------
@@ -89,19 +89,12 @@ import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create SHW System"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='SEP_26_2022')
+honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='SEP_30_2022')
 if DEV:
-    #from honeybee_ph_rhino.gh_compo_io import ghio_validators
-    #reload(ghio_validators)
-    #from honeybee_energy_ph.properties.hot_water import hw_system
-    #reload(hw_system)
-    #reload(ghio_create_shw)
-    #from honeybee_ph_utils import units
-    #reload(units)
-    pass
+    reload(gh_compo_io)
 
 if _system_type:
-    shw_sys = ghio_create_shw.ICreateSHWSystem(
+    gh_compo_interface = gh_compo_io.GHCompo_CreateSHWSystem(
         _system_type,
         _name_,
         _efficiency_,
@@ -117,7 +110,7 @@ if _system_type:
         _recirc_piping,
     )
 
-    hb_shw_ = shw_sys.create_hb_shw_obj()
+    hb_shw_ = gh_compo_interface.run()
 
 #-------------------------------------------------------------------------------
 if hb_shw_:

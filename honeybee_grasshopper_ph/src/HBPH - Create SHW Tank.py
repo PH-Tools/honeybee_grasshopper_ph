@@ -22,7 +22,7 @@
 """
 Creates Passive House Service Hot Water Tank which can be added to the a SHW System.
 -
-EM June 9, 2022
+EM September 30, 2022
     Args:
         _tank_type: ("0-No storage tank", "1-DHW and heating", "2-DHW only") The type of use for this tank.
         
@@ -48,40 +48,34 @@ EM June 9, 2022
         storage_tank_: A new HW Tank Object. You can add this tank to a Service Hot Water system.
 """
 
+from honeybee_ph_rhino import gh_compo_io
 from honeybee_ph_utils import preview
-from honeybee_energy_ph.hvac import hot_water
 
 #-------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create SHW Tank"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='JUN_09_2022')
+honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='SEP_30_2022')
 if DEV:
     reload(preview)
-    reload(hot_water)
+    reload(gh_compo_io)
 
 
 #-------------------------------------------------------------------------------
-# Creat Storage Tank
-storage_tank_ = hot_water.PhSHWTank()
-
-storage_tank_.tank_type = _tank_type or storage_tank_.tank_type
-storage_tank_.display_name = _display_name_ or storage_tank_.display_name
-storage_tank_.quantity = quantity_ or storage_tank_.quantity
-
-if for_solar_ is not None:
-    storage_tank_.solar_connection = for_solar_
-
-storage_tank_.standby_losses = heat_loss_rate_ or storage_tank_.standby_losses
-storage_tank_.storage_capacity = volume_ or storage_tank_.storage_capacity
-storage_tank_.standby_fraction = standby_frac_ or storage_tank_.standby_fraction
-
-if in_conditioned_space_ is not None:
-    storage_tank_.in_conditioned_space = in_conditioned_space_
-
-storage_tank_.room_temp = location_temp_ or 20
-storage_tank_.water_temp = water_temp_ or 60
+gh_compo_interface = gh_compo_io.GHCompo_CreateSHWTank(
+        _tank_type,
+        _display_name_,
+        quantity_,
+        for_solar_,
+        heat_loss_rate_,
+        volume_,
+        standby_frac_,
+        in_conditioned_space_,
+        location_temp_,
+        water_temp_,
+    )
+storage_tank_ = gh_compo_interface.run()
 
 
 # ------------------------------------------------------------------------------

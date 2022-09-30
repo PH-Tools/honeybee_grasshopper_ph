@@ -1,12 +1,25 @@
 # -*- coding: utf-8 -*-
 # -*- Python Version: 2.7 -*-
 
-"""Hot-Water-Heater GH-Component inputs node configuration."""
+"""GHCompo Interface: HBPH - Create SHW Heater."""
 
-from GhPython import Component
-from Grasshopper.Kernel.Parameters import Hints
+try:
+    from typing import Dict, Optional, Type
+except ImportError:
+    pass # IronPython 2.7
+
+try:
+    from GhPython import Component # type: ignore
+    from Grasshopper.Kernel.Parameters import Hints # type: ignore
+except:
+    pass # outside Grasshopper
 
 from honeybee_ph_rhino.gh_io import ComponentInput
+from honeybee_energy_ph.hvac import hot_water
+from honeybee_ph_rhino import gh_io
+
+# -----------------------------------------------------------------------------
+# -- Functions for configuring the GH Component input nodes.
 
 inputs_electric = {
     1: ComponentInput(_name='display_name',
@@ -177,3 +190,64 @@ def get_component_inputs(_heater_type):
         return input_groups[6]
     else:
         return input_groups[1]
+
+
+# -----------------------------------------------------------------------------
+# -- Component Interface
+
+class GHCompo_CreateSHWHeater(object):
+    """Component Interface."""
+
+    heater_classes = {
+        1: {"cls": hot_water.PhSHWHeaterElectric, "name":"1-Electric"},
+        2: {"cls": hot_water.PhSHWHeaterBoiler, "name":"2-Boiler (gas/oil)"},
+        3: {"cls": hot_water.PhSHWHeaterBoilerWood, "name":"3-Boiler (wood)"},
+        4: {"cls": hot_water.PhSHWHeaterDistrict, "name":"4-District"},
+        5: {"cls": hot_water.PhSHWHeaterHeatPump, "name":"5-HeatPump (annual COP)"},
+        6: {"cls": hot_water.PhSHWHeaterHeatPump, "name":"6-HeatPump (monthly COP)"},
+    }
+
+    valid_types = [heater_class["name"] for heater_class in heater_classes.values()]
+
+    def __init__(self, _IGH, _heater_type, _input_dict):
+        # type: (gh_io.IGH, int, Dict) -> None
+        self.IGH = _IGH
+        self.heater_type = _heater_type
+        self.input_dict = _input_dict
+
+    def _determine_heater_type_input(self):
+        # type: () -> Optional[int]
+        if not self.heater_type:
+            msg = "Set the 'heater_type' to configure the user-inputs. Options include: {}".format(self.valid_types)
+            self.IGH.warning(msg)
+            return None
+
+        return gh_io.input_to_int(self.heater_type)
+
+    def _determine_heater_class(self, _type_number):
+        # type: (int) -> Type[hot_water.PhHotWaterHeater]
+        try:
+            return self.heater_classes[_type_number]["cls"]
+        except KeyError:
+            msg = "Error: Input Heater Type: '{}' not supported. Please only input: '{}'".format(
+                self.heater_type,
+                self.valid_types)
+            raise Exception(msg)
+
+    def run(self):
+        # type: () -> Optional[hot_water.PhHotWaterHeater]
+
+        heater_type_number = self._determine_heater_type_input()
+        if heater_type_number is None:
+            return None
+
+        heater_class = self._determine_heater_class(heater_type_number)
+        heater_ = heater_class() # type: hot_water.PhHotWaterHeater
+
+        # -- Set all the attributes.
+        for attr_name in dir(heater_):
+            input_val = self.input_dict.get(attr_name, None)
+            if input_val:
+                setattr(heater_, attr_name, input_val)
+
+        return heater_

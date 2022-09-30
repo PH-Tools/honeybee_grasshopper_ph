@@ -22,7 +22,7 @@
 """
 Create new HBPH DHW Recirculation Piping Object.
 -
-EM August 18, 2022
+EM September 30, 2022
 
     Args:
         _geometry: (List[Curve]) A list of curves representing the SHW Recirculation
@@ -76,24 +76,17 @@ import rhinoscriptsyntax as rs
 import ghpythonlib.components as ghc
 import Grasshopper as gh
 
-from honeybee_ph_rhino.gh_compo_io import ghio_create_dhw_pipe
-from honeybee_ph_rhino import gh_io
-from honeybee_ph_utils import input_tools, preview
+from honeybee_ph_rhino import gh_compo_io, gh_io
+from honeybee_ph_utils import preview
 
 #-------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create SHW Recirculation Pipes"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='AUG_18_2022')
+honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='SEP_30_2022')
 if DEV:
-    #from honeybee_ph_utils import units
-    #reload(units)
-    #from honeybee_ph_rhino.gh_compo_io import ghio_validators
-    #reload(ghio_validators)
-    #from honeybee_energy_ph.hvac import hot_water
-    #reload(hot_water)
-    #reload(ghio_create_dhw_pipe)
+    reload(gh_compo_io)
     reload(preview)
 
 # ------------------------------------------------------------------------------
@@ -102,22 +95,19 @@ IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 
 
 #-------------------------------------------------------------------------------
-dhw_recirc_piping_ = []
-for i in range(len(_geometry)):
-    IDHWRecircPipe = ghio_create_dhw_pipe.IDHWRecircPipe(
-            IGH,
-            input_tools.clean_get(_geometry, i),
-            input_tools.clean_get(_name, i, "_unnamed_"),
-            input_tools.clean_get(_diameter, i, 0.0254),
-            input_tools.clean_get(_insul_thickness, i, 0.0254), 
-            input_tools.clean_get(_insul_conductivity, i, 0.04), 
-            input_tools.clean_get(_insul_reflective, i, True), 
-            input_tools.clean_get(_insul_quality, i, None),
-            input_tools.clean_get(_daily_period, i, 24),
-        )
+gh_compo_interface = gh_compo_io.GHCompo_CreateSHWRecircPipes(
+    IGH,
+    _geometry,
+    _name,
+    _diameter,
+    _insul_thickness,
+    _insul_conductivity,
+    _insul_reflective,
+    _insul_quality,
+    _daily_period,
+)
+dhw_recirc_piping_ = gh_compo_interface.run()
 
-    dhw_recirc_piping_.append(IDHWRecircPipe.create_hbph_dhw_recirc_pipe())
-    
 #-------------------------------------------------------------------------------
 # -- Preview
 for pipe in dhw_recirc_piping_:

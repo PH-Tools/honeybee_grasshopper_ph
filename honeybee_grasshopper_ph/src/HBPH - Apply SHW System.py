@@ -25,7 +25,7 @@ this component will completely override any existing SHW System on the rooms inp
 the room does not already have a Honeybee-Energy 'service_hot_water' load, one will 
 be added with a nominal load of 0.001 L/hour.
 -
-EM August 18, 2022
+EM September 30, 2022
 
     Args:
         _hb_shw: [SHWSystem] A Honeybee-Energy SHW Mechanical System Object 
@@ -39,34 +39,21 @@ EM August 18, 2022
             SHW system applied.
 """
 
-try:
-    from ladybug_rhino.config import conversion_to_meters
-except ImportError as e:
-    raise ImportError('Failed to import ladybug_rhino:\t{}'.format(e))
-
+from honeybee_ph_rhino import gh_compo_io
 
 #-------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Apply SHW System"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='AUG_18_2022')
+honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='SEP_30_2022')
 if DEV:
-    pass
+    reload(gh_compo_io)
 
 #-------------------------------------------------------------------------------
-hb_rooms_ = []
-for room in _hb_rooms:
-    new_room = room.duplicate()
-    
-    print _hb_shw
-    
-    if new_room.properties.energy.service_hot_water is None:
-        # assign a Hot Water flow first
-        flow = 0.001 # L/hour
-        new_room.properties.energy.abolute_service_hot_water(flow, conversion_to_meters())
-    
-    if _hb_shw is not None:
-        new_room.properties.energy.shw = _hb_shw
-        
-    hb_rooms_.append(new_room)
+gh_compo_interface = gh_compo_io.GHCompo_ApplySHWSys(
+        _hb_shw,
+        _hb_rooms,
+    )
+
+hb_rooms_ = gh_compo_interface.run()
