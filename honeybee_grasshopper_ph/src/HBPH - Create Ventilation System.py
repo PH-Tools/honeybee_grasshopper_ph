@@ -22,7 +22,7 @@
 """
 Create new PH-Style Ventilation Equpment which can be aded to HB-Rooms.
 -
-EM April 16, 2022
+EM October 1, 2022
     Args:
         system_name_: (str) The name to give to the fresh-air ventilation system.
             
@@ -42,25 +42,37 @@ EM April 16, 2022
         vent_system_: The new HBPH Ventilation System object.
 """
 
-from honeybee_energy_ph.hvac import ventilation
-from honeybee_ph_utils import preview
+try:
+    from honeybee_ph_utils import preview
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_utils:\t{}'.format(e))
+
+try:
+    from honeybee_ph_rhino import gh_compo_io
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
+
 
 # --- 
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create Ventilation System"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='APR_16_2022')
+honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='OCT_01_2022')
 if DEV:
-    reload(ventilation)
+    from honeybee_ph_rhino.gh_compo_io import mech_create_vent_sys as gh_compo_io
+    reload(gh_compo_io)
     reload(preview)
 
 # ------------------------------------------------------------------------------
-# -- Build a new Passive House style ventilation system
-vent_system_ = ventilation.PhVentilationSystem()
-vent_system_.display_name = system_name_ or vent_system_.display_name
-vent_system_.sys_type = system_type_ or 1
-vent_system_.ventilation_unit = vent_unit_ or ventilation.Ventilator()
+gh_compo_interface = gh_compo_io.GHCompo_CreateVentSystem(
+        system_name_,
+        system_type_,
+        vent_unit_,
+        duct_01_,
+        duct_02_,
+    )
+vent_system_ = gh_compo_interface.run()
 
 # ------------------------------------------------------------------------------
 preview.object_preview(vent_system_)

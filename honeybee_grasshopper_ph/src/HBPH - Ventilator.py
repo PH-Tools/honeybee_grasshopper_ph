@@ -23,44 +23,66 @@
 Collects and organizes data for a Ventilator Unit (HRV/ERV). Used to build up a 
 PH-Style Ventilation System.
 -
-EM April 28, 2022
+EM October 1, 2022
     Args:
-        unit_name_: (Optional[float]) The name of the Ventilator Unit
+        display_name_: (Optional[float]) The name of the Ventilator (ERV/HRV) Unit.
+        
         sensible_hr_: (Optional[float]) Input the Ventialtion Unit's Heat Recovery %. Default is 75% 
+        
         latent_hr_: (Optional[float]) Input the Ventialtion Unit's Moisture Recovery %. Default is 0% (HRV)
+        
         elec_efficiency_: (Optional[float]) Input the Electrical Efficiency of the Ventialtion 
             Unit (W/m3h). Default is 0.55 W/m3h
+        
+        frost_protection: (bool): Unit requires frost-protection? Default=True. 
+        
         frost_temp_: (Optional[float]) Min Temp [C] for frost protection to kick in. [deg.  C]. Default is -5 C
-        inside_: (bool) True=Unt is installed inside the conditioned space. False=installed outside.
+        
+        inside_: (bool) Unt is installed inside the conditioned space? Default=True
+    
     Returns:
         unit_: A Ventilator object for the Ventilation System. Connect to the 
             'ventUnit_' input on the 'Create Vent System' to build a PH-Style Ventilation System.
 """
 
-import honeybee_energy_ph.hvac.ventilation
-import honeybee_ph_utils.preview
+try:
+    from honeybee_ph_utils import preview
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_utils:\t{}'.format(e))
+
+try:
+    from honeybee_ph_rhino import gh_compo_io
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
+
 
 # --- 
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Ventilator"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='APR_28_2022')
+honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='OCT_01_2022')
 if DEV:
-    reload(honeybee_energy_ph.hvac.ventilation)
-    reload(honeybee_ph_utils.preview)
+    from honeybee_ph_utils import units
+    reload(units)
+    from honeybee_ph_rhino.gh_compo_io import ghio_validators
+    reload(ghio_validators)
+    from honeybee_ph_rhino.gh_compo_io import mech_create_ventilator as gh_compo_io
+    reload(gh_compo_io)
+    reload(preview)
+
 
 # ------------------------------------------------------------------------------
-unit_ = honeybee_energy_ph.hvac.ventilation.Ventilator()
-if unit_name_: unit_.name = unit_name_
-if sensible_hr_: unit_.sensible_heat_recovery = sensible_hr_
-if latent_hr_: unit_.latent_heat_recovery = latent_hr_
-if elec_efficiency_: unit_.electric_efficiency = elec_efficiency_
-if frost_protection_ is not None:
-    unit_.frost_protection_reqd = frost_protection_
-if frost_temp_: unit_.temperature_below_defrost_used = frost_temp_
-if inside_ is not None:
-    unit_.in_conditioned_space = inside_
+gh_compo_interface = gh_compo_io.GHCompo_CreatePhVentilator(
+        display_name_,
+        sensible_hr_,
+        latent_hr_,
+        elec_efficiency_,
+        frost_protection_,
+        frost_temp_,
+        inside_,
+    )
+unit_ = gh_compo_interface.run()
 
 # ------------------------------------------------------------------------------
-honeybee_ph_utils.preview.object_preview(unit_)
+preview.object_preview(unit_)

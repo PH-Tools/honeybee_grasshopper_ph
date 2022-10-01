@@ -22,7 +22,7 @@
 """
 Create a PH-Style Heating Equipment which can be added to HB-Rooms.
 -
-EM April 29, 2022
+EM October 1, 2022
     Args:
         _system_type: (int) Enter the type of heating system.
         
@@ -36,21 +36,26 @@ import rhinoscriptsyntax as rs
 import ghpythonlib.components as ghc
 import Grasshopper as gh
 
-from honeybee_ph_utils import preview
-from honeybee_ph_rhino import gh_io
-from honeybee_ph_rhino.gh_compo_io import ghio_heating
-from honeybee_energy_ph.hvac import heating
-from honeybee_ph_rhino import gh_io
+try:
+    from honeybee_ph_utils import preview
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_utils:\t{}'.format(e))
+
+try:
+    from honeybee_ph_rhino import gh_compo_io, gh_io
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
+
 
 #-------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create Heating System"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='APR_29_2022')
+honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='OCT_01_2022')
 if DEV:
     reload(gh_io)
-    reload(ghio_heating)
+    reload(gh_compo_io)
     reload(preview)
 
 # ------------------------------------------------------------------------------
@@ -59,47 +64,20 @@ IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 
 
 #-------------------------------------------------------------------------------
-class HeatingTypeInputError(Exception):
-    def __init__(self, _in, _valid_types):
-        self.msg = "Error: Input Heating type: '{}' not supported by this GH-Component. Please only input: "\
-        "{}".format(_in, _valid_types)
-        super(HeatingTypeInputError, self).__init__(self.msg)
-
-
-#-------------------------------------------------------------------------------
 # -- Setup the input nodes, get all the user input values
-input_dict = ghio_heating.get_component_inputs(_system_type)
+input_dict = gh_compo_io.mech_create_heating_sys.get_component_inputs(_system_type)
 gh_io.setup_component_inputs(IGH, input_dict, _start_i=1)
 input_values_dict = gh_io.get_component_input_values(ghenv)
 
 
 #-------------------------------------------------------------------------------
-# -- Build the new PH equipment object
-heating_classes = {
-    1: heating.PhHeatingDirectElectric,
-    2: heating.PhHeatingFossilBoiler,
-    3: heating.PhHeatingWoodBoiler,
-    4: heating.PhHeatingDistrict,
-    5: heating.PhHeatingHeatPumpAnnual,
-    6: heating.PhHeatingHeatPumpRatedMonthly,
-    }
-if _system_type:
-    try:
-        heating_class = heating_classes[gh_io.input_to_int(_system_type)]
-    except KeyError as e:
-        raise HeatingTypeInputError(_system_type, ghio_heating.valid_heating_types)
-
-    heating_system_ = heating_class()
-    for attr_name in dir(heating_system_):
-        if attr_name.startswith('_'):
-            continue
-
-        input_val = input_values_dict.get(attr_name)
-        if input_val:
-            setattr(heating_system_, attr_name, input_val)
-else:
-    msg = "Set the '_system_type' to configure the user-inputs."
-    ghenv.Component.AddRuntimeMessage(gh.Kernel.GH_RuntimeMessageLevel.Warning, msg)
+# -- Build the new System
+gh_compo_interface = gh_compo_io.GHCompo_CreateHeatingSystem(
+        IGH,
+        _system_type,
+        input_values_dict,
+    )
+heater_ = gh_compo_interface.run()
 
 
 #-------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
-# -*- Python Version: 2.7 -*-
 # -*- coding: utf-8 -*-
+# -*- Python Version: 2.7 -*-
 
 """Descriptors for validating and cleaning user-input into Grasshopper Components.
 
@@ -225,7 +225,11 @@ class FloatPercentage(Validated):
                              "Supply float values only.".format(
                                  new_value, type(new_value)))
 
-        if not 0 <= new_value <= 1:
+        # -- If the value is passed in as 0<->100, try and divide it
+        if 1.0 < new_value < 100.0:
+            new_value = new_value / 100
+
+        if not 0.0 <= new_value <= 1.0:
             raise ValueError(
                 "Error: input for '{}' must be between 0.0 and 1.0".format(name))
 
@@ -504,5 +508,39 @@ class UnitMeterPerSecond(Validated):
         result = units.convert(input_value, input_units or "M/S", "M/S")
 
         print('Converting: {} -> {:.4f} meter/second'.format(new_value, result))
+
+        return result
+
+
+class UnitWH_M3(Validated):
+    """A Wh/M3 (W/m3-hr) Fan Elec. Efficiency (float) of any positive value."""
+
+    def validate(self, name, new_value, old_value):
+        if new_value is None:
+            # If the user passed a 'default' attribute, try and use that
+            try:
+                return float(self.default)
+            except:
+                return old_value
+
+        input_value, input_units = units.parse_input(str(new_value))
+
+        # -- Make sure the value is a float
+        try:
+            input_value = float(input_value)
+        except:
+            raise ValueError("Error: input {} of type: {} is not allowed."
+                             "Supply float only.".format(
+                                 new_value, type(new_value)))
+
+        # -- Convert units
+        result = units.convert(input_value, input_units or "WH/M3", "WH/M3")
+
+        print('Converting: {} -> {:.4f} WH/M3'.format(new_value, result))
+
+        # -- Make sure its positive
+        if result and result < 0.0:
+            raise ValueError(
+                "Error: input for '{}' cannot be negative.".format(name))
 
         return result

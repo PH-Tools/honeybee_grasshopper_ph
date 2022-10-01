@@ -22,7 +22,7 @@
 """
 Add HBPH mechanical ventilation, heating, and cooling to HB-Rooms.
 -
-EM April 16, 2022
+EM October 1, 2022
     Args:
         _vent_system: (PhVentilationSystem) Enter the type of heating system.
         
@@ -36,48 +36,29 @@ EM April 16, 2022
         hb_rooms_: The input hb-rooms with the new HBPH Mechanical Systems added.
 """
 
-from copy import copy
+try:
+    from honeybee_ph_rhino import gh_compo_io, gh_io
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
+
 
 #-------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Add Mech Systems"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='APR_16_2022')
+honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='OCT_01_2022')
 if DEV:
-    pass
+    reload(gh_compo_io)
+    reload(gh_io)
 
 
 #-------------------------------------------------------------------------------
-hb_rooms_ = []
-for hb_room in _hb_rooms:
-    # -- Build up the new HB-HVAC
-    new_hvac = copy(hb_room.properties.energy.hvac.duplicate())
-    
-    # --------------------------------------------------------------------------
-    # -- Fresh-Air Ventilation
-    if _vent_system: print 'True=', _vent_system
-    if _vent_system:
-        new_hvac.properties.ph.ventilation_system = _vent_system
-        
-        
-        if _vent_system.ventilation_unit:
-            # -- Set the new h-hvac's values to match the PH-Ventilator Inputs, if any
-            
-            new_hvac.sensible_heat_recovery = _vent_system.ventilation_unit.sensible_heat_recovery
-            new_hvac.latent_heat_recovery = _vent_system.ventilation_unit.latent_heat_recovery
-            new_hvac.demand_controlled_ventilation = True
-    
-    # --------------------------------------------------------------------------
-    # -- Space Heating
-    for ph_heating_system in _space_heating_systems:
-        new_hvac.properties.ph.heating_systems.add(ph_heating_system)
-        
-    # --------------------------------------------------------------------------
-    # -- Space Cooling
-    for ph_cooling_system in _space_cooling_systems:
-        new_hvac.properties.ph.cooling_systems.add(ph_cooling_system)    
-    
-    new_room = hb_room.duplicate()
-    new_room.properties.energy.hvac = new_hvac
-    hb_rooms_.append(new_room)
+# -- Add the new Systems to the HB-Rooms
+gh_compo_interface = gh_compo_io.GHCompo_AddMechSystems(
+        _vent_system,
+        _space_heating_systems,
+        _space_cooling_systems,
+        _hb_rooms,
+    )
+hb_rooms_ = gh_compo_interface.run()

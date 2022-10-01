@@ -1,15 +1,34 @@
 # -*- coding: utf-8 -*-
 # -*- Python Version: 2.7 -*-
 
-"""HBPH-Cooling System GH-Component inputs node configuration."""
+"""GHCompo Interface: HBPH - Create Cooling System."""
 
 from copy import copy
 # Note: Use copy so that specific equipments can overwrite base with their own hints
 
-from GhPython import Component
-from Grasshopper.Kernel.Parameters import Hints
+from GhPython import Component # type: ignore
+from Grasshopper.Kernel.Parameters import Hints # type: ignore
 
-from honeybee_ph_rhino.gh_io import input_to_int, ComponentInput
+try:
+    from typing import Optional, Dict, Any
+except ImportError:
+    pass # IronPython 2.7
+
+try:
+    from honeybee_ph_rhino import gh_io
+    from honeybee_ph_rhino.gh_io import input_to_int, ComponentInput
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
+
+try:
+    from honeybee_energy_ph.hvac import cooling
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee_energy_ph:\n\t{}'.format(e))
+
+try:
+    from honeybee_ph_utils import input_tools
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee_ph_utils:\n\t{}'.format(e))
 
 
 class InputTypeNotFoundError(Exception):
@@ -95,13 +114,6 @@ input_groups = {
     4: inputs_panel,
 }
 
-valid_cooling_types = [
-    "1-ventilation",
-    "2-recirculation",
-    "3-dehumidification",
-    "4-panel",
-]
-
 # -----------------------------------------------------------------------------
 
 
@@ -120,3 +132,62 @@ def get_component_inputs(_cooling_type):
         return input_groups[input_type_id]
     except KeyError:
         raise InputTypeNotFoundError(input_type_id)
+
+# -----------------------------------------------------------------------------
+
+class GHCompo_CreateCoolingSystem(object):
+    cooling_classes = {
+        1: cooling.PhCoolingVentilation,
+        2: cooling.PhCoolingRecirculation,
+        3: cooling.PhCoolingDehumidification,
+        4: cooling.PhCoolingPanel,
+    }
+    
+    valid_cooling_types = [
+        "1-ventilation",
+        "2-recirculation",
+        "3-dehumidification",
+        "4-panel",
+    ]
+
+    def __init__(self, _IGH, _system_type, _input_dict):
+        # type: (gh_io.IGH, int, Dict[str, Any]) -> None
+        self.IGH = _IGH
+        self.system_type = _system_type
+        self.input_dict = _input_dict
+
+    @property
+    def system_type(self):
+        # type: () -> Optional[int]
+        return self._system_type
+
+    @system_type.setter
+    def system_type(self, _in):
+        self._system_type = input_tools.input_to_int(_in)
+
+    def run(self):
+        # type: () -> Optional[cooling.PhCoolingSystem]
+
+        if not self.system_type:
+            msg = "Set the '_system_type' to configure the user-inputs."
+            self.IGH.warning(msg)
+            return None
+
+        try:
+            cooling_class = self.cooling_classes[self.system_type]
+        except KeyError as e:
+            raise Exception(
+                "Error: Input Cooling type: '{}' not supported by this GH-Component. Please only input: "\
+                "{}".format(self.system_type, self.valid_cooling_types)
+            )
+
+        cooling_system_ = cooling_class()
+        for attr_name in dir(cooling_system_):
+            if attr_name.startswith('_'):
+                continue
+
+            input_val = self.input_dict.get(attr_name)
+            if input_val:
+                setattr(cooling_system_, attr_name, input_val)
+
+
