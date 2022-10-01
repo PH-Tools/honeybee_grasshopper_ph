@@ -23,9 +23,9 @@
 Settings and parameter values used when calculating the Window Shading Factors
 using the Passive House LBT-Radiation solver.
 -
-EM September 7, 2022
+EM October 1, 2022
     Args:
-        _epw_file: 
+        _epw_file: The EPW file to use to generate the sky-matrix objects.
         
         north_: Optional North Vetor or angle.
         
@@ -51,33 +51,52 @@ EM September 7, 2022
 """
 
 
-from honeybee_ph_utils import preview
-from honeybee_ph_rhino.gh_compo_io import ghio_lbt_shading
+import scriptcontext as sc
+import Rhino as rh
+import rhinoscriptsyntax as rs
+import ghpythonlib.components as ghc
+import Grasshopper as gh
+
+
+try:
+    from honeybee_ph_utils import preview
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_utils:\t{}'.format(e))
+
+try:
+    from honeybee_ph_rhino import gh_compo_io, gh_io
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
 
 # ------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Shading Factor Settings - LBT Rad"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='SEP_07_2022')
+honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='OCT_01_2022')
 if DEV:
-    reload(preview)
-    reload(ghio_lbt_shading)
+    reload(gh_compo_io)
+    reload(gh_io)
 
 # ------------------------------------------------------------------------------
-if _epw_file:
-    IShadingLBTRadiationSettings_ = ghio_lbt_shading.IShadingLBTRadiationSettings(
-            _epw_file,
-            _north_,
-            _winter_sky_matrix_,
-            _summer_sky_matrix_,
-            _shading_mesh_settings_,
-            _grid_size_,
-            _legend_par_,
-            _cpus_ 
-    )
+# -- GH Interface
+IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 
-    settings_ = IShadingLBTRadiationSettings_.create_hbph_obj()
+
+#-------------------------------------------------------------------------------
+gh_compo_interface = gh_compo_io.GHCompo_CreateLBTRadSettings(
+        IGH,
+        _epw_file,
+        _north_,
+        _winter_sky_matrix_,
+        _summer_sky_matrix_,
+        _shading_mesh_settings_,
+        _grid_size_,
+        _legend_par_,
+        _cpus_ 
+    )
+settings_ = gh_compo_interface.run()
+
 
 # ------------------------------------------------------------------------------  
 preview.object_preview(settings_)

@@ -1,23 +1,47 @@
-# -*- Python Version: 2.7 -*-
 # -*- coding: utf-8 -*-
+# -*- Python Version: 2.7 -*-
 
-"""Functions for Calculating Window PHPP-Style shading dimension"""
+"""GHCompo Interface: HBPH - Add Shading Dims."""
+
+import math
 
 try:
     from typing import Any, Sequence, Tuple, Optional, List
 except ImportError:
-    pass  # IronPython 2.7
+    pass # IronPython 2.7
 
-import Rhino.Geometry
+try:
+    import Rhino.Geometry # type: ignore
+except ImportError:
+    pass # Outside Rhino
 
-import math
+try:
+    from ladybug_rhino.config import tolerance, angle_tolerance
+    from ladybug_rhino.fromgeometry import from_linesegment3d, from_vector3d, from_point3d
+except ImportError as e:
+    raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
+try:
+    from ladybug_geometry.geometry3d import line, pointvector
+except ImportError as e:
+    raise ImportError('\nFailed to import ladybug_geometry:\n\t{}'.format(e))
 
-from honeybee import aperture
-from ladybug_geometry.geometry3d import line, pointvector
-from ladybug_rhino.fromgeometry import from_linesegment3d, from_vector3d, from_point3d
-from honeybee_ph_rhino import gh_io
+try:
+    from honeybee import aperture, room
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
+
+try:
+    from honeybee_ph.properties import aperture as hbph_aperture
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee_ph:\n\t{}'.format(e))
+
+try:
+    from honeybee_ph_rhino import gh_io
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
 
 
+# -----------------------------------------------------------------------------
 class PhppShadingDims:
     """Dataclass for holding shading dimension info"""
 
@@ -303,7 +327,7 @@ def find_overhang_shading(_aperture, _shading_objs, _IGH, _limit=99):
     # the window. Create a 'test plane' that is _extents (99m) tall and 0.5m past the wall surface, test if
     # any objects intersect that plane. If so, add them to the set of things
     # test in the next step
-    depth = float(_aperture.properties.ph.inset_dist) + 0.5
+    depth = float(_aperture.properties.ph.inset_dist) + 0.5 # type: ignore
     edge1 = _IGH.ghpythonlib_components.LineSDL(origin_point, UpVector, _limit)
     edge2 = _IGH.ghpythonlib_components.LineSDL(
         origin_point, from_vector3d(_aperture.geometry.normal), depth)
@@ -513,3 +537,50 @@ def CalcRevealDims(_aperture, _shader_objs, _intersection_surface, _reference_pt
     Side_CheckLine = _IGH.ghpythonlib_components.Line(_reference_pt, Side_KeyPoint)
 
     return (Side_o_reveal, Side_d_reveal, Side_CheckLine)
+
+# -----------------------------------------------------------------------------
+# -- Component Interface
+class GHCompo_SolveShadingDims(object):
+    def __init__(self, _IGH, _shading_surfaces, _hb_rooms, _run):
+        # type: (gh_io.IGH, List, List[room.Room], bool) -> None
+        self.IGH = _IGH
+        self.shading_surfaces = _shading_surfaces
+        self.hb_rooms = _hb_rooms
+        self.run_solver = _run
+
+    def run(self):
+        # type: () -> Tuple[List[Rhino.Geometry.Line], List[room.Room]]
+        # -- Find shading objects and dimensions
+        checklines_ = []
+        hb_rooms_ = [rm.duplicate() for rm in self.hb_rooms]
+        if self.run_solver:
+            for room in hb_rooms_:       
+                for face in room.faces:
+                    for hb_aperture in face.apertures:
+                        shading_dims = calc_shading_dims(hb_aperture, self.shading_surfaces, self.IGH)
+                        
+                        # -- Create a new HBPH-Shading Dims and store all the info
+                        hbph_shading_dims_obj = hbph_aperture.ShadingDimensions()
+                        
+                        hbph_shading_dims_obj.d_hori = shading_dims.d_hori
+                        hbph_shading_dims_obj.h_hori = shading_dims.h_hori
+                        hbph_shading_dims_obj.d_reveal = shading_dims.d_reveal
+                        hbph_shading_dims_obj.o_reveal = shading_dims.o_reveal
+                        hbph_shading_dims_obj.d_over = shading_dims.d_over
+                        hbph_shading_dims_obj.o_over = shading_dims.o_over
+                        
+                        # -- Add the new shading into the HB-Ap properties.ph
+                        hb_aperture.properties.ph.shading_dimensions = hbph_shading_dims_obj
+                        
+                        # -- Also set the winter / summer factors None
+                        hb_aperture.properties.ph.winter_shading_factor = None
+                        hb_aperture.properties.ph.summer_shading_factor = None
+                        
+                                        
+                        # -- Pull out the checklines for error-checking
+                        checklines_.append(shading_dims.checkline_hori)
+                        checklines_.append(shading_dims.checkline_over)
+                        checklines_.append(shading_dims.checkline_r1)
+                        checklines_.append(shading_dims.checkline_r2)
+            
+        return (checklines_, hb_rooms_)

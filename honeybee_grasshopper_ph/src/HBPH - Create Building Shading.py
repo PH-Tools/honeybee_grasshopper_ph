@@ -23,7 +23,7 @@
 Create the 'punched' building geometry and all aperture 'reveals' which are
 used when calculating detailed shading factors.
 -
-EM May 23, 2022
+EM October 1, 2022
     Args:
         _hb_rooms: The Honeybee Rooms with apertures.
     
@@ -39,22 +39,41 @@ EM May 23, 2022
         hb_rooms_: The Honeybe Rooms.
 """
 
-from honeybee_ph_rhino.gh_compo_io import ghio_win_shade_surfaces
+import scriptcontext as sc
+import Rhino as rh
+import rhinoscriptsyntax as rs
+import ghpythonlib.components as ghc
+import Grasshopper as gh
+
+
+try:
+    from honeybee_ph_utils import preview
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_utils:\t{}'.format(e))
+
+try:
+    from honeybee_ph_rhino import gh_compo_io, gh_io
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
 
 # ------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create Building Shading"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='MAY_23_2022')
+honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='OCT_01_2022')
 if DEV:
-    reload(ghio_win_shade_surfaces)
+    reload(gh_compo_io)
+    reload(gh_io)
 
 # ------------------------------------------------------------------------------
-shading_surfaces_ = []
-shading_surfaces_.extend(ghio_win_shade_surfaces.create_punched_geometry(_hb_rooms))
-shading_surfaces_.extend(ghio_win_shade_surfaces.create_window_reveals(_hb_rooms))
+# -- GH Interface
+IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 
-window_surfaces_ = ghio_win_shade_surfaces.create_inset_aperture_surfaces(_hb_rooms)
 
-hb_rooms_ = _hb_rooms
+#-------------------------------------------------------------------------------
+gh_compo_interface = gh_compo_io.GHCompo_CreateBuildingShading(
+        IGH,
+        _hb_rooms,
+    )
+window_surfaces_, shading_surfaces_, hb_rooms_ = gh_compo_interface.run()

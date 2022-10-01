@@ -34,7 +34,7 @@ but does not scale well for complex geometries or many test points. For such
 complex cases and situations where relfection of solar energy are important,
 honeybee-radiance should be used."
 -
-EM September 7, 2022
+EM October 1, 2022
     Args:
         _setttings: The Settings to use for the shading calculations. Connect a 
             'HBPH - Shading Factor Settings - LBT Rad'
@@ -58,60 +58,53 @@ EM September 7, 2022
     Returns:
         legend_: The Ladybug Legend for output / visualizations.
         
-        winter_radiation_shaded_mesh_: (kWh) The colored mesh showing the winter-period 
-            incident solar radiation on the apertures for output / visualizations.
+        winter_rad_mesh_: (kWh) The colored mesh showing the winter-period 
+            incident solar radiation on the apertures (for output / visualizations).
         
-        summer_radiation_shaded_mesh_: (kWh) The colored mesh showing the summer-period 
-            incident solar radiation on the apertures for output / visualizations.
+        summer_rad_mesh_: (kWh) The colored mesh showing the summer-period 
+            incident solar radiation on the apertures (for output / visualizations).
             
         hb_rooms_: The Honeybe Rooms with the shading factors added to all the apertures.
 """
 
-import Grasshopper.Kernel as ghK
-from honeybee_ph_rhino.gh_compo_io import ghio_lbt_shading
+import scriptcontext as sc
+import Rhino as rh
+import rhinoscriptsyntax as rs
+import ghpythonlib.components as ghc
+import Grasshopper as gh
+
+
+try:
+    from honeybee_ph_utils import preview
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_utils:\t{}'.format(e))
+
+try:
+    from honeybee_ph_rhino import gh_compo_io, gh_io
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
 
 # ------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Add Shading Factors - LBT Rad"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='SEP_07_2022')
+honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='OCT_01_2022')
 if DEV:
-    reload(ghio_lbt_shading)
-
-
-# ------------------------------------------------------------------------------
-if not _settings:
-    msg = 'Please input _settings to calculate Radiation results.'
-    ghenv.Component.AddRuntimeMessage( ghK.GH_RuntimeMessageLevel.Warning, msg )
-
-if not _hb_rooms:
-    msg = 'Please input Honeybee Rooms to calculate Radiation results.'
-    ghenv.Component.AddRuntimeMessage( ghK.GH_RuntimeMessageLevel.Warning, msg )
-
-if not _run:
-    msg = 'Please set _run to True in order to calculate Radiation results.'
-    ghenv.Component.AddRuntimeMessage( ghK.GH_RuntimeMessageLevel.Warning, msg )
-
+    reload(gh_compo_io)
+    reload(gh_io)
 
 # ------------------------------------------------------------------------------
-if _run and _settings and _hb_rooms:
-    # -- Setup the Interface Object
-    IShadingLBTRadiation_ = ghio_lbt_shading.IShadingLBTRadiation(
-            _settings,
-            _shading_surfaces_winter,
-            _shading_surfaces_summer,
-            _hb_rooms,
-    )
-    
-    # -- Run
-    (
-        legend_,
-        winter_radiation_shaded_mesh_,
-        summer_radiation_shaded_mesh_,
-        hb_rooms_
-    ) = IShadingLBTRadiation_.run()
-    
-else:
-    hb_rooms_ = _hb_rooms
+# -- GH Interface
+IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 
+
+#-------------------------------------------------------------------------------
+gh_compo_interface = gh_compo_io.GHCompo_SolveLBTRad(
+        IGH,
+        _settings,
+        _shading_surfaces_winter,
+        _shading_surfaces_summer,
+        _hb_rooms, 
+        _run)
+legend_, winter_rad_mesh_, summer_rad_mesh_, hb_rooms_ = gh_compo_interface.run()

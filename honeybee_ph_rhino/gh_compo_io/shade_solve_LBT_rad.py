@@ -1,34 +1,40 @@
-# -*- Python Version: 2.7 -*-
 # -*- coding: utf-8 -*-
+# -*- Python Version: 2.7 -*-
 
-"""Functions for Calculating Window shading factors using Ladybug's Incident Radiation solver."""
+"""GHCompo Interface: HBPH - Add Shading Factors - LBT Rad."""
 
 import math
+
 try:
-    from itertools import izip as zip
+    from itertools import izip as zip # type: ignore
 except:
     pass  # Python3
 
 try:
-    from typing import Any, List, Collection, Tuple, Optional
+    from typing import Any, List, Collection, Tuple
 except ImportError:
     pass  # IronPython
 
 try:
-    from System import Object
+    from System import Object # type: ignore
 except ImportError:
-    pass
+    pass # Outside .NET
 
 try:
-    import Rhino.Geometry as rg
+    import Rhino.Geometry as rg # type: ignore
 except ImportError:
-    pass
+    pass # Outside Rhino
 
 try:
-    from Grasshopper import DataTree
-    from Grasshopper.Kernel.Data import GH_Path
+    from Grasshopper import DataTree # type: ignore
+    from Grasshopper.Kernel.Data import GH_Path # type: ignore
 except ImportError:
-    pass
+    pass # Outside Grasshopper
+
+try:
+    from honeybee import room
+except ImportError as e:
+    raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
 try:
     from ladybug.viewsphere import view_sphere
@@ -47,8 +53,11 @@ try:
 except ImportError as e:
     raise ImportError("\nFailed to import ladybug_rhino:\n\t{}".format(e))
 
-from honeybee_ph_rhino.gh_compo_io import ghio_win_shade_surfaces
-from honeybee_ph_utils import sky_matrix
+try:
+    from honeybee_ph_rhino import gh_io
+    from honeybee_ph_rhino.gh_compo_io.shade_create_bldg_shd import create_inset_aperture_surface
+except ImportError as e:
+    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
 # Radiation and Shading Factor Calcs
 # -----------------------------------------------------------------------------
@@ -80,7 +89,7 @@ def create_shading_mesh(_bldg_shading_breps, _mesh_params):
 
 
 def deconstruct_sky_matrix(_sky_mtx):
-    # type: (ladybug_rhino.grasshopper.Objectifier) -> Tuple[List[rg.Vector3d], List[float]]
+    # type: (Any) -> Tuple[List[rg.Vector3d], List[float]]
     """Copied from Ladybug 'IncidentRadiation' Component
 
     Arguments:
@@ -127,14 +136,14 @@ def build_window_meshes(_window_surface, _grid_size, _mesh_params):
     # create the gridded mesh for the window surface
     # ---------------------------------------------------------------------------
     offset_dist = 0.001
-    window_mesh = to_joined_gridded_mesh3d([_window_surface], _grid_size, offset_dist)
+    window_mesh = to_joined_gridded_mesh3d([_window_surface], _grid_size, offset_dist) # type: ignore
     window_rh_mesh = from_mesh3d(window_mesh)
     points = [from_point3d(pt) for pt in window_mesh.face_centroids]
 
     # Create a 'back' for the window
     # ---------------------------------------------------------------------------
     # Mostly this is done so it can be passed to the ladybug_rhino.intersect.intersect_mesh_rays()
-    # solver as a surfce which is certain to *not* shade the window at all
+    # solver as a surface which is certain to *not* shade the window at all
     window_back_mesh = None
     for sr in _window_surface.Surfaces:
         window_normal = sr.NormalAt(0.5, 0.5)
@@ -278,76 +287,37 @@ def create_rhino_mesh(_graphic, _lb_mesh):
 
 # Component Interface
 # -----------------------------------------------------------------------------
-class HBPH_LBTRadSettings:
-    """LBT Radiation Solver Settings."""
 
-    def __init__(self,  _wsm, _ssm, _mshp, _gs, _lgp, _cpus):
-        # type: (Any, Any, rg.MeshingParameters, float, Any, Optional[int]) -> None
-        self.winter_sky_matrix = _wsm
-        self.summer_sky_matrix = _ssm
-        self.mesh_params = _mshp
-        self.grid_size = _gs
-        self.legend_par = _lgp
-        self.cpus = _cpus
+class GHCompo_SolveLBTRad(object):
 
-    def __str__(self):
-        return '{}()'.format(self.__class__.__name__)
-
-    def __repr__(self):
-        return str(self)
-
-    def ToString(self):
-        return str(self)
-
-
-class IShadingLBTRadiationSettings(object):
-    """Interface for LBT Radiation Solver Settings."""
-
-    # -- Defaults
-    winter_period = (10, 3)  # October 1 to March 31
-    summer_period = (6, 9)  # June 1 to September 30'
-
-    def __init__(self, _epw_file, _north, _winter_sky_matrix, _summer_sky_matrix,
-                 _mesh_params, _grid_size, _legend_par, _cpus):
-        # type: (str, float, Any, Any, rg.MeshingParameters, float, Any, Optional[int]) -> None
-        self.epw_file = _epw_file
-        self.winter_sky_matrix = _winter_sky_matrix or sky_matrix.gen_matrix(
-            self.epw_file, self.winter_period, _north)
-        self.summer_sky_matrix = _summer_sky_matrix or sky_matrix.gen_matrix(
-            self.epw_file, self.summer_period, _north)
-        self.mesh_params = _mesh_params or rg.MeshingParameters.Default
-        self.grid_size = _grid_size or 1.0
-        self.legend_par = _legend_par or None
-        self.cpus = _cpus or None
-
-    def create_hbph_obj(self):
-        hbph_obj = HBPH_LBTRadSettings(
-            self.winter_sky_matrix,
-            self.summer_sky_matrix,
-            self.mesh_params,
-            self.grid_size,
-            self.legend_par,
-            self.cpus
-        )
-        return hbph_obj
-
-
-class IShadingLBTRadiation(object):
-
-    def __init__(self,
-                 _settings,
-                 _shading_surfaces_winter,
-                 _shading_surfaces_summer,
-                 _hb_rooms,
-                 ):
-        # type: (Any, List, List, List) -> None
+    def __init__(self, _IGH, _settings, _shading_surfaces_winter, _shading_surfaces_summer, _hb_rooms, _run):
+        # type: (gh_io.IGH, Any, List, List, List[room.Room], bool) -> None
+        self.IGH = _IGH
         self.settings = _settings
         self.shading_surfaces_winter = _shading_surfaces_winter
         self.shading_surfaces_summer = _shading_surfaces_summer
         self.hb_rooms = _hb_rooms
+        self.run_solver = _run
+
+        # ---------------------------------------------------------------------
+        if not self.settings:
+            msg = 'Please input _settings to calculate Radiation results.'
+            self.IGH.warning(msg)
+
+        if not self.hb_rooms:
+            msg = 'Please input Honeybee Rooms to calculate Radiation results.'
+            self.IGH.warning(msg)
+
+        if not self.run_solver:
+            msg = 'Please set _run to True in order to calculate Radiation results.'
+            self.IGH.warning(msg)
+
 
     def run(self):
-        hb_rooms_ = []
+        # type: () -> Tuple[Any, Any, Any, List[room.Room]]
+
+        if not self.run_solver or not self.settings or not self.hb_rooms:
+            return (None, None, None, self.hb_rooms)
 
         # -- Create context Shade meshes
         # ---------------------------------------------------------------------
@@ -379,13 +349,13 @@ class IShadingLBTRadiation(object):
         mesh_by_window = DataTree[Object]()
 
         win_count = 0
+        hb_rooms_ = []
         for room in self.hb_rooms:
             new_room = room.duplicate()
 
             for face in new_room.faces:
                 for aperture in face.apertures:
-                    window_surface = ghio_win_shade_surfaces.create_inset_aperture_surface(
-                        aperture)
+                    window_surface = create_inset_aperture_surface(aperture)
 
                     # Build the meshes
                     # ----------------------------------------------------------------------

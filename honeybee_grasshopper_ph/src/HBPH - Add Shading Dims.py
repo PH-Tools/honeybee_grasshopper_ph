@@ -37,7 +37,7 @@ For background and reference on the methodology used, see: "Solar Gains in a
 Passive House: A Monthly Approach to Calculating Global Irradiaton Entering a 
 Shaded Window" By Andrew Peel, 2007.
 -
-EM June 18, 2022
+EM October 1, 2022
     Args:
         _shading_surfaces: (List[Brep]) <Optional> Any shading geometry (walls, overhangs, side-reveals
             neighbors, trees, etc...) you'd like to take into account when generating 
@@ -55,68 +55,43 @@ EM June 18, 2022
         hb_rooms_: (List[room.Room]) The Honeybe Rooms with the shading-object dimensions added to all the apertures.
 """
 
+
 import scriptcontext as sc
 import Rhino as rh
 import rhinoscriptsyntax as rs
 import ghpythonlib.components as ghc
 import Grasshopper as gh
 
-try:  # import the ladybug_rhino dependencies
-    from ladybug_rhino.config import tolerance, angle_tolerance
+
+try:
+    from honeybee_ph_utils import preview
 except ImportError as e:
-    raise ImportError('Failed to import ladybug_rhino:\t{}'.format(e))
+    raise ImportError('Failed to import honeybee_ph_utils:\t{}'.format(e))
 
-from honeybee_ph.properties import aperture
-from honeybee_ph_rhino.gh_compo_io import ghio_phpp_shading
-from honeybee_ph_rhino import gh_io
-
+try:
+    from honeybee_ph_rhino import gh_compo_io, gh_io
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
 
 # ------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Add Shading Dims"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='JUN_18_2022')
+honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='OCT_01_2022')
 if DEV:
-    reload(ghio_phpp_shading)
+    reload(gh_compo_io)
     reload(gh_io)
-    reload(aperture)
-
 
 # ------------------------------------------------------------------------------
 # -- GH Interface
 IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 
-# ------------------------------------------------------------------------------
-# -- Find shading objects and dimensions
-checklines_ = []
-hb_rooms_ = [rm.duplicate() for rm in _hb_rooms]
-if _run:
-    for room in hb_rooms_:       
-        for face in room.faces:
-            for hb_aperture in face.apertures:
-                shading_dims = ghio_phpp_shading.calc_shading_dims(hb_aperture, _shading_surfaces, IGH)
-                
-                # -- Create a new HBPH-Shading Dims and store all the info
-                hbph_shading_dims_obj = aperture.ShadingDimensions()
-                
-                hbph_shading_dims_obj.d_hori = shading_dims.d_hori
-                hbph_shading_dims_obj.h_hori = shading_dims.h_hori
-                hbph_shading_dims_obj.d_reveal = shading_dims.d_reveal
-                hbph_shading_dims_obj.o_reveal = shading_dims.o_reveal
-                hbph_shading_dims_obj.d_over = shading_dims.d_over
-                hbph_shading_dims_obj.o_over = shading_dims.o_over
-                
-                # -- Add the new shading into the HB-Ap properties.ph
-                hb_aperture.properties.ph.shading_dimensions = hbph_shading_dims_obj
-                
-                # -- Also set the winter / summer factors None
-                hb_aperture.properties.ph.winter_shading_factor = None
-                hb_aperture.properties.ph.summer_shading_factor = None
-                
-                                
-                # -- Pull out the checklines for error-checking
-                checklines_.append(shading_dims.checkline_hori)
-                checklines_.append(shading_dims.checkline_over)
-                checklines_.append(shading_dims.checkline_r1)
-                checklines_.append(shading_dims.checkline_r2)
+
+#-------------------------------------------------------------------------------
+gh_compo_interface = gh_compo_io.GHCompo_SolveShadingDims(
+        IGH,
+        _shading_surfaces,
+        _hb_rooms, 
+        _run)
+checklines_, hb_rooms_ = gh_compo_interface.run()

@@ -1,3 +1,4 @@
+# -- Import all the interfaces to simplify the API within Grasshopper
 # -- Hot Water
 from honeybee_ph_rhino.gh_compo_io.shw_apply_shw import GHCompo_ApplySHWSys
 from honeybee_ph_rhino.gh_compo_io.shw_create_system import GHCompo_CreateSHWSystem
@@ -34,3 +35,8 @@ from honeybee_ph_rhino.gh_compo_io.prog_Phius_MF_calc import GHCompo_CalcPhiusMF
 from honeybee_ph_rhino.gh_compo_io.prog_set_res_occupancy import GHCompo_SetResOccupancy
 from honeybee_ph_rhino.gh_compo_io.prog_create_operating_period import GHCompo_CreateOccPeriod
 from honeybee_ph_rhino.gh_compo_io.prog_create_vent_schd import GHCompo_CreateVentSched
+# -- Shading
+from honeybee_ph_rhino.gh_compo_io.shade_create_bldg_shd import GHCompo_CreateBuildingShading
+from honeybee_ph_rhino.gh_compo_io.shade_LBT_rad_settings import GHCompo_CreateLBTRadSettings
+from honeybee_ph_rhino.gh_compo_io.shade_solve_LBT_rad import GHCompo_SolveLBTRad
+from honeybee_ph_rhino.gh_compo_io.shade_solve_shading_dims import GHCompo_SolveShadingDims

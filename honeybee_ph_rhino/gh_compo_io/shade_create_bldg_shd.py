@@ -1,11 +1,12 @@
-# -*- Python Version: 2.7 -*-
 # -*- coding: utf-8 -*-
+# -*- Python Version: 2.7 -*-
 
-"""Functions for creating window shading surfaces."""
+"""GHCompo Interface: HBPH - Create Building Shading."""
 
-from honeybee import room, aperture
-from ladybug_rhino.fromgeometry import from_face3d
-from ladybug_geometry.geometry3d import Face3D
+try:
+    from typing import List, Tuple, Optional, Collection
+except ImportError:
+    pass # IronPython 2.7
 
 try:
     import Rhino.Geometry as rg # type: ignore
@@ -13,10 +14,24 @@ except ImportError:
     pass
 
 try:
-    from typing import List, Optional, Collection
-except ImportError:
-    pass
+    from honeybee import room, aperture
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
 
+try:
+    from ladybug_rhino.fromgeometry import from_face3d
+except ImportError as e:
+    raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
+
+try:
+    from ladybug_geometry.geometry3d import Face3D
+except ImportError as e:
+    raise ImportError('\nFailed to import ladybug_geometry:\n\t{}'.format(e))
+
+try:
+    from honeybee_ph_rhino import gh_io
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
 
 def create_punched_geometry(_hb_rooms):
     # type: (Collection[room.Room]) -> List[rg.Brep]
@@ -83,3 +98,22 @@ def create_window_reveals(_hb_rooms):
             for aperture in face.apertures:
                 reveals.extend(create_window_reveal(aperture))
     return reveals
+
+
+class GHCompo_CreateBuildingShading(object):
+    def __init__(self, _IGH, _hb_rooms):
+        # type: (gh_io.IGH, List[room.Room]) -> None
+        self.IGH = _IGH
+        self.hb_rooms = _hb_rooms
+
+    def run(self):
+        # type: () -> Tuple[List[rg.Brep], List[rg.Brep], List[room.Room]]
+
+        shading_surfaces_ = []
+        shading_surfaces_.extend(create_punched_geometry(self.hb_rooms))
+        shading_surfaces_.extend(create_window_reveals(self.hb_rooms))
+
+        window_surfaces_ = create_inset_aperture_surfaces(self.hb_rooms)
+        hb_rooms_ = self.hb_rooms
+
+        return (window_surfaces_, shading_surfaces_, hb_rooms_)
