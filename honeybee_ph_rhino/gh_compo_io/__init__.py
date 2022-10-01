@@ -26,3 +26,6 @@ from honeybee_ph_rhino.gh_compo_io.mech_create_ventilator import GHCompo_CreateP
 from honeybee_ph_rhino.gh_compo_io.mech_create_heating_sys import GHCompo_CreateHeatingSystem
 from honeybee_ph_rhino.gh_compo_io.mech_create_cooling_sys import GHCompo_CreateCoolingSystem
 from honeybee_ph_rhino.gh_compo_io.mech_add_mech_systems import GHCompo_AddMechSystems
+# -- Program [Schedule / Load]
+from honeybee_ph_rhino.gh_compo_io.prog_add_elec_equip import GHCompo_AddElecEquip
+from honeybee_ph_rhino.gh_compo_io.prog_create_elec_equip import GHCompo_CreateElecEquip

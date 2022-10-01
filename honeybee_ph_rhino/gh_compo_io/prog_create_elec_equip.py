@@ -1,26 +1,38 @@
 # -*- coding: utf-8 -*-
 # -*- Python Version: 2.7 -*-
 
-"""PH-Equipment GH-Component inputs node configuration."""
+"""GHCompo Interface: HBPH - Create PH Equipment."""
 
-from copy import copy
-# Note: Use copy so that specific equipments can overwrite base with their own hints
+from copy import copy # Use copy so that specific equipments can overwrite base with their own hints
 
-from GhPython import Component
-from Grasshopper.Kernel.Parameters import Hints
+try:
+    from typing import Dict, Optional
+except ImportError:
+    pass # IronPython 2.7
 
-from honeybee_ph_rhino.gh_io import ComponentInput
-from honeybee_ph_utils.input_tools import input_to_int
+from GhPython import Component # type: ignore
+from Grasshopper.Kernel.Parameters import Hints # type: ignore
 
+try:
+    from honeybee_ph_rhino import gh_io
+    from honeybee_ph_rhino.gh_io import ComponentInput
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
 
-class InputTypeNotFoundError(Exception):
-    def __init__(self, _in):
-        self.msg = 'Error: Equip. type ID: "{}" is not a valid equip type.'.format(_in)
-        super(InputTypeNotFoundError, self).__init__(self.msg)
+try:
+    from honeybee_energy_ph.load import ph_equipment
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee_energy_ph:\n\t{}'.format(e))
+
+try:
+    from honeybee_ph_utils.input_tools import input_to_int
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee_ph_utils:\n\t{}'.format(e))
 
 
 # -----------------------------------------------------------------------------
-# Setup the component input node groups
+# -- Setup the component input node groups
+
 inputs_base = {
     2: ComponentInput(_name='comment',
                       _description='(str) User defined comment / note.',
@@ -160,14 +172,6 @@ input_groups = {
     18: inputs_Custom_MEL,
 }
 
-valid_equipment_types = ["1-dishwasher", "2-clothes_washer", "3-clothes_dryer",
-                         "4-fridge", "5-freezer", "6-fridge_freezer", "7-cooking", "13-PHIUS_MEL",
-                         "14-PHIUS_Lighting_Int", "15-PHIUS_Lighting_Ext", "16-PHIUS_Lighting_Garage",
-                         "11-Custom_Electric_per_Year", "17-Custom_Electric_Lighting_per_Year",
-                         "18-Custom_Electric_MEL_per_Use", ]
-# "21-Commercial_Dishwasher", "22-Commercial_Refrigerator", "23-Commercial_Cooking", "24-Commercial_Custom"]
-
-
 # -----------------------------------------------------------------------------
 
 def get_component_inputs(_equipment_type):
@@ -180,9 +184,86 @@ def get_component_inputs(_equipment_type):
     input_type_id = input_to_int(_equipment_type)
 
     if not input_type_id:
-        raise InputTypeNotFoundError(input_type_id)
+        raise Exception(
+            'Error: Equip. type ID: "{}" is not a valid equip type.'.format(input_type_id)
+        )
 
     try:
         return input_groups[input_type_id]
     except KeyError:
-        raise InputTypeNotFoundError(input_type_id)
+        raise Exception(
+            'Error: Equip. type ID: "{}" is not a valid equip type.'.format(input_type_id)
+        )
+
+
+# -----------------------------------------------------------------------------
+# Component Interface
+
+class GHCompo_CreateElecEquip(object):
+    
+    equipment_classes = {
+            1: ph_equipment.PhDishwasher,
+            2: ph_equipment.PhClothesWasher,
+            3: ph_equipment.PhClothesDryer,
+            4: ph_equipment.PhRefrigerator,
+            5: ph_equipment.PhFreezer,
+            6: ph_equipment.PhFridgeFreezer,
+            7: ph_equipment.PhCooktop,
+            13: ph_equipment.PhPhiusMEL,
+            14: ph_equipment.PhPhiusLightingInterior,
+            15: ph_equipment.PhPhiusLightingExterior,
+            16: ph_equipment.PhPhiusLightingGarage,
+            11: ph_equipment.PhCustomAnnualElectric,
+            17: ph_equipment.PhCustomAnnualLighting,
+            18: ph_equipment.PhCustomAnnualMEL,
+    }
+
+    valid_equipment_types = ["1-dishwasher", "2-clothes_washer", "3-clothes_dryer",
+                            "4-fridge", "5-freezer", "6-fridge_freezer", "7-cooking", "13-PHIUS_MEL",
+                            "14-PHIUS_Lighting_Int", "15-PHIUS_Lighting_Ext", "16-PHIUS_Lighting_Garage",
+                            "11-Custom_Electric_per_Year", "17-Custom_Electric_Lighting_per_Year",
+                            "18-Custom_Electric_MEL_per_Use", ]
+    # "21-Commercial_Dishwasher", "22-Commercial_Refrigerator", "23-Commercial_Cooking", "24-Commercial_Custom"]
+
+    def __init__(self, _IGH, _equip_type, _input_dict):
+        # type: (gh_io.IGH, int, Dict) -> None
+        self.IGH = _IGH
+        self.equip_type = _equip_type
+        self.input_dict = _input_dict
+
+    @property
+    def equip_type(self):
+        # type: () -> Optional[int]
+        return self._equip_type
+
+    @equip_type.setter
+    def equip_type(self, _in):
+        self._equip_type = input_to_int(_in)
+
+    def run(self):
+        # type: () -> Optional[ph_equipment.PhEquipment]
+
+        if not self.equip_type:
+            msg = "Set the 'equipment_type' to configure the user-inputs."
+            self.IGH.warning(msg)
+            return None
+        
+        try:
+            equipment_class = self.equipment_classes[self.equip_type]
+        except KeyError as e:
+            raise Exception(
+                "Error: Input Equipment type: '{}' not supported. Please only input: "\
+                "{}".format(self.equip_type, self.valid_equipment_types)
+            )
+        
+        equipment_ = equipment_class()
+        for attr_name in dir(equipment_):
+            
+            if attr_name.startswith('_'):
+                continue
+            
+            input_val = self.input_dict.get(attr_name)
+            if input_val:
+                setattr(equipment_, attr_name, input_val)
+        
+        return equipment_

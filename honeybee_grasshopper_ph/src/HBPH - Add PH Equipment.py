@@ -23,7 +23,7 @@
 Add one or more detailed Passive House style electric-equipment objects to the 
 honeybee Rooms.
 -
-EM June 11, 2022
+EM October 1, 2022
 
     Args:
         phius_defaults_: (int) Optional. Input either:
@@ -46,59 +46,48 @@ EM June 11, 2022
             added to them.
 """
 
-import Grasshopper.Kernel as ghK
+import scriptcontext as sc
+import Rhino as rh
+import rhinoscriptsyntax as rs
+import ghpythonlib.components as ghc
+import Grasshopper as gh
 
-from honeybee_ph_utils import preview
-from honeybee_ph_rhino.gh_compo_io import ghio_add_ph_equipment
+
+try:
+    from honeybee_ph_utils import preview
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_utils:\t{}'.format(e))
+
+try:
+    from honeybee_ph_rhino import gh_compo_io, gh_io
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
+
 
 #-------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Add PH Equipment"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='JUN_11_2022')
+honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='OCT_01_2022')
 if DEV:
-    reload(preview)
-    reload(ghio_add_ph_equipment)
+    reload(gh_compo_io)
+    reload(gh_io)
 
-#-------------------------------------------------------------------------------
-# -- Create the HBPH-Equipment set
-if phius_defaults_:
-    ph_equipment = ghio_add_ph_equipment.add_Phius_default_equipment_to_list(equipment_, phius_defaults_)
-elif phi_defaults_:
-    ph_equipment = ghio_add_ph_equipment.add_Phi_default_equipment_to_list(equipment_, phi_defaults_)
-else:
-    ph_equipment = equipment_
-
-#-------------------------------------------------------------------------------
-# -- Find and collect all the unique HBE-ElectricEquipment objects on the HB-Rooms
-hb_ee_collection = ghio_add_ph_equipment.HBElecEquipCollection()
-hb_rooms = ghio_add_ph_equipment.clean_rooms_elec_equip(_hb_rooms)
-for hb_room in hb_rooms:
-    hb_ee_collection.add_to_collection(hb_room)
+# ------------------------------------------------------------------------------
+# -- GH Interface
+IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 
 
 #-------------------------------------------------------------------------------
-# --- Add the PH-equipment to each of the unique HBE-ElectricEquipment .properties.ph objects found
-for ph_equip_item in ph_equipment:
-    for hb_ElecEquipWithRooms_obj in hb_ee_collection.values():
-        hb_ElecEquipWithRooms_obj.add_hbph_equipment(ph_equip_item)
-
-
-#-------------------------------------------------------------------------------
-# --- Add the new modified Elec-Equipment with the new PH-Equip back onto the HB-Rooms
-hb_rooms_ = []
-for obj in hb_ee_collection.values():
-    """
-    try:
-        obj.set_hb_ee_wattage()
-    except NotImplementedError:
-        msg = "Warning: Cannot set the Honeybee-Energy Elec-Equipment Watts/m2 for the appliances."\
-            "Cannot calc. values for Phius Standard MEL and Lighting since their methods are not shared."
-        ghenv.Component.AddRuntimeMessage(ghK.GH_RuntimeMessageLevel.Warning, msg) 
-    """
-    obj.set_hb_room_ee()
-    hb_rooms_ += obj.hb_rooms
+gh_compo_interface = gh_compo_io.GHCompo_AddElecEquip(
+        IGH,
+        phius_defaults_,
+        phi_defaults_,
+        equipment_,
+        _hb_rooms,
+    )
+hb_rooms_, ph_equipment = gh_compo_interface.run()
 
 
 #-------------------------------------------------------------------------------
