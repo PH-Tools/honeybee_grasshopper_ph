@@ -26,7 +26,7 @@ equivalent constant-value fresh air ventilation operation scheduled which can th
 used to control the Honeybee-Energy fresh air ventilation. Note that the values here
 will also be stored and used as detailed inputs into  WUFI-Passive or PHPP upon export.
 -
-EM April 6, 2022
+EM October 1, 2022
     Args:
         _name_: Optional name for the Ventilation Schedule
         
@@ -44,68 +44,52 @@ EM April 6, 2022
         ventilation_sch_: The HB-Ventilation Schedule which can be applied to HB Rooms
 """
 
-import Grasshopper.Kernel as ghk
-from honeybee.typing import clean_and_id_ep_string, clean_ep_string
-from honeybee_energy.lib.scheduletypelimits import schedule_type_limit_by_identifier
-from honeybee_energy.schedule.ruleset import ScheduleRuleset
 
-import honeybee_ph_utils.preview
-import honeybee_energy_ph.properties.ruleset
+import scriptcontext as sc
+import Rhino as rh
+import rhinoscriptsyntax as rs
+import ghpythonlib.components as ghc
+import Grasshopper as gh
+
+
+try:
+    from honeybee_ph_utils import preview
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_utils:\t{}'.format(e))
+
+try:
+    from honeybee_ph_rhino import gh_compo_io, gh_io
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
 
 # ------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Vent. Schedule"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='APR_06_2022')
+honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='OCT_01_2022')
 if DEV:
-    reload(honeybee_ph_utils.preview)
-    reload(honeybee_energy_ph.properties.ruleset)
-    reload(honeybee_energy_ph._extend_honeybee_energy_ph)
+    reload(gh_compo_io)
+    reload(gh_io)
 
 # ------------------------------------------------------------------------------
-# -- Build the PhProperties object based on any PH-Style user-inputs on the honeybee-schedule
-ph_properties = honeybee_energy_ph.properties.ruleset.ScheduleRulesetPhProperties(_host=None)
+# -- GH Interface
+IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 
-ph_properties.operating_days_wk = operating_day_per_week_ or 7
-ph_properties.operating_weeks_year = operating_weeks_per_year_ or 52
 
-if _op_period_high:
-    _op_period_high.name = 'high'
-    ph_properties.daily_operating_periods.add_period_to_collection(_op_period_high)
-
-if _op_period_standard:
-    _op_period_standard.name = 'standard'
-    ph_properties.daily_operating_periods.add_period_to_collection(_op_period_standard)
-
-if _op_period_basic:
-    _op_period_basic.name = 'basic'
-    ph_properties.daily_operating_periods.add_period_to_collection(_op_period_basic)
-
-if _op_period_minimum:
-    _op_period_minimum.name = 'low'
-    ph_properties.daily_operating_periods.add_period_to_collection(_op_period_minimum)
-
-# ------------------------------------------------------------------------------
-# -- User Warnings
-msg = ph_properties.validate_operating_period_hours(24.0)
-if msg:
-    ghenv.Component.AddRuntimeMessage(ghk.GH_RuntimeMessageLevel.Warning, msg)
-    
-# ------------------------------------------------------------------------------
-# -- Create the HB-ScheduleRuleset's constant value based on the user-input
-hb_schedule_const_value = ph_properties.annual_average_operating_fraction
-
-# ------------------------------------------------------------------------------
-# -- Create a new constant-value honeybee-energy-ScheduleRuleset object
-# -- Set the properties.ph with the user-determined values above.
-name = clean_and_id_ep_string('ConstantSchedule') if _name_ is None else \
-        clean_ep_string(_name_)
-type_limit = schedule_type_limit_by_identifier('Fractional')
-ventilation_sch_ = ScheduleRuleset.from_constant_value(name, hb_schedule_const_value, type_limit)
-ph_properties._host = ventilation_sch_._properties
-ventilation_sch_._properties._ph = ph_properties
-
+#-------------------------------------------------------------------------------
+gh_compo_interface = gh_compo_io.GHCompo_CreateVentSched(
+        IGH,
+        _name_,
+        operating_days_per_week_,
+        operating_weeks_per_year_,
+        _op_period_high,
+        _op_period_standard,
+        _op_period_basic,
+        _op_period_minimum,
+    )
+ventilation_sch_ = gh_compo_interface.run()
 
 # ------------------------------------------------------------------------------  
-honeybee_ph_utils.preview.object_preview(ph_properties)
+if ventilation_sch_:
+    preview.object_preview(ventilation_sch_.properties.ph)

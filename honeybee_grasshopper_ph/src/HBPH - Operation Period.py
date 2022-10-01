@@ -23,7 +23,7 @@
 Create a new Operation Period with a fractional rate and an hours/ day of operation. 
 These Operationg Periods are used in the creation of HB-PH Schedules.
 -
-EM April 6, 2022
+EM October 1, 2022
     Args:
         name_: (str) Optional name for the period (ie: "high", "low", "on", off", etc..)
         
