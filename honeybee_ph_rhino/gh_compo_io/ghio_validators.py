@@ -37,8 +37,9 @@ class Validated(object):
     The .validate() method should raise a ValueError if the input does not meet the specification.
     """
 
-    def __init__(self, storage_name, **kwargs):
+    def __init__(self, storage_name, default=None, **kwargs):
         self.storage_name = storage_name  # normally the same as the Class Attribute
+        self.default = default
 
         # -- Also accept arbitrary additional args which can be used
         # -- by child classes during validation.
@@ -108,7 +109,7 @@ class HBName(Validated):
             # If the user passed a 'default' attribute, try and use that
             try:
                 return clean_and_id_ep_string(self.default)
-            except AttributeError:
+            except:
                 return old_value
 
         # No spaces, no leading or trailing whitespace
@@ -150,7 +151,7 @@ class Float(Validated):
             # If the user passed a 'default' attribute, try and use that
             try:
                 return float(self.default)
-            except AttributeError:
+            except:
                 return old_value
 
         try:
@@ -211,7 +212,11 @@ class FloatPercentage(Validated):
 
     def validate(self, name, new_value, old_value):
         if new_value is None:
-            return old_value
+            # If the user passed a 'default' attribute, try and use that
+            try:
+                return float(self.default)
+            except:
+                return old_value
 
         try:
             new_value = float(new_value)
@@ -233,7 +238,11 @@ class FloatMax24(Validated):
 
     def validate(self, name, new_value, old_value):
         if new_value is None:
-            return old_value
+            # If the user passed a 'default' attribute, try and use that
+            try:
+                return float(self.default)
+            except:
+                return old_value
 
         try:
             new_value = float(new_value)
@@ -260,7 +269,7 @@ class UnitM(Validated):
             # If the user passed a 'default' attribute, try and use that
             try:
                 return float(self.default)
-            except AttributeError:
+            except:
                 return old_value
 
         input_value, input_units = units.parse_input(str(new_value))
@@ -286,7 +295,11 @@ class UnitW_MK(Validated):
 
     def validate(self, name, new_value, old_value):
         if new_value is None:
-            return old_value
+            # If the user passed a 'default' attribute, try and use that
+            try:
+                return float(self.default)
+            except:
+                return old_value
 
         input_value, input_units = units.parse_input(str(new_value))
 
@@ -298,10 +311,44 @@ class UnitW_MK(Validated):
                              "Supply float only.".format(
                                  new_value, type(new_value)))
 
-        # -- Convert to Meters
+        # -- Convert units
         result = units.convert(input_value, input_units or "W/MK", "W/MK")
 
         print('Converting: {} -> {:.4f} W/MK'.format(new_value, result))
+
+        # -- Make sure its positive
+        if result and result < 0.0:
+            raise ValueError(
+                "Error: input for '{}' cannot be negative.".format(name))
+
+        return result
+
+
+class UnitW_M2K(Validated):
+    """A W/M2K U-Value value (float) of any positive value."""
+
+    def validate(self, name, new_value, old_value):
+        if new_value is None:
+            # If the user passed a 'default' attribute, try and use that
+            try:
+                return float(self.default)
+            except:
+                return old_value
+
+        input_value, input_units = units.parse_input(str(new_value))
+
+        # -- Make sure the value is a float
+        try:
+            input_value = float(input_value)
+        except:
+            raise ValueError("Error: input {} of type: {} is not allowed."
+                             "Supply float only.".format(
+                                 new_value, type(new_value)))
+
+        # -- Convert units
+        result = units.convert(input_value, input_units or "W/M2K", "W/M2K")
+
+        print('Converting: {} -> {:.4f} W/M2K'.format(new_value, result))
 
         # -- Make sure its positive
         if result and result < 0.0:
@@ -319,7 +366,7 @@ class UnitKWH_M2(Validated):
             # If the user passed a 'default' attribute, try and use that
             try:
                 return float(self.default)
-            except AttributeError:
+            except:
                 return old_value
 
         input_value, input_units = units.parse_input(str(new_value))
@@ -345,7 +392,11 @@ class UnitW_K(Validated):
 
     def validate(self, name, new_value, old_value):
         if new_value is None:
-            return old_value
+            # If the user passed a 'default' attribute, try and use that
+            try:
+                return float(self.default)
+            except:
+                return old_value
 
         input_value, input_units = units.parse_input(str(new_value))
 
@@ -378,7 +429,7 @@ class UnitDeltaC(Validated):
             # If the user passed a 'default' attribute, try and use that
             try:
                 return float(self.default)
-            except AttributeError:
+            except:
                 return old_value
 
         input_value, input_units = units.parse_input(str(new_value))
@@ -407,7 +458,7 @@ class UnitDegreeC(Validated):
             # If the user passed a 'default' attribute, try and use that
             try:
                 return float(self.default)
-            except AttributeError:
+            except:
                 return old_value
 
         input_value, input_units = units.parse_input(str(new_value))
@@ -436,7 +487,7 @@ class UnitMeterPerSecond(Validated):
             # If the user passed a 'default' attribute, try and use that
             try:
                 return float(self.default)
-            except AttributeError:
+            except:
                 return old_value
 
         input_value, input_units = units.parse_input(str(new_value))

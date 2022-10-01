@@ -23,7 +23,7 @@
 Create a new HBPH Window Frame Element. A full HBPH Window Frame is made of 4 of 
 these elements (top, right, bottom, left).
 -
-EM July 2, 2022
+EM October 1, 2022
     Args:
         _name_: (str)
         
@@ -54,7 +54,7 @@ except ImportError as e:
     raise ImportError('Failed to import honeybee_ph_utils:\t{}'.format(e))
 
 try:
-    from honeybee_ph_rhino.gh_compo_io import ghio_ph_frame_element
+    from honeybee_ph_rhino import gh_compo_io
 except ImportError as e:
     raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
 
@@ -64,23 +64,28 @@ import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create PH Window Frame Element"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='JUL_02_2022')
+honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='OCT_01_2022')
 
 if DEV:
+    from honeybee_ph_utils import units
+    reload(units)
+    from honeybee_ph_rhino.gh_compo_io import ghio_validators
+    reload(ghio_validators)
+    from honeybee_ph_rhino.gh_compo_io import win_create_frame_element as gh_compo_io
+    reload(gh_compo_io)
     reload(preview)
-    #reload(ghio_ph_frame_element)
 
 
 # -------------------------------------------------------------------------------------
-ghio_frame_element = ghio_ph_frame_element.IPhWindowFrameElement()
-ghio_frame_element.display_name = _name_
-ghio_frame_element.width = _width
-ghio_frame_element.u_factor = _u_factor
-ghio_frame_element.psi_glazing = psi_glazing_
-ghio_frame_element.psi_install = psi_install_
-ghio_frame_element.chi_value = chi_
-
-frame_element_ = ghio_frame_element.create_HBPH_Object()
+gh_compo_interface = gh_compo_io.GHCompo_CreatePhWinFrameElement(
+        _name_,
+        _width,
+        _u_factor,
+        psi_glazing_,
+        psi_install_,
+        chi_,
+    )
+frame_element_ = gh_compo_interface.run()
 
 
 # -------------------------------------------------------------------------------------

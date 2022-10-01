@@ -26,7 +26,7 @@ combined together into a single building segment before export to the PHPP / WUF
 the thermal bridges here will only get accounted for once. If the same thermal bridge object
 is added to more than one room, it will only show up once for each building-segment.
 -
-EM June 18, 2022
+EM September 30, 2022
 
     Args:
         _thermal_bridges: (List[PhThermalBridge]) A list of the new PH Thermal Bridge
@@ -40,22 +40,24 @@ EM June 18, 2022
             thermal bridges added to the Room's PH Building-Segment.
 """
 
+try:
+    from honeybee_ph_rhino import gh_compo_io
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
+
 #-------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Add Thermal Bridges to Rooms"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='JUN_18_2022')
+honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='SEP_30_2022')
 if DEV:
-    pass
+    reload(gh_compo_io)
+
 
 #-------------------------------------------------------------------------------
-hb_rooms_ = []
-for hb_room in _hb_rooms:
-    new_room = hb_room.duplicate()
-    
-    # -- add the new TBs to the HB-Room Building Segment
-    for tb in _thermal_bridges:
-        new_room.properties.ph.ph_bldg_segment.thermal_bridges[str(tb.identifier)] = tb
-    
-    hb_rooms_.append(new_room)
+gh_compo_interface = gh_compo_io.GHCompo_AddTBs(
+        _thermal_bridges,
+        _hb_rooms,
+    )
+hb_rooms_ = gh_compo_interface.run()

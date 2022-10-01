@@ -15,11 +15,12 @@ except ImportError:
     pass  # Python 3
 
 try:
-    from itertools import izip as zip
+    from itertools import izip as zip # type: ignore
 except ImportError:
     pass  # Python3+
 
-from GhPython import Component
+from GhPython import Component # type: ignore
+import System # type: ignore
 
 from contextlib import contextmanager
 from copy import deepcopy
@@ -305,7 +306,7 @@ class IGH:
 
         Returns:
         --------
-            * (honeybee.face.Face): A new LBT Face, inset by the specified amount
+            * (List): A new LBT Face, inset by the specified amount
         """
 
         rh_floor_surface = self.convert_to_rhino_geom(_lbt_face)

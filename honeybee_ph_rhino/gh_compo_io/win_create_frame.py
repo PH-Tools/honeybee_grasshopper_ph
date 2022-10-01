@@ -1,9 +1,15 @@
 # -*- coding: utf-8 -*-
 # -*- Python Version: 2.7 -*-
 
-"""Grasshopper Component Interface for HBPH Frame."""
+"""GHCompo Interface: HBPH - Create PH Window Frame."""
 
-try:  # import the core honeybee dependencies
+
+try:
+    from typing import Optional
+except ImportError:
+    pass # IronPython 2.7
+
+try:
     from honeybee.typing import clean_and_id_ep_string
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
@@ -19,19 +25,22 @@ except ImportError as e:
     raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
 
 
-class IPhWindowFrame(object):
+class GHCompo_CreatePhWinFrame(object):
     """Interface to collect and clean PhWindowFrame user-inputs."""
 
     display_name = ghio_validators.HBName("display_name")
 
-    def __init__(self):
-        self.display_name = clean_and_id_ep_string('PhWindowFrame')
+    def __init__(self, _display_name, _top, _right, _bottom, _left):
+        # type: (str, Optional[window.PhWindowFrameElement], Optional[window.PhWindowFrameElement],  Optional[window.PhWindowFrameElement],  Optional[window.PhWindowFrameElement]) -> None
+        self.display_name = clean_and_id_ep_string(_display_name or "PhWindowFrame")
+        self._top = _top
+        self._right = _right
+        self._bottom = _bottom
+        self._left = _left
+
         self._default_frame = window.PhWindowFrameElement(
-            clean_and_id_ep_string('PhWindowFrameElement'))
-        self._top = None
-        self._right = None
-        self._bottom = None
-        self._left = None
+            clean_and_id_ep_string('PhWindowFrameElement')
+        )
 
     @property
     def top(self):
@@ -73,7 +82,7 @@ class IPhWindowFrame(object):
         if _in is not None:
             self._left = _in
 
-    def create_HBPH_Object(self):
+    def run(self):
         # type: () -> window.PhWindowFrame
         """Returns a new HBPH PhWindowFrame object."""
 

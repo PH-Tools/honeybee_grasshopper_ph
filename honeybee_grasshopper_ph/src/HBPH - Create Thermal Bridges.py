@@ -24,7 +24,7 @@ Create a new HBPH Thermal Bridge object which can be added to an HB Model. Note 
 these thermal bridges will have no effect on the EnergyPlus/OpenStudio simualtion and 
 will only be considered when the model is exported to the PHPP/WUFI-Passive.
 -
-EM July 29, 2022
+EM October 1, 2022
 
     Args:
         _names: (List[str]) A list of the HBPH Thermal Bridge names.
@@ -51,31 +51,32 @@ EM July 29, 2022
             using the "HBPH - Add Thermal Bridges" component.
 """
 
-from itertools import izip_longest
-
 import scriptcontext as sc
 import Rhino as rh
 import rhinoscriptsyntax as rs
 import ghpythonlib.components as ghc
 import Grasshopper as gh
 
-from honeybee_energy_ph.construction import thermal_bridge
-from honeybee_ph_rhino.gh_compo_io import ghio_create_tb
-from honeybee_ph_utils import input_tools, preview
-from honeybee_ph_rhino.gh_compo_io import ghio_validators
-from honeybee_ph_rhino import gh_io
+try:
+    from honeybee_ph_rhino import gh_io, gh_compo_io
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
 
+try:
+    from honeybee_ph_utils import preview
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_utils:\t{}'.format(e))
+    
 #-------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create Thermal Bridges"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='JUL_29_2022')
+honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='OCT_01_2022')
 if DEV:
-    #reload(thermal_bridge)
-    #reload(ghio_validators)
-    #reload(ghio_create_tb)
-    #reload(input_tools)
+    reload(gh_io)
+    from honeybee_ph_rhino.gh_compo_io import tb_create as gh_compo_io
+    reload(gh_compo_io)
     reload(preview)
 
 # ------------------------------------------------------------------------------
@@ -83,18 +84,16 @@ if DEV:
 IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 
 #-------------------------------------------------------------------------------
-thermal_bridges_ = []
-for i in range(len(_geometry)):
-    ITb = ghio_create_tb.IThermalBridge(
-            IGH, input_tools.clean_get(_geometry, i)
-        )
-    ITb.display_name = input_tools.clean_get(_names, i)
-    ITb.psi_value = input_tools.clean_get(_psi_values, i)
-    ITb.fRsi_value = input_tools.clean_get(_fRsi_values, i, 0.75)
-    ITb.group_type = input_tools.clean_get(_types, i, 15)
-    ITb.quantity = input_tools.clean_get(_quantities, i, 1)
-
-    thermal_bridges_.append(ITb.create_hbph_thermal_bridge())
+gh_compo_interface = gh_compo_io.GHCompo_CreateTB(
+        IGH,
+        _geometry,
+        _names, 
+        _psi_values,
+        _fRsi_values,
+        _types,
+        _quantities,
+    )
+thermal_bridges_ = gh_compo_interface.run()
     
 #-------------------------------------------------------------------------------
 # -- Preview

@@ -21,11 +21,10 @@
 #
 """
 Create a new HBPH Window Glazing.
-
 -
-EM July 2, 2022
+EM October 1, 2022
     Args:
-        _name_: (str)
+        _name_: (Optional[str]) An optional name for the new PH-Style Glazing.
         
         _u_factor: (float) W/m2k - The COG U-value for the glazing, as per EN-673. Note that
             this value is not the same as the NFRC value.
@@ -44,7 +43,7 @@ except ImportError as e:
     raise ImportError('Failed to import honeybee_ph_utils:\t{}'.format(e))
 
 try:
-    from honeybee_ph_rhino.gh_compo_io import ghio_ph_glazing
+    from honeybee_ph_rhino import gh_compo_io
 except ImportError as e:
     raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
 
@@ -54,20 +53,25 @@ import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create PH Glazing"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='JUL_02_2022')
+honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='OCT_01_2022')
 
 if DEV:
-    #reload(ghio_ph_glazing)
+    from honeybee_ph_utils import units
+    reload(units)
+    from honeybee_ph_rhino.gh_compo_io import ghio_validators
+    reload(ghio_validators)
+    from honeybee_ph_rhino.gh_compo_io import win_create_glazing as gh_compo_io
+    reload(gh_compo_io)
     reload(preview)
 
 
 # -------------------------------------------------------------------------------------
-ghio_glazing = ghio_ph_glazing.IPhWindowGlazing()
-ghio_glazing.display_name = _name_
-ghio_glazing.u_factor = _u_factor
-ghio_glazing.g_value = _g_value
-
-glazing_ = ghio_glazing.create_HBPH_Object()
+gh_compo_interface = gh_compo_io.GHCompo_CreatePhGlazing(
+        _name_,
+        _u_factor,
+        _g_value,
+    )
+glazing_ = gh_compo_interface.run()
 
 
 # -------------------------------------------------------------------------------------

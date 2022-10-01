@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # -*- Python Version: 2.7 -*-
 
-"""Grasshopper Component Interface for HBPH Glazing"""
+"""GHCompo Interface: HBPH - Create PH Glazing."""
 
 try:  # import the core honeybee dependencies
     from honeybee.typing import clean_and_id_ep_string
@@ -19,19 +19,20 @@ except ImportError as e:
     raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
 
 
-class IPhWindowGlazing(object):
+class GHCompo_CreatePhGlazing(object):
     """Interface to collect and clean PhWindowGlazing user-inputs."""
 
-    display_name = ghio_validators.HBName("display_name")
-    u_factor = ghio_validators.FloatPositiveValue("u_factor")
-    g_value = ghio_validators.FloatPercentage("g_value")
+    display_name = ghio_validators.HBName("display_name", default="PhWindowGlazing")
+    u_factor = ghio_validators.UnitW_M2K("u_factor", default=0.8)
+    g_value = ghio_validators.FloatPercentage("g_value", default=0.4)
 
-    def __init__(self):
-        self.display_name = clean_and_id_ep_string('PhWindowGlazing')
-        self.u_factor = 0.8
-        self.g_value = 0.4
+    def __init__(self, _name, _u_factor, _g_value):
+        # type: (str, float, float) -> None
+        self.display_name = clean_and_id_ep_string(_name or "PhWindowGlazing")
+        self.u_factor = _u_factor
+        self.g_value = _g_value
 
-    def create_HBPH_Object(self):
+    def run(self):
         # type: () -> window.PhWindowGlazing
         """Returns a new HBPH PhWindowGlazing object."""
 

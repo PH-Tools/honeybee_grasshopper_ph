@@ -4,12 +4,12 @@
 """GHCompo Interface: HBPH - Create Space PH Ventilation."""
 
 try:
-    from Grasshopper import DataTree
+    from Grasshopper import DataTree # type: ignore
 except ImportError:
     pass  # outside Grasshopper
 
 try:
-    from itertools import izip_longest
+    from itertools import izip_longest # type: ignore
 except:
     # Python 3+
     from itertools import zip_longest as izip_longest

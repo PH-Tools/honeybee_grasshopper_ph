@@ -1,21 +1,27 @@
 # -*- coding: utf-8 -*-
 # -*- Python Version: 2.7 -*-
 
-"""Grasshopper Component Interface for HBPH Window Construction."""
+"""GHCompo Interface: HBPH - Create PH Window Construction."""
 
-try:  # import the honeybee-energy dependencies
+try:
+    from typing import Optional
+except ImportError:
+    pass # IronPython 2.7
+
+try: 
     from honeybee_energy.material.glazing import EnergyWindowMaterialSimpleGlazSys
     from honeybee_energy.construction.window import WindowConstruction
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee_energy:\n\t{}'.format(e))
 
-try:  # import the core honeybee dependencies
+try: 
     from honeybee.typing import clean_and_id_ep_string
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
 
 try:
     from honeybee_ph_rhino.gh_compo_io import ghio_validators
+    from honeybee_ph_rhino import gh_io
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
 
@@ -24,23 +30,37 @@ try:
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee_ph_utils:\n\t{}'.format(e))
 
+try:
+    from honeybee_energy_ph.construction import window
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee_energy_ph:\n\t{}'.format(e))
 
-class IPhWindowConstruction(object):
+class GHCompo_CreatePhConstruction(object):
 
     display_name = ghio_validators.HBName("display_name")
-    frame = ghio_validators.NotNone("frame")
-    glazing = ghio_validators.NotNone("glazing")
-    t_vis = ghio_validators.Float("t_vis")
+    nfrc_u_factor = ghio_validators.UnitW_M2K("nfrc_u_factor", default=None)
+    nfrc_shgc = ghio_validators.FloatPercentage("nfrc_shgc", default=None)
+    t_vis = ghio_validators.Float("t_vis", default=0.6)
 
-    def __init__(self):
-        self.display_name = clean_and_id_ep_string('PhWindowConstruction')
-        self.nfrc_u_factor = None
-        self.nfrc_shgc = None
-        self.t_vis = 0.6
+    def __init__(self, _IGH, _display_name, _frame, _glazing, _nfrc_u_factor, _nfrc_shgc, _t_vis):
+        # type: (gh_io.IGH, str, window.PhWindowFrame, window.PhWindowGlazing, float, float, float) -> None
+        self.IGH = _IGH
+        self.display_name = clean_and_id_ep_string(_display_name or "PhWindowConstruction")
+        self.frame = _frame
+        self.glazing = _glazing
+        self.nfrc_u_factor = _nfrc_u_factor
+        self.nfrc_shgc = _nfrc_shgc
+        self.t_vis = _t_vis
 
-    def create_HBPH_Object(self):
-        # type: () -> WindowConstruction
+    def run(self):
+        # type: () -> Optional[WindowConstruction]
         """Return a new HB-Window-Construction with values set by the PH Elements."""
+        
+        # ---------------------------------------------------------------------
+        if not self.frame or not self.glazing:
+            msg = "Supply a PH-Style Frame and Glazing to build a new Construction."
+            self.IGH.warning(msg)
+            return None
 
         # ---------------------------------------------------------------------
         # -- Create a new HB Simple Window Material and set the NFRC/HBmaterial properties
@@ -58,8 +78,8 @@ class IPhWindowConstruction(object):
 
         # -------------------------------------------------------------------------------------
         # -- Set the PH Properties on the WindowConstructionProperties
-        hb_win_construction_.properties.ph.ph_frame = self.frame
-        hb_win_construction_.properties.ph.ph_glazing = self.glazing
+        hb_win_construction_.properties.ph.ph_frame = self.frame # type: ignore
+        hb_win_construction_.properties.ph.ph_glazing = self.glazing # type: ignore
 
         return hb_win_construction_
 

@@ -4,7 +4,7 @@
 """GHCompo Interface: HBPH - Get FloorSegment Data."""
 
 try:
-    from System import Object
+    from System import Object # type: ignore
 except ImportError:
     pass  # Outside .NET
 

@@ -35,7 +35,7 @@ This method uses the steps and attributes outlined in:
 * https://www.youtube.com/watch?v=XSFHdPHJ7zA
 * https://bigladdersoftware.com/epx/docs/8-7/engineering-reference/conduction-through-the-walls.html#conduction-transfer-function-ctf-calculations-special-case-r-value-only-layers
 -
-EM September 26, 2022
+EM September 30, 2022
 
     Args:
         _const_names: (List[str]) A list of the Construction names to use.
@@ -47,8 +47,10 @@ EM September 26, 2022
             Constructions created with the simplified whole-assembly U-Values.
 """
 
-
-from honeybee_ph_rhino.gh_compo_io import ghio_create_sd_const
+try:
+    from honeybee_ph_rhino import gh_compo_io
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
 
 
 #-------------------------------------------------------------------------------
@@ -56,10 +58,14 @@ import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create SD Constructions"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='SEP_26_2022')
+honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='SEP_30_2022')
 if DEV:
-    reload(ghio_create_sd_const)
-    pass
-
-ISDConst = ghio_create_sd_const.ICreateSDConst(_const_names, _u_values)
-hb_constructions_ = ISDConst.create_sd_constructions()
+    reload(gh_compo_io)
+    
+    
+# -------------------------------------------------------------------------------------
+gh_compo_interface = gh_compo_io.GHCompo_CreateSDConstructions(
+        _const_names,
+        _u_values,
+    )
+hb_constructions_ = gh_compo_interface.run()

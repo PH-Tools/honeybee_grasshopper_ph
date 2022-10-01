@@ -1,10 +1,10 @@
 # -*- Python Version: 2.7 -*-
 # -*- coding: utf-8 -*-
 
-"""HBPH Create SD Construction Interfaces"""
+"""GHCompo Interface: HBPH - Create SD Constructions."""
 
 try:
-    from itertools import izip_longest
+    from itertools import izip_longest # type: ignore
 except ImportError:
     # -- Python 3+
     from itertools import zip_longest as izip_longest
@@ -15,7 +15,7 @@ try:
 except ImportError:
     raise Exception("Error importing honeybee_energy modules?")
 
-class ICreateSDConst(object):
+class GHCompo_CreateSDConstructions(object):
     MASS_HB_MAT = EnergyMaterial('MAT_Mass', 0.01, 100, 2500, 460, 'Rough',0.9, 0.7, 0.7)
 
     def __init__(self, _names, _u_values):
@@ -35,7 +35,7 @@ class ICreateSDConst(object):
             for _ in range(len(self.names) - len(self.u_values)):
                 self.u_values.append(self.u_values[0])
 
-    def create_sd_constructions(self):
+    def run(self):
         hb_constructions_ = []
         if self.names and self.u_values:
             # Create and add a new HB Construction to the output list

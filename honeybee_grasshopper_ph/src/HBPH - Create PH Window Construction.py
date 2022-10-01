@@ -31,7 +31,7 @@ will be used for all EnergyPlus simulatiuons, while the ISO values will be used 
 models and outputs.
 
 -
-EM July 2, 2022
+EM October 1, 2022
     Args:
         _name_: (str)
         
@@ -57,41 +57,56 @@ EM July 2, 2022
             part of an HB Construction Set.
 """
 
+import scriptcontext as sc
+import Rhino as rh
+import rhinoscriptsyntax as rs
+import ghpythonlib.components as ghc
+import Grasshopper as gh
+
 try:
     from honeybee_ph_utils import preview
 except ImportError as e:
     raise ImportError('Failed to import honeybee_ph_utils:\t{}'.format(e))
 
 try:
-    from honeybee_ph_rhino.gh_compo_io import ghio_ph_win_constr
+    from honeybee_ph_rhino import gh_compo_io, gh_io
 except ImportError as e:
     raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
-
 
 # -------------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create PH Window Construction"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='JUL_02_2022')
+honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='OCT_01_2022')
 
 if DEV:
-    reload(ghio_ph_win_constr)
+    from honeybee_ph_utils import units
+    reload(units)
+    from honeybee_ph_rhino.gh_compo_io import ghio_validators
+    reload(ghio_validators)
+    from honeybee_ph_rhino.gh_compo_io import win_create_constr as gh_compo_io
+    reload(gh_compo_io)
     reload(preview)
 
 
-# -------------------------------------------------------------------------------------
-if _glazing and _frame:
+# ------------------------------------------------------------------------------
+# -- GH Interface
+IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 
-    ghio_win_const = ghio_ph_win_constr.IPhWindowConstruction()
-    ghio_win_const.display_name = _name_
-    ghio_win_const.frame = _frame
-    ghio_win_const.glazing = _glazing
-    ghio_win_const.nfrc_u_factor = nfrc_u_factor_
-    ghio_win_const.nfrc_shgc = nfrc_shgc_
-    ghio_win_const.t_vis = t_vis_
-    
-    construction_ = ghio_win_const.create_HBPH_Object()
-    
-    # ---------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------------
+gh_compo_interface = gh_compo_io.GHCompo_CreatePhConstruction(
+    IGH,
+    _name_,
+    _frame,
+    _glazing,
+    nfrc_u_factor_,
+    nfrc_shgc_,
+    t_vis_,
+)
+construction_ = gh_compo_interface.run()
+
+# ---------------------------------------------------------------------------------
+if construction_:
     preview.object_preview(construction_.properties.ph)

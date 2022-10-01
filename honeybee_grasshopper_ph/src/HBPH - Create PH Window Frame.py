@@ -24,7 +24,7 @@ Create a new HBPH Window Frame. If only a single HBPH Frame Element is input (to
 frame element will be used for all sides. Otherwise, input the various frame elements as needed.
 
 -
-EM July 2, 2022
+EM October 1, 2022
     Args:
         _name_: (str)
         
@@ -50,7 +50,7 @@ except ImportError as e:
     raise ImportError('Failed to import honeybee_ph_utils:\t{}'.format(e))
 
 try:
-    from honeybee_ph_rhino.gh_compo_io import ghio_ph_frame
+    from honeybee_ph_rhino import gh_compo_io
 except ImportError as e:
     raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
 
@@ -60,22 +60,27 @@ import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create PH Window Frame"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='JUL_02_2022')
+honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='OCT_01_2022')
 
 if DEV:
+    from honeybee_ph_utils import units
+    reload(units)
+    from honeybee_ph_rhino.gh_compo_io import ghio_validators
+    reload(ghio_validators)
+    from honeybee_ph_rhino.gh_compo_io import win_create_frame as gh_compo_io
+    reload(gh_compo_io)
     reload(preview)
-    #reload(ghio_ph_frame)
 
 
 # -------------------------------------------------------------------------------------
-ghio_frame = ghio_ph_frame.IPhWindowFrame()
-ghio_frame.display_name = _name_
-ghio_frame.top = _top
-ghio_frame.right = _right
-ghio_frame.bottom = _bottom
-ghio_frame.left = _left
-
-frame_ = ghio_frame.create_HBPH_Object()
+gh_compo_interface = gh_compo_io.GHCompo_CreatePhWinFrame(
+        _name_,
+        _top,
+        _right,
+        _bottom,
+        _left,
+    )
+frame_ = gh_compo_interface.run()
 
 # -------------------------------------------------------------------------------------
 preview.object_preview(frame_)

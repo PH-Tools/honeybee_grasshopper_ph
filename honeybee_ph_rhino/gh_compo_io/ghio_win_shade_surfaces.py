@@ -8,7 +8,7 @@ from ladybug_rhino.fromgeometry import from_face3d
 from ladybug_geometry.geometry3d import Face3D
 
 try:
-    import Rhino.Geometry as rg
+    import Rhino.Geometry as rg # type: ignore
 except ImportError:
     pass
 

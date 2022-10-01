@@ -10,3 +10,14 @@ from honeybee_ph_rhino.gh_compo_io.space_add_spc import GHCompo_AddPHSpaces
 from honeybee_ph_rhino.gh_compo_io.space_create_spc import GHCompo_CreatePHSpaces
 from honeybee_ph_rhino.gh_compo_io.space_get_flr_seg_data import GHCompo_GetFloorSegData
 from honeybee_ph_rhino.gh_compo_io.space_create_vent_rates import GHCompo_CreateSpaceVent
+# -- Thermal Bridges
+from honeybee_ph_rhino.gh_compo_io.tb_add import GHCompo_AddTBs
+from honeybee_ph_rhino.gh_compo_io.tb_create import GHCompo_CreateTB
+# -- Window Constructions
+from honeybee_ph_rhino.gh_compo_io.win_create_glazing import GHCompo_CreatePhGlazing
+from honeybee_ph_rhino.gh_compo_io.win_create_constr import GHCompo_CreatePhConstruction
+from honeybee_ph_rhino.gh_compo_io.win_create_frame import GHCompo_CreatePhWinFrame
+from honeybee_ph_rhino.gh_compo_io.win_create_frame_element import GHCompo_CreatePhWinFrameElement
+# -- Envelope
+from honeybee_ph_rhino.gh_compo_io.assmbly_create_sd_const import GHCompo_CreateSDConstructions
+
