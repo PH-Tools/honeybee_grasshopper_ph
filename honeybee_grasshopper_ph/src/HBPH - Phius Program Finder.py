@@ -23,7 +23,7 @@
 Set the residential PH-Style occupancy for the Honeybee-Rooms input. For Phius, the 
 total occupancy with be the number-of-bedrooms + 1 for each dwelling unit.
 -
-EM April 6, 2022
+EM October 1, 2022
     Args:
         _name_: (str) The name of the Phius program to search the dataset for.
         
