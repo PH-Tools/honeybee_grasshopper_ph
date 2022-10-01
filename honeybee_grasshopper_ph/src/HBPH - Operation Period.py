@@ -37,24 +37,47 @@ EM April 6, 2022
             in order to describe the operating fraction.
 """
 
-import honeybee_energy_ph.properties.ruleset
-import honeybee_ph_utils.preview
+import scriptcontext as sc
+import Rhino as rh
+import rhinoscriptsyntax as rs
+import ghpythonlib.components as ghc
+import Grasshopper as gh
+
+
+try:
+    from honeybee_ph_utils import preview
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_utils:\t{}'.format(e))
+
+try:
+    from honeybee_ph_rhino import gh_compo_io, gh_io
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
 
 # ------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Operation Period"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='APR_06_2022')
+honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='OCT_01_2022')
 if DEV:
-    reload(honeybee_ph_utils.preview)
+    reload(gh_compo_io)
+    reload(gh_io)
 
 # ------------------------------------------------------------------------------
-op_period_ = honeybee_energy_ph.properties.ruleset.DailyOperationPeriod.from_operating_hours(
-    _hours_per_day or 0.0,
-    _operating_fraction or 0.0,
-    name_ or ''
-)
+# -- GH Interface
+IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
+
+
+#-------------------------------------------------------------------------------
+gh_compo_interface = gh_compo_io.GHCompo_CreateOccPeriod(
+        IGH,
+        name_,
+        _hours_per_day,
+        _operating_fraction,
+    )
+op_period_ = gh_compo_interface.run()
+
 
 # ------------------------------------------------------------------------------
-honeybee_ph_utils.preview.object_preview(op_period_)
+preview.object_preview(op_period_)
