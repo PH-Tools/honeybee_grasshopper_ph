@@ -41,45 +41,44 @@ EM April 6, 2022
             ProgramTypes found in the Phius dataset which match the search criteria.
 """
 
-import Grasshopper.Kernel as ghK
-from honeybee_ph_standards.programtypes import PHIUS_programs
+import scriptcontext as sc
+import Rhino as rh
+import rhinoscriptsyntax as rs
+import ghpythonlib.components as ghc
+import Grasshopper as gh
 
-from honeybee_energy_ph.library import programtypes
-from honeybee_energy_ph.properties import ruleset
 
-# ------------------------------------------------------------------------------
+try:
+    from honeybee_ph_utils import preview
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_utils:\t{}'.format(e))
+
+try:
+    from honeybee_ph_rhino import gh_compo_io, gh_io
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
+
+#-------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Phius Program Finder"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='APR_06_2022')
+honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='OCT_01_2022')
 if DEV:
-    reload(ruleset)
-    reload(programtypes)
-    reload(PHIUS_programs)
-    
- 
-# ------------------------------------------------------------------------------   
-# -- Get the data from in the Phius data set
-if _name_:
-    prog_data = programtypes.load_data_from_Phius_standards(_name_, 'name', protocol_)
-    if not prog_data:
-        msg = "No Phius data found for name: '{}'".format(_name_)
-        ghenv.Component.AddRuntimeMessage(ghK.GH_RuntimeMessageLevel.Warning, msg)
-elif description_:
-    prog_data = programtypes.load_data_from_Phius_standards(description_, 'description', protocol_)
-    if not prog_data:
-        msg = "No Phius data found for description: '{}'".format(description_)
-        ghenv.Component.AddRuntimeMessage(ghK.GH_RuntimeMessageLevel.Warning, msg)
-else:
-    prog_data = []
-    msg = "No Phius data found for name: '{}' or description: '{}'".format(_name_, description_)
-    ghenv.Component.AddRuntimeMessage(ghK.GH_RuntimeMessageLevel.Warning, msg)
-
+    reload(gh_compo_io)
+    reload(gh_io)
 
 # ------------------------------------------------------------------------------
-# -- Turn the datasets found into a HB Programs
-programs_ = []
-for data in prog_data:
-    prog = programtypes.build_hb_program_from_Phius_data(data)
-    programs_.append(prog)
+# -- GH Interface
+IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
+
+
+#-------------------------------------------------------------------------------
+gh_compo_interface = gh_compo_io.GHCompo_FindPhiusProgram(
+        IGH,
+        _name_,
+        description_,
+        protocol_,
+        base_program_,
+    )
+programs_ = gh_compo_interface.run()

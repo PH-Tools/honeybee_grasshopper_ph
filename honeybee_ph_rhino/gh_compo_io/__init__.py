@@ -29,3 +29,5 @@ from honeybee_ph_rhino.gh_compo_io.mech_add_mech_systems import GHCompo_AddMechS
 # -- Program [Schedule / Load]
 from honeybee_ph_rhino.gh_compo_io.prog_add_elec_equip import GHCompo_AddElecEquip
 from honeybee_ph_rhino.gh_compo_io.prog_create_elec_equip import GHCompo_CreateElecEquip
+from honeybee_ph_rhino.gh_compo_io.prog_find_Phius_program import GHCompo_FindPhiusProgram
+from honeybee_ph_rhino.gh_compo_io.prog_Phius_MF_calc import GHCompo_CalcPhiusMFLoads
