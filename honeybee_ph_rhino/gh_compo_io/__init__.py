@@ -54,3 +54,6 @@ from honeybee_ph_rhino.gh_compo_io.cert_Phius import GHCompo_PhiusCertification
 from honeybee_ph_rhino.gh_compo_io.cert_PHI import GHCompo_PhiCertification
 # -- Building Segment
 from honeybee_ph_rhino.gh_compo_io.building_segment import GHCompo_BuildingSegment
+# -- Export
+from honeybee_ph_rhino.gh_compo_io.write_wuif_xml import GHCompo_WriteWufiXml
+from honeybee_ph_rhino.gh_compo_io.write_PHPP import GHCompo_WriteToPHPP

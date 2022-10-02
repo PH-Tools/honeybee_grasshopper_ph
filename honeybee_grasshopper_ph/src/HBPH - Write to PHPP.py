@@ -35,7 +35,7 @@ NOTE:
     be sure to save your PHPP file with the new data to the appropriate location on 
     your computer.
 -
-EM Septembber 12, 2022
+EM October 2, 2022
     Args:
         _hbjson_file: (str) The full file path to the HBJSON you would like to write 
             out to PHPP.
@@ -53,30 +53,45 @@ EM Septembber 12, 2022
         hb_rooms_ (List[Room]) A list of the Honeybee Rooms with the ph-style occupancy set.
 """
 
-import os
-import honeybee.config
-import PHX.run
-import Grasshopper.Kernel as ghK
+import scriptcontext as sc
+import Rhino as rh
+import rhinoscriptsyntax as rs
+import ghpythonlib.components as ghc
+import Grasshopper as gh
+
+
+try:
+    from honeybee_ph_utils import preview
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_utils:\t{}'.format(e))
+
+try:
+    from honeybee_ph_rhino import gh_compo_io, gh_io
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
+
 
 #-------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Write to PHPP"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='SEP_12_2022')
+honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='OCT_02_2022')
 if DEV:
-    reload(PHX.run)
+    reload(gh_compo_io)
+    reload(gh_io)
 
-#-------------------------------------------------------------------------------
-if os.name != 'nt':
-    msg = "Error: This PHPP writer is only supported on Windows OS. It looks like "\
-        "you are running '{}'?".format(os.name)
-    ghenv.Component.AddRuntimeMessage(ghK.GH_RuntimeMessageLevel.Error, msg)
 
-#-------------------------------------------------------------------------------
-if _write and _hbjson_file:
-    hb_python_site_packages = honeybee.config.folders.python_package_path
-    PHX.run.write_hbjson_to_phpp(_hbjson_file, hb_python_site_packages, _activate_variants or "False")
-else:
-    msg = "Open a valid PHPP file in Excel, and set _write to True."
-    ghenv.Component.AddRuntimeMessage(ghK.GH_RuntimeMessageLevel.Warning, msg)
+# ------------------------------------------------------------------------------
+# -- GH Interface
+IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
+
+
+# -------------------------------------------------------------------------------------
+gh_compo_interface = gh_compo_io.GHCompo_WriteToPHPP(
+        IGH,
+        _hbjson_file,
+        _activate_variants,
+        _write,
+)
+gh_compo_interface.run()
