@@ -31,7 +31,7 @@ that separately using a normal EPW file with hourly data.
 Note: if you would like to use one of the pre-loaded PHPP climate data sets instead of providing detailed
 info here (for PHPP only) you can use the "HBPH - PH PHPP Climate" component to simply specify the dataset to load.
 -
-EM September 7, 2022
+EM October 2, 2022
     Args:
         _display_name_: (str) Optional name for the climate data set.
         
@@ -64,45 +64,54 @@ EM September 7, 2022
         climate_data_: A new HBPH Climate Data object that can passed along to an "HBPH - PH Site" component.
 """
 
-from honeybee_ph_utils import preview
-from honeybee_ph_rhino.gh_compo_io import ghio_climate
+import scriptcontext as sc
+import Rhino as rh
+import rhinoscriptsyntax as rs
+import ghpythonlib.components as ghc
+import Grasshopper as gh
+
+
+try:
+    from honeybee_ph_utils import preview
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_utils:\t{}'.format(e))
+
+try:
+    from honeybee_ph_rhino import gh_compo_io, gh_io
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
 
 # -------------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - PH Climate Data"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='SEP_07_2022')
-
+honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='OCT_02_2022')
 if DEV:
-    from honeybee_ph import site
-    reload(site)
-    from honeybee_ph_utils import units
-    reload(units)
-    from honeybee_ph_rhino.gh_compo_io import ghio_validators
-    reload(ghio_validators)
-    reload(ghio_climate)
-    reload(preview)
+    reload(gh_compo_io)
+    reload(gh_io)
+
+
+# ------------------------------------------------------------------------------
+# -- GH Interface
+IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
+
     
 # -------------------------------------------------------------------------------------
-IClimate_PeakLoads_ = ghio_climate.IClimate_PeakLoads(
-        _peak_heat_load_1_,
-        _peak_heat_load_2_,
-        _peak_cooling_load_1_,
-        _peak_cooling_load_2_,
-    )
-peak_loads_ = IClimate_PeakLoads_.create_hbph_obj()
-
-IClimate_ = ghio_climate.IClimate(
+gh_compo_interface = gh_compo_io.GHCompo_ClimateData(
+        IGH,
         _display_name_,
         _station_elevation_,
         _daily_temp_swing_,
         _avg_wind_speed_,
         _monthly_temps_,
         _monthly_radiation_,
-        peak_loads_,
-    )
-climate_data_ = IClimate_.create_hbph_obj()
+        _peak_heat_load_1_,
+        _peak_heat_load_2_,
+        _peak_cooling_load_1_,
+        _peak_cooling_load_2_,
+)
+climate_data_ = gh_compo_interface.run()
 
 
 # -------------------------------------------------------------------------------------

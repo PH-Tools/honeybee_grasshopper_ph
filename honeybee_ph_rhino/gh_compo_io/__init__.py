@@ -40,3 +40,17 @@ from honeybee_ph_rhino.gh_compo_io.shade_create_bldg_shd import GHCompo_CreateBu
 from honeybee_ph_rhino.gh_compo_io.shade_LBT_rad_settings import GHCompo_CreateLBTRadSettings
 from honeybee_ph_rhino.gh_compo_io.shade_solve_LBT_rad import GHCompo_SolveLBTRad
 from honeybee_ph_rhino.gh_compo_io.shade_solve_shading_dims import GHCompo_SolveShadingDims
+# -- Climate
+from honeybee_ph_rhino.gh_compo_io.climate_peak_load import GHCompo_CreatePeakLoad
+from honeybee_ph_rhino.gh_compo_io.climate_monthly_radiation import GHCompo_CreateMonthlyRadiation
+from honeybee_ph_rhino.gh_compo_io.climate_monthly_temps import GHCompo_MonthlyTemps
+from honeybee_ph_rhino.gh_compo_io.climate_data import GHCompo_ClimateData
+from honeybee_ph_rhino.gh_compo_io.climate_location import GHCompo_Location
+from honeybee_ph_rhino.gh_compo_io.climate_PHPP_code import GHCompo_PHPPCodes
+from honeybee_ph_rhino.gh_compo_io.climate_conver_fact import GHCompo_ConversionFactor
+from honeybee_ph_rhino.gh_compo_io.climate_site import GHCompo_Site
+# -- Certification
+from honeybee_ph_rhino.gh_compo_io.cert_Phius import GHCompo_PhiusCertification
+from honeybee_ph_rhino.gh_compo_io.cert_PHI import GHCompo_PhiCertification
+# -- Building Segment
+from honeybee_ph_rhino.gh_compo_io.building_segment import GHCompo_BuildingSegment

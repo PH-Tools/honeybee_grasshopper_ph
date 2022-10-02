@@ -26,7 +26,7 @@ values for NYC, USA will be used.
 Note also that this component will *NOT* reset any of the Honeybee EnergyPlus climate, and you will need to set
 that separately using a normal EPW file with hourly data.
 -
-EM September 7, 2022
+EM October 2, 2022
     Args:
         _latitude: (deg) default = 40.6 (NYC)
         
@@ -44,25 +44,43 @@ EM September 7, 2022
             component.
 """
 
-from honeybee_ph import site
-from honeybee_ph_rhino.gh_compo_io import ghio_climate
-from honeybee_ph_utils import preview
+import scriptcontext as sc
+import Rhino as rh
+import rhinoscriptsyntax as rs
+import ghpythonlib.components as ghc
+import Grasshopper as gh
+
+
+try:
+    from honeybee_ph_utils import preview
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_utils:\t{}'.format(e))
+
+try:
+    from honeybee_ph_rhino import gh_compo_io, gh_io
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
 
 # -------------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - PH Location"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='SEP_07_2022')
-
+honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='OCT_02_2022')
 if DEV:
-    reload(site)
-    reload(ghio_climate)
-    reload(preview)
+    reload(gh_compo_io)
+    reload(gh_io)
+
+
+# ------------------------------------------------------------------------------
+# -- GH Interface
+IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
+
     
 # -------------------------------------------------------------------------------------
 # -- Create the new Location Object
-ILocation_ = ghio_climate.ILocation(
+gh_compo_interface = gh_compo_io.GHCompo_Location(
+        IGH,
         _display_name,
         _latitude,
         _longitude,
@@ -71,7 +89,7 @@ ILocation_ = ghio_climate.ILocation(
         _hours_from_UTC,
     )
 
-location_ = ILocation_.create_hbph_obj()
+location_ = gh_compo_interface.run()
 
 # -------------------------------------------------------------------------------------
 preview.object_preview(location_)

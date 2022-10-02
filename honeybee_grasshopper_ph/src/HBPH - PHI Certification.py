@@ -22,7 +22,7 @@
 """
 Enter the relevant Phius Certification threshold data for the building-segment.
 -
-EM June 4, 2022
+EM October 2, 2022
     Args:
         _building_category_type: Input either -
             "1-Residential building" (default)
@@ -74,38 +74,55 @@ EM June 4, 2022
             assign to one or more Building Segments.
 """
 
+import scriptcontext as sc
+import Rhino as rh
+import rhinoscriptsyntax as rs
+import ghpythonlib.components as ghc
+import Grasshopper as gh
 
-from honeybee_ph_rhino import gh_io
-from honeybee_ph_utils import preview, enumerables
-from honeybee_ph import phi
 
+try:
+    from honeybee_ph_utils import preview
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_utils:\t{}'.format(e))
+
+try:
+    from honeybee_ph_rhino import gh_compo_io, gh_io
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
 
 #-------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - PHI Certification"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='JUN_04_2022')
+honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='OCT_02_2022')
 if DEV:
-    reload(enumerables)
+    reload(gh_compo_io)
     reload(gh_io)
-    reload(preview)
-    reload(phi)
 
 
-#-------------------------------------------------------------------------------
-phi_certification_ =  phi.PhiCertification()
+# ------------------------------------------------------------------------------
+# -- GH Interface
+IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 
-phi_certification_.building_category_type = gh_io.input_to_int(_building_category_type)
-phi_certification_.building_use_type = gh_io.input_to_int(_building_use_type)
-phi_certification_.ihg_type = gh_io.input_to_int(_ihg_type)
-phi_certification_.occupancy_type = gh_io.input_to_int(_occupancy_type)
 
-phi_certification_.certification_type = gh_io.input_to_int(_certification_type)
-phi_certification_.certification_class = gh_io.input_to_int(_certification_class)
-phi_certification_.primary_energy_type = gh_io.input_to_int(_primary_energy_type)
-phi_certification_.enerphit_type = gh_io.input_to_int(_enerphit_type)
-phi_certification_.retrofit_type = gh_io.input_to_int(_retrofit)
+# -------------------------------------------------------------------------------------
+gh_compo_interface = gh_compo_io.GHCompo_PhiCertification(
+        IGH,
+        _building_category_type,
+        _building_use_type,
+        _ihg_type,
+        _occupancy_type,
+        _certification_type,
+        _certification_class,
+        _primary_energy_type,
+        _enerphit_type,
+        _retrofit,
+    )
 
-#-------------------------------------------------------------------------------
+phi_certification_ = gh_compo_interface.run()
+
+
+# -------------------------------------------------------------------------------------
 preview.object_preview(phi_certification_)

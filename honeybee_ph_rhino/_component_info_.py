@@ -5,7 +5,7 @@
 These are called when the component is instantiated within the Grasshopper canvas.
 """
 
-RELEASE_VERSION = "HONEYBEE-PH v0.1"
+RELEASE_VERSION = "Honeybee-PH for GH v1.0.0"
 CATEGORY = "HB-PH"
 SUB_CATEGORIES = {
     0: "00 | Utils",
@@ -375,10 +375,9 @@ def set_component_params(ghenv, dev=False):
         * None:
     """
 
+    compo_name = ghenv.Component.Name
     try:
-        compo_name = ghenv.Component.Name
-        sub_cat_num = COMPONENT_PARAMS.get(
-            compo_name, {}).get("SubCategory", 1)
+        sub_cat_num = COMPONENT_PARAMS.get(compo_name, {}).get("SubCategory", 1)
         sub_cat_name = SUB_CATEGORIES.get(sub_cat_num)
     except Exception as e:
         raise ComponentNameError(compo_name, e)
@@ -391,9 +390,8 @@ def set_component_params(ghenv, dev=False):
 
     ghenv.Component.Message = msg
 
-    # ------ Set the othere stuff
-    ghenv.Component.NickName = COMPONENT_PARAMS.get(
-        compo_name, {}).get("NickName")
+    # ------ Set the other stuff
+    ghenv.Component.NickName = COMPONENT_PARAMS.get(compo_name, {}).get("NickName")
     ghenv.Component.Category = CATEGORY
     ghenv.Component.SubCategory = sub_cat_name
     ghenv.Component.IconDisplayMode = ghenv.Component.IconDisplayMode.application

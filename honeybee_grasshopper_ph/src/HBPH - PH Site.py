@@ -27,7 +27,7 @@ to use one of the climates pre-loaded into the PHPP.
 Note also that this component will *NOT* reset any of the Honeybee EnergyPlus climate, and you will need to set
 that separately using a normal EPW file with hourly data.
 -
-EM September 7, 2022
+EM October 2, 2022
     Args:
         _display_name: (str) Optional display name for the Site.
         
@@ -45,31 +45,49 @@ EM September 7, 2022
         site_: A new HBPH Site object which can be passed along the "Building Segment" and will 
             be used to set location and climate information in the PHPP and WUFI-Passive models.
 """
-from honeybee_ph_utils import preview
-from honeybee_ph_rhino.gh_compo_io import ghio_climate
 
+import scriptcontext as sc
+import Rhino as rh
+import rhinoscriptsyntax as rs
+import ghpythonlib.components as ghc
+import Grasshopper as gh
+
+
+try:
+    from honeybee_ph_utils import preview
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_utils:\t{}'.format(e))
+
+try:
+    from honeybee_ph_rhino import gh_compo_io, gh_io
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
 
 # -------------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - PH Site"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='SEP_07_2022')
-
+honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='OCT_02_2022')
 if DEV:
-    reload(ghio_climate)
-    from honeybee_ph import site
-    reload(site)
-    reload(preview)
+    reload(gh_compo_io)
+    reload(gh_io)
+
+
+# ------------------------------------------------------------------------------
+# -- GH Interface
+IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
+  
 
 # -------------------------------------------------------------------------------------
-ISite_ = ghio_climate.ISite(
+gh_compo_interface = gh_compo_io.GHCompo_Site(
+        IGH,
         _display_name,
         _location,
         _climate_data,
         _phpp_climate,
 )
-site_ = ISite_.create_hbph_obj()
+site_ = gh_compo_interface.run()
 
 # -------------------------------------------------------------------------------------
 preview.object_preview(site_)

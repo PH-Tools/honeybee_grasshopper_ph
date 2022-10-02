@@ -33,7 +33,7 @@ model. Only Honeybee Faces with boundary conditions of "Outdoors", "Ground" and
 -
 Use this before passing the honeybee-rooms on to the 'HB Model' component.
 -
-EM June 19, 2022
+EM October 2, 2022
     Args:
         segment_name_: Name for the building-segment
                
@@ -74,72 +74,56 @@ EM June 19, 2022
         hb_rooms_: The honeyee-Rooms with building-segment information added.
 """
 
-from honeybee_ph_standards.sourcefactors import factors, phius_CO2_factors, phius_source_energy_factors
-from honeybee_ph_utils import preview
-from honeybee_ph_rhino.gh_compo_io import ghio_bldg_segment
+import scriptcontext as sc
+import Rhino as rh
+import rhinoscriptsyntax as rs
+import ghpythonlib.components as ghc
+import Grasshopper as gh
 
 
+try:
+    from honeybee_ph_utils import preview
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_utils:\t{}'.format(e))
+
+try:
+    from honeybee_ph_rhino import gh_compo_io, gh_io
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
+    
+    
 # -------------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Bldg Segment"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='JUN_19_2022')
+honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='OCT_02_2022')
 if DEV:
-    reload(preview)
-    reload(ghio_bldg_segment)
+    reload(gh_compo_io)
+    reload(gh_io)
 
+
+# ------------------------------------------------------------------------------
+# -- GH Interface
+IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
+
+    
+# -------------------------------------------------------------------------------------
+gh_compo_interface = gh_compo_io.GHCompo_BuildingSegment(
+        IGH,
+        _segment_name_,
+        num_floor_levels_,
+        num_dwelling_units_,
+        site_,
+        source_energy_factors_,
+        co2e_factors_,
+        phius_certification_,
+        phi_certification_,
+        winter_set_temp_,
+        summer_set_temp_,
+        _hb_rooms,
+)
+hb_rooms_, hbph_segment = gh_compo_interface.run()
 
 # -------------------------------------------------------------------------------------
-# -- Build the BldgSegment Interface
-ghio_segment = ghio_bldg_segment.IBldgSegment()
-ghio_segment.display_name = _segment_name_
-ghio_segment.num_floor_levels = num_floor_levels_
-ghio_segment.num_dwelling_units = num_dwelling_units_
-ghio_segment.site = site_
-ghio_segment.phius_certification = phius_certification_
-ghio_segment.phi_certification = phi_certification_
-ghio_segment.set_points.winter = winter_set_temp_
-ghio_segment.set_points.summer = summer_set_temp_
-
-# -- Collect all the Thermal Bridges from all the Rooms input
-# -- note that only one instance of each TB will be maintained on the 
-# -- final Building Segment
-tb_dict = {}
-for room in _hb_rooms:
-    tb_dict.update(room.properties.ph.ph_bldg_segment.thermal_bridges)
-ghio_segment.thermal_bridges = tb_dict
-
-
-# -------------------------------------------------------------------------------------
-# -- Sort out the fuel factors 
-for factor in factors.build_factors_from_library(phius_source_energy_factors.factors_2021) + source_energy_factors_:
-    ghio_segment._source_energy_factors.add_factor(factor) 
-for factor in factors.build_factors_from_library(phius_CO2_factors.factors_2021) + co2e_factors_:
-    ghio_segment._co2e_factors.add_factor(factor) 
-
-
-allowed_fuels = list(set(
-    list(phius_source_energy_factors.factors_2021.keys()) +
-    list(phius_CO2_factors.factors_2021.keys())
-))
-ghio_segment.co2e_factors.validate_fuel_types(allowed_fuels)
-
-
-# -------------------------------------------------------------------------------------
-# -- Create the actual HBPH Building Segment Object
-hbph_segment = ghio_segment._create_hbph_bldg_segment()
-
-
-# -------------------------------------------------------------------------------------
-# -- Set the new HBPH Building Segment on the HB rooms
-hb_rooms_ = []
-for i, hb_room in enumerate(_hb_rooms):
-    new_room = hb_room.duplicate()
-    new_room.properties.ph.ph_bldg_segment = hbph_segment
-    hb_rooms_.append(new_room)
-
-# -------------------------------------------------------------------------------------
-# -- Preview
 preview.object_preview(hbph_segment)
-
