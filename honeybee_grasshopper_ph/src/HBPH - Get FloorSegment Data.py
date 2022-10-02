@@ -25,7 +25,7 @@ This is only useful if you  have assigned detailed space numbers and names to th
 floor-segment geometry back in the Rhino scene. This component will help gather and 
 organize this data so that it can be passed along to the 'Create Spaces' component.
 -
-EM September 30, 2022
+EM October 2, 2022
     Args:
         _group_by_name: (bool): If True, will attempt to group the Floor Segments 
             found based on their number/name
@@ -57,11 +57,10 @@ from honeybee_ph_rhino import gh_io, gh_compo_io
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Get FloorSegment Data"
-DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='SEP_30_2022')
+DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
     reload(gh_compo_io)
-
+    reload(gh_io)
 
 # ------------------------------------------------------------------------------
 # -- GH Interface

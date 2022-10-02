@@ -23,7 +23,7 @@
 Settings and parameter values used when calculating the Window Shading Factors
 using the Passive House LBT-Radiation solver.
 -
-EM October 1, 2022
+EM October 2, 2022
     Args:
         _epw_file: The EPW file to use to generate the sky-matrix objects.
         
@@ -72,8 +72,7 @@ except ImportError as e:
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Shading Factor Settings - LBT Rad"
-DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='OCT_01_2022')
+DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
     reload(gh_compo_io)
     reload(gh_io)

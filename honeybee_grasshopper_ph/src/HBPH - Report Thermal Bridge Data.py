@@ -25,7 +25,7 @@ component will generate both the 'highlight' geometry for each thermal-bridge on
 at a time, and also the 'background' building geometry. Pass all of the outputs 
 along to the "HBPH - Export PDFs" component for exporting to PDF.
 -
-EM July 10, 2022
+EM October 2, 2022
     Args:
         _hb_model: (honeybee.model.Model) The Honeybee-Model to use as the source.
         
@@ -71,8 +71,7 @@ from honeybee_ph_rhino import gh_io
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Report Thermal Bridge Data"
-DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='JUN_10_2022')
+DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
     reload(build_thermal_bridges)
 

@@ -23,7 +23,7 @@
 Create a new HBPH Window Frame Element. A full HBPH Window Frame is made of 4 of 
 these elements (top, right, bottom, left).
 -
-EM October 1, 2022
+EM October 2, 2022
     Args:
         _name_: (str)
         
@@ -54,7 +54,7 @@ except ImportError as e:
     raise ImportError('Failed to import honeybee_ph_utils:\t{}'.format(e))
 
 try:
-    from honeybee_ph_rhino import gh_compo_io
+    from honeybee_ph_rhino import gh_compo_io, gh_io
 except ImportError as e:
     raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
 
@@ -63,17 +63,10 @@ except ImportError as e:
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create PH Window Frame Element"
-DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='OCT_01_2022')
-
+DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
-    from honeybee_ph_utils import units
-    reload(units)
-    from honeybee_ph_rhino.gh_compo_io import ghio_validators
-    reload(ghio_validators)
-    from honeybee_ph_rhino.gh_compo_io import win_create_frame_element as gh_compo_io
     reload(gh_compo_io)
-    reload(preview)
+    reload(gh_io)
 
 
 # -------------------------------------------------------------------------------------

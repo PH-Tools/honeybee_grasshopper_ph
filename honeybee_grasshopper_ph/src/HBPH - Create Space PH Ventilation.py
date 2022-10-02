@@ -23,7 +23,7 @@
 Create a List or Tree of new SpacePhVentFlowRates objects which can be used to 
 set the PH-Style ventilation flow rates for a Space.
 -
-EM September 30, 2022
+EM October 2, 2022
     Args:
         _v_sup: (float): A list or Tree of Supply-air ventilation flow rates (m3/s).
         
@@ -47,10 +47,10 @@ from honeybee_ph_rhino import gh_compo_io
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create Space PH Ventilation"
-DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='SEP_30_2022')
+DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
     reload(gh_compo_io)
+    reload(gh_io)
 
 
 # ------------------------------------------------------------------------------

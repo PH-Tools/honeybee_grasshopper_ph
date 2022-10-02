@@ -23,7 +23,7 @@
 Create a new Operation Period with a fractional rate and an hours/ day of operation. 
 These Operationg Periods are used in the creation of HB-PH Schedules.
 -
-EM October 1, 2022
+EM October 2, 2022
     Args:
         name_: (str) Optional name for the period (ie: "high", "low", "on", off", etc..)
         
@@ -58,8 +58,7 @@ except ImportError as e:
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Operation Period"
-DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='OCT_01_2022')
+DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
     reload(gh_compo_io)
     reload(gh_io)

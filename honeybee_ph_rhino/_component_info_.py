@@ -5,7 +5,7 @@
 These are called when the component is instantiated within the Grasshopper canvas.
 """
 
-RELEASE_VERSION = "Honeybee-PH for GH v1.0.0"
+RELEASE_VERSION = "Honeybee-PH v1.0"
 CATEGORY = "HB-PH"
 SUB_CATEGORIES = {
     0: "00 | Utils",
@@ -359,7 +359,7 @@ class ComponentNameError(Exception):
 
 
 def set_component_params(ghenv, dev=False):
-    # type (ghenv, Optional[str | bool]) -> None
+    # type (ghenv, Optional[str | bool]) -> bool
     """
     Sets the visible attributes of the Grasshopper Component (Name, Date, etc..)
 
@@ -395,3 +395,5 @@ def set_component_params(ghenv, dev=False):
     ghenv.Component.Category = CATEGORY
     ghenv.Component.SubCategory = sub_cat_name
     ghenv.Component.IconDisplayMode = ghenv.Component.IconDisplayMode.application
+
+    return dev

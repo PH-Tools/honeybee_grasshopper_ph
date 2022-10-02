@@ -26,7 +26,7 @@ combined together into a single building segment before export to the PHPP / WUF
 the thermal bridges here will only get accounted for once. If the same thermal bridge object
 is added to more than one room, it will only show up once for each building-segment.
 -
-EM September 30, 2022
+EM October 2, 2022
 
     Args:
         _thermal_bridges: (List[PhThermalBridge]) A list of the new PH Thermal Bridge
@@ -41,7 +41,7 @@ EM September 30, 2022
 """
 
 try:
-    from honeybee_ph_rhino import gh_compo_io
+    from honeybee_ph_rhino import gh_compo_io, gh_io
 except ImportError as e:
     raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
 
@@ -50,9 +50,11 @@ import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Add Thermal Bridges to Rooms"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='SEP_30_2022')
+honeybee_ph_rhino._component_info_.set_component_params(ghenv)
+DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
     reload(gh_compo_io)
+    reload(gh_io)
 
 
 #-------------------------------------------------------------------------------

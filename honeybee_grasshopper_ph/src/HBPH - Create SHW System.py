@@ -25,7 +25,7 @@ using the 'Apply SHW System' component. Note that many elements here replicate t
 Honeybee-Energy "HB SHW System" component, but allow for additional HB-PH elements such as 
 piping and storage tanks to be added as well.
 -
-EM September 30, 2022
+EM October 2, 2022
 
     Args:
         _system_type: [str] Text for the specific type of service hot water system and equipment.
@@ -88,10 +88,10 @@ from honeybee_ph_utils import preview
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create SHW System"
-DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='SEP_30_2022')
+DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
     reload(gh_compo_io)
+    reload(gh_io)
 
 if _system_type:
     gh_compo_interface = gh_compo_io.GHCompo_CreateSHWSystem(

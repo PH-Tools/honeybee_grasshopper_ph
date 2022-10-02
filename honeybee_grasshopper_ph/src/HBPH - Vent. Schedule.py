@@ -26,7 +26,7 @@ equivalent constant-value fresh air ventilation operation scheduled which can th
 used to control the Honeybee-Energy fresh air ventilation. Note that the values here
 will also be stored and used as detailed inputs into  WUFI-Passive or PHPP upon export.
 -
-EM October 1, 2022
+EM October 2, 2022
     Args:
         _name_: Optional name for the Ventilation Schedule
         
@@ -66,12 +66,10 @@ except ImportError as e:
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Vent. Schedule"
-DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='OCT_01_2022')
+DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
     reload(gh_compo_io)
     reload(gh_io)
-
 # ------------------------------------------------------------------------------
 # -- GH Interface
 IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )

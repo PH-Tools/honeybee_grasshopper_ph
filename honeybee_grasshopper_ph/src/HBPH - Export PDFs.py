@@ -37,7 +37,7 @@ cause all sorts of unexpected results sometimes.
 -
 Set the component '_export_pdfs' to 'True' to run the exporter.
 -
-EM July 12, 2022
+EM October 2, 2022
     Args:
         _save_folder: (str) The name of the target folder to save the PDF files to.
         
@@ -91,8 +91,7 @@ from honeybee_ph_rhino import gh_io
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Export PDFs"
-DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='JUN_12_2022')
+DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
     reload(to_pdf)
 

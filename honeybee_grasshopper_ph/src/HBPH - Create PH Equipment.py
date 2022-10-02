@@ -23,7 +23,7 @@
 Create a new detailed Passive House style equipment which can be added to the 
 honeybee Rooms.
 -
-EM October 1, 2022
+EM October 2, 2022
 """
 
 import scriptcontext as sc
@@ -48,7 +48,8 @@ import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create PH Equipment"
 DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='OCT_01_2022')
+honeybee_ph_rhino._component_info_.set_component_params(ghenv)
+DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
     reload(gh_compo_io)
     reload(gh_io)

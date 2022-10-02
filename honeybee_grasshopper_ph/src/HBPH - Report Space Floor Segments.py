@@ -25,7 +25,7 @@ TFA/iCFA or Fresh-air ventilation data. This component will read through the
 Honeybee-Model and pull out relevant data and prepare it for export using
 the "HBPH - Export PDFs" component.
 -
-EM August 9, 2022
+EM October 2, 2022
     Args:
         _hb_model: (honeybee.model.Model) The honeybee Model to use as the source.
         
@@ -65,8 +65,7 @@ from honeybee_ph_utils import input_tools
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Report Space Floor Segments"
-DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='AUG_09_2022')
+DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
     reload(build_floor_segments)
 

@@ -31,7 +31,7 @@ will be used for all EnergyPlus simulatiuons, while the ISO values will be used 
 models and outputs.
 
 -
-EM October 1, 2022
+EM October 2, 2022
     Args:
         _name_: (str)
         
@@ -77,17 +77,10 @@ except ImportError as e:
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create PH Window Construction"
-DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='OCT_01_2022')
-
+DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
-    from honeybee_ph_utils import units
-    reload(units)
-    from honeybee_ph_rhino.gh_compo_io import ghio_validators
-    reload(ghio_validators)
-    from honeybee_ph_rhino.gh_compo_io import win_create_constr as gh_compo_io
     reload(gh_compo_io)
-    reload(preview)
+    reload(gh_io)
 
 
 # ------------------------------------------------------------------------------

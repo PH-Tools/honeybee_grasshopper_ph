@@ -22,7 +22,7 @@
 """
 Creates Passive House Service Hot Water Tank which can be added to the a SHW System.
 -
-EM September 30, 2022
+EM October 2, 2022
     Args:
         _tank_type: ("0-No storage tank", "1-DHW and heating", "2-DHW only") The type of use for this tank.
         
@@ -55,11 +55,10 @@ from honeybee_ph_utils import preview
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create SHW Tank"
-DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='SEP_30_2022')
+DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
-    reload(preview)
     reload(gh_compo_io)
+    reload(gh_io)
 
 
 #-------------------------------------------------------------------------------

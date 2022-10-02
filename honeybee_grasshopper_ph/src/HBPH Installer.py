@@ -63,7 +63,7 @@ EM September 26, 2022
 
 ghenv.Component.Name = 'HBPH Installer'
 ghenv.Component.NickName = 'HBPHInstall'
-ghenv.Component.Message = 'DEV | SEP_26_2022'
+ghenv.Component.Message = 'Honeybee-PH v1.0'
 ghenv.Component.Category = 'Honeybee-PH'
 ghenv.Component.SubCategory = '0 | Installer'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -428,7 +428,7 @@ def update_libraries_pip(python_exe, package_name, version=None, target=None):
     return stderr
 
 # Package versions
-honeybee_ph_version =_hbph_ver # None defaults to newest
+honeybee_ph_version = _hbph_ver # None defaults to newest
 PHX_version = _phx_ver # None defaults to newest
 rich_version = "12.4.1"
 xlwings_version = "0.27.7"

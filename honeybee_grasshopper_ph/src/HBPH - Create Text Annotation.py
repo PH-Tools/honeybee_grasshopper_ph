@@ -24,7 +24,7 @@ Create a new Text Annotation object which can be used during PDF Export. These
 annotations can be used to add titles or other data to Layouts, or to add notes or 
 text directly into the Rhino-scene as well.
 -
-EM July 10, 2022
+EM October 2, 2022
     Args:
         _text: (str) The Text for the annotation to show.
         
@@ -66,8 +66,7 @@ from honeybee_ph_utils import input_tools
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create Text Annotation"
-DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='JUN_10_2022')
+DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
     reload(to_pdf)
     reload(input_tools)

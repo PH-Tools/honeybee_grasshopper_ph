@@ -22,7 +22,7 @@
 """
 Create new PH-Style Ventilation Equpment which can be aded to HB-Rooms.
 -
-EM October 1, 2022
+EM October 2, 2022
     Args:
         system_name_: (str) The name to give to the fresh-air ventilation system.
             
@@ -57,12 +57,10 @@ except ImportError as e:
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create Ventilation System"
-DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='OCT_01_2022')
+DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
-    from honeybee_ph_rhino.gh_compo_io import mech_create_vent_sys as gh_compo_io
     reload(gh_compo_io)
-    reload(preview)
+    reload(gh_io)
 
 # ------------------------------------------------------------------------------
 gh_compo_interface = gh_compo_io.GHCompo_CreateVentSystem(

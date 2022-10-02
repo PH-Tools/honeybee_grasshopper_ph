@@ -23,7 +23,7 @@
 Collects and organizes data for a Ventilator Unit (HRV/ERV). Used to build up a 
 PH-Style Ventilation System.
 -
-EM October 1, 2022
+EM October 2, 2022
     Args:
         display_name_: (Optional[float]) The name of the Ventilator (ERV/HRV) Unit.
         
@@ -60,16 +60,10 @@ except ImportError as e:
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Ventilator"
-DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='OCT_01_2022')
+DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
-    from honeybee_ph_utils import units
-    reload(units)
-    from honeybee_ph_rhino.gh_compo_io import ghio_validators
-    reload(ghio_validators)
-    from honeybee_ph_rhino.gh_compo_io import mech_create_ventilator as gh_compo_io
     reload(gh_compo_io)
-    reload(preview)
+    reload(gh_io)
 
 
 # ------------------------------------------------------------------------------

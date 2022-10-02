@@ -23,7 +23,8 @@
 Create a new Hot-Water Heater with detailed Passive-House style inputs which 
 can then be added to the HB-Energy SHW.
 -
-EM September 30, 2022
+EM October 2, 2022
+
 """
 
 import scriptcontext as sc
@@ -39,12 +40,10 @@ from honeybee_ph_utils import preview
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create SHW Heater"
-DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='SEP_30_2022')
+DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
-    reload(gh_io)
     reload(gh_compo_io)
-    reload(preview)
+    reload(gh_io)
 
 
 # ------------------------------------------------------------------------------

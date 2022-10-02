@@ -22,7 +22,7 @@
 """
 Create new HBPH DHW Recirculation Piping Object.
 -
-EM September 30, 2022
+EM October 2, 2022
 
     Args:
         _geometry: (List[Curve]) A list of curves representing the SHW Recirculation
@@ -83,11 +83,10 @@ from honeybee_ph_utils import preview
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create SHW Recirculation Pipes"
-DEV = True
-honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev='SEP_30_2022')
+DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
     reload(gh_compo_io)
-    reload(preview)
+    reload(gh_io)
 
 # ------------------------------------------------------------------------------
 # -- GH Interface
