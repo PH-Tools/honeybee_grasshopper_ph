@@ -31,7 +31,7 @@ class GHCompo_CreatePhWinFrameElement(object):
 
     def __init__(self, _display_name, _width, _u_factor, _psi_glazing, _psi_install, _chi_value):
         # type: (str, float, float, float, float, float) -> None
-        self.display_name = clean_and_id_ep_string(_display_name or "PhWindowFrameElement")
+        self.display_name = _display_name or clean_and_id_ep_string("PhWindowFrameElement")
         self.width = _width
         self.u_factor = _u_factor
         self.psi_glazing = _psi_glazing

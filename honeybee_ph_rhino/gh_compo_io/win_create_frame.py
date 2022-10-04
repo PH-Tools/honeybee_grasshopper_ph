@@ -32,7 +32,7 @@ class GHCompo_CreatePhWinFrame(object):
 
     def __init__(self, _display_name, _top, _right, _bottom, _left):
         # type: (str, Optional[window.PhWindowFrameElement], Optional[window.PhWindowFrameElement],  Optional[window.PhWindowFrameElement],  Optional[window.PhWindowFrameElement]) -> None
-        self.display_name = clean_and_id_ep_string(_display_name or "PhWindowFrame")
+        self.display_name = _display_name or clean_and_id_ep_string("PhWindowFrame")
         self._top = _top
         self._right = _right
         self._bottom = _bottom

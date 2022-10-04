@@ -28,7 +28,7 @@ class GHCompo_CreatePhGlazing(object):
 
     def __init__(self, _name, _u_factor, _g_value):
         # type: (str, float, float) -> None
-        self.display_name = clean_and_id_ep_string(_name or "PhWindowGlazing")
+        self.display_name = _name or clean_and_id_ep_string("PhWindowGlazing")
         self.u_factor = _u_factor
         self.g_value = _g_value
 

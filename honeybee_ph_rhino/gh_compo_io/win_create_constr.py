@@ -41,7 +41,7 @@ class GHCompo_CreatePhConstruction(object):
     nfrc_u_factor = ghio_validators.UnitW_M2K("nfrc_u_factor", default=None)
     nfrc_shgc = ghio_validators.FloatPercentage("nfrc_shgc", default=None)
     t_vis = ghio_validators.Float("t_vis", default=0.6)
-
+    
     def __init__(self, _IGH, _display_name, _frame, _glazing, _nfrc_u_factor, _nfrc_shgc, _t_vis):
         # type: (gh_io.IGH, str, window.PhWindowFrame, window.PhWindowGlazing, float, float, float) -> None
         self.IGH = _IGH
