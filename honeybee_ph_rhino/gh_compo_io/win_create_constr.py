@@ -45,7 +45,7 @@ class GHCompo_CreatePhConstruction(object):
     def __init__(self, _IGH, _display_name, _frame, _glazing, _nfrc_u_factor, _nfrc_shgc, _t_vis):
         # type: (gh_io.IGH, str, window.PhWindowFrame, window.PhWindowGlazing, float, float, float) -> None
         self.IGH = _IGH
-        self.display_name = clean_and_id_ep_string(_display_name or "PhWindowConstruction")
+        self.display_name = _display_name or clean_and_id_ep_string("PhWindowConstruction")
         self.frame = _frame
         self.glazing = _glazing
         self.nfrc_u_factor = _nfrc_u_factor
