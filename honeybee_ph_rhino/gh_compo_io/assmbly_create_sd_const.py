@@ -1,5 +1,5 @@
-# -*- Python Version: 2.7 -*-
 # -*- coding: utf-8 -*-
+# -*- Python Version: 2.7 -*-
 
 """GHCompo Interface: HBPH - Create SD Constructions."""
 
@@ -8,6 +8,11 @@ try:
 except ImportError:
     # -- Python 3+
     from itertools import zip_longest as izip_longest
+
+try:
+    from honeybee_ph_utils import units
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee_ph_utils:\n\t{}'.format(e))
 
 try:
     from honeybee_energy.material.opaque import EnergyMaterial, EnergyMaterialNoMass
@@ -22,6 +27,7 @@ class GHCompo_CreateSDConstructions(object):
         self.names = _names
         self.u_values = _u_values
         self._cleanup_input_lists()
+        self._convert_u_value_units()
 
     def _cleanup_input_lists(self):
         """Make sure the input list lengths align."""
@@ -34,6 +40,14 @@ class GHCompo_CreateSDConstructions(object):
         elif len(self.names) > len(self.u_values):
             for _ in range(len(self.names) - len(self.u_values)):
                 self.u_values.append(self.u_values[0])
+
+    def _convert_u_value_units(self):
+        """Ensure all U-Values are converted to SI units."""
+        _ = []
+        for u_value in self.u_values:
+            val, unit = units.parse_input(u_value)
+            _.append(units.convert(val, unit, "W/M2K"))
+        self.u_values = _
 
     def run(self):
         hb_constructions_ = []
