@@ -260,6 +260,12 @@ COMPONENT_PARAMS = {
         "Category": CATEGORY,
         "SubCategory": 1,
     },
+    "HBPH - Create Mixed HB-Material": {
+        "NickName": "Create Mixed HB-Material",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
     "HBPH - PHI Certification": {
         "NickName": "PHI Cert.",
         "Message": RELEASE_VERSION,

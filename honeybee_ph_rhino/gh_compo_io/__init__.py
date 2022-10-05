@@ -21,6 +21,7 @@ from honeybee_ph_rhino.gh_compo_io.win_create_frame import GHCompo_CreatePhWinFr
 from honeybee_ph_rhino.gh_compo_io.win_create_frame_element import GHCompo_CreatePhWinFrameElement
 # -- Envelope
 from honeybee_ph_rhino.gh_compo_io.assmbly_create_sd_const import GHCompo_CreateSDConstructions
+from honeybee_ph_rhino.gh_compo_io.assmbly_create_mixed_mat import GHCompo_CreateMixedHBMaterial
 # -- Mech
 from honeybee_ph_rhino.gh_compo_io.mech_create_vent_sys import GHCompo_CreateVentSystem
 from honeybee_ph_rhino.gh_compo_io.mech_create_ventilator import GHCompo_CreatePhVentilator
