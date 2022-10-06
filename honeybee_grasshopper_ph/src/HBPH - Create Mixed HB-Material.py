@@ -35,7 +35,7 @@ procedures in ASHRAE HoF Chapter 25 (Zone method), or use pre-calculated assembl
 from a source such as ASHRAE 90.1 - Appendix A. You can also calculate the effective
 U-Factor of such assemblies using 2-D heat flow simulation tools such as THERM or Flixo.
 -
-EM October 5, 2022
+EM October 6, 2022
 
     Args:
         __name_: (str)
@@ -97,7 +97,7 @@ reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create Mixed HB-Material"
 DEV = True
 honeybee_ph_rhino._component_info_.set_component_params(ghenv)
-DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev="OCT_05_2022")
+DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
     reload(gh_compo_io)
     reload(gh_io)

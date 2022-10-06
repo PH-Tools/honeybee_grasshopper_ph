@@ -33,7 +33,7 @@ model. Only Honeybee Faces with boundary conditions of "Outdoors", "Ground" and
 -
 Use this before passing the honeybee-rooms on to the 'HB Model' component.
 -
-EM October 2, 2022
+EM October 6, 2022
     Args:
         segment_name_: Name for the building-segment
                
@@ -100,12 +100,16 @@ DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
     reload(gh_compo_io)
     reload(gh_io)
+    from honeybee_ph_rhino.gh_compo_io import ghio_validators
+    reload(ghio_validators)
+    from honeybee_ph_rhino.gh_compo_io import building_segment as gh_compo_io
+    reload(gh_compo_io)
 
 # ------------------------------------------------------------------------------
 # -- GH Interface
 IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 
-    
+
 # -------------------------------------------------------------------------------------
 gh_compo_interface = gh_compo_io.GHCompo_BuildingSegment(
         IGH,

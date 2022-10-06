@@ -35,7 +35,7 @@ This method uses the steps and attributes outlined in:
 * https://www.youtube.com/watch?v=XSFHdPHJ7zA
 * https://bigladdersoftware.com/epx/docs/8-7/engineering-reference/conduction-through-the-walls.html#conduction-transfer-function-ctf-calculations-special-case-r-value-only-layers
 -
-EM October 5, 2022
+EM October 6, 2022
 
     Args:
         _const_names: (List[str]) A list of the Construction names to use.
@@ -59,7 +59,7 @@ reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create SD Constructions"
 DEV = True
 honeybee_ph_rhino._component_info_.set_component_params(ghenv)
-DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev="OCT_05_2022")
+DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
     reload(gh_compo_io)
     reload(gh_io)
