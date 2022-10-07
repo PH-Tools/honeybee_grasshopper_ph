@@ -20,58 +20,18 @@
 # @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 #
 """
-Enter the relevant Phius Certification threshold data for the building-segment.
+Enter the relevant PHI PHPP configuration settings. Note that PHPP-9 and PHPP-10 
+use different options, so enter the correct info for the version you will be 
+writing your data to.
 -
-EM October 2, 2022
+EM October 7, 2022
     Args:
-        _building_category_type: Input either -
-            "1-Residential building" (default)
-            "2-Non-residential building"
+        _phpp_version: Enter either "9" or "10" to configure the inputs for the
+            PHPP version you will be writing to.
         
-        _building_use_type: Input either - 
-            "10-Dwelling" (default)
-            "11-Nursing home / students"
-            "12-Other"
-            "20-Office / Admin. building"
-            "21-School"
-            "22-Other"
-            
-        _ihg_type: Input either-
-            "2-Standard" (default),
-            "3-PHPP calculation ('IHG' worksheet)",
-            "4-PHPP calculation ('IHG non-res' worksheet)",
-            
-        _occupancy_type: Input either-
-            "1-Standard (only for residential buildings)",
-            "2-User determined",
-        
-        _certification_type: Input either -
-            "1-Passive House" (default)
-            "2-EnerPHit"
-            "3-PHI Low Energy Building"
-            "4-Other"
-
-        _certification_class: Input either -
-            "1-Classic" (default)
-            "2-Plus"
-            "3-Premium"
-
-        _primary_energy_type: Input either -
-            "1-PE (non-renewable)"
-            "2-PER (renewable)" (default)
-
-        _enerphit_type: Input either -
-            "1-Component method"
-            "2-Energy demand method" (default)
-
-        _retrofit: Input either -
-            "1-New building" (default)
-            "2-Retrofit"
-            "3-Step-by-step retrofit"
-
     Returns:
-        phi_certification_: The PHI Certification Settings object to 
-            assign to one or more Building Segments.
+        phi_certification_: A new PHI Certifiction config object which can 
+            be added to a "Building Segment" to control the PHPP settings.
 """
 
 import scriptcontext as sc
@@ -80,16 +40,8 @@ import rhinoscriptsyntax as rs
 import ghpythonlib.components as ghc
 import Grasshopper as gh
 
-
-try:
-    from honeybee_ph_utils import preview
-except ImportError as e:
-    raise ImportError('Failed to import honeybee_ph_utils:\t{}'.format(e))
-
-try:
-    from honeybee_ph_rhino import gh_compo_io, gh_io
-except ImportError as e:
-    raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
+from honeybee_ph_rhino import gh_compo_io, gh_io
+from honeybee_ph_utils import preview
 
 #-------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
@@ -97,29 +49,37 @@ reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - PHI Certification"
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
+    from honeybee_ph import phi
+    reload(phi)
     reload(gh_compo_io)
     reload(gh_io)
-
+    from honeybee_ph_rhino.gh_compo_io import cert_PHI
+    reload(cert_PHI)
+    
 
 # ------------------------------------------------------------------------------
 # -- GH Interface
 IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 
 
-# -------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+# -- Setup the input nodes, get all the user input values
+input_dict = gh_compo_io.cert_PHI.get_component_inputs(_phpp_version)
+gh_io.setup_component_inputs(IGH, input_dict)
+input_values_dict = gh_io.get_component_input_values(ghenv)
+
+if DEV:
+    from honeybee_ph_rhino.gh_compo_io import cert_PHI as gh_compo_io
+    reload(gh_compo_io)
+
+
+#-------------------------------------------------------------------------------
+# -- Build the new PHI Settings object
 gh_compo_interface = gh_compo_io.GHCompo_PhiCertification(
         IGH,
-        _building_category_type,
-        _building_use_type,
-        _ihg_type,
-        _occupancy_type,
-        _certification_type,
-        _certification_class,
-        _primary_energy_type,
-        _enerphit_type,
-        _retrofit,
+        _phpp_version,
+        input_values_dict,
     )
-
 phi_certification_ = gh_compo_interface.run()
 
 
