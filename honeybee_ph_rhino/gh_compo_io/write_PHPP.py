@@ -21,19 +21,19 @@ except ImportError as e:
     raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
 
 try:
-    import PHX.run # type: ignore
+    import PHX.run
 except ImportError as e:
     raise ImportError('\nFailed to import PHX:\n\t{}'.format(e))
 
 
 class GHCompo_WriteToPHPP(object):
 
-    def __init__(self, _IGH, _hb_json_file, _activate_variants="False", _write=False):
+    def __init__(self, _IGH, _hb_json_file, _activate_variants, _write):
         # type: (gh_io.IGH, str, str, bool) -> None
         self.IGH = _IGH
         self.hb_json_file = _hb_json_file
-        self.activate_variants = _activate_variants
-        self.write = _write
+        self.activate_variants = _activate_variants or "False"
+        self.write = _write or False
         
         #-------------------------------------------------------------------------------
         if os.name != 'nt':
