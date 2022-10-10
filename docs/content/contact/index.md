@@ -33,6 +33,8 @@ to do that we need you to provide enough information for us to know what is happ
 - Operating System and version (Windows, Mac, etc)
 - Rhino version you are running
 - Ladybug Tools version you are running
+- PHPP version and language if exporing to PHPP
+- WUFI-Passive version if exporting to WUFI
 - Versions of any other relevant plugins you are using?
 
 **Screen Shots / Examples:**
