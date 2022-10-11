@@ -59,7 +59,7 @@ if DEV:
 
 #-------------------------------------------------------------------------------
 gh_compo_interface = gh_compo_io.GHCompo_AddTBs(
-        _thermal_bridges,
         _hb_rooms,
+        _thermal_bridges
     )
 hb_rooms_ = gh_compo_interface.run()
