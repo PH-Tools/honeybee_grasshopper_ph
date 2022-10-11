@@ -127,7 +127,11 @@ class IntegerNonZero(Validated):
 
     def validate(self, name, new_value, old_value):
         if new_value is None:
-            return old_value
+            # If the user passed a 'default' attribute, try and use that
+            try:
+                return int(self.default)
+            except:
+                return old_value
 
         try:
             new_value = int(new_value)
@@ -170,7 +174,10 @@ class FloatNonZero(Validated):
 
     def validate(self, name, new_value, old_value):
         if new_value is None:
-            return old_value
+            try:
+                return float(self.default)
+            except:
+                return old_value
 
         try:
             new_value = float(new_value)
@@ -191,7 +198,10 @@ class FloatPositiveValue(Validated):
 
     def validate(self, name, new_value, old_value):
         if new_value is None:
-            return old_value
+            try:
+                return float(self.default)
+            except:
+                return old_value
 
         try:
             new_value = float(new_value)

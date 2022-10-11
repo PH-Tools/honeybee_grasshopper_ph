@@ -33,8 +33,8 @@ except ImportError as e:
 class _SetPoints(object):
     """Temp holder to collect and clean SetPoint user-inputs"""
 
-    winter = ghio_validators.FloatNonZero("winter", default=2)
-    summer = ghio_validators.FloatNonZero("summer", default=25)
+    winter = ghio_validators.FloatNonZero("winter", default=20.0)
+    summer = ghio_validators.FloatNonZero("summer", default=25.0)
 
     def __init__(self, _winter, _summer):
         self.winter = _winter
@@ -48,6 +48,7 @@ class _SetPoints(object):
 
     def ToString(self):
         return str(self)
+
 
 class GHCompo_BuildingSegment(object):
     _allowed_fuels = list(set(

@@ -14,9 +14,17 @@ try:
 except:
     pass # outside Grasshopper
 
-from honeybee_ph_rhino.gh_io import ComponentInput
-from honeybee_energy_ph.hvac import hot_water
-from honeybee_ph_rhino import gh_io
+try:
+    from honeybee_ph_rhino import gh_io
+    from honeybee_ph_rhino.gh_io import ComponentInput
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
+
+try:
+    from honeybee_energy_ph.hvac import hot_water
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee_energy_ph:\n\t{}'.format(e))
+
 
 # -----------------------------------------------------------------------------
 # -- Functions for configuring the GH Component input nodes.
