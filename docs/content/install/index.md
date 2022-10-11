@@ -7,7 +7,8 @@ Honeybee-PH and the Grasshopper toolkit are free and open-source. Feel free down
 ## Requirements
 In order to successfully install Honeybee-PH, please make sure that your system already has all of the required software installed and working:
 - [Rhino-3D v7+](https://www.rhino3d.com/)
-- [Ladybug-Tools v1.5+](https://www.ladybug.tools/)
+- [Ladybug-Tools v1.51+](https://www.ladybug.tools/)
+- Honeybee-Energy v1.51.47 or later.
 - [WUFI-Passive](https://wufi.de/en/software/wufi-passive/) (If you want to open your files in WUFI-Passive)
 - [PHPP v9+](https://passivehouse.com/04_phpp/04_phpp.htm) (If you want to open your files in PHPP)
 - Windows OS. &#128551; While almost all the Rhino/Grasshopper tools work fine on MacOS, we are still having trouble [getting Rhino to talk to Microsoft Excel on MacOS](https://discourse.mcneel.com/t/python-subprocess-permissions-error-on-mac-os-1743/142830). Sorry. For now, you will need Windows in order to use the PHPP exporter, and WUFI-Passive only runs on Windows.
@@ -30,6 +31,7 @@ If you run into any errors or trouble during install:
 - Do you have Rhino and Grasshopper v7? Right now, this is the only version of Rhino we support.
 - Are you sure you already have Ladybug-Tools and Honeybee installed? You can use the Honeybee "HB Check Versions" component to check that your Python, Radiance, and OS installs are working properly?
 ![HB Check Versions](/honeybee_grasshopper_ph/img/install/hb_config.png)
+- Do you have a compatible version of Ladybug Tools installed? Honeybee-PH requires Honeybee-Energy v1.51.47 or better to work properly. If you have an older version of Ladybug Tools / Honeybee installed, you should use the Ladybug Tools "LB Versioner" component to update your installation to the latest version before trying to use Honeybee-PH.
 - Are you using vanilla Ladybug-Tools, or are you using [Pollination](https://www.pollination.cloud/)? If you are using Pollination on Windows, it is possible that your Ladybug-Tools are installed in a different directory than normal. This means you may need additional permissions before you can install Honeybee-PH. If you run into any permissions issues, try running Rhino 'Run as administrator' from your Start Menu and then running the Installation.
 ![Run as Admin](/honeybee_grasshopper_ph/img/install/run_admin.png)
 - Still having trouble? Check out the [Contact](/{{< gh_pages_name >}}/contact/) page for additional resources.

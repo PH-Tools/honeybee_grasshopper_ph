@@ -29,7 +29,7 @@ This tool will download and install several new libraries into the Ladybug-Tools
 python interpreter, and will download and install new Grasshopper components which
 will be added to your Rhino / Grasshopper installation.
 -
-EM September 26, 2022
+EM October 11, 2022
     Args:
         _install: (bool) Set to True to install Honeybee-PH on your computer.
         
@@ -63,7 +63,7 @@ EM September 26, 2022
 
 ghenv.Component.Name = 'HBPH Installer'
 ghenv.Component.NickName = 'HBPHInstall'
-ghenv.Component.Message = 'Honeybee-PH v1.0'
+ghenv.Component.Message = 'OCT_11_2022'
 ghenv.Component.Category = 'Honeybee-PH'
 ghenv.Component.SubCategory = '0 | Installer'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -87,8 +87,16 @@ try:
     hb_loaded = True
 except ImportError as e:
     hb_loaded = False
-    msg = 'Failed to import honeybee:> Please be sure you have installed Ladybug Tools before proceeding.'
+    msg = '>> Failed to import honeybee:'\
+        '>> Please be sure you have installed Ladybug Tools before proceeding.'\
+        '>> See https://www.ladybug.tools/ for more information on downloading and installing Ladybug Tools.'
     raise ImportError('{}{}'.format(msg, e))
+
+try:
+    from honeybee_energy.config import folders as energy_folders
+except ImportError as e:
+    energy_loaded = False
+    msg = "Failed to import honeybee_energy:> Please be sure you have installed Honeybee-Energy before proceeding."
 
 
 def get_python_exe():
@@ -105,6 +113,7 @@ def get_python_exe():
     if os.path.isfile(py_exe_file):
         return py_exe_file, py_site_pack
     return None, None
+
 
 def nukedir(target_dir, rmdir=False):
     # type: (str, bool) -> None
@@ -209,10 +218,10 @@ def check_rhino_version(_min_version_allowed):
     raise Exception(msg)
 
 
-def check_lbt_version(_min_version_allowed):
+def check_hb_core_version(_min_version_allowed):
     # type: (Tuple[int, int, int]) -> Tuple[int, int, int]
     try:
-        lbt_version_installed = honeybee.config.folders.honeybee_core_version # -> (1, 50, 0)
+        hb_core_version_installed = honeybee.config.folders.honeybee_core_version # -> (1, 50, 0)
     except:
         msg = 'Error: Cannot load "honeybee.config.folders.honeybee_core_version" for some reason?'\
             'Please make sure you have Ladybug Tools installed, and updated to a the current version '\
@@ -222,17 +231,17 @@ def check_lbt_version(_min_version_allowed):
         return
     
     # Only check against Major and Minor, not the third number
-    for inst_num, min_num in zip(lbt_version_installed, _min_version_allowed[:2]):
+    for inst_num, min_num in zip(hb_core_version_installed, _min_version_allowed):
         if inst_num < min_num:
-            msg = "Honeybee-PH is not "\
-                "compatible with the version of Ladybug Tools installed on this computer: {}. Please "\
-                "update your Ladybug Tools installation to the latest version before proceeding "\
-                "with the installation. You can use the Ladybug 'LB Versioner' component to update "\
-                "your installation, and then restart Rhino before trying again.".format(lbt_version_installed)
+            msg = "Error: Honeybee-PH is not "\
+                "compatible with the version of Honeybee installed on this computer (v{}.{}.{}) Please "\
+                "update your Ladybug Tools/Honeybee installation to a compatible version before proceeding "\
+                "with the Honeybee-PH installation. You can use the Ladybug 'LB Versioner' component to update "\
+                "your Honeybee installation, and then restart Rhino before trying to install Honeybee-PH again.".format(*hb_core_version_installed)
             print msg
             ghenv.Component.AddRuntimeMessage(Message.Error,msg)
             break
-    return lbt_version_installed
+    return hb_core_version_installed
 
 
 def download_repo_from_github(_download_url, _download_file):
@@ -428,22 +437,22 @@ def update_libraries_pip(python_exe, package_name, version=None, target=None):
     return stderr
 
 # Package versions
-honeybee_ph_version = _hbph_ver # None defaults to newest
+honeybee_ph_version =_hbph_ver # None defaults to newest
 PHX_version = _phx_ver # None defaults to newest
 rich_version = "12.4.1"
 xlwings_version = "0.27.7"
 
 # required versions
 rhino_min_version = (7,18)
-lbt_min_version = (1, 51, 11)
+hb_core_min_version = (1, 51, 47)
 
 # --------------------------------------------------------------------------
 # -- Check version compatibility
 rh_version_installed = check_rhino_version(rhino_min_version)
 print "Rhino version: {}.{} found.".format(*rh_version_installed)
 
-lbt_version_installed = check_lbt_version(lbt_min_version)
-print "Ladybug Tools version: {}.{}.{} found.".format(*lbt_version_installed)
+hb_core_version_installed = check_hb_core_version(hb_core_min_version)
+print "Honeybee-Core version: {}.{}.{} found.".format(*hb_core_version_installed)
 
 if _install and not (_hbph_branch or _phx_branch or _hbph_gh_branch):
     # -- Install the PIP version
@@ -573,6 +582,6 @@ elif _install and (_hbph_branch or _phx_branch or _hbph_gh_branch):
     
 else:  # give a message to the user about what to do
     if hb_loaded:
-        check_lbt_version(lbt_min_version)
+        check_hb_core_version(hb_core_min_version)
     print 'Please:- Be sure you have already installed Ladybug Tools.- Are connected to '\
     'the internet.- Set _install to "True" to install Honeybee-PH and all dependencies on this system.'   
