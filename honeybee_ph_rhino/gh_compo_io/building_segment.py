@@ -75,6 +75,7 @@ class GHCompo_BuildingSegment(object):
         self.phi_certification = _phi_certification or phi.PhiCertification()
         self.hb_rooms = _hb_rooms
         self.set_points = _SetPoints(_winter_set_temp, _summer_set_temp)
+        self.thermal_bridges = {}
         self._create_tb_dict()
 
         # -------------------------------------------------------------------------------------
@@ -136,6 +137,8 @@ class GHCompo_BuildingSegment(object):
         # -- final Building Segment
         tb_dict = {}
         for room in self.hb_rooms:
+            if not room:
+                continue
             tb_dict.update(room.properties.ph.ph_bldg_segment.thermal_bridges) # type: ignore
         self.thermal_bridges = tb_dict
 
@@ -152,7 +155,6 @@ class GHCompo_BuildingSegment(object):
                 continue
             setattr(obj, attr_name, getattr(self, attr_name))
 
-
         # override...
         obj.set_points = self._create_hbph_set_points()
 
@@ -160,6 +162,7 @@ class GHCompo_BuildingSegment(object):
 
     def run(self):
         # type: () -> Tuple[List[room.Room], bldg_segment.BldgSegment]
+        
         # -------------------------------------------------------------------------------------
         # -- Create the actual HBPH Building Segment Object
         hbph_segment = self._create_bldg_segment()
@@ -168,6 +171,9 @@ class GHCompo_BuildingSegment(object):
         # -- Set the new HBPH Building Segment on the HB rooms
         hb_rooms_ = []
         for hb_room in self.hb_rooms:
+            if not hb_room:
+                continue
+            
             new_room = hb_room.duplicate()
             new_room.properties.ph.ph_bldg_segment = hbph_segment # type: ignore
             hb_rooms_.append(new_room)
