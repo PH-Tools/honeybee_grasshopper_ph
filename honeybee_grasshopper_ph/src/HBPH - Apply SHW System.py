@@ -25,7 +25,7 @@ this component will completely override any existing SHW System on the rooms inp
 the room does not already have a Honeybee-Energy 'service_hot_water' load, one will 
 be added with a nominal load of 0.001 L/hour.
 -
-EM October 2, 2022
+EM October 13, 2022
 
     Args:
         _hb_shw: [SHWSystem] A Honeybee-Energy SHW Mechanical System Object 
@@ -39,7 +39,16 @@ EM October 2, 2022
             SHW system applied.
 """
 
-from honeybee_ph_rhino import gh_compo_io
+try:
+    from honeybee_ph_utils import preview
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_utils:\t{}'.format(e))
+
+try:
+    from honeybee_ph_rhino import gh_compo_io, gh_io
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
+
 
 #-------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
@@ -49,11 +58,12 @@ DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
     reload(gh_compo_io)
     reload(gh_io)
+    from honeybee_ph_rhino.gh_compo_io import shw_apply_shw as gh_compo_io
+    reload(gh_compo_io)
 
 #-------------------------------------------------------------------------------
 gh_compo_interface = gh_compo_io.GHCompo_ApplySHWSys(
         _hb_shw,
         _hb_rooms,
     )
-
 hb_rooms_ = gh_compo_interface.run()
