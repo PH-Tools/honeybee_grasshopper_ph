@@ -18,8 +18,16 @@ try:  # import the honeybee-energy extension
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee_energy:\n\t{}'.format(e))
 
-from honeybee_energy_ph.hvac import hot_water
-from honeybee_ph_rhino.gh_compo_io import ghio_validators
+try:
+    from honeybee_energy_ph.hvac import hot_water
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee_energy_ph:\n\t{}'.format(e))
+
+try:
+    from honeybee_ph_rhino.gh_compo_io import ghio_validators
+    from honeybee_ph_rhino import gh_io
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
 
 
 class GHCompo_CreateSHWSystem(object):
@@ -28,8 +36,9 @@ class GHCompo_CreateSHWSystem(object):
     efficiency = ghio_validators.FloatPercentage("efficiency")
     loss_coeff = ghio_validators.UnitW_K("loss_coeff")
 
-    def __init__(self, sys_type, display_name, efficiency, condition, loss_coeff, tank_1, tank_2, buffer_tank, solar_tank, heaters, branch_piping, _num_tap_points, recirc_piping):
-        # type: (str, str, Optional[float], Union[None, Room, int], Union[None, float, str], Optional[hot_water.PhSHWTank], Optional[hot_water.PhSHWTank], Optional[hot_water.PhSHWTank], Optional[hot_water.PhSHWTank], List, List, Optional[int], List) -> None
+    def __init__(self, _IGH, sys_type, display_name, efficiency, condition, loss_coeff, tank_1, tank_2, buffer_tank, solar_tank, heaters, branch_piping, _num_tap_points, recirc_piping):
+        # type: (gh_io.IGH, str, str, Optional[float], Union[None, Room, int], Union[None, float, str], Optional[hot_water.PhSHWTank], Optional[hot_water.PhSHWTank], Optional[hot_water.PhSHWTank], Optional[hot_water.PhSHWTank], List, List, Optional[int], List) -> None
+        self.IGH = _IGH
         self.sys_type = sys_type
         self.display_name = display_name
         self.efficiency = efficiency
@@ -66,9 +75,12 @@ class GHCompo_CreateSHWSystem(object):
                 )
 
     def run(self):
-        # type: () -> shw.SHWSystem
+        # type: () -> Optional[shw.SHWSystem]
         """Create a new HB-Energy SHW System object."""
-
+        if not self.sys_type:
+            msg = "Please supply an 'HB SHW System Templates' type to '_system_type' to create the system."
+            self.IGH.warning(msg)
+            return None
 
         # -- Create the basic HB-Energy object
         shw_sys = shw.SHWSystem(self.display_name, self.sys_type,
