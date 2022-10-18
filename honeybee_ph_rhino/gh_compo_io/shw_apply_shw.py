@@ -40,8 +40,9 @@ class GHCompo_ApplySHWSys(object):
             * (List[room.Room]): A list of the HB-Room with their HB-Energy
                 SHW System modified.
         """
+        
         if self.hb_shw is None:
-            return
+            return self.hb_rooms
 
         hb_rooms_ = [] # type: List[room.Room]
         for room in self.hb_rooms:
