@@ -23,7 +23,7 @@
 Create a new Hot-Water Heater with detailed Passive-House style inputs which 
 can then be added to the HB-Energy SHW.
 -
-EM October 2, 2022
+EM October 13, 2022
 
 """
 
@@ -33,8 +33,16 @@ import rhinoscriptsyntax as rs
 import ghpythonlib.components as ghc
 import Grasshopper as gh
 
-from honeybee_ph_rhino import gh_compo_io, gh_io
-from honeybee_ph_utils import preview
+try:
+    from honeybee_ph_utils import preview
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_utils:\t{}'.format(e))
+
+try:
+    from honeybee_ph_rhino import gh_compo_io, gh_io
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
+
 
 #-------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_

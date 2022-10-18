@@ -35,7 +35,7 @@ This method uses the steps and attributes outlined in:
 * https://www.youtube.com/watch?v=XSFHdPHJ7zA
 * https://bigladdersoftware.com/epx/docs/8-7/engineering-reference/conduction-through-the-walls.html#conduction-transfer-function-ctf-calculations-special-case-r-value-only-layers
 -
-EM October 6, 2022
+EM October 13, 2022
 
     Args:
         _const_names: (List[str]) A list of the Construction names to use.
@@ -63,6 +63,8 @@ DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
     reload(gh_compo_io)
     reload(gh_io)
+    from honeybee_ph_utils import units
+    reload(units)    
     from honeybee_ph_rhino.gh_compo_io import assmbly_create_sd_const as gh_compo_io
     reload(gh_compo_io)
 
