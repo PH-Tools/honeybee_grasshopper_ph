@@ -50,6 +50,7 @@ from honeybee_ph_rhino.gh_compo_io.climate_location import GHCompo_Location
 from honeybee_ph_rhino.gh_compo_io.climate_PHPP_code import GHCompo_PHPPCodes
 from honeybee_ph_rhino.gh_compo_io.climate_conver_fact import GHCompo_ConversionFactor
 from honeybee_ph_rhino.gh_compo_io.climate_site import GHCompo_Site
+from honeybee_ph_rhino.gh_compo_io.climate_site_from_phius_file import GHCompo_CreateSiteFromPhiusFile
 # -- Certification
 from honeybee_ph_rhino.gh_compo_io.cert_Phius import GHCompo_PhiusCertification
 from honeybee_ph_rhino.gh_compo_io.cert_PHI import GHCompo_PhiCertification
