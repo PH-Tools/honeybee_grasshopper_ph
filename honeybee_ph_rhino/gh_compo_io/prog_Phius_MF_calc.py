@@ -7,7 +7,7 @@
 from collections import defaultdict
 
 try:
-    from typing import List
+    from typing import List, Optional
 except ImportError:
     pass # IronPython 2.7
 
@@ -27,6 +27,11 @@ try:
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
 
+try:
+    from honeybee_ph_standards.programtypes.default_elec_equip import ph_default_equip
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee_ph_standards:\n\t{}'.format(e))
+
 
 def stories_error(_hb_rooms):
     # type (list[room.Room]) -> bool
@@ -42,25 +47,25 @@ def stories_error(_hb_rooms):
 
 
 def spaces_error(_hb_rooms):
-    # type: (list[room.Room]) -> room.Room | bool
+    # type: (list[room.Room]) -> Optional[room.Room]
     """Returns any Honeybee Room which does not have PH-Spaces."""
     for rm in _hb_rooms:
         if len(rm.properties.ph.spaces) == 0:
             return rm
-    return False
+    return None
 
 
 def people_error(_hb_rooms):
-    # type: (list[room.Room]) -> room.Room | bool
+    # type: (list[room.Room]) -> Optional[room.Room]
     """Returns any room that does not have the 'People' HBE property applied."""
     for rm in _hb_rooms:
         if rm.properties.energy.people is None:
             return rm
-    return False
+    return None
 
 
-def check_inputs(_hb_rooms, _ghenv):
-    # type: (list[room.Room], ghenv) -> None
+def check_inputs(_hb_rooms, _IGH):
+    # type: (list[room.Room], gh_io.IGH) -> None
     """Validate the input Honeybee-Rooms.
 
     Arguments:
@@ -80,7 +85,7 @@ def check_inputs(_hb_rooms, _ghenv):
             "have used the Honeybee 'Set Story' component to properly assign story ID numbers "\
             "to each of the rooms in the project. This calculator sorts the rooms by story, "\
             "so it is important to set the story attribute before using this component."
-        _ghenv.Component.AddRuntimeMessage(ghK.GH_RuntimeMessageLevel.Warning, msg)
+        _IGH.warning(msg)
         print(msg)
 
     # -- Check that al the rooms have "PH-Spaces"
@@ -90,8 +95,7 @@ def check_inputs(_hb_rooms, _ghenv):
             "PH-Spaces before using this component. Use the HB-PH 'Create Spaces' and 'Add Spaces' "\
             "components in order to add Spaces to all the Honeybee-Rooms.".format(
                 rm_with_error.display_name)
-        _ghenv.Component.AddRuntimeMessage(ghK.GH_RuntimeMessageLevel.Error, msg)
-        print(msg)
+        _IGH.error(msg)
 
     # -- Check that all the rooms have a "People"
     rm = people_error(_hb_rooms)
@@ -99,7 +103,7 @@ def check_inputs(_hb_rooms, _ghenv):
         msg = "Error: There is no 'People' property assigned to room: '{}'. Be sure to use "\
             "the HB-PH 'Set Occupancy' component to assign the number of bedrooms per-HB-Room "\
             "before using this calculator.".format(rm_with_error.display_name)
-        _ghenv.Component.AddRuntimeMessage(ghK.GH_RuntimeMessageLevel.Error, msg)
+        _IGH.error(msg)
         print(msg)
 
 
@@ -263,22 +267,22 @@ class GHCompo_CalcPhiusMFLoads(object):
 
             # ------------------------------------------------------------------------------
             # -- Create the new Phius MF Elec Equip
-            mel = ph_equipment.PhCustomAnnualMEL(_defaults=True)
+            mel = ph_equipment.PhCustomAnnualMEL(_defaults=ph_default_equip['PhCustomAnnualMEL']['PHIUS'])
             mel.energy_demand = bldg_avg_mel
             mel.comment = "MEL - Phius MF Calculator"
             elec_equipment_.append(mel)
 
-            lighting_int = ph_equipment.PhCustomAnnualLighting(_defaults=True)
+            lighting_int = ph_equipment.PhCustomAnnualLighting(_defaults=ph_default_equip['PhCustomAnnualLighting']['PHIUS'])
             lighting_int.energy_demand = bldg_avg_lighting_int
             lighting_int.comment = "Interior Lighting - Phius MF Calculator"
             elec_equipment_.append(lighting_int)
 
-            lighting_ext = ph_equipment.PhCustomAnnualLighting(_defaults=True)
+            lighting_ext = ph_equipment.PhCustomAnnualLighting(_defaults=ph_default_equip['PhCustomAnnualLighting']['PHIUS'])
             lighting_ext.energy_demand = bldg_avg_lighting_ext
             lighting_ext.comment = "Exterior Lighting - Phius MF Calculator"
             elec_equipment_.append(lighting_ext)
 
-            lighting_garage = ph_equipment.PhCustomAnnualLighting(_defaults=True)
+            lighting_garage = ph_equipment.PhCustomAnnualLighting(_defaults=ph_default_equip['PhCustomAnnualLighting']['PHIUS'])
             lighting_garage.energy_demand = bldg_avg_lighting_garage
             lighting_garage.comment = "Garage Lighting - Phius MF Calculator"
             lighting_garage.in_conditioned_space = False
