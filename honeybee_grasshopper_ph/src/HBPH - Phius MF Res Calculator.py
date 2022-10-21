@@ -30,7 +30,7 @@ in the Phius Multifamily Workbook. These include MEL, Interior-Lighting, Exterio
 This does NOT include the other residential appliances (fridge, cooking, etc..). Be sure to add those 
 to the Residential Honeybee-Rooms in addition to the elec_equipment_ created by this component.
 -
-EM October 2, 2022
+EM October 21, 2022
 
     Args:
         int_light_HE_frac_: (float) default=1.0 | The % (0-1.0) of interior lighting
@@ -72,13 +72,11 @@ EM October 2, 2022
         hb_nonres_rooms_: The non-residential HB-Rooms.
 """
 
-
 import scriptcontext as sc
 import Rhino as rh
 import rhinoscriptsyntax as rs
 import ghpythonlib.components as ghc
 import Grasshopper as gh
-
 
 try:
     from honeybee_ph_utils import preview
@@ -98,6 +96,11 @@ DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
     reload(gh_compo_io)
     reload(gh_io)
+    from honeybee_energy_ph.load import phius_mf
+    reload(phius_mf)
+    from honeybee_ph_rhino.gh_compo_io import prog_Phius_MF_calc as gh_compo_io
+    reload(gh_compo_io)
+
 
 # ------------------------------------------------------------------------------
 # -- GH Interface
@@ -112,7 +115,8 @@ gh_compo_interface = gh_compo_io.GHCompo_CalcPhiusMFLoads(
         garage_light_HE_frac_,
         _hb_rooms,
     )
+
 (
-    res_data_by_story_, res_totals_, non_res_program_data_, non_res_room_data_, non_res_totals_,
-    elec_equipment_, hb_res_rooms_, hb_nonres_rooms_ 
+    res_data_by_story_, res_totals_, non_res_program_data_, non_res_room_data_,
+    non_res_totals_, elec_equipment_, hb_res_rooms_, hb_nonres_rooms_ 
 ) = gh_compo_interface.run()
