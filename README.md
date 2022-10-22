@@ -15,6 +15,8 @@ More information, examples and tutorials can be found on the [Honeybee-PH](https
 # How To Install honeybee-grasshoper-ph:
 See the [Honeybee-PH Installation](https://ph-tools.github.io/honeybee_grasshopper_ph/install/) page for more information on how to add this package to your system.
 
+Check out the [detailed installation walkthrough on YouTube](https://youtu.be/DvH_Wxf1D8A)
+
 ## Dependencies
 
 The honeybee-grasshopper-ph plugin has the following dependencies on core libraries:
