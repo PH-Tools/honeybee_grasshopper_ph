@@ -23,7 +23,7 @@
 Set the residential PH-Style occupancy for the Honeybee-Rooms input. For Phius, the 
 total occupancy with be the number-of-bedrooms + 1 for each dwelling unit.
 -
-EM October 2, 2022
+EM October 22, 2022
     Args:
         _name_: (str) The name of the Phius program to search the dataset for.
         
@@ -64,8 +64,14 @@ reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Phius Program Finder"
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
-    reload(gh_compo_io)
+    from honeybee_energy_ph.library import programtypes
+    reload(programtypes)
     reload(gh_io)
+    from honeybee_ph_standards.programtypes import PHIUS_programs
+    reload(PHIUS_programs)
+    from honeybee_ph_rhino.gh_compo_io import prog_find_Phius_program as gh_compo_io
+    reload(gh_compo_io)
+
 
 # ------------------------------------------------------------------------------
 # -- GH Interface

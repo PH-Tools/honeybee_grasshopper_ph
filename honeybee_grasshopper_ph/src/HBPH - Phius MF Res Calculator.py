@@ -30,7 +30,7 @@ in the Phius Multifamily Workbook. These include MEL, Interior-Lighting, Exterio
 This does NOT include the other residential appliances (fridge, cooking, etc..). Be sure to add those 
 to the Residential Honeybee-Rooms in addition to the elec_equipment_ created by this component.
 -
-EM October 21, 2022
+EM October 22, 2022
 
     Args:
         int_light_HE_frac_: (float) default=1.0 | The % (0-1.0) of interior lighting
@@ -94,6 +94,8 @@ reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Phius MF Res Calculator"
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
+    from honeybee_energy_ph.load import ph_equipment
+    reload(ph_equipment)
     reload(gh_compo_io)
     reload(gh_io)
     from honeybee_energy_ph.load import phius_mf

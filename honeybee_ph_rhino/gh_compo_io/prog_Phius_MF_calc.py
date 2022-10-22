@@ -232,7 +232,8 @@ class GHCompo_CalcPhiusMFLoads(object):
         # ---------------------------------------------------------------------------
         # -- Calculate the Elec. Energy average per Honeybee-Room
         total_hb_rooms = len(_hb_res_rooms) + len(_hb_nonres_rooms)
-        bldg_avg_mel = (_total_res_mel + _total_nonres_mel) / total_hb_rooms
+        bldg_avg_mel_dwellings = _total_res_mel  / total_hb_rooms
+        bldg_avg_mel_non_res = _total_nonres_mel / total_hb_rooms
         bldg_avg_lighting_int = (_total_res_int_lighting + _total_nonres_int_lighting) / total_hb_rooms
         bldg_avg_lighting_ext = _total_res_ext_lighting / total_hb_rooms
         bldg_avg_lighting_garage = _total_res_garage_lighting / total_hb_rooms
@@ -240,8 +241,13 @@ class GHCompo_CalcPhiusMFLoads(object):
         # ---------------------------------------------------------------------------
         # -- Create the new Phius MF Elec Equip
         mel = ph_equipment.PhCustomAnnualMEL(_defaults=ph_default_equip['PhCustomAnnualMEL']['PHIUS'])
-        mel.energy_demand = bldg_avg_mel
-        mel.comment = "MEL - Phius MF Calculator"
+        mel.energy_demand = bldg_avg_mel_dwellings
+        mel.comment = "MEL_Dwell - Phius MF Calculator"
+        elec_equipment_.append(mel)
+
+        mel = ph_equipment.PhCustomAnnualMEL(_defaults=ph_default_equip['PhCustomAnnualMEL']['PHIUS'])
+        mel.energy_demand = bldg_avg_mel_non_res
+        mel.comment = "MEL_Comm - Phius MF Calculator"
         elec_equipment_.append(mel)
 
         lighting_int = ph_equipment.PhCustomAnnualLighting(_defaults=ph_default_equip['PhCustomAnnualLighting']['PHIUS'])
