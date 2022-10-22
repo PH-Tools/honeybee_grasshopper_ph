@@ -26,6 +26,10 @@ In order to successfully install the <strong>honeybee-ph</strong> toolkit, follo
 - Step 2: Open the Installation File using Rhino / Grasshopper and follow the instructions. (*Note: if you run into permissions trouble during install, try opening Rhino 'as administrator'.)*
 - Step 3: Restart Rhino and Grasshopper to ensure that all the new components are properly added to your installation.
 
+## YouTube Walk-through
+Check out a detailed step-by-step walk-through showing both the LadybugTools installation and the Honeybee-PH installation:
+[Installation Walk-through](https://youtu.be/DvH_Wxf1D8A)
+
 ## Install Trouble?
 If you run into any errors or trouble during install:
 - Do you have Rhino and Grasshopper v7? Right now, this is the only version of Rhino we support.
