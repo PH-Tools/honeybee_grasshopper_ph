@@ -16,7 +16,7 @@ except ImportError as e:
 
 class GHCompo_CreatePhVentilator(object):
     display_name = ghio_validators.HBName("display_name")
-    sensible_hr = ghio_validators.FloatPercentage("sensible_hr", default=75.0)
+    sensible_hr = ghio_validators.FloatPercentage("sensible_hr", default=0.75)
     latent_hr = ghio_validators.FloatPercentage("latent_hr", default=0.0)
     elec_efficiency = ghio_validators.UnitWH_M3("elec_efficiency", default=0.45)
     frost_temp = ghio_validators.UnitDegreeC("frost_temp", default=-5.0)
