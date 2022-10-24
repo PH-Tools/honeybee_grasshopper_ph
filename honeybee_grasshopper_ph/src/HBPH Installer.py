@@ -29,7 +29,7 @@ This tool will download and install several new libraries into the Ladybug-Tools
 python interpreter, and will download and install new Grasshopper components which
 will be added to your Rhino / Grasshopper installation.
 -
-EM October 11, 2022
+EM October 24, 2022
     Args:
         _install: (bool) Set to True to install Honeybee-PH on your computer.
         
@@ -63,7 +63,7 @@ EM October 11, 2022
 
 ghenv.Component.Name = 'HBPH Installer'
 ghenv.Component.NickName = 'HBPHInstall'
-ghenv.Component.Message = 'OCT_11_2022'
+ghenv.Component.Message = 'OCT_24_2022'
 ghenv.Component.Category = 'Honeybee-PH'
 ghenv.Component.SubCategory = '0 | Installer'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -82,6 +82,7 @@ import Rhino
 from Grasshopper.Folders import UserObjectFolders
 from Grasshopper.Kernel import GH_RuntimeMessageLevel as Message
 
+
 try:
     import honeybee
     hb_loaded = True
@@ -92,26 +93,37 @@ except ImportError as e:
         '>> See https://www.ladybug.tools/ for more information on downloading and installing Ladybug Tools.'
     raise ImportError('{}{}'.format(msg, e))
 
+
+try:  # import the core honeybee dependencies
+    from honeybee.config import folders as hb_folders
+except ImportError as e:
+    msg =   'Failed to import honeybee:'\
+            'Please install Ladybug and Honeybee before proceeding.\t{}'.format(e)
+    raise ImportError(msg)
+
+
 try:
     from honeybee_energy.config import folders as energy_folders
 except ImportError as e:
     energy_loaded = False
-    msg = "Failed to import honeybee_energy:> Please be sure you have installed Honeybee-Energy before proceeding."
+    msg =   'Failed to import honeybee_energy:'\
+            'Please install Ladybug and Honeybee-Energy before proceeding.\t{}'.format(e)
+    raise ImportError(msg)
 
 
 def get_python_exe():
+    # type: () -> Tuple[Optional[str], Optional[str]]
     """Get the path to the Python installed in the ladybug_tools folder.
-
+    Use the HB COnfig method so that Pollination isntalls get resolved correctly
+    
     Will be None if Python is not installed.
     """
-    home_folder = os.getenv('HOME') or os.path.expanduser('~')
-    py_install = os.path.join(home_folder, 'ladybug_tools', 'python')
-    py_exe_file = os.path.join(py_install, 'python.exe') if os.name == 'nt' else \
-        os.path.join(py_install, 'bin', 'python3')
-    py_site_pack = os.path.join(py_install, 'Lib', 'site-packages') if os.name == 'nt' else \
-        os.path.join(py_install, 'lib', 'python3.7', 'site-packages')
+    py_exe_file = hb_folders.python_exe_path
+    py_site_pack = hb_folders.python_package_path
+
     if os.path.isfile(py_exe_file):
         return py_exe_file, py_site_pack
+    
     return None, None
 
 
@@ -198,7 +210,7 @@ def get_paths(_repo="honeybee_ph", _branch='main'):
     """Return the location of the url to download, and the target file location to save to."""
     
     download_url = "https://github.com/PH-Tools/{}/archive/refs/heads/{}.zip".format(_repo, _branch)
-    download_folder = honeybee.config.folders.python_package_path
+    download_folder = hb_folders.python_package_path
     download_file = os.path.join(download_folder, "main.zip")
     
     return download_url, download_file
@@ -221,7 +233,7 @@ def check_rhino_version(_min_version_allowed):
 def check_hb_core_version(_min_version_allowed):
     # type: (Tuple[int, int, int]) -> Tuple[int, int, int]
     try:
-        hb_core_version_installed = honeybee.config.folders.honeybee_core_version # -> (1, 50, 0)
+        hb_core_version_installed = hb_folders.honeybee_core_version # -> (1, 50, 0)
     except:
         msg = 'Error: Cannot load "honeybee.config.folders.honeybee_core_version" for some reason?'\
             'Please make sure you have Ladybug Tools installed, and updated to a the current version '\
@@ -459,22 +471,13 @@ if _install and not (_hbph_branch or _phx_branch or _hbph_gh_branch):
     
     # --------------------------------------------------------------------------
     # Ensure that Python has been installed in the ladybug_tools folder
-    home_folder = os.getenv('HOME') or os.path.expanduser('~')
-    try:
-        home_folder.decode('ascii')
-    except UnicodeDecodeError:
-        msg = 'Your username folder "{}" contains non-ASCII characters' \
-            'While the latest version of Ladybug Tools supports most non-ASCII ' \
-            'characters, there are some characters that can still cause issues.' \
-            'To avoid all poential problems, you can create a new username with ' \
-            'non-ASCII characters and install Ladybug Tools from that'.format(home_folder)
-        print(msg)
-        give_warning(msg)
+    
     py_exe, py_lib = get_python_exe()
     assert py_exe is not None, \
         'No Python instalation was found at: {}.This is a requirement in ' \
         'order to contine with installation'.format(
             os.path.join(home_folder, 'ladybug_tools', 'python'))
+    
     
     # --------------------------------------------------------------------------
     # Install the Honeybee-PH package
@@ -519,17 +522,7 @@ elif _install and (_hbph_branch or _phx_branch or _hbph_gh_branch):
     
     # --------------------------------------------------------------------------
     # Ensure that Python has been installed in the ladybug_tools folder
-    home_folder = os.getenv('HOME') or os.path.expanduser('~')
-    try:
-        home_folder.decode('ascii')
-    except UnicodeDecodeError:
-        msg = 'Your username folder "{}" contains non-ASCII characters' \
-            'While the latest version of Ladybug Tools supports most non-ASCII ' \
-            'characters, there are some characters that can still cause issues.' \
-            'To avoid all poential problems, you can create a new username with ' \
-            'non-ASCII characters and install Ladybug Tools from that'.format(home_folder)
-        print(msg)
-        give_warning(msg)
+
     py_exe, py_lib = get_python_exe()
     assert py_exe is not None, \
         'No Python instalation was found at: {}.This is a requirement in ' \
