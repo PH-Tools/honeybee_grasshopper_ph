@@ -40,11 +40,11 @@ class GHCompo_CreateSDConstructions(object):
         names_ = [] # type: List[str]
         
         if len(_names) < len(_u_value_inputs):
-            for u_value_input, name in izip_longest(_u_value_inputs, _names, fillvalue=_u_value_inputs[0]):
+            for u_value_input, name in izip_longest(_u_value_inputs, _names, fillvalue=_names[0]):
                 u_value_inputs_.append(u_value_input)
                 names_.append(name)
         elif len(_names) > len(_u_value_inputs):
-            for u_value_input, name in izip_longest(_u_value_inputs, _names, fillvalue=_names[0]):
+            for u_value_input, name in izip_longest(_u_value_inputs, _names, fillvalue=_u_value_inputs[0]):
                 u_value_inputs_.append(u_value_input)
                 names_.append(name)
         else:
