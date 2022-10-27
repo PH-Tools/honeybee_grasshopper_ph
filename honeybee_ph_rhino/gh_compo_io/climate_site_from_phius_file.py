@@ -229,22 +229,26 @@ class GHCompo_CreateSiteFromPhiusFile(object):
     def __init__(self, _IGH, _source_file_path):
         # type: (gh_io.IGH, str) -> None
         self.IGH = _IGH
-        self.source_file_path = _source_file_path
-        self.data = self._read_file()
+        self.data = self._read_file(_source_file_path)
         self.monthly_data_collection = MonthlyDataInputCollection()
         self.peak_load_data_collection = PeakLoadInputCollection()
 
-    def _read_file(self):
-        # type: () -> List[str]
+    def _read_file(self, _source_file_path):
+        # type: (Optional[str]) -> List[str]
         """Read in the Phius Data file (TXT only) and return a list of the contents."""
 
-        extension = self.source_file_path[-3:].upper()
+        if not _source_file_path:
+            msg = "Please supply a valid .TXT file path for the Phius data to read."
+            self.IGH.warning(msg)
+            return []
+
+        extension = _source_file_path[-3:].upper()
         if extension != "TXT":
             msg = "Error: Input Phius data '.TXT' file path. Got file of type: '{}'?".format(extension)
             self.IGH.error(msg)
-            return None
+            return []
         
-        return self.IGH.ghpythonlib_components.ReadFile(self.source_file_path)
+        return self.IGH.ghpythonlib_components.ReadFile(_source_file_path)
 
     def _create_input_data_collection(self):
         # type: () -> None
