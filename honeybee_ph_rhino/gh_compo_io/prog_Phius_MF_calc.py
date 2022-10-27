@@ -85,8 +85,9 @@ def check_inputs(_hb_rooms, _IGH):
             "have used the Honeybee 'Set Story' component to properly assign story ID numbers "\
             "to each of the rooms in the project. This calculator sorts the rooms by story, "\
             "so it is important to set the story attribute before using this component."
-        _IGH.warning(msg)
         print(msg)
+        _IGH.warning(msg)
+        
 
     # -- Check that al the rooms have "PH-Spaces"
     rm_with_error = spaces_error(_hb_rooms)
@@ -95,6 +96,7 @@ def check_inputs(_hb_rooms, _IGH):
             "PH-Spaces before using this component. Use the HB-PH 'Create Spaces' and 'Add Spaces' "\
             "components in order to add Spaces to all the Honeybee-Rooms.".format(
                 rm_with_error.display_name)
+        print(msg)
         _IGH.error(msg)
 
     # -- Check that all the rooms have a "People"
@@ -292,7 +294,7 @@ class GHCompo_CalcPhiusMFLoads(object):
                 self.IGH.warning(msg)
 
             # -- Check the inputs for errors, display warnings
-            check_inputs(hb_res_rooms_, self.IGH.ghenv)
+            check_inputs(hb_res_rooms_, self.IGH)
             
             (res_data_by_story_,
             total_res_mel,
