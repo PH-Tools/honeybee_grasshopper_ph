@@ -15,11 +15,18 @@ except ImportError as e:
 
 try:
     from honeybee_ph_rhino import gh_io
+    from honeybee_ph_rhino.gh_compo_io import ghio_validators
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
 
+
 class GHCompo_PhiusCertification(object):
 
+    PHIUS_annual_heating_demand_kWh_m2 = ghio_validators.UnitKWH_M2("PHIUS_annual_heating_demand_kWh_m2")
+    PHIUS_annual_cooling_demand_kWh_m2 = ghio_validators.UnitKWH_M2("PHIUS_annual_cooling_demand_kWh_m2")
+    PHIUS_peak_heating_load_W_m2 = ghio_validators.UnitW_M2("PHIUS_peak_heating_load_W_m2")
+    PHIUS_peak_cooling_load_W_m2 = ghio_validators.UnitW_M2("PHIUS_peak_cooling_load_W_m2")
+    
     def __init__(self, _IGH, building_category_type_, building_use_type_, building_status_, building_type_, _PHIUS_annual_heating_demand_kWh_m2, _PHIUS_annual_cooling_demand_kWh_m2, _PHIUS_peak_heating_load_W_m2, _PHIUS_peak_cooling_load_W_m2,):
         # type: (gh_io.IGH, Optional[int], Optional[int], Optional[int], Optional[int], float, float, float, float) -> None
         self.IGH = _IGH
