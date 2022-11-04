@@ -32,9 +32,9 @@ class GHCompo_ClimateData(object):
         # type: (gh_io.IGH, Optional[str], Optional[float], Optional[float], Optional[float], Optional[site.Climate_MonthlyTempCollection], Optional[site.Climate_MonthlyRadiationCollection],site.Climate_PeakLoadValueSet, Optional[site.Climate_PeakLoadValueSet], Optional[site.Climate_PeakLoadValueSet], Optional[site.Climate_PeakLoadValueSet]) -> None
         self.IGH = _IGH
         self.display_name = _display_name or "_unnamed_climate_"
-        self.station_elevation = _station_elevation
-        self.daily_temp_swing = _daily_temp_swing
-        self.average_wind_speed = _average_wind_speed
+        self.station_elevation = _station_elevation or 0.0
+        self.daily_temp_swing = _daily_temp_swing or 8.0
+        self.average_wind_speed = _average_wind_speed or 4.0
         self.monthly_temps = _monthly_temps or site.Climate_MonthlyTempCollection()
         self.monthly_radiation = _monthly_radiation or site.Climate_MonthlyRadiationCollection()
         self.heat_load_1 = _peak_heat_load_1 or site.Climate_PeakLoadValueSet()
