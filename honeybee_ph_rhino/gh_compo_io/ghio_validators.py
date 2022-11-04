@@ -305,7 +305,7 @@ class UnitM(Validated):
 
 
 class UnitW_MK(Validated):
-    """A W/MK conductivity value (float) of any positive value."""
+    """A W/MK conductivity value (float) of any value."""
 
     def validate(self, name, new_value, old_value):
         if new_value is None:
@@ -329,11 +329,6 @@ class UnitW_MK(Validated):
         result = units.convert(input_value, input_units or "W/MK", "W/MK")
 
         print('Converting: {} -> {:.4f} W/MK'.format(new_value, result))
-
-        # -- Make sure its positive
-        if result and result < 0.0:
-            raise ValueError(
-                "Error: input for '{}' cannot be negative.".format(name))
 
         return result
 
@@ -368,35 +363,6 @@ class UnitW_M2K(Validated):
         if result and result < 0.0:
             raise ValueError(
                 "Error: input for '{}' cannot be negative.".format(name))
-
-        return result
-
-
-class UnitKWH_M2(Validated):
-    """A kWh/m2 value (float) of any positive or negative value."""
-
-    def validate(self, name, new_value, old_value):
-        if new_value is None:
-            # If the user passed a 'default' attribute, try and use that
-            try:
-                return float(self.default)
-            except:
-                return old_value
-
-        input_value, input_units = units.parse_input(str(new_value))
-
-        # -- Make sure the value is a float
-        try:
-            input_value = float(input_value)
-        except:
-            raise ValueError("Error: input {} of type: {} is not allowed."
-                             "Supply float only.".format(
-                                 new_value, type(new_value)))
-
-        # -- Convert to Meters
-        result = units.convert(input_value, input_units or "KWH/M2", "KWH/M2")
-
-        print('Converting: {} -> {:.4f} kWh/m2'.format(new_value, result))
 
         return result
 
@@ -554,7 +520,8 @@ class UnitWH_M3(Validated):
                 "Error: input for '{}' cannot be negative.".format(name))
 
         return result
-        
+
+     
 class UnitKWH_M2(Validated):
     """A kWH/M2 Energy Demand of any positive value."""
 
@@ -588,6 +555,7 @@ class UnitKWH_M2(Validated):
 
         return result
         
+
 class UnitW_M2(Validated):
     """A W/M2 Load of any positive value."""
 
