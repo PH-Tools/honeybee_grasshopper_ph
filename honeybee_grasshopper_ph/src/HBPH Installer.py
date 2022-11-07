@@ -29,7 +29,7 @@ This tool will download and install several new libraries into the Ladybug-Tools
 python interpreter, and will download and install new Grasshopper components which
 will be added to your Rhino / Grasshopper installation.
 -
-EM October 24, 2022
+EM November 7, 2022
     Args:
         _install: (bool) Set to True to install Honeybee-PH on your computer.
         
@@ -63,7 +63,7 @@ EM October 24, 2022
 
 ghenv.Component.Name = 'HBPH Installer'
 ghenv.Component.NickName = 'HBPHInstall'
-ghenv.Component.Message = 'OCT_24_2022'
+ghenv.Component.Message = 'NOV_07_2022'
 ghenv.Component.Category = 'Honeybee-PH'
 ghenv.Component.SubCategory = '0 | Installer'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -242,17 +242,18 @@ def check_hb_core_version(_min_version_allowed):
         ghenv.Component.AddRuntimeMessage(Message.Error,msg)
         return
     
-    # Only check against Major and Minor, not the third number
-    for inst_num, min_num in zip(hb_core_version_installed, _min_version_allowed):
-        if inst_num < min_num:
-            msg = "Error: Honeybee-PH is not "\
-                "compatible with the version of Honeybee installed on this computer (v{}.{}.{}) Please "\
-                "update your Ladybug Tools/Honeybee installation to a compatible version before proceeding "\
-                "with the Honeybee-PH installation. You can use the Ladybug 'LB Versioner' component to update "\
-                "your Honeybee installation, and then restart Rhino before trying to install Honeybee-PH again.".format(*hb_core_version_installed)
-            print msg
-            ghenv.Component.AddRuntimeMessage(Message.Error,msg)
-            break
+    # Combine all the version numbers together, otherwise 1.53.2 will look < 1.52.47
+    min_version_number = "{:03}{:03}{:03}".format(*_min_version_allowed)
+    inst_version_number = "{:03}{:03}{:03}".format(*hb_core_version_installed)
+    if int(inst_version_number) < int(min_version_number):
+        msg = "Error: Honeybee-PH is not "\
+            "compatible with the version of Honeybee installed on this computer (v{}.{}.{}) Please "\
+            "update your Ladybug Tools/Honeybee installation to a compatible version before proceeding "\
+            "with the Honeybee-PH installation. You can use the Ladybug 'LB Versioner' component to update "\
+            "your Honeybee installation, and then restart Rhino before trying to install Honeybee-PH again.".format(*hb_core_version_installed)
+        print msg
+        ghenv.Component.AddRuntimeMessage(Message.Error,msg)
+
     return hb_core_version_installed
 
 
@@ -421,8 +422,9 @@ def copy_from_github_repo(_github_repo_name, _branch):
 
 
 def update_libraries_pip(python_exe, package_name, version=None, target=None):
+    # type: (str, str, str, str) -> Tuple[str, str]
     """Update Python libraries using pip.
-
+    
     Args:
         python_exe: The path to the Python executable to be used for installation.
         
@@ -431,28 +433,33 @@ def update_libraries_pip(python_exe, package_name, version=None, target=None):
         version: An optional string for the version of the package to install.
         
         target: An optional target directory into which the package will be installed.
-        """
-    # build up the command using the inputs
+    Returns:
+        stdout (str):
+        
+        stderr (str):
+    """
+    
+    #-- Build up the command using the inputs
     if version is not None:
         package_name = '{}=={}'.format(package_name, version)
     cmds = [python_exe, '-m', 'pip', 'install', package_name]
     if target is not None:
         cmds.extend(['--target', target, '--upgrade'])
-
-    # execute the command and print any errors
-    print('Installing {} via pip using{}'.format(package_name, python_exe))
+    
+    #-- Execute the command and print any errors
+    print('Installing {} via pip using: {}'.format(package_name, python_exe))
     use_shell = True if os.name == 'nt' else False
     process = subprocess.Popen(
         cmds, shell=use_shell, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output = process.communicate()
     stdout, stderr = output
-    return stderr
+    return stdout, stderr
 
 # Package versions
 honeybee_ph_version =_hbph_ver # None defaults to newest
 PHX_version = _phx_ver # None defaults to newest
-rich_version = "12.4.1"
-xlwings_version = "0.27.7"
+rich_version = None
+xlwings_version = None
 
 # required versions
 rhino_min_version = (7,18)
@@ -465,7 +472,7 @@ print "Rhino version: {}.{} found.".format(*rh_version_installed)
 
 hb_core_version_installed = check_hb_core_version(hb_core_min_version)
 print "Honeybee-Core version: {}.{}.{} found.".format(*hb_core_version_installed)
-
+print "- "*25
 if _install and not (_hbph_branch or _phx_branch or _hbph_gh_branch):
     # -- Install the PIP version
     
@@ -482,24 +489,30 @@ if _install and not (_hbph_branch or _phx_branch or _hbph_gh_branch):
     # --------------------------------------------------------------------------
     # Install the Honeybee-PH package
     
-    print('Installing Honeybee-PH Python libraries.')
-    stderr = update_libraries_pip(py_exe, 'honeybee-ph', honeybee_ph_version)
-    if os.path.isdir(os.path.join(py_lib, 'honeybee-ph-{}.dist-info'.format(honeybee_ph_version))):
-        print('Honeybee-PH Python libraries successfully installed! ')
+    print('Installing Honeybee-PH Python libraries to: {}'.format(py_lib))
+    stdout, stderr = update_libraries_pip(py_exe, 'honeybee-ph', honeybee_ph_version)
+    hb_ph_package_install_dir = os.path.join(py_lib, 'honeybee_ph')
+    if os.path.isdir(hb_ph_package_install_dir):
+        print('Honeybee-PH Python libraries successfully installed to: {}{}'.format(hb_ph_package_install_dir, '- '*25))
     else:
+        print('Honeybee-PH Python libraries failed to install to: {}{}'.format(hb_ph_package_install_dir, '- '*25))
         give_warning(stderr)
-        print (stderr)
+        print 'stderr:', stderr
+        print 'stdout:', stdout
     
     
     # --------------------------------------------------------------------------
     # Install the PHX package
-    print('Installing PHX (Passive House Exchange) Python libraries.')
-    stderr = update_libraries_pip(py_exe, 'phx', PHX_version)
-    if os.path.isdir(os.path.join(py_lib, 'phx-{}.dist-info'.format(PHX_version))):
-        print('PHX Python libraries successfully installed! ')
+    print('Installing PHX (Passive House Exchange) Python library to: {}'.format(py_lib))
+    stdout, stderr = update_libraries_pip(py_exe, 'phx', PHX_version)
+    phx_package_install_dir = os.path.join(py_lib, 'PHX')
+    if os.path.isdir(phx_package_install_dir):
+        print('PHX Python libraries successfully installed to: {}{}'.format(phx_package_install_dir, '- '*25))
     else:
+        print('PHX Python library failed to install to: {}{}'.format(phx_package_install_dir, '- '*25))
         give_warning(stderr)
-        print (stderr)
+        print 'stderr:', stderr
+        print 'stdout:', stdout
     
     
     # --------------------------------------------------------------------------
@@ -535,7 +548,7 @@ elif _install and (_hbph_branch or _phx_branch or _hbph_gh_branch):
     print 'Installing Python package: Rich.'
     py_exe = honeybee.config.folders.python_exe_path
     py_lib = honeybee.config.folders.python_package_path
-    stderr = update_libraries_pip(py_exe, 'rich', rich_version)
+    stdout, stderr = update_libraries_pip(py_exe, 'rich', rich_version)
 
     if os.path.isdir(os.path.join(py_lib, 'rich-{}.dist-info'.format(rich_version))):
         print 'Rich Python package successfully installed! '
@@ -549,7 +562,7 @@ elif _install and (_hbph_branch or _phx_branch or _hbph_gh_branch):
     print 'Installing Python package: XLWings.'
     py_exe = honeybee.config.folders.python_exe_path
     py_lib = honeybee.config.folders.python_package_path
-    stderr = update_libraries_pip(py_exe, 'xlwings', xlwings_version)
+    stdout, stderr = update_libraries_pip(py_exe, 'xlwings', xlwings_version)
 
     if os.path.isdir(os.path.join(py_lib, 'xlwings-{}.dist-info'.format(rich_version))):
         print 'XLWings Python package successfully installed! '
