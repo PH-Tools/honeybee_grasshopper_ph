@@ -25,8 +25,10 @@ try:  # import the core honeybee dependencies
     from honeybee.typing import clean_ep_string, clean_and_id_ep_string
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
-
-from honeybee_ph_utils import units
+try:
+    from ph_units import parser, converter
+except ImportError as e:
+    raise ImportError('\nFailed to import ph-units:\n\t{}'.format(e))
 
 
 class Validated(object):
@@ -286,7 +288,7 @@ class UnitM(Validated):
             except:
                 return old_value
 
-        input_value, input_units = units.parse_input(str(new_value))
+        input_value, input_units = parser.parse_input(str(new_value))
 
         # -- Make sure the value is a float
         try:
@@ -297,7 +299,7 @@ class UnitM(Validated):
                                  new_value, type(new_value)))
 
         # -- Convert to Meters
-        result = units.convert(input_value, input_units or "M", "M")
+        result = converter.convert(input_value, input_units or "M", "M")
 
         print('Converting: {} -> {:.4f} M'.format(new_value, result))
 
@@ -315,7 +317,7 @@ class UnitW_MK(Validated):
             except:
                 return old_value
 
-        input_value, input_units = units.parse_input(str(new_value))
+        input_value, input_units = parser.parse_input(str(new_value))
 
         # -- Make sure the value is a float
         try:
@@ -326,7 +328,7 @@ class UnitW_MK(Validated):
                                  new_value, type(new_value)))
 
         # -- Convert units
-        result = units.convert(input_value, input_units or "W/MK", "W/MK")
+        result = converter.convert(input_value, input_units or "W/MK", "W/MK")
 
         print('Converting: {} -> {:.4f} W/MK'.format(new_value, result))
 
@@ -344,7 +346,7 @@ class UnitW_M2K(Validated):
             except:
                 return old_value
 
-        input_value, input_units = units.parse_input(str(new_value))
+        input_value, input_units = parser.parse_input(str(new_value))
 
         # -- Make sure the value is a float
         try:
@@ -355,7 +357,7 @@ class UnitW_M2K(Validated):
                                  new_value, type(new_value)))
 
         # -- Convert units
-        result = units.convert(input_value, input_units or "W/M2K", "W/M2K")
+        result = converter.convert(input_value, input_units or "W/M2K", "W/M2K")
 
         print('Converting: {} -> {:.4f} W/M2K'.format(new_value, result))
 
@@ -378,7 +380,7 @@ class UnitW_K(Validated):
             except:
                 return old_value
 
-        input_value, input_units = units.parse_input(str(new_value))
+        input_value, input_units = parser.parse_input(str(new_value))
 
         # -- Make sure the value is a float
         try:
@@ -389,7 +391,7 @@ class UnitW_K(Validated):
                                  new_value, type(new_value)))
 
         # -- Convert to Meters
-        result = units.convert(input_value, input_units or "W/K", "W/K")
+        result = converter.convert(input_value, input_units or "W/K", "W/K")
 
         print('Converting: {} -> {:.4f} W/K'.format(new_value, result))
 
@@ -412,7 +414,7 @@ class UnitDeltaC(Validated):
             except:
                 return old_value
 
-        input_value, input_units = units.parse_input(str(new_value))
+        input_value, input_units = parser.parse_input(str(new_value))
 
         # -- Make sure the value is a float
         try:
@@ -423,7 +425,7 @@ class UnitDeltaC(Validated):
                                  new_value, type(new_value)))
 
         # -- Convert to Meters
-        result = units.convert(input_value, input_units or "DELTA-C", "DELTA-C")
+        result = converter.convert(input_value, input_units or "DELTA-C", "DELTA-C")
 
         print('Converting: {} -> {:.4f} Delta-C'.format(new_value, result))
 
@@ -441,7 +443,7 @@ class UnitDegreeC(Validated):
             except:
                 return old_value
 
-        input_value, input_units = units.parse_input(str(new_value))
+        input_value, input_units = parser.parse_input(str(new_value))
 
         # -- Make sure the value is a float
         try:
@@ -452,7 +454,7 @@ class UnitDegreeC(Validated):
                                  new_value, type(new_value)))
 
         # -- Convert to Meters
-        result = units.convert(input_value, input_units or "C", "C")
+        result = converter.convert(input_value, input_units or "C", "C")
 
         print('Converting: {} -> {:.4f} C'.format(new_value, result))
 
@@ -470,7 +472,7 @@ class UnitMeterPerSecond(Validated):
             except:
                 return old_value
 
-        input_value, input_units = units.parse_input(str(new_value))
+        input_value, input_units = parser.parse_input(str(new_value))
 
         # -- Make sure the value is a float
         try:
@@ -481,7 +483,7 @@ class UnitMeterPerSecond(Validated):
                                  new_value, type(new_value)))
 
         # -- Convert to Meters
-        result = units.convert(input_value, input_units or "M/S", "M/S")
+        result = converter.convert(input_value, input_units or "M/S", "M/S")
 
         print('Converting: {} -> {:.4f} meter/second'.format(new_value, result))
 
@@ -499,7 +501,7 @@ class UnitWH_M3(Validated):
             except:
                 return old_value
 
-        input_value, input_units = units.parse_input(str(new_value))
+        input_value, input_units = parser.parse_input(str(new_value))
 
         # -- Make sure the value is a float
         try:
@@ -510,7 +512,7 @@ class UnitWH_M3(Validated):
                                  new_value, type(new_value)))
 
         # -- Convert units
-        result = units.convert(input_value, input_units or "WH/M3", "WH/M3")
+        result = converter.convert(input_value, input_units or "WH/M3", "WH/M3")
 
         print('Converting: {} -> {:.4f} WH/M3'.format(new_value, result))
 
@@ -533,7 +535,7 @@ class UnitKWH_M2(Validated):
             except:
                 return old_value
 
-        input_value, input_units = units.parse_input(str(new_value))
+        input_value, input_units = parser.parse_input(str(new_value))
 
         # -- Make sure the value is a float
         try:
@@ -544,7 +546,7 @@ class UnitKWH_M2(Validated):
                                  new_value, type(new_value)))
 
         # -- Convert units
-        result = units.convert(input_value, input_units or "KWH/M2", "KWH/M2")
+        result = converter.convert(input_value, input_units or "KWH/M2", "KWH/M2")
 
         print('Converting: {} -> {:.4f} KWH/M2'.format(new_value, result))
 
@@ -567,7 +569,7 @@ class UnitW_M2(Validated):
             except:
                 return old_value
 
-        input_value, input_units = units.parse_input(str(new_value))
+        input_value, input_units = parser.parse_input(str(new_value))
 
         # -- Make sure the value is a float
         try:
@@ -578,7 +580,7 @@ class UnitW_M2(Validated):
                                  new_value, type(new_value)))
 
         # -- Convert units
-        result = units.convert(input_value, input_units or "W/M2", "W/M2")
+        result = converter.convert(input_value, input_units or "W/M2", "W/M2")
 
         print('Converting: {} -> {:.4f} W/M2'.format(new_value, result))
 

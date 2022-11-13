@@ -9,14 +9,14 @@ except ImportError:
     pass  # Python 2.7
 
 try:
-    from System import Object
-    from System.Drawing import Color
+    from System import Object #type: ignore
+    from System.Drawing import Color # type: ignore
 except ImportError:
     pass  # Outside .NET
 
 try:
-    from Rhino.DocObjects import ObjectAttributes
-    from Rhino.Geometry import Brep, Point3d, Vector3d, Line
+    from Rhino.DocObjects import ObjectAttributes # type: ignore
+    from Rhino.Geometry import Brep, Point3d, Vector3d, Line # type: ignore
 except ImportError:
     pass  # Outside Rhino
 
