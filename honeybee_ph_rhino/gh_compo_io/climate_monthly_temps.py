@@ -14,7 +14,8 @@ except ImportError as e:
     raise ImportError('\nFailed to import honeybee_ph:\n\t{}'.format(e))
 
 try:
-    from honeybee_ph_utils import units
+    from ph_units.converter import convert
+    from ph_units.parser import parse_input
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee_ph_utils:\n\t{}'.format(e))
 
@@ -51,8 +52,8 @@ class GHCompo_MonthlyTemps(object):
         """Clean and convert the input data (if needed)."""
         _ = []
         for t in self._validate(_input_list):
-            input_value, input_units = units.parse_input(str(t))
-            result = units.convert(input_value, input_units or "C", "C")
+            input_value, input_units = parse_input(str(t))
+            result = convert(input_value, input_units or "C", "C")
             _.append(result)
         return _
 

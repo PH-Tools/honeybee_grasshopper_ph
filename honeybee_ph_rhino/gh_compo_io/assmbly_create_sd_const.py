@@ -15,9 +15,10 @@ except ImportError:
     from itertools import zip_longest as izip_longest
 
 try:
-    from honeybee_ph_utils import units
+    from ph_units.converter import convert
+    from ph_units.parser import parse_input
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_ph_utils:\n\t{}'.format(e))
+    raise ImportError('\nFailed to import ph_units:\n\t{}'.format(e))
 
 try:
     from honeybee_energy.material.opaque import EnergyMaterial, EnergyMaterialNoMass
@@ -60,9 +61,9 @@ class GHCompo_CreateSDConstructions(object):
         _ = [] # type: List[Union[float, int]]
         
         for u_value in _u_value_inputs:
-            val, unit = units.parse_input(u_value)
+            val, unit = parse_input(u_value)
             
-            val = units.convert(val, unit, "W/M2K")
+            val = convert(val, unit, "W/M2K")
             if val:
                 _.append(val)
         return _
