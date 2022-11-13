@@ -110,14 +110,14 @@ def get_component_inputs(_heating_type):
 
 # -----------------------------------------------------------------------------
 class GHCompo_CreateHeatingSystem(object):
-    heating_classes = {
+    heating_classes = { 
         1: heating.PhHeatingDirectElectric,
         2: heating.PhHeatingFossilBoiler,
         3: heating.PhHeatingWoodBoiler,
         4: heating.PhHeatingDistrict,
         5: heating.PhHeatingHeatPumpAnnual,
         6: heating.PhHeatingHeatPumpRatedMonthly,
-        }
+        } # type: Dict[int, type[heating.PhHeatingSystem]]
 
     valid_heating_types = [
         "1-direct_electric",
@@ -145,13 +145,14 @@ class GHCompo_CreateHeatingSystem(object):
 
     def run(self):
         # type: () -> Optional[heating.PhHeatingSystem]
-
-        # -- Build the new PH equipment object
+        """Build the new PH equipment object"""
+        
         if not self.system_type:
             msg = "Set the '_system_type' to configure the user-inputs."
             self.IGH.warning(msg)
             return None
 
+        # --- Figure out which type of heating system is being built
         try:
             heating_class = self.heating_classes[self.system_type]
         except KeyError as e:
@@ -159,8 +160,9 @@ class GHCompo_CreateHeatingSystem(object):
                 "Error: Input Heating type: '{}' not supported by this GH-Component. Please only input: "\
                 "{}".format(self.system_type, self.valid_heating_types)
             )
-
         heating_system_ = heating_class()
+        
+        # --- Build the system
         for attr_name in dir(heating_system_):
             if attr_name.startswith('_'):
                 continue
@@ -168,3 +170,5 @@ class GHCompo_CreateHeatingSystem(object):
             input_val = self.input_dict.get(attr_name)
             if input_val:
                 setattr(heating_system_, attr_name, input_val)
+        
+        return heating_system_

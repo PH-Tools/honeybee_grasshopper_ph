@@ -141,7 +141,7 @@ class GHCompo_CreateCoolingSystem(object):
         2: cooling.PhCoolingRecirculation,
         3: cooling.PhCoolingDehumidification,
         4: cooling.PhCoolingPanel,
-    }
+    } # type: (Dict[int, type[cooling.PhCoolingSystem]])
     
     valid_cooling_types = [
         "1-ventilation",
@@ -173,6 +173,7 @@ class GHCompo_CreateCoolingSystem(object):
             self.IGH.warning(msg)
             return None
 
+        # -- Figure out which Cooling system type is being built
         try:
             cooling_class = self.cooling_classes[self.system_type]
         except KeyError as e:
@@ -181,6 +182,7 @@ class GHCompo_CreateCoolingSystem(object):
                 "{}".format(self.system_type, self.valid_cooling_types)
             )
 
+        # --- Build the Cooling system
         cooling_system_ = cooling_class()
         for attr_name in dir(cooling_system_):
             if attr_name.startswith('_'):
@@ -189,5 +191,6 @@ class GHCompo_CreateCoolingSystem(object):
             input_val = self.input_dict.get(attr_name)
             if input_val:
                 setattr(cooling_system_, attr_name, input_val)
-
+       
+        return cooling_system_
 

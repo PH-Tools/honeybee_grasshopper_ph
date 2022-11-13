@@ -21,9 +21,9 @@ from honeybee_ph_rhino.gh_compo_io import ghio_validators
 
 class SpacePhVentFlowRates(object):
     """Temporary dataclass to store flow-rate info"""
-    v_sup = ghio_validators.FloatPositiveValue('v_sup')
-    v_eta = ghio_validators.FloatPositiveValue('v_eta')
-    v_tran = ghio_validators.FloatPositiveValue('v_tran')
+    v_sup = ghio_validators.UnitM3_S('v_sup')
+    v_eta = ghio_validators.UnitM3_S('v_eta')
+    v_tran = ghio_validators.UnitM3_S('v_tran')
 
     def __init__(self, _v_sup, _v_eta, _v_tran):
         # type: (float, float, float) -> None
@@ -58,6 +58,7 @@ class SpacePhVentFlowRates(object):
 
 
 class GHCompo_CreateSpaceVent(object):
+    """Grasshopper Component Interface for """
 
     def __init__(self, _IGH, _v_sups, _v_etas, _v_trans):
         # type: (gh_io.IGH, DataTree, DataTree, DataTree) -> None

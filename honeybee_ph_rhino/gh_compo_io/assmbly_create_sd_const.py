@@ -34,22 +34,25 @@ class GHCompo_CreateSDConstructions(object):
         _u_value_inputs, self.names = self._cleanup_input_lists(_names, _u_values)
         self.u_values = self._convert_u_value_units(_u_value_inputs)
 
-    def _cleanup_input_lists(self, _names, _u_value_inputs):
+    def _cleanup_input_lists(self, _name_inputs, _u_value_inputs):
         # type: (List[str], List[str]) -> Tuple[List[str], List[str]]
         """Make sure the input list lengths align."""
         u_value_inputs_ = [] # type: List[str]
         names_ = [] # type: List[str]
+
+        if (not _name_inputs) or (not _u_value_inputs):
+            return u_value_inputs_, names_
         
-        if len(_names) < len(_u_value_inputs):
-            for u_value_input, name in izip_longest(_u_value_inputs, _names, fillvalue=_names[0]):
+        if len(_name_inputs) < len(_u_value_inputs):
+            for u_value_input, name in izip_longest(_u_value_inputs, _name_inputs, fillvalue=_name_inputs[0]):
                 u_value_inputs_.append(u_value_input)
                 names_.append(name)
-        elif len(_names) > len(_u_value_inputs):
-            for u_value_input, name in izip_longest(_u_value_inputs, _names, fillvalue=_u_value_inputs[0]):
+        elif len(_name_inputs) > len(_u_value_inputs):
+            for u_value_input, name in izip_longest(_u_value_inputs, _name_inputs, fillvalue=_u_value_inputs[0]):
                 u_value_inputs_.append(u_value_input)
                 names_.append(name)
         else:
-            for u_value_input, name in izip_longest(_u_value_inputs, _names):
+            for u_value_input, name in izip_longest(_u_value_inputs, _name_inputs):
                 u_value_inputs_.append(u_value_input)
                 names_.append(name)
 

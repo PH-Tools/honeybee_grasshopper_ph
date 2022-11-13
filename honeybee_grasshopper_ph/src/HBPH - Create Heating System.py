@@ -22,7 +22,7 @@
 """
 Create a PH-Style Heating Equipment which can be added to HB-Rooms.
 -
-EM October 2, 2022
+EM Novemenber 13, 2022
     Args:
         _system_type: (int) Enter the type of heating system.
         
@@ -53,6 +53,8 @@ reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create Heating System"
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
+    from honeybee_ph_rhino.gh_compo_io import mech_create_heating_sys
+    from honeybee_ph_rhino.gh_compo_io import mech_create_heating_sys as gh_compo_io
     reload(gh_compo_io)
     reload(gh_io)
 
@@ -75,7 +77,7 @@ gh_compo_interface = gh_compo_io.GHCompo_CreateHeatingSystem(
         _system_type,
         input_values_dict,
     )
-heater_ = gh_compo_interface.run()
+heating_system_ = gh_compo_interface.run()
 
 
 #-------------------------------------------------------------------------------
