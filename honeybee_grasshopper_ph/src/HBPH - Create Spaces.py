@@ -34,7 +34,7 @@ a wall.
 Each Volume is made of one or more floor-segments. Each floor-segment can have a
 'weighting factor' applied for calculating the TFA/iCFA for Passive House certification.
 -
-EM October 2, 2022
+EM October 14, 2022
     Args:
         _flr_seg_geom: (Tree[Geometry]) The Rhino geometry that you would like to use 
             to create the Floor-Segments of the various Spaces. Each branch should be a list 
@@ -82,12 +82,18 @@ reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create Spaces"
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
+    from honeybee_ph_rhino.gh_compo_io import space_create_spc as gh_compo_io
+    from honeybee_ph_rhino.make_spaces import make_floor
+    from honeybee_ph import space
+    reload(space)
+    reload(make_floor)    
     reload(gh_compo_io)
     reload(gh_io)
 
 # ------------------------------------------------------------------------------
 if _volume_geometry.BranchCount != 0:
-    msg = " Sorry - Detailed input using '_volume_geometry' is not implemented just yet. Coming soon."
+    msg = " Sorry - Detailed input using '_volume_geometry' is not "\
+            "implemented just yet. Coming soon."
     raise NotImplementedError(msg)
 
 

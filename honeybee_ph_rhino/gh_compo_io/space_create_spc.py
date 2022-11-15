@@ -4,31 +4,55 @@
 """GHCompo Interface: HBPH - Create Spaces."""
 
 try:
-    from typing import Tuple
+    from typing import Tuple, Union, TypeVar, Any, List, Optional
+    T = TypeVar("T")
 except ImportError:
     pass  # IronPython 2.7
 
 try:
-    from Grasshopper import DataTree
+    from Grasshopper import DataTree # type: ignore
 except ImportError:
     pass  # outside Grasshopper
 
 try:
-    from System import Object, Double, String
+    from System import Object, Double, String # type: ignore
 except:
     pass  # outside .NET
 
 try:
+    from ladybug_geometry.geometry3d import face
+except ImportError as e:
+    raise ImportError('\nFailed to import ladybug_geometry:\n\t{}'.format(e))
+
+try:
     from ladybug_rhino.fromgeometry import from_face3d
+    from ladybug_rhino.config import units_abbreviation
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
-from honeybee_ph import space
-from honeybee_ph_rhino import gh_io
-from honeybee_ph_rhino.make_spaces import make_floor, make_volume
+try:
+    from honeybee_ph import space
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee_ph:\n\t{}'.format(e))
 
+try:
+    from honeybee_ph_rhino import gh_io
+    from honeybee_ph_rhino.make_spaces import make_floor, make_volume
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
+
+try:
+    from ph_units import converter, parser
+except ImportError as e:
+    raise ImportError('\nFailed to import ph_units:\n\t{}'.format(e))
+
+try:
+    from honeybee_ph_rhino.gh_compo_io.space_create_vent_rates import SpacePhVentFlowRates
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
 
 class GHCompo_CreatePHSpaces(object):
+    DEFAULT_SPACE_HEIGHT = 2.5 #m
 
     def __init__(self,
                  _IGH,
@@ -50,11 +74,31 @@ class GHCompo_CreatePHSpaces(object):
         self.number = _space_numbers
         self.vent_rates = _space_ph_vent_rates
 
-    def _clean_input_tree(self, _input_tree, branch_count, default, _type=Object):
-        # type (DataTree, int, Any, Any) -> DataTree[<type>]
+    @property
+    def rh_doc_unit_type_abbreviation(self):
+        # type: () -> str
+        """Return the Rhino file's unit-type as a string abbreviation. ie: "Meter" -> "M", etc.."""
+        
+        return units_abbreviation().upper()
+
+    def _default_height_in_local_units(self):
+        # type: () -> Union[float, int]
+        """Return the default SpaceVolume height in the Rhino document unit-type."""
+
+        default_height_value = self.DEFAULT_SPACE_HEIGHT
+        default_height_unit = "M"
+        value = converter.convert(default_height_value, default_height_unit, self.rh_doc_unit_type_abbreviation)
+        if not value:
+            msg = "Error: Failed to convert:"\
+            "'{}{}' to local unit-type: '{}'".format(default_height_value, default_height_unit, self.rh_doc_unit_type_abbreviation)
+            raise Exception(msg)
+        return value
+
+    def _clean_input_tree(self, _input_tree, branch_count, default, _type):
+        # type: (DataTree, int, Any, T) -> DataTree[T]
         """Align the input DataTrees so they are all the same length. Apply defaults."""
 
-        new_tree = self.IGH.Grasshopper.DataTree[_type]()
+        new_tree = self.IGH.Grasshopper.DataTree[_type]() # type: DataTree[T]
         pth = self.IGH.Grasshopper.Kernel.Data.GH_Path
         for i in range(branch_count):
             try:
@@ -63,63 +107,133 @@ class GHCompo_CreatePHSpaces(object):
                 new_tree.Add(default, pth(i))
         return new_tree
 
-    def run(self):
-        # type: () -> Tuple
-        # ------------------------------------------------------------------------------
-        # -- Organize the input trees, lists, lengths, defaults
-        input_len = len(self.flr_geom.Branches)
-        weighting_factors = self._clean_input_tree(
-            self.weighting_factors, input_len, 1.0, Double)
-        volume_heights = self._clean_input_tree(self.vol_heights, input_len, 2.5, Double)
-        space_names = self._clean_input_tree(self.names, input_len, '_Unnamed_', String)
-        space_numbers = self._clean_input_tree(self.number, input_len, '000', String)
-        vent_rates = self._clean_input_tree(self.vent_rates, input_len, None, Object)
+    def _clean_volume_heights_tree(self, _input_tree, _branch_count, _default_height, _type):
+        # type: (DataTree, int, Any, T) -> DataTree[T]
+        """Return a cleaned DataTree of the volume height inputs. Allows for conversion of user input.
+        
+        ie: if the user inputs "15 m" will convert to the Rhino document unit-type.
+        """
+        
+        new_tree = self.IGH.Grasshopper.DataTree[_type]() # type: DataTree[T]
+        pth = self.IGH.Grasshopper.Kernel.Data.GH_Path
+        
+        for i in range(_branch_count):
+            try:
+                if not _input_tree.Branch(i):
+                    new_tree.Add(_default_height, pth(i))
 
-        # ------------------------------------------------------------------------------
+                for input_item in _input_tree.Branch(i):
+                    val, unit = parser.parse_input(input_item)
+                    converted_value = converter.convert(val, unit, self.rh_doc_unit_type_abbreviation)
+                    new_tree.Add(converted_value, pth(i))
+            except ValueError:
+                new_tree.Add(_default_height, pth(i))
+        return new_tree
+
+    def _create_space_floors(self, _flr_srfc_list, _weighting_factor_branch):
+        # type: (List, DataTree[Double]) -> Tuple[List[space.SpaceFloor], List[Optional[face.Face3D]]]
+        """Return a list of space.SpaceFloor objects based on Rhino Geometry and TFA weighting factors."""
+
+        space_floors, e = make_floor.space_floor_from_rh_geom(
+            self.IGH,
+            list(_flr_srfc_list),
+            list(_weighting_factor_branch)
+        )
+        
+        error_faces = [from_face3d(s) for s in e] # type: List[Optional[face.Face3D]]
+        if error_faces:
+            msg = 'Error: There was a problem joining together one or more group of floor surfaces?\n'\
+                'Check the "error_" output for a preview of the surfaces causing the problem\n'\
+                'Check the names and numbers of the surfaces, and make sure they can be properly merged?'
+            self.IGH.error(msg)
+        
+        return space_floors, error_faces
+
+    def _create_space_volumes(self, _space_floors, _vol_heights):
+        # type: (List[space.SpaceFloor], List[float]) -> List[space.SpaceVolume]
+        """Return a new space.SpaceVolume based on a floor and a height."""
+        
+        volumes = make_volume.volumes_from_floors(
+                    self.IGH,
+                    _space_floors,
+                    list(_vol_heights)
+                )
+        return volumes
+
+    def _add_flow_rates_to_space(self, _vent_rates, _new_space):
+        # type: (List[SpacePhVentFlowRates], space.Space) -> space.Space
+        """Add any user-determined vent flow rates, if any."""
+        
+        try:
+            flow_rate_obj = sum(_vent_rates)
+            _new_space.properties.ph._v_sup = flow_rate_obj.v_sup # type: ignore
+            _new_space.properties.ph._v_eta = flow_rate_obj.v_eta # type: ignore
+            _new_space.properties.ph._v_tran = flow_rate_obj.v_tran # type: ignore
+        except TypeError:
+            pass
+        return _new_space
+
+    def _space_volumes_as_rh_geom(self, _space_volumes):
+        # type: (List[space.SpaceVolume]) -> List
+        """Return a list of space.SpaceVolumes as Rhino Geometry (Brep)."""
+        
+        volume_rh_breps_ = []
+        for vol in _space_volumes:
+            volume_rh_breps_.append(
+                self.IGH.ghpythonlib_components.BrepJoin(
+                    self.IGH.convert_to_rhino_geom(vol.geometry)
+                    ).breps
+                )
+        return volume_rh_breps_
+
+    def _create_ph_spaces(self, _space_names, _space_numbers, _weighting_factors, _volume_heights, _vent_rates):
+        # type: (DataTree[str], DataTree[str], DataTree[Double], DataTree[Double], DataTree) -> Tuple[List[Optional[face.Face3D]], List, List, List[space.Space]]      
+        """Create all the PH space.Spaces based on the user input."""
+        
         spaces_ = []
-        error_ = None
+        errors_ = []
         floor_breps_ = DataTree[Object]()
         volume_breps_ = DataTree[Object]()
+        
         # -- Build one Space for each branch on the _flr_seg_geom input tree
         for i, flr_srfc_list in enumerate(self.flr_geom.Branches):
             new_space = space.Space()
-            new_space.name = space_names.Branch(i)[0]
-            new_space.number = space_numbers.Branch(i)[0]
-
-            space_floors, e = make_floor.space_floor_from_rh_geom(
-                self.IGH, list(flr_srfc_list),
-                list(weighting_factors.Branch(i))
-            )
-            if e:
-                error_ = [from_face3d(s) for s in e]
-                msg = 'Error: There was a problem joining together one or more group of floor surfaces?\n'\
-                    'Check the "error_" output for a preview of the surfaces causing the problem\n'\
-                    'Check the names and numbers of the surfaces, and make sure they can be properly merged?'
-                self.IGH.error(msg)
-
-            space_volumes = make_volume.volumes_from_floors(
-                self.IGH, space_floors, list(volume_heights.Branch(i)))
+            new_space.name = _space_names.Branch(i)[0]
+            new_space.number = _space_numbers.Branch(i)[0]
+            space_floors, errors_ = self._create_space_floors(flr_srfc_list, _weighting_factors.Branch(i))
+            space_volumes = self._create_space_volumes(space_floors, _volume_heights.Branch(i))
             new_space.add_new_volumes(space_volumes)
-
-            # -- Add any user-determined vent flow rates, if any
-            try:
-                flow_rate_obj = sum(vent_rates.Branch(i))
-                new_space.properties.ph._v_sup = flow_rate_obj.v_sup # type: ignore
-                new_space.properties.ph._v_eta = flow_rate_obj.v_eta # type: ignore
-                new_space.properties.ph._v_tran = flow_rate_obj.v_tran # type: ignore
-            except TypeError:
-                pass
-
+            new_space = self._add_flow_rates_to_space(_vent_rates.Branch(i), new_space)
             spaces_.append(new_space)
 
-            # -- Output Preview
+            # -- Output Preview: Floor Surfaces
             pth = self.IGH.Grasshopper.Kernel.Data.GH_Path
-            floor_breps_.AddRange([from_face3d(flr.geometry)
-                                  for flr in space_floors], pth(i))
-            for srfc_list in [self.IGH.convert_to_rhino_geom(vol.geometry) for vol in space_volumes]:
-                vol_brep = self.IGH.ghpythonlib_components.BrepJoin(srfc_list).breps
-                volume_breps_.Add(vol_brep, pth(i))
+            flr_rh_geom = [from_face3d(flr.geometry) for flr in space_floors]
+            floor_breps_.AddRange(flr_rh_geom, pth(i))
+            
+            # -- Output Preview: Volume Breps
+            volume_breps_.AddRange(self._space_volumes_as_rh_geom(space_volumes), pth(i))
 
         spaces_ = sorted(spaces_, key=lambda sp: sp.full_name)
+        
+        return errors_, floor_breps_, volume_breps_, spaces_
 
-        return error_, floor_breps_, volume_breps_, spaces_
+    def run(self):
+        # type: () -> Tuple[List[Optional[face.Face3D]], List, List, List[space.Space]]
+        """Run the space maker."""
+        
+        # -------------------------------------------------------------------------------
+        # -- Organize the input trees, lists, lengths, defaults
+        default_height = self._default_height_in_local_units()
+        input_len = len(self.flr_geom.Branches)
+
+        space_names = self._clean_input_tree(self.names, input_len, '_Unnamed_', String)
+        space_numbers = self._clean_input_tree(self.number, input_len, '000', String)
+        weighting_factors = self._clean_input_tree(
+            self.weighting_factors, input_len, 1.0, Double)
+        volume_heights = self._clean_volume_heights_tree(
+            self.vol_heights, input_len, default_height, Double)
+        vent_rates = self._clean_input_tree(self.vent_rates, input_len, None, Object)
+
+        return self._create_ph_spaces(space_names, space_numbers, 
+                                weighting_factors, volume_heights, vent_rates)

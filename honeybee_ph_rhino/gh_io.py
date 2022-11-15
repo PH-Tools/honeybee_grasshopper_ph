@@ -269,7 +269,7 @@ class IGH:
 
         Arguments:
         ----------
-            * _inputs (list): The LBT Geometry items / objects to try and convert
+            * _inputs (List): The LBT Geometry items / objects to try and convert
 
         Returns:
         --------
@@ -357,7 +357,7 @@ class IGH:
             return self.convert_to_LBT_geom(srfcInset_Neg)
 
     def merge_Face3D(self, _face3Ds):
-        # type: (honeybee.face.Face3D) -> List[ List[honeybee.face.Face3D] ]
+        # type: (List[honeybee.face.Face3D]) -> List[List[honeybee.face.Face3D] ]
         """Combine a set of Face3D surfaces together into 'merged' Face3Ds
 
         This *should* work on surfaces that are touching, AND ones that overlap. Using

@@ -66,19 +66,18 @@ def gather_neighbor_group_ids(IGH, _flr_segments):
 
     return (neighbor_group_ids, error_surfaces)
 
-
 def group_floor_segments_by_neighbor(_neighbor_group_id_groups, _flr_segments):
     # type: (dict[int, set[int]], List[space.SpaceFloorSegment]) -> List[List[space.SpaceFloorSegment]]
     """Group the FloorSegments if they are 'touching'
 
     Arguments:
     ----------
-        * _neighbor_group_id_goups (dict[int, set[int]]): A dict of the floor segment ids grouped.
+        * _neighbor_group_id_groups (dict[int, set[int]]): A dict of the floor segment ids grouped.
         * _flr_segments (list[space.SpaceFloorSegment]): A list of the floor segments.
 
     Returns:
     --------
-        * list[list[space.SpaceFloorSegment]]: A list of lists of the touching SpaceFloorSegment Objecst.
+        * list[list[space.SpaceFloorSegment]]: A list of lists of the touching SpaceFloorSegment Objects.
     """
 
     # -- Sort by Neighbor Group results
@@ -90,9 +89,18 @@ def group_floor_segments_by_neighbor(_neighbor_group_id_groups, _flr_segments):
 
     return floors_sorted_by_neighbor.values()
 
+def _build_floor_from_single_segment(_flr_segment):
+    # type: (space.SpaceFloorSegment) -> space.SpaceFloor
+    """Return a new space.SpaceFloor from a single space.SpaceFloorSegment."""
 
-def build_floors_from_segments(IGH, _flr_segments):
-    # type: (gh_io.IGH, List[space.SpaceFloorSegment]) -> tuple[list[space.SpaceFloor], List[space.SpaceFloorSegment]]
+    new_floor = space.SpaceFloor()
+    new_floor.add_floor_segment(_flr_segment)
+    new_floor.geometry = _flr_segment.duplicate_geometry()
+    
+    return new_floor
+
+def build_floors_from_segments(IGH, _flr_segments, _merge_segments=False):
+    # type: (gh_io.IGH, List[space.SpaceFloorSegment], bool) -> tuple[list[space.SpaceFloor], List[space.SpaceFloorSegment]]
     """Create new SpaceFloor objects from the SpaceFloor Segments. This will attempt to 
         group and merge SpaceFloorSegments if they are touching one another.
 
@@ -109,35 +117,31 @@ def build_floors_from_segments(IGH, _flr_segments):
             during Merge. If no errors, this list will be empty.
     """
 
-    error_surfaces = []
-    new_floors = []
-    # -- If its just a single FloorSegment
-    if len(_flr_segments) == 1:
-        new_floor = space.SpaceFloor()
-        for seg in _flr_segments:
-            new_floor.add_floor_segment(seg)
-            new_floor.geometry = seg.geometry.duplicate()
-        new_floors.append(new_floor)
-    else:
+    error_surfaces_ = []
+    new_floors_ = []
+
+    if _merge_segments:
         # -- Sort out the 'neighbor' (ie: touching) SpaceFloorSegment groups
-        neighbor_group_ids, error_surfaces = gather_neighbor_group_ids(
+        neighbor_group_ids, error_surfaces_ = gather_neighbor_group_ids(
             IGH, _flr_segments)
         neighbor_group_flr_segs = group_floor_segments_by_neighbor(
             neighbor_group_ids, _flr_segments)
 
         # -- Build new Floors for each of the neighbor groups
         for flr_seg_group in neighbor_group_flr_segs:
-            grp_face_3Ds = [seg.geometry for seg in flr_seg_group]
+            grp_face_3Ds = [seg.geometry for seg in flr_seg_group if seg.geometry]
             new_flr_seg_geometry = IGH.merge_Face3D(grp_face_3Ds)
             new_floor = space.SpaceFloor()
 
             for seg in flr_seg_group:
                 new_floor.add_floor_segment(seg)
             new_floor.geometry = new_flr_seg_geometry[0][0].duplicate()
-            new_floors.append(new_floor)
+            new_floors_.append(new_floor)
+    else:
+        for floor_segment in _flr_segments:
+            new_floors_.append(_build_floor_from_single_segment(floor_segment))
 
-    return (new_floors, error_surfaces)
-
+    return (new_floors_, error_surfaces_)
 
 def space_floor_from_rh_geom(IGH, _flr_segment_geom, _weighting_factors):
     # type: (gh_io.IGH, List[Any], List[float]) -> tuple[list[space.SpaceFloor], List[space.SpaceFloorSegment]]
@@ -157,7 +161,7 @@ def space_floor_from_rh_geom(IGH, _flr_segment_geom, _weighting_factors):
         [1] List[space.SpaceFloorSegment]: A list of any surfaces that cause and error 
             during Merge. If no errors, this list will be empty. 
     """
-
+    
     # -- Check inputs
     weighting_factors = []
     for i in range(len(_flr_segment_geom)):
@@ -177,6 +181,6 @@ def space_floor_from_rh_geom(IGH, _flr_segment_geom, _weighting_factors):
         IGH, _flr_segment_geom, weighting_factors)
 
     # -- Build the new SpaceFloors from the new SpaceFloorSegments
-    new_floors, error_surfaces = build_floors_from_segments(IGH, flr_segments)
+    new_floors, error_surfaces = build_floors_from_segments(IGH, flr_segments, _merge_segments=False)
 
     return (new_floors, error_surfaces)
