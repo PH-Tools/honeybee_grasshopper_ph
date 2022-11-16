@@ -3,6 +3,8 @@
 
 """Functions for getting / sorting all the Honeybee-Model TFA Floor Surfaces."""
 
+from collections import defaultdict, OrderedDict
+
 try:
     from typing import Tuple, List, Dict, Optional, Callable
 except ImportError:
@@ -20,15 +22,31 @@ try:
 except ImportError:
     pass  # Outside Rhino
 
-from collections import defaultdict, OrderedDict
+try:
+    from honeybee import model, room, facetype
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
 
-from honeybee import model, room, facetype
-from ladybug_rhino.fromgeometry import from_face3d, from_point3d
+try:
+    from ladybug_rhino.fromgeometry import from_face3d, from_point3d
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
 
-from honeybee_ph_rhino import gh_io
-from honeybee_ph import space
-from honeybee_ph_rhino.reporting.annotations import TextAnnotation
-from honeybee_ph_utils.units import convert
+try:
+    from honeybee_ph import space
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee_ph:\n\t{}'.format(e))
+
+try:
+    from honeybee_ph_rhino import gh_io
+    from honeybee_ph_rhino.reporting.annotations import TextAnnotation
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
+
+try:
+    from ph_units.converter import convert
+except ImportError as e:
+    raise ImportError('\nFailed to import ph_units:\n\t{}'.format(e))
 
 
 class ClippingPlaneLocation(object):
@@ -66,7 +84,6 @@ def color_by_TFA(_flr_seg, _space):
     else:
         return Color.FromArgb(255, 252, 182, 252)  # Purple
 
-
 def color_by_Vent(_flr_seg, _space):
     # type: (space.SpaceFloorSegment, space.Space) -> Color
     """Return a System.Drawing.Color based on the Ventilation Air Flow Rate of the Space"""
@@ -79,7 +96,6 @@ def color_by_Vent(_flr_seg, _space):
         return Color.FromArgb(255, 246, 170, 154)  # Extract Only
     else:
         return Color.FromArgb(255, 235, 235, 235)  # No Vent Flow
-
 
 def text_by_TFA(_space, _units="SI"):
     # type: (space.Space, str) -> str
@@ -106,7 +122,6 @@ def text_by_TFA(_space, _units="SI"):
         ]
 
     return "\n".join(txt)
-
 
 def text_by_Vent(_space, _units="SI"):
     # type: (space.Space, str) -> str
@@ -162,7 +177,6 @@ def _get_hbph_spaces(_hb_room_group):
 
     return sorted(list(spaces.values()), key=lambda sp: sp.display_name)
 
-
 def _sort_rooms_by_z_location(_hb_model):
     # type: (model.Model) -> Dict[str, List[room.Room]]
     """Return a Dict with the HB-Rooms grouped by their floor's Z-height."""
@@ -179,7 +193,6 @@ def _sort_rooms_by_z_location(_hb_model):
         sorted_rooms_grouped_by_story[k] = rooms_by_z_height[k]
 
     return sorted_rooms_grouped_by_story
-
 
 def _group_hb_rooms_by_story(_hb_model):
     # type: (model.Model) -> Dict[str, List[room.Room]]
@@ -205,7 +218,6 @@ def _group_hb_rooms_by_story(_hb_model):
 
     return sorted_rooms_grouped_by_story
 
-
 def _build_rh_attrs(_IGH, _color, _weight=0.5, _draw_order=None):
     # type: (gh_io.IGH, Color, float, Optional[int]) -> ObjectAttributes
 
@@ -223,7 +235,6 @@ def _build_rh_attrs(_IGH, _color, _weight=0.5, _draw_order=None):
         new_attr_obj.DisplayOrder = _draw_order  # 1 = Front, -1 = Back
 
     return new_attr_obj
-
 
 def _get_flr_seg_data(_IGH, _get_color, _space):
     # type: (gh_io.IGH, Callable, space.Space) -> Tuple[List, List]
@@ -254,7 +265,6 @@ def _get_flr_seg_data(_IGH, _get_color, _space):
             flr_sef_attrs_.append(crv_attr)
 
     return flr_seg_geom_, flr_sef_attrs_
-
 
 def _get_clipping_plane_locations(_IGH, _room_group, _offset_up=0.25, _offset_down=0.25):
     # type: (gh_io.IGH, List[room.Room], float, float) -> Tuple[ClippingPlaneLocation, ClippingPlaneLocation]
@@ -292,12 +302,10 @@ def _get_clipping_plane_locations(_IGH, _room_group, _offset_up=0.25, _offset_do
 
     return upper_clipping_plane, lower_clipping_plane
 
-
 def _find_space_annotation_location(_IGH, _space):
     # type: (gh_io.IGH, space.Space) -> Point3d
     """Returns a single geometric center point of a Space's Volumes."""
     return _IGH.ghpythonlib_components.Average([from_point3d(p) for p in _space.reference_points])
-
 
 def _get_all_space_floor_segment_center_points(_IGH, space):
     # type: (gh_io.IGH, space.Space) -> List[Point3d]
@@ -309,7 +317,6 @@ def _get_all_space_floor_segment_center_points(_IGH, space):
         for flr_seg in volume.floor.floor_segments
     ]
 
-
 def _build_annotation_leader_line(_IGH, _pt1, _pt2):
     # type: (gh_io.IGH, Point3d, Point3d) -> Tuple[Line, ObjectAttributes]
     """Return a new LeaderLine and ObjectAttributes"""
@@ -318,7 +325,6 @@ def _build_annotation_leader_line(_IGH, _pt1, _pt2):
     rh_attr = _build_rh_attrs(_IGH, Color.FromArgb(255, 0, 0, 0), 0.05)
 
     return rh_geom, rh_attr
-
 
 def _build_annotation_leader_marker(_IGH, _cp, _radius=0.0075):
     # type: (gh_io.IGH, Point3d, float) -> Tuple

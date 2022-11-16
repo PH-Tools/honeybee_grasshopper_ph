@@ -6,7 +6,7 @@
 import os
 
 try:
-    from itertools import izip_longest
+    from itertools import izip_longest # type: ignore
 except:
     from itertools import zip_longest as izip_longest
 
@@ -16,27 +16,29 @@ except ImportError:
     pass  # IronPython 2.7
 
 try:
-    from System.Drawing import Color, Size
-    from System import Guid
+    from System.Drawing import Color, Size # type: ignore
+    from System import Guid # type: ignore
 except ImportError:
     pass  # Outside .NET
 
 try:
-    from Rhino.Geometry import Mesh, Hatch, TextJustification, Point3d, Rectangle3d, Transform
-    from Rhino.DocObjects import ObjectAttributes, DetailViewObject
-    from Rhino.DocObjects.DimensionStyle import MaskFrame
+    from Rhino.Geometry import Mesh, Hatch, TextJustification, Point3d, Rectangle3d, Transform # type: ignore
+    from Rhino.DocObjects import ObjectAttributes, DetailViewObject # type: ignore
+    from Rhino.DocObjects.DimensionStyle import MaskFrame # type: ignore
 except ImportError:
     pass  # Outside Rhino
 
 try:
-    from Grasshopper import DataTree
+    from Grasshopper import DataTree # type: ignore
 except ImportError:
     pass  # Outside Grasshopper
 
-from honeybee_ph_rhino import gh_io
-
-from honeybee_ph_rhino.reporting.annotations import TextAnnotation
-from honeybee_ph_rhino.reporting.build_floor_segments import ClippingPlaneLocation
+try:
+    from honeybee_ph_rhino import gh_io
+    from honeybee_ph_rhino.reporting.annotations import TextAnnotation
+    from honeybee_ph_rhino.reporting.build_floor_segments import ClippingPlaneLocation
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
 
 
 def _transform_annotation(_IGH, _annotation, _transform):

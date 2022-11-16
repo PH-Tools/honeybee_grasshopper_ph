@@ -3,30 +3,44 @@
 
 """Functions for getting / sorting all the Honeybee-Model Thermal Bridges."""
 
+from collections import defaultdict
+
 try:
     from typing import List, Dict, Tuple, Set
 except ImportError:
     pass  # Python 2.7
 
 try:
-    from System import Object
-    from System.Drawing import Color
+    from System import Object # type: ignore
+    from System.Drawing import Color # type: ignore
 except ImportError:
     pass  # Outside .NET
 
 try:
-    from Rhino.Geometry import Curve
-    from Rhino.DocObjects import ObjectAttributes
+    from Rhino.Geometry import Curve # type: ignore
+    from Rhino.DocObjects import ObjectAttributes # type: ignore
 except ImportError:
     pass  # Outside Rhino
 
-from collections import defaultdict, OrderedDict
+try:
+    from ladybug_rhino.fromgeometry import from_polyline3d, from_linesegment3d, from_face3d
+except ImportError as e:
+    raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
-from ladybug_rhino.fromgeometry import from_polyline3d, from_linesegment3d, from_face3d
-from honeybee import model
+try:
+    from honeybee import model
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
 
-from honeybee_energy_ph.construction import thermal_bridge
-from honeybee_ph_rhino import gh_io
+try:
+    from honeybee_energy_ph.construction import thermal_bridge
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee_energy_ph:\n\t{}'.format(e))
+
+try:
+    from honeybee_ph_rhino import gh_io
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
 
 
 def _create_rh_attr_object(_IGH, _color, _weight):
@@ -47,7 +61,6 @@ def _create_rh_attr_object(_IGH, _color, _weight):
 
     return new_attr_obj
 
-
 def _get_all_tb_groups_from_model(_hb_model):
     # type: (model.Model) -> Dict[str, List[thermal_bridge.PhThermalBridge]]
     """Return a Dict of all the unique TB objects found in the Model, grouped by display_name."""
@@ -65,7 +78,6 @@ def _get_all_tb_groups_from_model(_hb_model):
 
     return tb_groups
 
-
 def _get_all_tb_names(_hb_model):
     # type: (model.Model) -> List[str]
     """Return a list of all the unique TB object display_names found in the model."""
@@ -76,7 +88,6 @@ def _get_all_tb_names(_hb_model):
             tb_names.add(tb.display_name)
 
     return sorted(list(tb_names))
-
 
 def _get_tb_geometry(_hbph_tb):
     # type: (thermal_bridge.PhThermalBridge) -> Curve
@@ -94,7 +105,6 @@ def _get_tb_geometry(_hbph_tb):
         return from_polyline3d(_hbph_tb.geometry)
     except:
         return from_linesegment3d(_hbph_tb.geometry)
-
 
 def get_tb_data(_IGH, _hb_model, _highlight_outline_color, _highlight_outline_weight,
                 _default_srfc_color, _default_outline_color, _default_outline_weight):

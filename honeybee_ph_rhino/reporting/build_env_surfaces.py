@@ -3,28 +3,38 @@
 
 """Functions for getting / sorting all the Honeybee-Model Envelope Surfaces."""
 
+from collections import defaultdict
+
 try:
     from typing import Tuple, Dict, List
 except ImportError:
     pass  # Python 2.7
 
 try:
-    from System import Object
-    from System.Drawing import Color
+    from System import Object # type: ignore
+    from System.Drawing import Color # type: ignore
 except ImportError:
     pass  # Outside .NET
 
 try:
-    from Rhino.DocObjects import ObjectAttributes
+    from Rhino.DocObjects import ObjectAttributes # type: ignore
 except ImportError:
     pass  # Outside Rhino
 
-from collections import defaultdict
+try:
+    from honeybee import model, face
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
 
-from honeybee import model, face
-from ladybug_rhino.fromgeometry import from_face3d
+try:
+    from ladybug_rhino.fromgeometry import from_face3d
+except ImportError as e:
+    raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
-from honeybee_ph_rhino import gh_io
+try:
+    from honeybee_ph_rhino import gh_io
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
 
 
 def _create_rh_attr_object(_IGH, _color, _weight):
@@ -45,7 +55,6 @@ def _create_rh_attr_object(_IGH, _color, _weight):
 
     return new_attr_obj
 
-
 def _get_hb_face_groups_from_model(_hb_model):
     # type: (model.Model) -> Dict[str, List[face.Face]]
     """Return a dict with Honeybee-Faces grouped by their Construction-Name."""
@@ -62,7 +71,6 @@ def _get_hb_face_groups_from_model(_hb_model):
 
     return face_groups
 
-
 def _get_all_construction_names(_hb_model):
     # type: (model.Model) -> List[str]
     """Returns a sorted list of all the construction names found in the Honeybee-Model."""
@@ -74,7 +82,6 @@ def _get_all_construction_names(_hb_model):
         for hb_face in hb_room.faces:
             hb_cont_names.add(hb_face.properties.energy.construction.display_name)
     return sorted(list(hb_cont_names))
-
 
 def get_env_data(_IGH, _hb_model, _highlight_srfc_color, _highlight_outline_color,
                  _highlight_outline_weight, _default_srfc_color, _default_outline_color,

@@ -1,36 +1,52 @@
+# -*- coding: utf-8 -*-
+# -*- Python Version: 2.7 -*-
+
+"""Functions for getting / """
+
+import math
+
 try:
     from typing import Tuple, List
 except ImportError:
     pass  # IronPython 2.7
 
 try:
-    from itertools import izip
+    from itertools import izip # type: ignore
 except ImportError:
-    import zip as izip  # Python 3
+    import zip as izip  # type: ignore // Python 3
 
 try:
-    from System import Object
-    from System.Drawing import Color
+    from System import Object # type: ignore
+    from System.Drawing import Color # type: ignore
 except ImportError:
     pass  # Outside .NET
 
 try:
-    from Grasshopper import DataTree
+    from Grasshopper import DataTree # type: ignore
 except ImportError:
     pass  # Outside Grasshopper
 
 try:
-    from Rhino.Geometry import TextJustification
-    from Rhino.DocObjects import ObjectAttributes
+    from Rhino.Geometry import TextJustification # type: ignore
+    from Rhino.DocObjects import ObjectAttributes # type: ignore
 except ImportError:
     pass  # Outside Rhino
 
-import math
-from ladybug_rhino.fromgeometry import from_face3d, from_plane, from_point3d
-from honeybee import boundarycondition
+try:
+    from ladybug_rhino.fromgeometry import from_face3d, from_plane, from_point3d
+except ImportError as e:
+    raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
-from honeybee import model
-from honeybee_ph_rhino import gh_io
+try:
+    from honeybee import boundarycondition
+    from honeybee import model
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
+
+try:
+    from honeybee_ph_rhino import gh_io
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
 
 
 def _create_rh_attr_object(_IGH, _color, _weight):
@@ -51,7 +67,6 @@ def _create_rh_attr_object(_IGH, _color, _weight):
 
     return new_attr_obj
 
-
 def _get_exterior_env_surfaces(_hb_model):
     # type: (model.Model) -> List
 
@@ -64,10 +79,8 @@ def _get_exterior_env_surfaces(_hb_model):
 
     return envelope_surfaces
 
-
 def _to_mesh(_IGH, _srfc, _color):
     return _IGH.ghpythonlib_components.MeshColours(_srfc, _color)
-
 
 def _merge_rh_srfc(_IGH, _rh_surfaces):
     # type: (gh_io.IGH, List) -> List
@@ -84,7 +97,6 @@ def _merge_rh_srfc(_IGH, _rh_surfaces):
 
     return merged_breps
 
-
 def _get_edges(_IGH, _rh_breps):
     # type: (gh_io.IGH, List) -> List
     if not isinstance(_rh_breps, list):
@@ -97,7 +109,6 @@ def _get_edges(_IGH, _rh_breps):
         edges.append(c)
 
     return edges
-
 
 def _get_window_surfaces(_IGH, _hb_model):
     # type: (gh_io.IGH, model.Model) -> Tuple[List, List]
@@ -118,7 +129,6 @@ def _get_window_surfaces(_IGH, _hb_model):
                 win_planes.append(centered_plane)
 
     return win_surfaces, win_planes
-
 
 def make(_IGH, _hb_model):
     # type: (gh_io.IGH, model.Model) -> Tuple[DataTree, DataTree]
