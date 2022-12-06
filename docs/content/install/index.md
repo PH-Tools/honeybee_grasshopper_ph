@@ -4,18 +4,17 @@ weight: 10
 ---
 Honeybee-PH and the Grasshopper toolkit are free and open-source. Feel free download  and give it a try.
 
-## YouTube Walk-through
-To watch a detailed step-by-step walk through showing both the LadybugTools installation and the Honeybee-PH installation, it is recommended to take a look at the YouTube installation tutorial here:
+## YouTube Walk Through
+Watch a detailed step-by-step walk through showing both the LadybugTools installation and the Honeybee-PH installation here:
 [Installation Walk Through](https://youtu.be/DvH_Wxf1D8A)
 
 
 ## Requirements
 In order to successfully install Honeybee-PH, please make sure that your system already has all of the required software installed and working:
 - [Rhino-3D v7+](https://www.rhino3d.com/)
-- [Ladybug-Tools v1.51+](https://www.ladybug.tools/)
-- Honeybee-Energy v1.51.47 or later.
-- [WUFI-Passive](https://wufi.de/en/software/wufi-passive/) (If you want to open your files in WUFI-Passive)
-- [PHPP v9+](https://passivehouse.com/04_phpp/04_phpp.htm) (If you want to open your files in PHPP)
+- [Ladybug-Tools v1.51+](https://www.ladybug.tools/) (Note: Run the 'Versioner' tool before installing)
+- [WUFI-Passive](https://wufi.de/en/software/wufi-passive/)
+- [PHPP v9 or v10](https://passivehouse.com/04_phpp/04_phpp.htm)
 - Windows OS. &#128551; While almost all the Rhino/Grasshopper tools work fine on MacOS, we are still having trouble [getting Rhino to talk to Microsoft Excel on MacOS](https://discourse.mcneel.com/t/python-subprocess-permissions-error-on-mac-os-1743/142830). Sorry. For now, you will need Windows in order to use the PHPP exporter, and WUFI-Passive only runs on Windows.
 
 {{< raw_html >}}
