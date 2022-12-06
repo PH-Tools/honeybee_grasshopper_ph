@@ -52,7 +52,7 @@
 
 /* -- Home Dependencies Section -- */
 .home-dependencies {
-    margin: 30px auto 30px auto;
+    margin: 30px 10px 30px 10px;
     text-align: center;
 }
 
@@ -61,19 +61,25 @@
     display: grid;
     grid-gap: 10px;
     margin: 0px;
-    padding: 80px 80px;
     background-color: var(--color-ph-tools-very-light);
 }
+
 
 @media only screen and (max-width: 1000px) {
     .home-features {
         grid-template-columns: 1fr;
+        padding: 10px 10px;
+    }
+
+    .home-features .feature-text {
+        display: none;
     }
 }
 
 @media only screen and (min-width: 1000px) {
     .home-features {
         grid-template-columns: 1fr 1fr;
+        padding: 80px 80px;
     }
 }
 
@@ -89,6 +95,10 @@
     background-color: var(--color-ph-tools-light);
     margin: 10px 10px;
     padding: 15px 15px;
+}
+
+.home-features .feature-text {
+    color: var(--color-ph-tools-dark);
 }
 
 /* -- Home Learn More Section -- */

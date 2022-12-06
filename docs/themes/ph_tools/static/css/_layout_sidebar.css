@@ -24,8 +24,19 @@
 
 .sidebar a {
     padding: 4px 20px 4px 18px;
-    display: block;
     width: 215px;
+}
+
+@media only screen and (max-width: 1000px) {
+    .sidebar a {
+        display: none;
+    }
+}
+
+@media only screen and (min-width: 1000px) {
+    .sidebar a {
+        display: block;
+    }
 }
 
 .scrollbar {

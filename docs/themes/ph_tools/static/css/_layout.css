@@ -23,9 +23,21 @@ body {
 }
 
 .row-fluid {
-    display: flex;
-    width: fit-content;
+    /* width: fit-content; */
+    width: 100%;
     justify-content: space-between;
+}
+
+@media only screen and (max-width: 1000px) {
+    .row-fluid {
+        display: block;
+    }
+}
+
+@media only screen and (min-width: 1000px) {
+    .row-fluid {
+        display: flex;
+    }
 }
 
 .container {

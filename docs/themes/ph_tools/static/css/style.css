@@ -80,12 +80,24 @@ a:visited {
 .site-title {
   color: var(--color-base-font);
   font-weight: 400;
-  font-size: 26px;
   line-height: 60px;
   letter-spacing: -0.5px;
   text-decoration: none;
   cursor: pointer;
 }
+
+@media only screen and (max-width: 1000px) {
+  .site-title {
+    font-size: 14px;
+  }
+}
+
+@media only screen and (min-width: 1000px) {
+  .site-title {
+    font-size: 26px;
+  }
+}
+
 
 .site-nav {
   background-color: var(--background-color);
