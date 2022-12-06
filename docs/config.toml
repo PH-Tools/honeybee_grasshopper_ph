@@ -12,7 +12,8 @@ theme = "ph_tools"
   package_name = "PHX"
   gh_pages_name = "honeybee_grasshopper_ph"
   installer_download_url = "https://github.com/PH-Tools/honeybee_grasshopper_ph/raw/main/hbph_installer.gh"
-  
+  youtube_SF_souce_files = "https://github.com/PH-Tools/honeybee_grasshopper_ph/docs/static/downloads/Single_Family_Home_Source_Files.zip"
+
 [menu]
   [[menu.main]]
     identifier = "quick_start"

@@ -4,6 +4,11 @@ weight: 10
 ---
 Honeybee-PH and the Grasshopper toolkit are free and open-source. Feel free download  and give it a try.
 
+## YouTube Walk-through
+To watch a detailed step-by-step walk through showing both the LadybugTools installation and the Honeybee-PH installation, it is recommended to take a look at the YouTube installation tutorial here:
+[Installation Walk Through](https://youtu.be/DvH_Wxf1D8A)
+
+
 ## Requirements
 In order to successfully install Honeybee-PH, please make sure that your system already has all of the required software installed and working:
 - [Rhino-3D v7+](https://www.rhino3d.com/)
@@ -25,10 +30,6 @@ In order to successfully install the <strong>honeybee-ph</strong> toolkit, follo
 - Step 1: Download the Installation File: {{< installer_button >}}
 - Step 2: Open the Installation File using Rhino / Grasshopper and follow the instructions. (*Note: if you run into permissions trouble during install, try opening Rhino 'as administrator'.)*
 - Step 3: Restart Rhino and Grasshopper to ensure that all the new components are properly added to your installation.
-
-## YouTube Walk-through
-Check out a detailed step-by-step walk-through showing both the LadybugTools installation and the Honeybee-PH installation:
-[Installation Walk-through](https://youtu.be/DvH_Wxf1D8A)
 
 ## Install Trouble?
 If you run into any errors or trouble during install:
