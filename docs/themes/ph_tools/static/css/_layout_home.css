@@ -59,11 +59,22 @@
 /* -- Home Features Section -- */
 .home-features {
     display: grid;
-    grid-template-columns: 1fr 1fr;
     grid-gap: 10px;
     margin: 0px;
     padding: 80px 80px;
     background-color: var(--color-ph-tools-very-light);
+}
+
+@media only screen and (max-width: 1000px) {
+    .home-features {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media only screen and (min-width: 1000px) {
+    .home-features {
+        grid-template-columns: 1fr 1fr;
+    }
 }
 
 .home-features h2 {
