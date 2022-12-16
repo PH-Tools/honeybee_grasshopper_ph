@@ -32,6 +32,7 @@ The honeybee-grasshopper-ph plugin has the following dependencies on core librar
 * [honeybee-energy-standards](https://github.com/ladybug-tools/honeybee-ph-standards)
 * [honeybee-ph](https://github.com/PH-Tools/honeybee_ph)
 * [PHX](https://github.com/PH-Tools/PHX)
+* [PH_units](https://github.com/PH-Tools/PH_units)
 
 ## Other Required Components
 
