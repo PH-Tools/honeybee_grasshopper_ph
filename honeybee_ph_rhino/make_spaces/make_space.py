@@ -5,11 +5,21 @@
 
 from collections import namedtuple
 
-from honeybee import room
-from ladybug_rhino.fromgeometry import from_point3d
-from ladybug_rhino.togeometry import to_point3d
+try:
+    from honeybee import room
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
 
-from honeybee_ph import space
+try:
+    from ladybug_rhino.fromgeometry import from_point3d
+    from ladybug_rhino.togeometry import to_point3d
+except ImportError as e:
+    raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
+
+try:
+    from honeybee_ph import space
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee_ph:\n\t{}'.format(e))
 
 
 SpaceData = namedtuple('SpaceData', ['space', 'reference_points'])
@@ -69,44 +79,42 @@ def add_spaces_to_honeybee_rooms(_spaces, _hb_rooms, _inherit_names=False):
     for space in _spaces:
         spaces_dict[id(space)] = SpaceData(space, [pt for pt in space.reference_points])
 
-    # -- Duplicate HB Rooms to ensure no conflicts
-    hb_rooms = [rm.duplicate() for rm in _hb_rooms]
-
     # -- Add the spaces to the host-rooms
     new_rooms = []
-    for room in hb_rooms:
+    for hb_room in _hb_rooms:
+        dup_room = hb_room.duplicate()
 
         # -- See if any of the Space Reference points are inside the Room Geometry
         for space_data_id, space_data in spaces_dict.items():
             for pt in space_data.reference_points:
-                if not room.geometry.is_point_inside(pt):
+                if not dup_room.geometry.is_point_inside(pt):
                     continue
 
-                sp = space_data.space
-                sp.host = room
+                sp = space_data.space.duplicate()
+                sp.host = dup_room
 
                 # -- If 'inherit names', simplify the spaces so that
                 # -- there is only a single space inside of the HB-Room
                 # -- and it will inherit its name from the parent HB-Room.
                 if _inherit_names:
-                    sp.name = room.display_name
-                    room.properties.ph.merge_new_space(sp)
+                    sp.name = dup_room.display_name
+                    dup_room.properties.ph.merge_new_space(sp) # type: ignore
                 else:
-                    room.properties.ph.add_new_space(sp)
+                    dup_room.properties.ph.add_new_space(sp) # type: ignore
 
                 # -- Add in any detailed PH-Style vent flow rates if they exist
                 if sp.properties.ph.has_ventilation_flow_rates:
                     sp_flow_rate = sp.properties.ph.honeybee_flow_rate
 
-                    existing_room_flow = room.properties.energy.ventilation.flow_per_zone
+                    existing_room_flow = dup_room.properties.energy.ventilation.flow_per_zone # type: ignore
                     new_room_flow = sp_flow_rate + existing_room_flow
-                    room.properties.energy.abolute_ventilation(new_room_flow)
+                    dup_room.properties.energy.abolute_ventilation(new_room_flow) # type: ignore
 
                 # -- to speed up further checks
                 del spaces_dict[space_data_id]
                 break
 
-        new_rooms.append(room)
+        new_rooms.append(dup_room)
 
     # -- There should not be any spaces left in the dict if all were
     # -- hosted properly. Raise warning error if any are un-hosted?

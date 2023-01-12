@@ -4,7 +4,7 @@
 """GHCompo Interface: HBPH - Add Spaces."""
 
 try:
-    import Rhino.Geometry as rg
+    import Rhino.Geometry as rg # type: ignore
 except ImportError as e:
     raise ImportError('Failed to import Rhino Geometry.\n{}'.format(e))
 
@@ -23,10 +23,16 @@ try:
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
 
+try:
+    from honeybee_ph import space
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee_ph:\n\t{}'.format(e))
 
-from honeybee_ph_rhino.make_spaces import make_space
-from honeybee_ph_rhino import gh_io
-from honeybee_ph import space
+try:
+    from honeybee_ph_rhino.make_spaces import make_space
+    from honeybee_ph_rhino import gh_io
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
 
 class GHCompo_AddPHSpaces(object):
 

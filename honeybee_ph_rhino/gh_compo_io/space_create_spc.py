@@ -71,7 +71,7 @@ class GHCompo_CreatePHSpaces(object):
         self.vol_geom = _volume_geometry
         self.vol_heights = _volume_heights
         self.names = _space_names
-        self.number = _space_numbers
+        self.numbers = _space_numbers
         self.vent_rates = _space_ph_vent_rates
 
     @property
@@ -228,7 +228,7 @@ class GHCompo_CreatePHSpaces(object):
         input_len = len(self.flr_geom.Branches)
 
         space_names = self._clean_input_tree(self.names, input_len, '_Unnamed_', String)
-        space_numbers = self._clean_input_tree(self.number, input_len, '000', String)
+        space_numbers = self._clean_input_tree(self.numbers, input_len, '000', String)
         weighting_factors = self._clean_input_tree(
             self.weighting_factors, input_len, 1.0, Double)
         volume_heights = self._clean_volume_heights_tree(

@@ -24,11 +24,11 @@ class MyClassWithValidation(object):
 try:  # import the core honeybee dependencies
     from honeybee.typing import clean_ep_string, clean_and_id_ep_string
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 try:
     from ph_units import parser, converter
 except ImportError as e:
-    raise ImportError('\nFailed to import ph-units:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import ph-units:\n\t{}".format(e))
 
 
 class Validated(object):
@@ -49,7 +49,7 @@ class Validated(object):
             setattr(self, _k, _v)
 
     def __set__(self, instance, value):
-        """Set the value on the instance. Runs a .validate() method on self to 
+        """Set the value on the instance. Runs a .validate() method on self to
         allow for subclasses to implement custom input validation.
 
         Arguments:
@@ -60,7 +60,7 @@ class Validated(object):
         value = self.validate(
             name=self.storage_name,
             new_value=value,
-            old_value=instance.__dict__.get(self.storage_name, None)
+            old_value=instance.__dict__.get(self.storage_name, None),
         )
         instance.__dict__[self.storage_name] = value
 
@@ -73,21 +73,24 @@ class Validated(object):
         """
         return instance.__dict__[self.storage_name]
 
-    def validate(self, name,  new_value, old_value):
+    def validate(self, name, new_value, old_value):
         """Return validated input value, or raise an error.
 
         Arguments:
         ---------
             * name: The Class-Attribute's name. Mostly used for Error messages.
             * new_value: The new value to validate.
-            * old_value: The original value of the descriptor, sometimes useful 
+            * old_value: The original value of the descriptor, sometimes useful
                 for returning if 'new_value' is None, or similar.
         """
         raise NotImplementedError(
-            "Error: Must implement the .validated() method on subclass of Validated.")
+            "Error: Must implement the .validated() method on subclass of Validated."
+        )
 
     def __str__(self):
-        return "Validated[{}](storage_name={})".format(self.__class__.__name__, self.storage_name)
+        return "Validated[{}](storage_name={})".format(
+            self.__class__.__name__, self.storage_name
+        )
 
 
 class NotNone(Validated):
@@ -138,13 +141,15 @@ class IntegerNonZero(Validated):
         try:
             new_value = int(new_value)
         except:
-            raise ValueError("Error: input {} of type: {} is not allowed."
-                             "Supply positive integer only.".format(
-                                 new_value, type(new_value)))
+            raise ValueError(
+                "Error: input {} of type: {} is not allowed."
+                "Supply positive integer only.".format(new_value, type(new_value))
+            )
 
         if new_value < 1:
             raise ValueError(
-                "Error: input for '{}' cannot be zero or negative.".format(name))
+                "Error: input for '{}' cannot be zero or negative.".format(name)
+            )
 
         return new_value
 
@@ -163,15 +168,17 @@ class Float(Validated):
         try:
             new_value = float(new_value)
         except:
-            raise ValueError("Error: input {} of type: {} is not allowed."
-                             "Supply float only.".format(
-                                 new_value, type(new_value)))
+            raise ValueError(
+                "Error: input {} of type: {} is not allowed."
+                "Supply float only.".format(new_value, type(new_value))
+            )
 
         return new_value
 
 
 class FloatNonZero(Validated):
     """A Floating Point value which is not allowed to be zero."""
+
     tolerance = 0.0001
 
     def validate(self, name, new_value, old_value):
@@ -184,13 +191,13 @@ class FloatNonZero(Validated):
         try:
             new_value = float(new_value)
         except:
-            raise ValueError("Error: input {} of type: {} is not allowed."
-                             "Supply float values only.".format(
-                                 new_value, type(new_value)))
+            raise ValueError(
+                "Error: input {} of type: {} is not allowed."
+                "Supply float values only.".format(new_value, type(new_value))
+            )
 
         if new_value - 0.0 < self.tolerance:
-            raise ValueError(
-                "Error: input for '{}' cannot be zero.".format(name))
+            raise ValueError("Error: input for '{}' cannot be zero.".format(name))
 
         return new_value
 
@@ -208,13 +215,13 @@ class FloatPositiveValue(Validated):
         try:
             new_value = float(new_value)
         except:
-            raise ValueError("Error: input {} of type: {} is not allowed."
-                             "Supply float values only.".format(
-                                 new_value, type(new_value)))
+            raise ValueError(
+                "Error: input {} of type: {} is not allowed."
+                "Supply float values only.".format(new_value, type(new_value))
+            )
 
         if new_value < 0:
-            raise ValueError(
-                "Error: input for '{}' cannot be negative.".format(name))
+            raise ValueError("Error: input for '{}' cannot be negative.".format(name))
 
         return new_value
 
@@ -233,9 +240,10 @@ class FloatPercentage(Validated):
         try:
             new_value = float(new_value)
         except:
-            raise ValueError("Error: input {} of type: {} is not allowed."
-                             "Supply float values only.".format(
-                                 new_value, type(new_value)))
+            raise ValueError(
+                "Error: input {} of type: {} is not allowed."
+                "Supply float values only.".format(new_value, type(new_value))
+            )
 
         # -- If the value is passed in as 0<->100, try and divide it
         if 1.0 < new_value < 100.0:
@@ -243,13 +251,15 @@ class FloatPercentage(Validated):
 
         if not 0.0 <= new_value <= 1.0:
             raise ValueError(
-                "Error: input for '{}' must be between 0.0 and 1.0".format(name))
+                "Error: input for '{}' must be between 0.0 and 1.0".format(name)
+            )
 
         return new_value
 
 
 class FloatMax24(Validated):
     """A Floating Point value which is less than 24.0"""
+
     tolerance = -0.0001
 
     def validate(self, name, new_value, old_value):
@@ -263,13 +273,15 @@ class FloatMax24(Validated):
         try:
             new_value = float(new_value)
         except:
-            raise ValueError("Error: input {} of type: {} is not allowed."
-                             "Supply float values only.".format(
-                                 new_value, type(new_value)))
+            raise ValueError(
+                "Error: input {} of type: {} is not allowed."
+                "Supply float values only.".format(new_value, type(new_value))
+            )
 
         if 24.0 - new_value < self.tolerance:
             raise ValueError(
-                "Error: input for '{}' cannot be greater than 24.".format(name))
+                "Error: input for '{}' cannot be greater than 24.".format(name)
+            )
 
         return new_value
 
@@ -294,14 +306,15 @@ class UnitM(Validated):
         try:
             input_value = float(input_value)
         except:
-            raise ValueError("Error: input {} of type: {} is not allowed."
-                             "Supply float only.".format(
-                                 new_value, type(new_value)))
+            raise ValueError(
+                "Error: input {} of type: {} is not allowed."
+                "Supply float only.".format(new_value, type(new_value))
+            )
 
         # -- Convert to Meters
         result = converter.convert(input_value, input_units or "M", "M")
 
-        print('Converting: {} -> {:.4f} M'.format(new_value, result))
+        print("Converting: {} -> {:.4f} M".format(new_value, result))
 
         return result
 
@@ -323,14 +336,15 @@ class UnitW_MK(Validated):
         try:
             input_value = float(input_value)
         except:
-            raise ValueError("Error: input {} of type: {} is not allowed."
-                             "Supply float only.".format(
-                                 new_value, type(new_value)))
+            raise ValueError(
+                "Error: input {} of type: {} is not allowed."
+                "Supply float only.".format(new_value, type(new_value))
+            )
 
         # -- Convert units
         result = converter.convert(input_value, input_units or "W/MK", "W/MK")
 
-        print('Converting: {} -> {:.4f} W/MK'.format(new_value, result))
+        print("Converting: {} -> {:.4f} W/MK".format(new_value, result))
 
         return result
 
@@ -352,19 +366,19 @@ class UnitW_M2K(Validated):
         try:
             input_value = float(input_value)
         except:
-            raise ValueError("Error: input {} of type: {} is not allowed."
-                             "Supply float only.".format(
-                                 new_value, type(new_value)))
+            raise ValueError(
+                "Error: input {} of type: {} is not allowed."
+                "Supply float only.".format(new_value, type(new_value))
+            )
 
         # -- Convert units
         result = converter.convert(input_value, input_units or "W/M2K", "W/M2K")
 
-        print('Converting: {} -> {:.4f} W/M2K'.format(new_value, result))
+        print("Converting: {} -> {:.4f} W/M2K".format(new_value, result))
 
         # -- Make sure its positive
         if result and result < 0.0:
-            raise ValueError(
-                "Error: input for '{}' cannot be negative.".format(name))
+            raise ValueError("Error: input for '{}' cannot be negative.".format(name))
 
         return result
 
@@ -386,19 +400,19 @@ class UnitW_K(Validated):
         try:
             input_value = float(input_value)
         except:
-            raise ValueError("Error: input {} of type: {} is not allowed."
-                             "Supply float only.".format(
-                                 new_value, type(new_value)))
+            raise ValueError(
+                "Error: input {} of type: {} is not allowed."
+                "Supply float only.".format(new_value, type(new_value))
+            )
 
         # -- Convert to Meters
         result = converter.convert(input_value, input_units or "W/K", "W/K")
 
-        print('Converting: {} -> {:.4f} W/K'.format(new_value, result))
+        print("Converting: {} -> {:.4f} W/K".format(new_value, result))
 
         # -- Make sure its positive
         if result and result < 0.0:
-            raise ValueError(
-                "Error: input for '{}' cannot be negative.".format(name))
+            raise ValueError("Error: input for '{}' cannot be negative.".format(name))
 
         return result
 
@@ -420,14 +434,15 @@ class UnitDeltaC(Validated):
         try:
             input_value = float(input_value)
         except:
-            raise ValueError("Error: input {} of type: {} is not allowed."
-                             "Supply float only.".format(
-                                 new_value, type(new_value)))
+            raise ValueError(
+                "Error: input {} of type: {} is not allowed."
+                "Supply float only.".format(new_value, type(new_value))
+            )
 
         # -- Convert to Meters
         result = converter.convert(input_value, input_units or "DELTA-C", "DELTA-C")
 
-        print('Converting: {} -> {:.4f} Delta-C'.format(new_value, result))
+        print("Converting: {} -> {:.4f} Delta-C".format(new_value, result))
 
         return result
 
@@ -449,14 +464,15 @@ class UnitDegreeC(Validated):
         try:
             input_value = float(input_value)
         except:
-            raise ValueError("Error: input {} of type: {} is not allowed."
-                             "Supply float only.".format(
-                                 new_value, type(new_value)))
+            raise ValueError(
+                "Error: input {} of type: {} is not allowed."
+                "Supply float only.".format(new_value, type(new_value))
+            )
 
         # -- Convert to Meters
         result = converter.convert(input_value, input_units or "C", "C")
 
-        print('Converting: {} -> {:.4f} C'.format(new_value, result))
+        print("Converting: {} -> {:.4f} C".format(new_value, result))
 
         return result
 
@@ -478,14 +494,15 @@ class UnitMeterPerSecond(Validated):
         try:
             input_value = float(input_value)
         except:
-            raise ValueError("Error: input {} of type: {} is not allowed."
-                             "Supply float only.".format(
-                                 new_value, type(new_value)))
+            raise ValueError(
+                "Error: input {} of type: {} is not allowed."
+                "Supply float only.".format(new_value, type(new_value))
+            )
 
         # -- Convert to Meters
         result = converter.convert(input_value, input_units or "M/S", "M/S")
 
-        print('Converting: {} -> {:.4f} meter/second'.format(new_value, result))
+        print("Converting: {} -> {:.4f} meter/second".format(new_value, result))
 
         return result
 
@@ -507,23 +524,23 @@ class UnitWH_M3(Validated):
         try:
             input_value = float(input_value)
         except:
-            raise ValueError("Error: input {} of type: {} is not allowed."
-                             "Supply float only.".format(
-                                 new_value, type(new_value)))
+            raise ValueError(
+                "Error: input {} of type: {} is not allowed."
+                "Supply float only.".format(new_value, type(new_value))
+            )
 
         # -- Convert units
         result = converter.convert(input_value, input_units or "WH/M3", "WH/M3")
 
-        print('Converting: {} -> {:.4f} WH/M3'.format(new_value, result))
+        print("Converting: {} -> {:.4f} WH/M3".format(new_value, result))
 
         # -- Make sure its positive
         if result and result < 0.0:
-            raise ValueError(
-                "Error: input for '{}' cannot be negative.".format(name))
+            raise ValueError("Error: input for '{}' cannot be negative.".format(name))
 
         return result
 
-     
+
 class UnitKWH_M2(Validated):
     """A kWH/M2 Energy Demand of any positive value."""
 
@@ -541,22 +558,22 @@ class UnitKWH_M2(Validated):
         try:
             input_value = float(input_value)
         except:
-            raise ValueError("Error: input {} of type: {} is not allowed."
-                             "Supply float only.".format(
-                                 new_value, type(new_value)))
+            raise ValueError(
+                "Error: input {} of type: {} is not allowed."
+                "Supply float only.".format(new_value, type(new_value))
+            )
 
         # -- Convert units
         result = converter.convert(input_value, input_units or "KWH/M2", "KWH/M2")
 
-        print('Converting: {} -> {:.4f} KWH/M2'.format(new_value, result))
+        print("Converting: {} -> {:.4f} KWH/M2".format(new_value, result))
 
         # -- Make sure its positive
         if result and result < 0.0:
-            raise ValueError(
-                "Error: input for '{}' cannot be negative.".format(name))
+            raise ValueError("Error: input for '{}' cannot be negative.".format(name))
 
         return result
-        
+
 
 class UnitW_M2(Validated):
     """A W/M2 Load of any positive value."""
@@ -575,21 +592,22 @@ class UnitW_M2(Validated):
         try:
             input_value = float(input_value)
         except:
-            raise ValueError("Error: input {} of type: {} is not allowed."
-                             "Supply float only.".format(
-                                 new_value, type(new_value)))
+            raise ValueError(
+                "Error: input {} of type: {} is not allowed."
+                "Supply float only.".format(new_value, type(new_value))
+            )
 
         # -- Convert units
         result = converter.convert(input_value, input_units or "W/M2", "W/M2")
 
-        print('Converting: {} -> {:.4f} W/M2'.format(new_value, result))
+        print("Converting: {} -> {:.4f} W/M2".format(new_value, result))
 
         # -- Make sure its positive
         if result and result < 0.0:
-            raise ValueError(
-                "Error: input for '{}' cannot be negative.".format(name))
+            raise ValueError("Error: input for '{}' cannot be negative.".format(name))
 
         return result
+
 
 class UnitM3_S(Validated):
     """A M3/Second Airflow of any positive value."""
@@ -608,19 +626,52 @@ class UnitM3_S(Validated):
         try:
             input_value = float(input_value)
         except:
-            raise ValueError("Error: input {} of type: {} is not allowed."
-                             "Supply float only.".format(
-                                 new_value, type(new_value)))
+            raise ValueError(
+                "Error: input {} of type: {} is not allowed."
+                "Supply float only.".format(new_value, type(new_value))
+            )
 
         # -- Convert units
         result = converter.convert(input_value, input_units or "M3/S", "M3/S")
 
-        print('Converting: {} -> {:.4f} M3/S'.format(new_value, result))
+        print("Converting: {} -> {:.4f} M3/S".format(new_value, result))
 
         # -- Make sure its positive
         if result and result < 0.0:
-            raise ValueError(
-                "Error: input for '{}' cannot be negative.".format(name))
+            raise ValueError("Error: input for '{}' cannot be negative.".format(name))
 
         return result
 
+
+class UnitKW(Validated):
+    """A KW power of any positive value."""
+
+    def validate(self, name, new_value, old_value):
+        if new_value is None:
+            # If the user passed a 'default' attribute, try and use that
+            try:
+                return float(self.default)
+            except:
+                return old_value
+
+        input_value, input_units = parser.parse_input(str(new_value))
+
+        # -- Make sure the value is a float
+        try:
+            input_value = float(input_value)
+        except:
+            raise ValueError(
+                "Error: input {} of type: {} is not allowed."
+                "Supply float only.".format(new_value, type(new_value))
+            )
+
+        # -- Convert units
+        result = converter.convert(input_value, input_units or "KW", "KW")
+
+        print("Converting: {} -> {:.4f} KW".format(new_value, result))
+
+        # -- Make sure its positive
+        if result and result < 0.0:
+            raise ValueError("Error: input for '{}' cannot be negative.".format(name))
+
+        return result

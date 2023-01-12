@@ -4,31 +4,33 @@
 """GHCompo Interface: HBPH - Create Cooling System."""
 
 from copy import copy
+
 # Note: Use copy so that specific equipments can overwrite base with their own hints
 
-from GhPython import Component # type: ignore
-from Grasshopper.Kernel.Parameters import Hints # type: ignore
+from GhPython import Component  # type: ignore
+from Grasshopper.Kernel.Parameters import Hints  # type: ignore
 
 try:
     from typing import Optional, Dict, Any
 except ImportError:
-    pass # IronPython 2.7
+    pass  # IronPython 2.7
 
 try:
     from honeybee_ph_rhino import gh_io
+    from honeybee_ph_rhino.gh_compo_io import ghio_validators
     from honeybee_ph_rhino.gh_io import input_to_int, ComponentInput
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
 try:
     from honeybee_energy_ph.hvac import cooling
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_energy_ph:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
 
 try:
     from honeybee_ph_utils import input_tools
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_ph_utils:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee_ph_utils:\n\t{}".format(e))
 
 
 class InputTypeNotFoundError(Exception):
@@ -38,74 +40,114 @@ class InputTypeNotFoundError(Exception):
 
 
 # -----------------------------------------------------------------------------
-# Setup the component input node groups
+# Setup all the component input node groups
+
 inputs_base = {
-    1: ComponentInput(_name='display_name',
-                      _description='(str) Optional display name for the cooling system.',
-                      _type_hint=Component.NewStrHint()),
-    2: ComponentInput(_name='percent_coverage',
-                      _description='(float) default=1.0 The fraction of total cooling supplied by this system (0-1)',
-                      _type_hint=Component.NewFloatHint()),
+    1: ComponentInput(
+        _name="display_name",
+        _description="(str) Optional display name for the cooling system.",
+        _type_hint=Component.NewStrHint(),
+    ),
+    2: ComponentInput(
+        _name="percent_coverage",
+        _description="(float) default=1.0 The fraction of total cooling supplied by this system (0-1)",
+        _type_hint=Component.NewFloatHint(),
+    ),
 }
 
 inputs_ventilation = copy(inputs_base)
-inputs_ventilation.update({
-    3: ComponentInput(_name='annual_COP',
-                      _description='(float) The Annual COP (W/W) of the equipment.',
-                      _type_hint=Component.NewFloatHint()),
-    4: ComponentInput(_name='single_speed',
-                      _description='(bool) Cyclical operation works through an on/off regulation of the compressor. If this is set to False, then the assumption is that the unit has a VRF (variant refrigerant flow), which  works by modulating the efficiency of the compressor.',
-                      _type_hint=Hints.GH_BooleanHint_CS()),
-    5: ComponentInput(_name='min_coil_temp',
-                      _description='(float) Deg. C',
-                      _type_hint=Component.NewFloatHint()),
-    6: ComponentInput(_name='capacity',
-                      _description='(float) Maximum kW output.',
-                      _type_hint=Component.NewFloatHint()),
-})
+inputs_ventilation.update(
+    {
+        3: ComponentInput(
+            _name="annual_COP",
+            _description="(float) The Annual COP (W/W) of the equipment.",
+            _type_hint=Component.NewFloatHint(),
+        ),
+        4: ComponentInput(
+            _name="single_speed",
+            _description="(bool) Cyclical operation works through an on/off regulation of the compressor. If this is set to False, then the assumption is that the unit has a VRF (variant refrigerant flow), which  works by modulating the efficiency of the compressor.",
+            _type_hint=Hints.GH_BooleanHint_CS(),
+        ),
+        5: ComponentInput(
+            _name="min_coil_temp",
+            _description="(float) Deg. C",
+            _type_hint=Component.NewStrHint(),
+        ),
+        6: ComponentInput(
+            _name="capacity",
+            _description="(float) Maximum kW output.",
+            _type_hint=Component.NewStrHint(),
+        ),
+    }
+)
 
 
 inputs_recirculation = copy(inputs_base)
-inputs_recirculation.update({
-    3: ComponentInput(_name='annual_COP',
-                      _description='(float) The Annual COP (W/W) of the equipment.',
-                      _type_hint=Component.NewFloatHint()),
-    4: ComponentInput(_name='single_speed',
-                      _description='(bool) Cyclical operation works through an on/off regulation of the compressor. If this is set to False, then the assumption is that the unit has a VRF (variant refrigerant flow), which  works by modulating the efficiency of the compressor.',
-                      _type_hint=Hints.GH_BooleanHint_CS()),
-    5: ComponentInput(_name='min_coil_temp',
-                      _description='(float) Deg. C',
-                      _type_hint=Component.NewFloatHint()),
-    6: ComponentInput(_name='capacity',
-                      _description='(float) Maximum kW output.',
-                      _type_hint=Component.NewFloatHint()),
-    7: ComponentInput(_name='flow_rate_m3_hr',
-                      _description='(float) The maximum airflow rate in m3/hr',
-                      _type_hint=Component.NewFloatHint()),
-    8: ComponentInput(_name='flow_rate_variable',
-                      _description='(bool) VAV system: The volume flow changes proportionally  to the cooling capacity, thereby reducing the  temperature remains constant (usually better dehumidification)',
-                      _type_hint=Hints.GH_BooleanHint_CS()),
-})
+inputs_recirculation.update(
+    {
+        3: ComponentInput(
+            _name="annual_COP",
+            _description="(float) The Annual COP (W/W) of the equipment.",
+            _type_hint=Component.NewFloatHint(),
+        ),
+        4: ComponentInput(
+            _name="single_speed",
+            _description="(bool) Cyclical operation works through an on/off regulation of the compressor. If this is set to False, then the assumption is that the unit has a VRF (variant refrigerant flow), which  works by modulating the efficiency of the compressor.",
+            _type_hint=Hints.GH_BooleanHint_CS(),
+        ),
+        5: ComponentInput(
+            _name="min_coil_temp",
+            _description="(float) Deg. C",
+            _type_hint=Component.NewStrHint(),
+        ),
+        6: ComponentInput(
+            _name="capacity",
+            _description="(float) Maximum kW output.",
+            _type_hint=Component.NewStrHint(),
+        ),
+        7: ComponentInput(
+            _name="flow_rate_m3_s",
+            _description="(float) The maximum airflow rate in m3/s",
+            _type_hint=Component.NewStrHint(),
+        ),
+        8: ComponentInput(
+            _name="flow_rate_variable",
+            _description="(bool) VAV system: The volume flow changes proportionally  to the cooling capacity, thereby reducing the  temperature remains constant (usually better dehumidification)",
+            _type_hint=Hints.GH_BooleanHint_CS(),
+        ),
+    }
+)
 
 inputs_dehumidification = copy(inputs_base)
-inputs_dehumidification.update({
-    3: ComponentInput(_name='annual_COP',
-                      _description='(float) The Annual COP (W/W) of the equipment.',
-                      _type_hint=Component.NewFloatHint()),
-    4: ComponentInput(_name='useful_heat_loss',
-                      _description='If this is set to True, then the waste heat from the dehumidification unit will be considered as an internal heat gain. On the contrary, dehumidification has no influence on the thermal balance.',
-                      _type_hint=Component.NewFloatHint()),
-})
+inputs_dehumidification.update(
+    {
+        3: ComponentInput(
+            _name="annual_COP",
+            _description="(float) The Annual COP (W/W) of the equipment.",
+            _type_hint=Component.NewFloatHint(),
+        ),
+        4: ComponentInput(
+            _name="useful_heat_loss",
+            _description="If this is set to True, then the waste heat from the dehumidification unit will be considered as an internal heat gain. On the contrary, dehumidification has no influence on the thermal balance.",
+            _type_hint=Hints.GH_BooleanHint_CS(),
+        ),
+    }
+)
 
 inputs_panel = copy(inputs_base)
-inputs_panel.update({
-    3: ComponentInput(_name='annual_COP',
-                      _description='(float) The Annual COP (W/W) of the equipment.',
-                      _type_hint=Component.NewFloatHint()),
-})
+inputs_panel.update(
+    {
+        3: ComponentInput(
+            _name="annual_COP",
+            _description="(float) The Annual COP (W/W) of the equipment.",
+            _type_hint=Component.NewFloatHint(),
+        ),
+    }
+)
 
 
 # -----------------------------------------------------------------------------
+# -- Configure the Grasshopper Component with the right inputs nodes for the type
 
 input_groups = {
     1: inputs_ventilation,
@@ -113,8 +155,6 @@ input_groups = {
     3: inputs_dehumidification,
     4: inputs_panel,
 }
-
-# -----------------------------------------------------------------------------
 
 
 def get_component_inputs(_cooling_type):
@@ -133,16 +173,130 @@ def get_component_inputs(_cooling_type):
     except KeyError:
         raise InputTypeNotFoundError(input_type_id)
 
+
 # -----------------------------------------------------------------------------
+# -- Facades for System Constructors (So they can do input validation and unit conversion)
+
+
+class FacadePhCoolingVentilation(object):
+    display_name = ghio_validators.HBName(
+        "display_name", default="_unnamed_ventilation_cooling_"
+    )
+    percent_coverage = ghio_validators.FloatPercentage("percent_coverage", default=1.0)
+    min_coil_temp = ghio_validators.UnitDegreeC("min_coil_temp", default=12)
+    capacity = ghio_validators.UnitKW("capacity", default=10)
+
+    def __init__(self, _input_dict):
+        # type: (Dict) -> None
+        self.display_name = _input_dict["display_name"]
+        self.percent_coverage = _input_dict["percent_coverage"]
+        self.single_speed = _input_dict["single_speed"] or False
+        self.min_coil_temp = _input_dict["min_coil_temp"]
+        self.capacity = _input_dict["capacity"]
+        self.annual_COP = _input_dict["annual_COP"] or 2.0
+
+    def build(self):
+        # type: () -> cooling.PhCoolingVentilation
+        obj = cooling.PhCoolingVentilation()
+        obj.display_name = self.display_name
+        obj.percent_coverage = self.percent_coverage
+        obj.single_speed = self.single_speed
+        obj.min_coil_temp = self.min_coil_temp
+        obj.capacity = self.capacity
+        obj.annual_COP = self.annual_COP
+        return obj
+
+
+class FacadePhCoolingRecirculation(object):
+    display_name = ghio_validators.HBName(
+        "display_name", default="_unnamed_recirculation_cooling_"
+    )
+    percent_coverage = ghio_validators.FloatPercentage("percent_coverage", default=1.0)
+    min_coil_temp = ghio_validators.UnitDegreeC("min_coil_temp", default=12)
+    flow_rate_m3_s = ghio_validators.UnitM3_S("flow_rate_m3_s", default=0.0278)
+    capacity = ghio_validators.UnitKW("capacity", default=10)
+
+    def __init__(self, _input_dict):
+        # type: (Dict) -> None
+        self.display_name = _input_dict["display_name"]
+        self.percent_coverage = _input_dict["percent_coverage"]
+        self.single_speed = _input_dict["single_speed"] or False
+        self.min_coil_temp = _input_dict["min_coil_temp"]
+        self.flow_rate_m3_s = _input_dict["flow_rate_m3_s"]
+        self.flow_rate_variable = _input_dict["flow_rate_variable"] or True
+        self.capacity = _input_dict["capacity"]
+        self.annual_COP = _input_dict["annual_COP"] or 2.0
+
+    def build(self):
+        # type: () -> cooling.PhCoolingRecirculation
+        obj = cooling.PhCoolingRecirculation()
+        obj.display_name = self.display_name
+        obj.percent_coverage = self.percent_coverage
+        obj.single_speed = self.single_speed
+        obj.min_coil_temp = self.min_coil_temp
+        obj.flow_rate_m3_hr = self.flow_rate_m3_s * 60 * 60
+        obj.flow_rate_variable = self.flow_rate_variable
+        obj.capacity = self.capacity
+        obj.annual_COP = self.annual_COP
+        return obj
+
+
+class FacadePhCoolingDehumidification(object):
+    display_name = ghio_validators.HBName(
+        "display_name", default="_unnamed_dehumidification_cooling_"
+    )
+    percent_coverage = ghio_validators.FloatPercentage("percent_coverage", default=1.0)
+
+    def __init__(self, _input_dict):
+        # type: (Dict) -> None
+        self.display_name = _input_dict["display_name"]
+        self.percent_coverage = _input_dict["percent_coverage"]
+        self.useful_heat_loss = _input_dict["useful_heat_loss"] or False
+        self.annual_COP = _input_dict["annual_COP"] or 2.0
+
+    def build(self):
+        # type: () -> cooling.PhCoolingDehumidification
+        obj = cooling.PhCoolingDehumidification()
+        obj.display_name = self.display_name
+        obj.percent_coverage = self.percent_coverage
+        obj.useful_heat_loss = self.useful_heat_loss
+        obj.annual_COP = self.annual_COP
+        return obj
+
+
+class FacadePhCoolingPanel(object):
+    display_name = ghio_validators.HBName(
+        "display_name", default="_unnamed_panel_cooling_"
+    )
+    percent_coverage = ghio_validators.FloatPercentage("percent_coverage", default=1.0)
+
+    def __init__(self, _input_dict):
+        # type: (Dict) -> None
+        self.display_name = _input_dict["display_name"]
+        self.percent_coverage = _input_dict["percent_coverage"]
+        self.annual_COP = _input_dict["annual_COP"] or 2.0
+
+    def build(self):
+        # type: () -> cooling.PhCoolingPanel
+        obj = cooling.PhCoolingPanel()
+        obj.display_name = self.display_name
+        obj.percent_coverage = self.percent_coverage
+        obj.annual_COP = self.annual_COP
+        return obj
+
+
+# -----------------------------------------------------------------------------
+# -- GH Component Interface
+
 
 class GHCompo_CreateCoolingSystem(object):
     cooling_classes = {
-        1: cooling.PhCoolingVentilation,
-        2: cooling.PhCoolingRecirculation,
-        3: cooling.PhCoolingDehumidification,
-        4: cooling.PhCoolingPanel,
-    } # type: (Dict[int, type[cooling.PhCoolingSystem]])
-    
+        1: FacadePhCoolingVentilation,
+        2: FacadePhCoolingRecirculation,
+        3: FacadePhCoolingDehumidification,
+        4: FacadePhCoolingPanel,
+    }
+
     valid_cooling_types = [
         "1-ventilation",
         "2-recirculation",
@@ -167,6 +321,7 @@ class GHCompo_CreateCoolingSystem(object):
 
     def run(self):
         # type: () -> Optional[cooling.PhCoolingSystem]
+        """Find the right System Builder and create the new System from the user inputs."""
 
         if not self.system_type:
             msg = "Set the '_system_type' to configure the user-inputs."
@@ -178,19 +333,10 @@ class GHCompo_CreateCoolingSystem(object):
             cooling_class = self.cooling_classes[self.system_type]
         except KeyError as e:
             raise Exception(
-                "Error: Input Cooling type: '{}' not supported by this GH-Component. Please only input: "\
-                "{}".format(self.system_type, self.valid_cooling_types)
+                "Error: Input Cooling type: '{}' not supported by this GH-Component. "
+                "Please only input: {}".format(self.system_type, self.valid_cooling_types)
             )
 
-        # --- Build the Cooling system
-        cooling_system_ = cooling_class()
-        for attr_name in dir(cooling_system_):
-            if attr_name.startswith('_'):
-                continue
-
-            input_val = self.input_dict.get(attr_name)
-            if input_val:
-                setattr(cooling_system_, attr_name, input_val)
-       
-        return cooling_system_
-
+        # --- Build the Cooling system from the user_inputs
+        cooling_builder = cooling_class(self.input_dict)
+        return cooling_builder.build()

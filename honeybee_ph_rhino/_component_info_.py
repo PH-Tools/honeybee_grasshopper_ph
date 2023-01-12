@@ -5,7 +5,7 @@
 These are called when the component is instantiated within the Grasshopper canvas.
 """
 
-RELEASE_VERSION = "Honeybee-PH v1.0"
+RELEASE_VERSION = "Honeybee-PH v1.0.1"
 CATEGORY = "HB-PH"
 SUB_CATEGORIES = {
     0: "00 | Utils",
@@ -169,39 +169,15 @@ COMPONENT_PARAMS = {
         "Category": CATEGORY,
         "SubCategory": 1,
     },
-    # --
-    "HBPH - Create PH Equipment": {
-        "NickName": "Create PH Equipment",
+    # -- HVAC
+    "HBPH - Create Exhaust Ventilator": {
+        "NickName": "Create Exhaust Ventilator",
         "Message": RELEASE_VERSION,
         "Category": CATEGORY,
         "SubCategory": 1,
     },
-    "HBPH - Add PH Equipment": {
-        "NickName": "Add PH Equipment",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 1,
-    },
-    "HBPH - Set Res Occupancy": {
-        "NickName": "Set Res Occupancy",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 1,
-    },
-    "HBPH - Phius MF Res Calculator": {
-        "NickName": "Phius MF Res Calc",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 1,
-    },
-    "HBPH - Phius Program Finder": {
-        "NickName": "Phius Programs",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 1,
-    },
-    "HBPH - Create Conversion Factor": {
-        "NickName": "Factor",
+    "HBPH - Add Exhaust Ventilator": {
+        "NickName": "Create Exhaust Ventilator",
         "Message": RELEASE_VERSION,
         "Category": CATEGORY,
         "SubCategory": 1,
@@ -226,6 +202,44 @@ COMPONENT_PARAMS = {
     },
     "HBPH - Create Ventilation System": {
         "NickName": "Create Vent",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
+    #  -- Elec Equipment
+    "HBPH - Create PH Equipment": {
+        "NickName": "Create PH Equipment",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
+    "HBPH - Add PH Equipment": {
+        "NickName": "Add PH Equipment",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
+    # --
+    "HBPH - Set Res Occupancy": {
+        "NickName": "Set Res Occupancy",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
+    "HBPH - Phius MF Res Calculator": {
+        "NickName": "Phius MF Res Calc",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
+    "HBPH - Phius Program Finder": {
+        "NickName": "Phius Programs",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
+    "HBPH - Create Conversion Factor": {
+        "NickName": "Factor",
         "Message": RELEASE_VERSION,
         "Category": CATEGORY,
         "SubCategory": 1,
@@ -364,8 +378,7 @@ COMPONENT_PARAMS = {
 
 class ComponentNameError(Exception):
     def __init__(self, _name, error):
-        self.message = 'Error: Cannot get Component Params for: "{}"'.format(
-            _name)
+        self.message = 'Error: Cannot get Component Params for: "{}"'.format(_name)
         print(error)
         super(ComponentNameError, self).__init__(self.message)
 
