@@ -6,29 +6,48 @@
 from collections import namedtuple
 
 try:
+    from typing import Dict, List
+except ImportError:
+    pass  # IronPython 2.7
+
+try:
     from honeybee import room
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
 try:
     from ladybug_rhino.fromgeometry import from_point3d
     from ladybug_rhino.togeometry import to_point3d
 except ImportError as e:
-    raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import ladybug_rhino:\n\t{}".format(e))
+try:
+    from ladybug_geometry import geometry3d
+except ImportError as e:
+    raise ImportError("\nFailed to import ladybug_geometry:\n\t{}".format(e))
 
 try:
     from honeybee_ph import space
+    from honeybee_ph.properties.space import SpacePhProperties
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_ph:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee_ph:\n\t{}".format(e))
 
 
-SpaceData = namedtuple('SpaceData', ['space', 'reference_points'])
+# SpaceData = namedtuple("SpaceData", ["space", "reference_points"])
+
+
+class SpaceData(object):
+    """Temporary data class for organizing the space data and test points"""
+
+    def __init__(self, space, reference_points):
+        # type: (space.Space, List[geometry3d.Point3D]) -> None
+        self.space = space
+        self.reference_points = reference_points
 
 
 def offset_space_reference_points(IGH, _space, _dist=0.0):
     # type (gh_io.IGH, space.Space, float) -> space.Space
     """Move the Space's floor segments 'up' in the world-Z some distance. This is
-        useful since if the reference point is directly 'on' the honeybee-Room's floor 
+        useful since if the reference point is directly 'on' the honeybee-Room's floor
         surface, sometimes it will not test as 'inside' correctly. Tolerance issue?
 
     Arguments:
@@ -39,19 +58,22 @@ def offset_space_reference_points(IGH, _space, _dist=0.0):
 
     Returns:
     --------
-        * space.Space: A copy of the input Space with the floor-segment reference 
+        * space.Space: A copy of the input Space with the floor-segment reference
             points modified.
     """
-
+    # -------------------------------------------------------------------------
     if _dist == 0:
         return _space
+
+    # -------------------------------------------------------------------------
     new_space = _space.duplicate()
     for volume in new_space.volumes:
         for seg in volume.floor._floor_segments:
             seg.reference_point = to_point3d(
                 IGH.ghpythonlib_components.Move(
                     from_point3d(seg.reference_point),
-                    IGH.ghpythonlib_components.UnitZ(_dist)).geometry
+                    IGH.ghpythonlib_components.UnitZ(_dist),
+                ).geometry
             )
     return new_space
 
@@ -69,16 +91,18 @@ def add_spaces_to_honeybee_rooms(_spaces, _hb_rooms, _inherit_names=False):
 
     Returns:
     --------
-        (list[room.Room]): A list of Honeybee rooms with Spaces added to them. 
+        (list[room.Room]): A list of Honeybee rooms with Spaces added to them.
     """
 
+    # -------------------------------------------------------------------------
     # -- Organize the spaces into a dict and pull out the reference points
     # -- This is done to avoid re-collecting the points at each is_point_inside
     # -- check and so that 'del' can be used to speed up the hosting checks.
-    spaces_dict = {}
+    spaces_dict = {}  # type: Dict[int, SpaceData]
     for space in _spaces:
         spaces_dict[id(space)] = SpaceData(space, [pt for pt in space.reference_points])
 
+    # -------------------------------------------------------------------------
     # -- Add the spaces to the host-rooms
     new_rooms = []
     for hb_room in _hb_rooms:
@@ -90,6 +114,12 @@ def add_spaces_to_honeybee_rooms(_spaces, _hb_rooms, _inherit_names=False):
                 if not dup_room.geometry.is_point_inside(pt):
                     continue
 
+                print(
+                    "Hosting Space: {}  in HB-Room: {}".format(
+                        space_data.space.name, dup_room.display_name
+                    )
+                )
+
                 sp = space_data.space.duplicate()
                 sp.host = dup_room
 
@@ -98,17 +128,18 @@ def add_spaces_to_honeybee_rooms(_spaces, _hb_rooms, _inherit_names=False):
                 # -- and it will inherit its name from the parent HB-Room.
                 if _inherit_names:
                     sp.name = dup_room.display_name
-                    dup_room.properties.ph.merge_new_space(sp) # type: ignore
+                    dup_room.properties.ph.merge_new_space(sp)  # type: ignore
                 else:
-                    dup_room.properties.ph.add_new_space(sp) # type: ignore
+                    dup_room.properties.ph.add_new_space(sp)  # type: ignore
 
                 # -- Add in any detailed PH-Style vent flow rates if they exist
-                if sp.properties.ph.has_ventilation_flow_rates:
-                    sp_flow_rate = sp.properties.ph.honeybee_flow_rate
+                sp_prop_ph = sp.properties.ph  # type: SpacePhProperties # type:ignore
+                if sp_prop_ph.has_ventilation_flow_rates:
+                    sp_flow_rate = sp_prop_ph.honeybee_flow_rate
 
-                    existing_room_flow = dup_room.properties.energy.ventilation.flow_per_zone # type: ignore
+                    existing_room_flow = dup_room.properties.energy.ventilation.flow_per_zone  # type: ignore
                     new_room_flow = sp_flow_rate + existing_room_flow
-                    dup_room.properties.energy.abolute_ventilation(new_room_flow) # type: ignore
+                    dup_room.properties.energy.abolute_ventilation(new_room_flow)  # type: ignore
 
                 # -- to speed up further checks
                 del spaces_dict[space_data_id]

@@ -29,9 +29,13 @@ This tool will download and install several new libraries into the Ladybug-Tools
 python interpreter, and will download and install new Grasshopper components which
 will be added to your Rhino / Grasshopper installation.
 -
-EM November 9, 2022
+EM February 3, 2023
     Args:
         _install: (bool) Set to True to install Honeybee-PH on your computer.
+        
+        _require_admin: (bool) Set FALSE if you KNOW that you need to install HBPH without
+            admin. Default=TRUE. In almost all cases, leave this set to TRUE unless you
+            are absolutely certain and know what you are doing.
         
         _hbph_branch: (str) Default='main' Optional GitHub repo branch name for
             the honeybee-ph package to install (https://github.com/PH-Tools/honeybee_ph).
@@ -63,7 +67,7 @@ EM November 9, 2022
 COMPONENT = ghenv.Component # type: ignore
 COMPONENT.Name = 'HBPH Installer'
 COMPONENT.NickName = 'HBPHInstall'
-COMPONENT.Message = 'NOV_09_2022'
+COMPONENT.Message = 'FEB_03_2023'
 COMPONENT.Category = 'Honeybee-PH'
 COMPONENT.SubCategory = '00 | Utils'
 COMPONENT.AdditionalHelpFromDocStrings = '0'
@@ -441,8 +445,17 @@ def install_from_PyPi(_hbph_version, _phx_version, _hbph_gh_branch, _lbt_python_
     lbt_gh.give_popup_message(''.join([success_msg, restart_msg]), 'Installation Successful!')
     return
 
-def install_honeybee_ph(_install, _hbph_branch, _hbph_gh_branch, _phx_branch, _hbph_version, _phx_version, _min_ver_rhino, _min_ver_hb):
-    # type: (bool, Optional[str], Optional[str], Optional[str], Optional[str], Optional[str], Tuple[int, int], Tuple[int, int, int]) -> None
+def require_admin(_component_input):
+    # type: (Optional[bool]) -> bool
+    """There may be cases where the user wants to install WITHOUT admin."""
+    if _component_input is not None:
+        return _component_input
+    else:
+        return True
+
+
+def install_honeybee_ph(_install, _hbph_branch, _hbph_gh_branch, _phx_branch, _hbph_version, _phx_version, _min_ver_rhino, _min_ver_hb, _require_admin):
+    # type: (bool, Optional[str], Optional[str], Optional[str], Optional[str], Optional[str], Tuple[int, int], Tuple[int, int, int, bool]) -> None
     """Install the Honeybee-PH plugin.
     
     Arguments:
@@ -469,12 +482,18 @@ def install_honeybee_ph(_install, _hbph_branch, _hbph_gh_branch, _phx_branch, _h
     # -- fall back to other python installations on the user' computer, which will mess 
     # -- up all sorts of things. This error should be raised BEFORE any installation 
     # -- to ensure that nothing gets mistakenly installed elsewhere on the user's system.
-    if (os.name == 'nt') and (not lbt_gh.is_user_admin()):
-        msg = "Warning: You must have 'Admin' privileges on this computer in order "\
-            "to properly install Honeybee-PH. Try restarting Rhino using "\
-            "'Run as administrator' before proceeding."
-        raise Exception(msg)
-
+    if _require_admin:
+        if (os.name == 'nt') and (not lbt_gh.is_user_admin()):
+            msg = "Warning: You must have 'Admin' privileges on this computer in order "\
+                "to properly install Honeybee-PH. Try restarting Rhino using "\
+                "'Run as administrator' before proceeding."
+            raise Exception(msg)
+    else:
+        msg = "Note: You have chosen to install WITHOUT admin privledges. This may cause "\
+            "HBPH to be installed in an unexpected location on your system? If you don't "\
+            "know where you want your HBPH installed, leave '_require_admin' set to TRUE"
+        print msg
+    
     # -------------------------------------------------------------------------    
     if any((_hbph_branch, _phx_branch, _hbph_gh_branch)):
         # -- If the user supplies any GitHub branch name, use the GitHub versions for all.
@@ -501,10 +520,11 @@ def install_honeybee_ph(_install, _hbph_branch, _hbph_gh_branch, _phx_branch, _h
                         )
         return
 
+admin = require_admin(_require_admin)
 
 if _install:
     install_honeybee_ph(_install, _hbph_branch, _hbph_gh_branch, _phx_branch,
-                        _hbph_version, _phx_version, MIN_VER_RHINO, MIN_VER_HB_CORE,)
+                        _hbph_version, _phx_version, MIN_VER_RHINO, MIN_VER_HB_CORE, admin)
 else:
     msg = 'Please:'\
     '- Be sure you have already installed Ladybug Tools.'\

@@ -20,7 +20,7 @@ def calc_reference_point(IGH, _face3D):
     """Find the 'reference point' for a Face3D.
 
     For rectangular Face3D objects, this is the center point. For irregular shaped Face3D
-    objects ('L', 'T', 'O', etc...) this will use the Rhino 'PullPoint' to project the 
+    objects ('L', 'T', 'O', etc...) this will use the Rhino 'PullPoint' to project the
     center to the nearest surface edge. This ensure thats the reference point is always
     'on' the Face3D itself.
 
@@ -34,10 +34,25 @@ def calc_reference_point(IGH, _face3D):
         * (pointvector.Point3D): The Reference Point found.
     """
 
+    # -------------------------------------------------------------------------
     # -- Find the normal centerpoint of the surface
     face_cent_rh_pt = from_point3d(_face3D.center)
     face_rh = from_face3d(_face3D)
+
+    # -------------------------------------------------------------------------
+    # -- 'Pull' the point onto the nearest surface edge
     new_cp = IGH.ghpythonlib_components.PullPoint(face_cent_rh_pt, face_rh).closest_point
+
+    # -------------------------------------------------------------------------
+    # -- Move the point a little more ( + 0.01) in the direction of the 'pull'
+    # -- to ensure the reference point is 'in' the space volume brep
+    MOVE_DISTANCE = 0.01
+    pull_vector, pull_length = IGH.ghpythonlib_components.Vector2Pt(
+        face_cent_rh_pt, new_cp, False
+    )
+
+    pull_vector = IGH.ghpythonlib_components.Amplitude(pull_vector, MOVE_DISTANCE)
+    new_cp = IGH.ghpythonlib_components.Move(new_cp, pull_vector).geometry
 
     return pointvector.Point3D(new_cp.X, new_cp.Y, new_cp.Z)
 
@@ -52,12 +67,12 @@ def create_floor_segment_from_rhino_geom(IGH, _flr_segment_geom, _weighting_fact
         * _flr_segment_geom (List[Any]): A list of Rhino Geometry representing
             the floor-segments.
         * _weighting_factors (List[float]): A List of the weighting-factors (0.0-1.0)
-            to apply to the floor segments. Note: the length of this list should match the 
+            to apply to the floor segments. Note: the length of this list should match the
             _flr_segment_geom length.
 
     Returns:
     --------
-        * list[space.SpaceFloorSegment]: A list of the new SpaceFloorSegments 
+        * list[space.SpaceFloorSegment]: A list of the new SpaceFloorSegments
             created from the input Rhino geometry.
     """
 
@@ -70,8 +85,10 @@ def create_floor_segment_from_rhino_geom(IGH, _flr_segment_geom, _weighting_fact
     # Face3Ds here before moving on? Give useful warnings.
 
     # -- Check weighting factors
-    assert len(lbt_face_3ds) == len(_weighting_factors), "Error: input lists of floor"\
+    assert len(lbt_face_3ds) == len(_weighting_factors), (
+        "Error: input lists of floor"
         "segments and weighting factor lengths do not match?"
+    )
 
     # -- Create new SpaceFloorSegments for each surface input
     flr_segments = []
