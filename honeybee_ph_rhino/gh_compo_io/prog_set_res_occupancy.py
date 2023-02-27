@@ -10,12 +10,12 @@ except ImportError:
 
 try:
     from honeybee import room
+    from honeybee.properties import RoomProperties
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
 try:
     from honeybee_energy.load import people
-    from honeybee_energy.lib import schedules
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy:\n\t{}".format(e))
 
@@ -39,30 +39,17 @@ class GHCompo_SetResOccupancy(object):
         self._number_people = _num_people
         self.hb_rooms = _hb_rooms
 
-    def dup_hb_people(self, hb_obj, object_name, object_class):
-        # type: (room.Room, str, type[people.People]) -> people.People
-        """Duplicate an HB-People Load."""
-        # get the always on schedule
-        always_on = schedules.schedule_by_identifier("Always On")
+    @property
+    def any_input(self):
+        # type: () -> bool
+        """Return True if any inputs are provided"""
+        return any((self._number_bedrooms, self._number_dwellings, self._number_people))
 
-        # try to get the load object assigned to the Room or ProgramType
-        try:  # assume it's a Room
-            load_obj = hb_obj.properties
-            for attribute in ("energy", object_name):
-                load_obj = getattr(load_obj, attribute)
-        except AttributeError:  # it's a ProgramType
-            load_obj = getattr(hb_obj, object_name)
-
-        load_id = "{}_{}".format(hb_obj.identifier, object_name)
-        try:  # duplicate the load object
-            dup_load = load_obj.duplicate()
-            dup_load.identifier = load_id
-            return dup_load
-        except AttributeError:  # create a new object
-            try:  # assume it's People, Lighting, Equipment or Infiltration
-                return object_class(load_id, 0, always_on)
-            except:  # it's a Ventilation object
-                return object_class(load_id)
+    @property
+    def all_inputs(self):
+        # type: () -> bool
+        """Return True if any inputs are provided"""
+        return all((self._number_bedrooms, self._number_dwellings, self._number_people))
 
     def get_number_bedrooms(self, i):
         # type: (int) -> int
@@ -73,7 +60,11 @@ class GHCompo_SetResOccupancy(object):
         except IndexError:
             # -- Unless the user didn't provide the right number of input values
             # -- in which case: use the first provided value as the fallback.
-            return self._number_bedrooms[0]
+            try:
+                return self._number_bedrooms[0]
+            except IndexError:
+                msg = "Error: Please provided the num. of bedrooms in the HB-Room."
+                raise Exception(msg)
 
     def get_number_dwellings(self, i):
         # type: (int) -> int
@@ -84,7 +75,11 @@ class GHCompo_SetResOccupancy(object):
         except IndexError:
             # -- Unless the user didn't provide the right number of input values
             # -- in which case: use the first provided value as the fallback.
-            return self._number_dwellings[0]
+            try:
+                return self._number_dwellings[0]
+            except IndexError:
+                msg = "Error: Please provided the num. of dwellings units in the HB-Room."
+                raise Exception(msg)
 
     def get_number_people(self, i):
         # type: (int) -> float
@@ -95,7 +90,11 @@ class GHCompo_SetResOccupancy(object):
         except IndexError:
             # -- Unless the user didn't provide the right number of input values
             # -- in which case: use the first provided value as the fallback.
-            return self._number_people[0]
+            try:
+                return self._number_people[0]
+            except IndexError:
+                msg = "Error: Please provided the num. of people for the HB-Room."
+                raise Exception(msg)
 
     def _new_room_with_properties_set(self, i, hb_room):
         # type: (int, room.Room) -> room.Room
@@ -103,7 +102,8 @@ class GHCompo_SetResOccupancy(object):
 
         # -- Type Aliases
         new_room = hb_room.duplicate()
-        new_hb_ppl_obj = self.dup_hb_people(new_room, "people", people.People)
+        hb_ppl_obj = hb_room.properties.energy.people  # type: people.People
+        new_hb_ppl_obj = hb_ppl_obj.duplicate()  # type: people.People # type: ignore
         new_hb_ppl_prop_ph = new_hb_ppl_obj.properties.ph  # type: PeoplePhProperties
 
         # -- Set the HB-people property attributes
@@ -122,14 +122,16 @@ class GHCompo_SetResOccupancy(object):
     def run(self):
         # type: () -> List[room.Room]
 
-        # -- If no bedroom info provided, just pass along the same rooms input.
-        if not self._number_bedrooms:
+        # -- Check inputs
+        if not self.any_input:
+            return [rm for rm in self.hb_rooms]
+        elif self.any_input and not self.all_inputs:
+            msg = "Please provide the number of bedrooms, people and dwelling units for the Honeybee Rooms."
+            self.IGH.warning(msg)
             return [rm for rm in self.hb_rooms]
 
         # -- Set the room bedroom count and figure out the number of people.
-        hb_rooms_ = [
+        return [
             self._new_room_with_properties_set(i, hb_room)
             for i, hb_room in enumerate(self.hb_rooms)
         ]
-
-        return hb_rooms_
