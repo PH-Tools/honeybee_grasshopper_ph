@@ -22,8 +22,18 @@
 """
 Enter the relevant Phius Certification threshold data for the building-segment.
 -
-EM October 2, 2022
+EM March 4, 2023
     Args:
+        certification_program_: Input either -
+            "1-Default"
+            "2-PHIUS 2015"
+            "3-PHIUS 2018"
+            "4-Italian"
+            "5-PHIUS 2018 CORE"
+            "6-PHIUS 2018 ZERO"
+            "7-PHIUS 2021 CORE"
+            "8-PHIUS 2021 ZERO"
+        
         building_category_type_: Input either -
             "1-Residential building" (default)
             "2-Non-residential building"
@@ -84,6 +94,9 @@ reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Phius Certification"
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
+    from honeybee_ph import phius
+    reload(phius)
+    from honeybee_ph_rhino.gh_compo_io import cert_Phius as gh_compo_io
     reload(gh_compo_io)
     reload(gh_io)
 
@@ -96,6 +109,7 @@ IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 # -------------------------------------------------------------------------------------
 gh_compo_interface = gh_compo_io.GHCompo_PhiusCertification(
         IGH,
+        certification_program_,
         building_category_type_,
         building_use_type_,
         building_status_,

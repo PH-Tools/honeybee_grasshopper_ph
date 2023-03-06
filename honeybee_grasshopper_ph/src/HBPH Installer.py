@@ -29,7 +29,7 @@ This tool will download and install several new libraries into the Ladybug-Tools
 python interpreter, and will download and install new Grasshopper components which
 will be added to your Rhino / Grasshopper installation.
 -
-EM February 3, 2023
+EM March 6, 2023
     Args:
         _install: (bool) Set to True to install Honeybee-PH on your computer.
         
@@ -67,14 +67,14 @@ EM February 3, 2023
 COMPONENT = ghenv.Component # type: ignore
 COMPONENT.Name = 'HBPH Installer'
 COMPONENT.NickName = 'HBPHInstall'
-COMPONENT.Message = 'FEB_03_2023'
+COMPONENT.Message = 'MAR_06_2023'
 COMPONENT.Category = 'Honeybee-PH'
 COMPONENT.SubCategory = '00 | Utils'
 COMPONENT.AdditionalHelpFromDocStrings = '0'
 
 # -- Required Versions
 MIN_VER_RHINO = (7, 18)
-MIN_VER_HB_CORE = (1, 51, 47)
+MIN_VER_HB_CORE = (1, 54, 34)
 
 import os
 import sys

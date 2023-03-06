@@ -319,6 +319,36 @@ class UnitM(Validated):
         return result
 
 
+class UnitMM(Validated):
+    """A Millimeter value (float) of any value (positive or negative)."""
+
+    def validate(self, name, new_value, old_value):
+        if new_value is None:
+            # If the user passed a 'default' attribute, try and use that
+            try:
+                return float(self.default)
+            except:
+                return old_value
+
+        input_value, input_units = parser.parse_input(str(new_value))
+
+        # -- Make sure the value is a float
+        try:
+            input_value = float(input_value)
+        except:
+            raise ValueError(
+                "Error: input {} of type: {} is not allowed."
+                "Supply float only.".format(new_value, type(new_value))
+            )
+
+        # -- Convert to MilliMeters
+        result = converter.convert(input_value, input_units or "MM", "MM")
+
+        print("Converting: {} -> {:.4f} MM".format(new_value, result))
+
+        return result
+
+
 class UnitW_MK(Validated):
     """A W/MK conductivity value (float) of any value."""
 

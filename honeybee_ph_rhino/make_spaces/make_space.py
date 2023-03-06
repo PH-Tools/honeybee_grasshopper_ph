@@ -12,6 +12,7 @@ except ImportError:
 
 try:
     from honeybee import room
+    from honeybee_energy.properties.room import RoomEnergyProperties
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
@@ -28,6 +29,7 @@ except ImportError as e:
 try:
     from honeybee_ph import space
     from honeybee_ph.properties.space import SpacePhProperties
+    from honeybee_ph.properties.room import RoomPhProperties
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph:\n\t{}".format(e))
 
@@ -78,6 +80,33 @@ def offset_space_reference_points(IGH, _space, _dist=0.0):
     return new_space
 
 
+def set_absolute_ventilation(_hb_room, _new_room_airflow):
+    # type: (room.Room, float) -> room.Room
+    """Set the Absolute Ventilation on an HB-Room's .properties.energy
+
+    Implemented to support HBE <1.5 and 1.6 where they corrected the type on the 
+    attribute name (added the missing 's' in 'absolute')
+    
+    Arguments:
+    ----------
+        * _hb_room (room.Room): The Room to set the 
+            .properties.energy.absolute_ventilation rate for.
+        * _new_room_airflow (float): The new absolute ventilation flow-rate.
+    
+    Returns:
+    --------
+        * (room.Room): The HB-Room with the .properties.energy modified.
+    """
+
+    rm_prop_energy = _hb_room.properties.energy # type: RoomEnergyProperties # type: ignore
+    if hasattr(_hb_room, "abolute_ventilation"):
+        rm_prop_energy.abolute_ventilation(_new_room_airflow) # type: ignore
+    else:
+        rm_prop_energy.absolute_ventilation(_new_room_airflow)
+
+    return _hb_room
+
+
 def add_spaces_to_honeybee_rooms(_spaces, _hb_rooms, _inherit_names=False):
     # type: (list[space.Space], list[room.Room], bool) -> tuple[list[room.Room], list[SpaceData]]
     """Sorts a list of Spaces, checks which are 'in' which HB-Room, and adds the space to that room.
@@ -106,7 +135,7 @@ def add_spaces_to_honeybee_rooms(_spaces, _hb_rooms, _inherit_names=False):
     # -- Add the spaces to the host-rooms
     new_rooms = []
     for hb_room in _hb_rooms:
-        dup_room = hb_room.duplicate()
+        dup_room = hb_room.duplicate() # type: room.Room # type: ignore
 
         # -- See if any of the Space Reference points are inside the Room Geometry
         for space_data_id, space_data in spaces_dict.items():
@@ -126,20 +155,22 @@ def add_spaces_to_honeybee_rooms(_spaces, _hb_rooms, _inherit_names=False):
                 # -- If 'inherit names', simplify the spaces so that
                 # -- there is only a single space inside of the HB-Room
                 # -- and it will inherit its name from the parent HB-Room.
+                dup_rm_prop_ph = dup_room.properties.ph # type: RoomPhProperties # type: ignore
                 if _inherit_names:
                     sp.name = dup_room.display_name
-                    dup_room.properties.ph.merge_new_space(sp)  # type: ignore
+                    dup_rm_prop_ph.merge_new_space(sp)
                 else:
-                    dup_room.properties.ph.add_new_space(sp)  # type: ignore
+                    dup_rm_prop_ph.add_new_space(sp)
 
                 # -- Add in any detailed PH-Style vent flow rates if they exist
                 sp_prop_ph = sp.properties.ph  # type: SpacePhProperties # type:ignore
                 if sp_prop_ph.has_ventilation_flow_rates:
-                    sp_flow_rate = sp_prop_ph.honeybee_flow_rate
+                    space_flow_rate = sp_prop_ph.honeybee_flow_rate # type: float # type: ignore
 
-                    existing_room_flow = dup_room.properties.energy.ventilation.flow_per_zone  # type: ignore
-                    new_room_flow = sp_flow_rate + existing_room_flow
-                    dup_room.properties.energy.abolute_ventilation(new_room_flow)  # type: ignore
+                    dup_room_prop_energy = dup_room.properties.energy # type: RoomEnergyProperties # type: ignore
+                    existing_room_flow = float(dup_room_prop_energy.ventilation.flow_per_zone)
+                    new_room_flow = space_flow_rate + existing_room_flow
+                    dup_room = set_absolute_ventilation(dup_room, new_room_flow)
 
                 # -- to speed up further checks
                 del spaces_dict[space_data_id]

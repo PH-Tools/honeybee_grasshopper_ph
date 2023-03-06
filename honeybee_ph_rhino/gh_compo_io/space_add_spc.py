@@ -73,6 +73,5 @@ class GHCompo_AddPHSpaces(object):
             )
             self.IGH.error(msg)
 
-        print(check_pts_)
         # ---------------------------------------------------------------------
         return hb_rooms_, check_pts_
