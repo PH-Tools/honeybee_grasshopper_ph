@@ -74,7 +74,7 @@ COMPONENT.AdditionalHelpFromDocStrings = '0'
 
 # -- Required Versions
 MIN_VER_RHINO = (7, 18)
-MIN_VER_HB_CORE = (1, 54, 34)
+MIN_VER_LBT_GH = (1, 6, 20)
 
 import os
 import sys
@@ -102,7 +102,10 @@ except ImportError:
 try:
     from ladybug_rhino.versioning import change
     from ladybug_rhino import grasshopper as lbt_gh
+    from ladybug_rhino.config import folders as lbr_folders
+    lbr_loaded = True
 except ImportError as e:
+    lbr_loaded = False
     msg =   'Failed to import ladybug_rhino:'\
             'Please make sure Ladybug and Honeybee are installed properly before proceeding.\t{}'.format(e)
     raise ImportError(msg)
@@ -153,45 +156,46 @@ def check_rhino_version_compatibility(_min_version_allowed):
     print(msg)
     raise Exception(msg)
 
-def check_hb_core_version_compatibility(_min_version_allowed):
+def check_LBT_GH_version_compatibility(_min_version_allowed):
     # type: (Tuple[int, int, int]) -> bool
-    """Return True if the installed Honeybee-Core version meets the minimum compatibility requirements.
+    """Return True if the installed LBT Grasshopper version meets the minimum compatibility requirements.
     
     Arguments:
     ----------
-        * _min_version_allowed (Tuple[int, int]): The Minimum Honeybee-Core version compatible
+        * _min_version_allowed (Tuple[int, int]): The Minimum Ladybug Grasshopper version compatible
             with Honeybee-PH. 
     
     Returns:
     --------
         * (bool)
     """
-
-    hb_core_version_installed =  hb_folders.honeybee_core_version
-    if not hb_core_version_installed: # -> (1, 50, 0)
+    # ---------------------------------------------------------------------------
+    lbt_gh = lbr_folders.lbt_grasshopper_version
+    if not lbt_gh:
         msg = (
             "Error: Please make sure that you have Ladybug Tools and Honeybee installed "
             "before proceeding with the installation. "
-            "Cannot determine the Honeybee-Core version installed? "
-            " - honeybee.config.folders.honeybee_core_version={} ".format(hb_folders.honeybee_core_version)
+            "Cannot determine the Ladybug Tools version installed? "
+            " - ladybug_rhino.config.lbt_grasshopper_version={} ".format(lbt_gh)
             )
         raise Exception(msg)
-
-
-    print("Honeybee-Core version: {}.{}.{} found.".format(*hb_core_version_installed))
+    
+    # ---------------------------------------------------------------------------
+    print("LBT Grasshopper version: {}.{}.{} found.".format(*lbt_gh))
     print("- "*25)
     
-    for inst_ver, min_ver in zip(hb_core_version_installed, _min_version_allowed):
-        if inst_ver > min_ver:
-            break
-        elif inst_ver < min_ver:
-            msg = "Error: Honeybee-PH is not "\
-                "compatible with the version of Honeybee installed on this computer [v{}]. Honeybee-PH requires "\
-                "at least Honeybee-Core v{} in order to work properly. Please "\
-                "update your Ladybug Tools/Honeybee installation to a compatible version before proceeding "\
-                "with the Honeybee-PH installation. You can use the Ladybug 'LB Versioner' component to update "\
-                "your Honeybee installation, and then restart Rhino before trying to install Honeybee-PH again.".format(hb_core_version_installed, _min_version_allowed)
-            raise Exception(msg)
+    # ---------------------------------------------------------------------------
+    if lbt_gh < _min_version_allowed:
+        msg = "Error: Honeybee-PH is not "\
+            "compatible with the version of Ladybug Tools installed on this computer [v{}]. Honeybee-PH requires "\
+            "at least LadybugTools v{} in order to work properly. Please "\
+            "update your Ladybug Tools installation to a compatible version before proceeding "\
+            "with the Honeybee-PH installation. You can use the Ladybug 'LB Versioner' component to update "\
+            "your Honeybee installation, and then restart Rhino before trying to install Honeybee-PH again."\
+            "Note that you may be required to run the 'LB Versioner' more than once if you have a very old "\
+            "version of Ladybug Tools installed.".format(lbt_gh, _min_version_allowed)
+        raise Exception(msg)
+    
     return True
 
 def pip_install(_package_name, _package_version, _lbt_python_exe_path, _lbt_python_package_path, _package_install_folder_name=None):
@@ -454,8 +458,8 @@ def require_admin(_component_input):
         return True
 
 
-def install_honeybee_ph(_install, _hbph_branch, _hbph_gh_branch, _phx_branch, _hbph_version, _phx_version, _min_ver_rhino, _min_ver_hb, _require_admin):
-    # type: (bool, Optional[str], Optional[str], Optional[str], Optional[str], Optional[str], Tuple[int, int], Tuple[int, int, int, bool]) -> None
+def install_honeybee_ph(_install, _hbph_branch, _hbph_gh_branch, _phx_branch, _hbph_version, _phx_version, _min_ver_rhino, _min_ver_lbt_gh, _require_admin):
+    # type: (bool, Optional[str], Optional[str], Optional[str], Optional[str], Optional[str], Tuple[int, int], Tuple[int, int, int], bool) -> None
     """Install the Honeybee-PH plugin.
     
     Arguments:
@@ -466,6 +470,9 @@ def install_honeybee_ph(_install, _hbph_branch, _hbph_gh_branch, _phx_branch, _h
         * _phx_branch (Optional[str]): The name of the GitHub branch to install (ie: 'main').
         * _hbph_version (Optional[str]): The version number of Honeybee-PH to install from PyPi.
         * _phx_version (Optional[str]): The version number of PHX to install from PyPi.
+        * _min_ver_rhino (Tuple[int, int]):
+        * _min_ver_lbt_gh (Tuple[int, int, int]):
+        * _require_admin (bool):
     
     Returns:
     --------
@@ -475,7 +482,7 @@ def install_honeybee_ph(_install, _hbph_branch, _hbph_gh_branch, _phx_branch, _h
     # -------------------------------------------------------------------------
     # -- Check version compatibility
     check_rhino_version_compatibility(_min_ver_rhino)
-    check_hb_core_version_compatibility(_min_ver_hb)
+    check_LBT_GH_version_compatibility(_min_ver_lbt_gh)
 
     # -------------------------------------------------------------------------
     # -- Check to make sure the user has admin rights, otherwise PyPi will silently
@@ -520,11 +527,13 @@ def install_honeybee_ph(_install, _hbph_branch, _hbph_gh_branch, _phx_branch, _h
                         )
         return
 
+# ---
 admin = require_admin(_require_admin)
 
+# ---
 if _install:
     install_honeybee_ph(_install, _hbph_branch, _hbph_gh_branch, _phx_branch,
-                        _hbph_version, _phx_version, MIN_VER_RHINO, MIN_VER_HB_CORE, admin)
+                        _hbph_version, _phx_version, MIN_VER_RHINO, MIN_VER_LBT_GH, admin)
 else:
     msg = 'Please:'\
     '- Be sure you have already installed Ladybug Tools.'\
