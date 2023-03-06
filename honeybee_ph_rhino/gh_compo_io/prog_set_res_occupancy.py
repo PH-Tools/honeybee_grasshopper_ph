@@ -16,6 +16,7 @@ except ImportError as e:
 
 try:
     from honeybee_energy.load import people
+    from honeybee_energy.properties.room import RoomEnergyProperties
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy:\n\t{}".format(e))
 
@@ -96,25 +97,38 @@ class GHCompo_SetResOccupancy(object):
                 msg = "Error: Please provided the num. of people for the HB-Room."
                 raise Exception(msg)
 
+    def duplicate_people(self, _hb_room):
+        # type: (room.Room) -> people.People
+        """If the room does not already have a 'people' object, give warning."""
+        new_room_prop_e = _hb_room.properties.energy # type: RoomEnergyProperties # type: ignore
+        if not new_room_prop_e.people:
+            msg = "Error: The Honeybee-Room '{}' does not have an HB-Energy 'People' load. "\
+                "Please apply a 'People' load to the room before proceeding.".format(_hb_room.display_name)
+            raise Exception(msg)
+        
+        new_people = new_room_prop_e.people.duplicate() # type: people.People # type: ignore
+        return new_people
+
     def _new_room_with_properties_set(self, i, hb_room):
         # type: (int, room.Room) -> room.Room
         """Return a duplicate room with the new people attribute values set."""
 
         # -- Type Aliases
-        new_room = hb_room.duplicate()
-        hb_ppl_obj = hb_room.properties.energy.people  # type: people.People
-        new_hb_ppl_obj = hb_ppl_obj.duplicate()  # type: people.People # type: ignore
-        new_hb_ppl_prop_ph = new_hb_ppl_obj.properties.ph  # type: PeoplePhProperties
-
+        new_room = hb_room.duplicate() # type: room.Room # type: ignore
+        
+        # -- Clean up the People (might be None)
+        new_hb_ppl_obj = self.duplicate_people(new_room)
+        new_hb_ppl_prop_ph = new_hb_ppl_obj.properties.ph  # type: PeoplePhProperties # type: ignore
+        
         # -- Set the HB-people property attributes
         new_hb_ppl_prop_ph.is_dwelling_unit = True
         new_hb_ppl_prop_ph.number_dwelling_units = self.get_number_dwellings(i)
         new_hb_ppl_prop_ph.number_bedrooms = self.get_number_bedrooms(i)
         new_hb_ppl_prop_ph.number_people = self.get_number_people(i)
-        ppl_per_m2 = new_hb_ppl_prop_ph.number_people / hb_room.floor_area
-        new_hb_ppl_obj.people_per_area = ppl_per_m2
+        _ppl_per_m2 = new_hb_ppl_prop_ph.number_people / hb_room.floor_area
+        new_hb_ppl_obj.people_per_area = _ppl_per_m2
 
-        # -- Set the new room's people
+        # -- Set the new room's people with the new values
         new_room.properties.energy.people = new_hb_ppl_obj  # type: ignore
 
         return new_room
