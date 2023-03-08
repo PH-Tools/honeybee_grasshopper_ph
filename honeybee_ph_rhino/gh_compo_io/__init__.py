@@ -19,6 +19,7 @@ from honeybee_ph_rhino.gh_compo_io.win_create_glazing import GHCompo_CreatePhGla
 from honeybee_ph_rhino.gh_compo_io.win_create_constr import GHCompo_CreatePhConstruction
 from honeybee_ph_rhino.gh_compo_io.win_create_frame import GHCompo_CreatePhWinFrame
 from honeybee_ph_rhino.gh_compo_io.win_create_frame_element import GHCompo_CreatePhWinFrameElement
+from honeybee_ph_rhino.gh_compo_io.win_set_inst_depth import GHCompo_SetApertureInstallDepth
 # -- Envelope
 from honeybee_ph_rhino.gh_compo_io.assmbly_create_sd_const import GHCompo_CreateSDConstructions
 from honeybee_ph_rhino.gh_compo_io.assmbly_create_mixed_mat import GHCompo_CreateMixedHBMaterial
@@ -36,7 +37,6 @@ from honeybee_ph_rhino.gh_compo_io.prog_create_elec_equip import GHCompo_CreateE
 from honeybee_ph_rhino.gh_compo_io.prog_find_Phius_program import GHCompo_FindPhiusProgram
 from honeybee_ph_rhino.gh_compo_io.prog_Phius_MF_calc import GHCompo_CalcPhiusMFLoads
 from honeybee_ph_rhino.gh_compo_io.prog_set_res_occupancy import GHCompo_SetResOccupancy
-from honeybee_ph_rhino.gh_compo_io.prog_set_num_dwellings import GHCompo_SetNumDwellings
 from honeybee_ph_rhino.gh_compo_io.prog_create_operating_period import GHCompo_CreateOccPeriod
 from honeybee_ph_rhino.gh_compo_io.prog_create_vent_schd import GHCompo_CreateVentSched
 # -- Shading

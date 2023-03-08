@@ -29,6 +29,11 @@ except ImportError as e:
     raise ImportError('\nFailed to import ladybug_geometry:\n\t{}'.format(e))
 
 try:
+    from honeybee_ph.properties.aperture import AperturePhProperties
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee_ph:\n\t{}'.format(e))
+
+try:
     from honeybee_ph_rhino import gh_io
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
@@ -52,9 +57,10 @@ def create_punched_geometry(_hb_rooms):
 def create_inset_aperture_surface(_aperture):
     # type: (aperture.Aperture) -> Optional[rg.Brep]
     """Return Rhino.Geometry.Brep of an aperture's face, inset."""
+    ap_prop_ph = _aperture.properties.ph # type: AperturePhProperties
     inset_face = from_face3d(
         _aperture.geometry.move(
-            _aperture.geometry.normal.reverse() * _aperture.properties.ph.inset_dist  # type: ignore
+            _aperture.geometry.normal.reverse() * ap_prop_ph.install_depth
         )
     )  # type: Optional[rg.Brep]
 
@@ -79,13 +85,13 @@ def create_inset_aperture_surfaces(_hb_rooms):
 def create_window_reveal(_hb_aperture):
     # type: (aperture.Aperture) -> List[rg.Brep]
     """Return a list of the Aperture 'reveal' surfaces."""
-
+    ap_prop_ph = _hb_aperture.properties.ph # type: AperturePhProperties
     extrusion_vector = _hb_aperture.normal.reverse(
-    ) * _hb_aperture.properties.ph.inset_dist  # type: ignore
+    ) * ap_prop_ph.install_depth
     return [
         from_face3d(Face3D.from_extrusion(seg, extrusion_vector))
         for seg in _hb_aperture.geometry.boundary_segments
-    ]  # type: ignore
+    ]
 
 
 def create_window_reveals(_hb_rooms):

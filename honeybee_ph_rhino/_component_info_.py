@@ -5,7 +5,7 @@
 These are called when the component is instantiated within the Grasshopper canvas.
 """
 
-RELEASE_VERSION = "Honeybee-PH v1.0.18"
+RELEASE_VERSION = "Honeybee-PH v1.0.19"
 CATEGORY = "HB-PH"
 SUB_CATEGORIES = {
     0: "00 | Utils",
@@ -30,6 +30,12 @@ COMPONENT_PARAMS = {
     },
     "HBPH - Phius Certification": {
         "NickName": "Phius Cert.",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
+    "HBPH - PHI Certification": {
+        "NickName": "PHI Cert.",
         "Message": RELEASE_VERSION,
         "Category": CATEGORY,
         "SubCategory": 1,
@@ -219,7 +225,7 @@ COMPONENT_PARAMS = {
         "Category": CATEGORY,
         "SubCategory": 1,
     },
-    # --
+    # -- Programs
     "HBPH - Set Res Occupancy": {
         "NickName": "Set Res Occupancy",
         "Message": RELEASE_VERSION,
@@ -244,6 +250,7 @@ COMPONENT_PARAMS = {
         "Category": CATEGORY,
         "SubCategory": 1,
     },
+    # -- Windows 
     "HBPH - Create PH Window Frame Element": {
         "NickName": "Create Frame Element",
         "Message": RELEASE_VERSION,
@@ -274,6 +281,13 @@ COMPONENT_PARAMS = {
         "Category": CATEGORY,
         "SubCategory": 1,
     },
+    "HBPH - Set Window Install Depth" :{
+        "NickName": " Window Install Depth",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
+    # -- Envelope
     "HBPH - Create SD Constructions": {
         "NickName": "Create SD Const.",
         "Message": RELEASE_VERSION,
@@ -282,12 +296,6 @@ COMPONENT_PARAMS = {
     },
     "HBPH - Create Mixed HB-Material": {
         "NickName": "Create Mixed HB-Material",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 1,
-    },
-    "HBPH - PHI Certification": {
-        "NickName": "PHI Cert.",
         "Message": RELEASE_VERSION,
         "Category": CATEGORY,
         "SubCategory": 1,

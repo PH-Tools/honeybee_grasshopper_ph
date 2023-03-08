@@ -115,8 +115,9 @@ def _get_top_glazing_edge(_aperture):
     edge = edge.move(vect_towards_center * dist)
 
     # -- move the bottom edge 'in' the inset distance as well
+    ap_prop_ph = _aperture.properties.ph #type: hbph_aperture.AperturePhProperties
     edge = edge.move(_aperture.normal.normalize() *
-                     _aperture.properties.ph.inset_dist * -1)
+                     ap_prop_ph.install_depth * -1)
     return from_linesegment3d(edge)
 
 
@@ -142,8 +143,9 @@ def _get_bottom_glazing_edge(_aperture):
     edge = edge.move(vect_towards_center * dist)
 
     # -- move the bottom edge 'in' the inset distance as well
+    ap_prop_ph = _aperture.properties.ph # type: hbph_aperture.AperturePhProperties
     edge = edge.move(_aperture.normal.normalize() *
-                     _aperture.properties.ph.inset_dist * -1)
+                     ap_prop_ph.install_depth * -1)
     return from_linesegment3d(edge)
 
 
@@ -169,8 +171,9 @@ def _get_left_glazing_edge(_aperture):
     edge = edge.move(vect_towards_center * dist)
 
     # -- move the bottom edge 'in' the inset distance as well
+    ap_prop_ph = _aperture.properties.ph # type: hbph_aperture.AperturePhProperties
     edge = edge.move(_aperture.normal.normalize() *
-                     _aperture.properties.ph.inset_dist * -1)
+                     ap_prop_ph.install_depth * -1)
     return from_linesegment3d(edge)
 
 
@@ -196,8 +199,9 @@ def _get_right_glazing_edge(_aperture):
     edge = edge.move(vect_towards_center * dist)
 
     # -- move the bottom edge 'in' the inset distance as well
+    ap_prop_ph = _aperture.properties.ph # type: hbph_aperture.AperturePhProperties
     edge = edge.move(_aperture.normal.normalize() *
-                     _aperture.properties.ph.inset_dist * -1)
+                     ap_prop_ph.install_depth * -1)
     return from_linesegment3d(edge)
 
 
@@ -205,12 +209,12 @@ def _get_glazing_center(_aperture):
     # type (aperture.Aperture) -> Rhino.Geometry.Point3d
     """Return the center point of the glazing surface of an HB-Aperture.
 
-    This will be a point in the center, put pushed 'in' the "inset_dist" amount.
+    This will be a point in the center, put pushed 'in' the "install_depth" amount.
     """
-
+    ap_prop_ph = _aperture.properties.ph # type: hbph_aperture.AperturePhProperties
     return from_point3d(
         _aperture.geometry.centroid.move(
-            _aperture.normal.normalize() * _aperture.properties.ph.inset_dist * -1)
+            _aperture.normal.normalize() * ap_prop_ph.install_depth * -1)
     )
 
 
@@ -327,7 +331,8 @@ def find_overhang_shading(_aperture, _shading_objs, _IGH, _limit=99):
     # the window. Create a 'test plane' that is _extents (99m) tall and 0.5m past the wall surface, test if
     # any objects intersect that plane. If so, add them to the set of things
     # test in the next step
-    depth = float(_aperture.properties.ph.inset_dist) + 0.5 # type: ignore
+    ap_prop_ph = _aperture.properties.ph # type: hbph_aperture.AperturePhProperties
+    depth = float(ap_prop_ph.install_depth) + 0.5
     edge1 = _IGH.ghpythonlib_components.LineSDL(origin_point, UpVector, _limit)
     edge2 = _IGH.ghpythonlib_components.LineSDL(
         origin_point, from_vector3d(_aperture.geometry.normal), depth)
