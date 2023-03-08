@@ -17,8 +17,14 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
 try:
+    from honeybee_energy.properties.room import RoomEnergyProperties
+except ImportError as e:
+    raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
+
+try:
     from honeybee_energy_ph.load import phius_mf
     from honeybee_energy_ph.load import ph_equipment
+    from honeybee_energy_ph.properties.load.people import PeoplePhProperties
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
 
@@ -157,7 +163,9 @@ class GHCompo_CalcPhiusMFLoads(object):
     def _room_is_dwelling(self, _hb_room):
         # type: (room.Room) -> bool
         """Return True if the Honeybee-Room is a 'dwelling' (residential)?"""
-        return _hb_room.properties.energy.people.properties.ph.is_dwelling_unit  # type: ignore
+        hb_room_prop_e = _hb_room.properties.energy # type: RoomEnergyProperties
+        hb_room_prop_e_prop_ph = hb_room_prop_e.people.properties.ph # type: PeoplePhProperties
+        return hb_room_prop_e_prop_ph.is_residential
 
     def calc_res_electric_consumption(self, _hb_res_rooms):
         # type: (List[room.Room]) -> Tuple[List[str], float, float, float, float, List[str]]
