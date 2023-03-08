@@ -421,6 +421,14 @@ class IGH:
             level = self.Grasshopper.Kernel.GH_RuntimeMessageLevel.Warning
             self.ghenv.Component.AddRuntimeMessage(level, _in)
 
+    def remark(self, _in):
+        """Raise a runtime Note message on the GH Component"""
+        if not _in:
+            return None
+        else:
+            level = self.Grasshopper.Kernel.GH_RuntimeMessageLevel.Remark
+            self.ghenv.Component.AddRuntimeMessage(level, _in)
+
 
 class ComponentInput:
     """GH-Component Input Node data class."""
