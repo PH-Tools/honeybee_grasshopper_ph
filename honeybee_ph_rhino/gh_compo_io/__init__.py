@@ -36,6 +36,7 @@ from honeybee_ph_rhino.gh_compo_io.prog_create_elec_equip import GHCompo_CreateE
 from honeybee_ph_rhino.gh_compo_io.prog_find_Phius_program import GHCompo_FindPhiusProgram
 from honeybee_ph_rhino.gh_compo_io.prog_Phius_MF_calc import GHCompo_CalcPhiusMFLoads
 from honeybee_ph_rhino.gh_compo_io.prog_set_res_occupancy import GHCompo_SetResOccupancy
+from honeybee_ph_rhino.gh_compo_io.prog_set_num_dwellings import GHCompo_SetNumDwellings
 from honeybee_ph_rhino.gh_compo_io.prog_create_operating_period import GHCompo_CreateOccPeriod
 from honeybee_ph_rhino.gh_compo_io.prog_create_vent_schd import GHCompo_CreateVentSched
 # -- Shading

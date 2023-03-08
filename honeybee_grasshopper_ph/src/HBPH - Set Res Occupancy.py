@@ -20,10 +20,13 @@
 # @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 #
 """
-Set the residential PH-Style occupancy for the Honeybee-Rooms input. For Phius, the 
-total occupancy with be the number-of-bedrooms + 1 for each dwelling unit.
+Set the PH-Style occupancy for the Honeybee-Rooms input. 
+Note that for any 'Single-Family' or 'Non-Residential' HB-Rooms, just input a '1'
+for the '_num_dwellings'. Otherwise, input the number of dwellings for EACH HB-Room input. 
 -
-EM February 2, 2023
+For Phius projects, a dwelling's '_num_people' should be the dwelling's number-of-bedrooms + 1
+-
+EM March 8, 2023
     Args:
         _num_bedrooms: (list[int]) A list of number of bedrooms for EACH Honeybee-Room input.
             This should ideally be the same length as the '_hb_rooms' input, and in the same 
@@ -31,13 +34,20 @@ EM February 2, 2023
             Honeybee-Rooms input. Note that this value is the number of bedrooms PER-HB-ROOM, 
             not the total number of bedrooms in the entire model.
             
-        _num_dwellings: (List[int]) A list of number of dwelling-units for EACH Honeybee-Room input.
-            This should ideally be the same length as the '_hb_rooms' input, and in the same 
-            order. If only a single value is input, that value will get applied to al of the 
-            Honeybee-Rooms input. Note that this value is the number of dwellings PER-HB-ROOM, 
+        _num_dwellings: (List[int]) 
+            -
+            Single-Family | Input just a '1'. In that case, all HB-Rooms input will be tagged
+            as part of the same 'single-family' residence.
+            -
+            Non-Residential | Input just a '1'. In this case, the occupancy will be determined
+            by the Non-Res worksheets / sections instead.
+            -
+            Multi-Family | Input a list of the number-of-dwelling-units for EACH Honeybee-Room input.
+            This should be the same length as the '_hb_rooms' input, and in the same 
+            order. Note that this value should be the number of dwellings PER-HB-ROOM, 
             not the total number of dwellings in the entire model.
         
-        _num_people: (List[float]) A list of number of people for EACH Honeybee-Room input.
+        _num_people: (List[float]) A list of the number of people for EACH Honeybee-Room input.
             This should ideally be the same length as the '_hb_rooms' input, and in the same 
             order. If only a single value is input, that value will get applied to al of the 
             Honeybee-Rooms input. Note that this value is the number of people PER-HB-ROOM, 
@@ -72,7 +82,7 @@ except ImportError as e:
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Set Res Occupancy"
-DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=None)
+DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
     from honeybee_ph_rhino.gh_compo_io import prog_set_res_occupancy as gh_compo_io
     reload(gh_compo_io)
