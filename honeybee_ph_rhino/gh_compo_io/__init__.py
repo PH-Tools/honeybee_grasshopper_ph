@@ -31,6 +31,7 @@ from honeybee_ph_rhino.gh_compo_io.mech_create_cooling_sys import GHCompo_Create
 from honeybee_ph_rhino.gh_compo_io.mech_add_mech_systems import GHCompo_AddMechSystems
 from honeybee_ph_rhino.gh_compo_io.mech_create_exhaust_vent import GHCompo_CreateExhaustVent
 from honeybee_ph_rhino.gh_compo_io.mech_add_exhaust_vent import GHCompo_AddExhaustVent
+from honeybee_ph_rhino.gh_compo_io.mech_create_vent_duct import GHCompo_CreateVentDuct
 # -- Program [Schedule / Load]
 from honeybee_ph_rhino.gh_compo_io.prog_add_elec_equip import GHCompo_AddElecEquip
 from honeybee_ph_rhino.gh_compo_io.prog_create_elec_equip import GHCompo_CreateElecEquip
