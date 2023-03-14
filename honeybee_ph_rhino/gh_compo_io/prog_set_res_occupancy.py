@@ -151,11 +151,51 @@ class GHCompo_SetResOccupancy(object):
         else:
             return True
 
+    @property
+    def branch_lengths_match(self):
+        # type: () -> bool
+        hb_rm_branch_len = self.hb_rooms.BranchCount
+        br_branch_len = self._number_bedrooms.BranchCount
+        dw_branch_len = self._number_dwellings.BranchCount
+        ppl_branch_len = self._number_people.BranchCount
+
+        if not hb_rm_branch_len == br_branch_len == dw_branch_len == ppl_branch_len:
+            msg = "Error: The input data BranchCounts do not match. You entered "\
+            "{} Honeybee Rooms Branches, {} 'Num-Bedroom' Branches, {} 'Num-Dwelling' "\
+            "Branches, and {} 'Num-People' Branches? Please enure all input DataTrees "\
+            "are the same shape and length.".format(
+                hb_rm_branch_len, br_branch_len, dw_branch_len, ppl_branch_len
+            )
+            print(msg)
+            self.IGH.warning(msg)
+            return False
+        return True
+
+    def branch_input_lengths_match(self, _branch_num):
+        # type: (int) -> bool
+        hb_rm_lst_len = len(self.hb_rooms.Branch(_branch_num))
+        br_list_len = len(self._number_bedrooms.Branch(_branch_num))
+        ppl_list_len = len(self._number_people.Branch(_branch_num))
+        dwellings_list_len = len(self._number_people.Branch(_branch_num))
+
+        if not hb_rm_lst_len == br_list_len == ppl_list_len == dwellings_list_len:
+            msg = "Please make sure all the input values match. On Branch number {} you input "\
+            "{} Honeybee-Rooms, {} 'Num-Bedroom' values, {} 'Num-People' values, and {} 'Num-Dwellings' values? "\
+            "Please ensure that all input values are the same length.".format(
+                _branch_num, hb_rm_lst_len,br_list_len, ppl_list_len, dwellings_list_len)
+            print(msg)
+            self.IGH.warning(msg)
+            return False
+        return True
+    
     def create_rooms_with_ph_occupancies(self):
         # type: () -> DataTree[List[room.Room]]
         hb_rooms_ = DataTree[room.Room]()
 
         for i, branch in enumerate(self.hb_rooms.Branches):
+            if not self.branch_input_lengths_match(i):
+                continue
+            
             ph_single_fam_dwelling_ob = PhDwellings(_num_dwellings=1)
             
             for k, hb_room in enumerate(branch):
@@ -206,7 +246,11 @@ class GHCompo_SetResOccupancy(object):
 
     def run(self):
         # type: () -> DataTree[List[room.Room]]
-        if self.all_required_inputs:
-            return self.create_rooms_with_ph_occupancies()
-        else:
+        if not self.all_required_inputs:
             return self.hb_rooms
+        
+        if not self.branch_lengths_match:
+            return self.hb_rooms
+
+        return self.create_rooms_with_ph_occupancies()
+

@@ -4,12 +4,12 @@
 """GHCompo Interface: HBPH - Create Ventilation System."""
 
 try:
-    from typing import Any
+    from typing import Any, Optional
 except ImportError:
     pass #IronPython 2.7
 
 try:
-    from honeybee_energy_ph.hvac import ventilation
+    from honeybee_energy_ph.hvac import ventilation, ducting
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee_energy_ph:\n\t{}'.format(e))
 
@@ -28,8 +28,8 @@ class GHCompo_CreateVentSystem(object):
     display_name = ghio_validators.HBName("display_name")
 
     def __init__(self, _display_name, _sys_type, _vent_unit, _duct_01, _duct_02):
-        # type: (str, int, ventilation.Ventilator, Any, Any) -> None
-        self.display_name = _display_name or "_unnamed_ventilator_"
+        # type: (str, int, ventilation.Ventilator, Optional[ducting.PhDuctElement], Optional[ducting.PhDuctElement]) -> None
+        self.display_name = _display_name or "__unnamed_ventilator__"
         self.system_type = _sys_type
         self.vent_unit = _vent_unit
         self.duct_01 = _duct_01
@@ -52,5 +52,11 @@ class GHCompo_CreateVentSystem(object):
         vent_system_.display_name = self.display_name or vent_system_.display_name
         vent_system_.sys_type = self.system_type
         vent_system_.ventilation_unit = self.vent_unit or ventilation.Ventilator()
+
+        if self.duct_01:
+            vent_system_.duct_01 = self.duct_01
+
+        if self.duct_02:
+            vent_system_.duct_02 = self.duct_02
 
         return vent_system_
