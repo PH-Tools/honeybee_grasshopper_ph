@@ -146,6 +146,8 @@ class GHCompo_CreateVentDuct(object):
                                       self.insul_conductivity,
                                       self.insul_reflective,
                                       self.diameter,
+                                      self.height,
+                                      self.width,
                                       )
             )
 
