@@ -33,7 +33,7 @@ model. Only Honeybee Faces with boundary conditions of "Outdoors", "Ground" and
 -
 Use this before passing the honeybee-rooms on to the 'HB Model' component.
 -
-EM October 6, 2022
+EM March 16, 2023
     Args:
         segment_name_: Name for the building-segment
                
@@ -69,6 +69,12 @@ EM October 6, 2022
         winter_set_temp_: default = 20C [68F]
         
         summer_set_temp_: default = 25C [77F]
+        
+        mech_room_temp_: default = 20C [68F] Supply in cases where the HRV/ERV is located 
+            'outside' the normal conditioned space. For instance on the roof, or in a semi-
+            heated outdoor space such as a garage or breezeway. For Phius Certification, 
+            use the 'ERV_HRV_Outside Calculator' tool which can be downloaded from the 
+            Phius website www.phius.org
     
     Returns:
         hb_rooms_: The honeyee-Rooms with building-segment information added.
@@ -100,6 +106,8 @@ DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
     reload(gh_compo_io)
     reload(gh_io)
+    from honeybee_ph import bldg_segment
+    reload(bldg_segment)
     from honeybee_ph_rhino.gh_compo_io import ghio_validators
     reload(ghio_validators)
     from honeybee_ph_rhino.gh_compo_io import building_segment as gh_compo_io
@@ -123,6 +131,7 @@ gh_compo_interface = gh_compo_io.GHCompo_BuildingSegment(
         phi_certification_,
         winter_set_temp_,
         summer_set_temp_,
+        mech_room_temp_,
         _hb_rooms,
 )
 hb_rooms_, hbph_segment = gh_compo_interface.run()

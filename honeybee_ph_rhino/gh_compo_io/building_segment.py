@@ -33,10 +33,11 @@ except ImportError as e:
 class _SetPoints(object):
     """Temp holder to collect and clean SetPoint user-inputs"""
 
-    winter = ghio_validators.FloatNonZero("winter", default=20.0)
-    summer = ghio_validators.FloatNonZero("summer", default=25.0)
+    winter = ghio_validators.UnitDegreeC("winter", default=20.0)
+    summer = ghio_validators.UnitDegreeC("summer", default=25.0)
 
     def __init__(self, _winter, _summer):
+        # type: (str, str) -> None
         self.winter = _winter
         self.summer = _summer
 
@@ -61,11 +62,12 @@ class GHCompo_BuildingSegment(object):
     site = ghio_validators.NotNone("site")
     phius_certification = ghio_validators.NotNone("phius_certification")
     phi_certification = ghio_validators.NotNone("phi_certification")
+    mech_room_temp = ghio_validators.UnitDegreeC("mech_room_temp", default=20.0)
 
     def __init__(self, _IGH, _segment_name, _num_floor_levels, _num_dwelling_units, _site,
             _source_energy_factors, _co2_factors,
-            _phius_certification, _phi_certification, _winter_set_temp, _summer_set_temp, _hb_rooms):
-        # type: (gh_io.IGH, str, int, int, site.Site, List, List, phius.PhiusCertification, phi.PhiCertification, float, float, List[room.Room]) -> None
+            _phius_certification, _phi_certification, _winter_set_temp, _summer_set_temp, _mech_room_temp, _hb_rooms):
+        # type: (gh_io.IGH, str, int, int, site.Site, List, List, phius.PhiusCertification, phi.PhiCertification, str, str, str, List[room.Room]) -> None
         self.IGH = _IGH
         self.display_name = _segment_name or '_unnamed_bldg_segment_'
         self.num_floor_levels = _num_floor_levels
@@ -75,6 +77,7 @@ class GHCompo_BuildingSegment(object):
         self.phi_certification = _phi_certification or phi.PhiCertification()
         self.hb_rooms = _hb_rooms
         self.set_points = _SetPoints(_winter_set_temp, _summer_set_temp)
+        self.mech_room_temp = _mech_room_temp
         self.thermal_bridges = {}
         self._create_tb_dict()
 
