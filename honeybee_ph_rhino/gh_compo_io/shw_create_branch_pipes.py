@@ -20,7 +20,7 @@ from honeybee_ph_utils import input_tools
 class _BranchPipeBuilder(object):
     """Interface for collect and clean DHW Branch Piping user-inputs"""
 
-    diameter = ghio_validators.UnitM("diameter", default=0.0127)
+    diameter_m = ghio_validators.UnitM("diameter_m", default=0.0127)
     display_name = ghio_validators.HBName(
         "display_name", default="_unnamed_branch_pipe_")
 
@@ -29,7 +29,7 @@ class _BranchPipeBuilder(object):
         self.IGH = IGH
         self.geometry = _geometry
         self.display_name = _name
-        self.diameter = _diameter
+        self.diameter_m = _diameter
 
     def _convert_to_polyline(self, _input):
         """Try to convert input geometry to a Rhino Polyline object."""
@@ -69,7 +69,15 @@ class _BranchPipeBuilder(object):
 
         for segment in segments:
             hbph_obj.add_segment(
-                hot_water.PhPipeSegment(segment, self.diameter)
+                hot_water.PhPipeSegment(
+                    _geom=segment,
+                    _diameter_m=self.diameter_m,
+                    _insul_thickness_m=0.0,
+                    _insul_conductivity= 0.04,
+                    _insul_refl = False,
+                    _insul_quality=None,
+                    _daily_period=24
+                 )
             )
 
         return hbph_obj
@@ -82,7 +90,7 @@ class GHCompo_CreateSHWBranchPipes(object):
         self.IGH = _IGH
         self.geometry = _geometry
         self.name = _name
-        self.diameter = _diameter
+        self.diameter_m = _diameter
 
     def run(self):
         # type: () -> List[hot_water.PhPipeElement]
@@ -93,7 +101,7 @@ class GHCompo_CreateSHWBranchPipes(object):
                     self.IGH,
                     input_tools.clean_get(self.geometry, i),
                     input_tools.clean_get(self.name, i, "_unnamed_"),
-                    input_tools.clean_get(self.diameter, i),
+                    input_tools.clean_get(self.diameter_m, i),
                 )
             dhw_branch_piping_.append(branch_pipe_builder.create_hbph_dhw_branch_pipe())
         

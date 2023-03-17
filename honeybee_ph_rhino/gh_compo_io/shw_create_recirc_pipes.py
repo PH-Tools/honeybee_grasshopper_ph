@@ -19,24 +19,24 @@ from honeybee_ph_utils import input_tools
 class _RecircPipeBuilder(object):
     """Interface for collect and clean DHW Recirculation Piping user-inputs"""
     
-    diameter = ghio_validators.UnitM("diameter", default=0.0254)
+    diameter_m = ghio_validators.UnitM("diameter_m", default=0.0254)
     display_name = ghio_validators.HBName(
         "display_name", default="_unnamed_recirc_pipe_")
-    insul_thickness = ghio_validators.UnitM("insul_thickness", default=0.0254)
+    insul_thickness_m = ghio_validators.UnitM("insul_thickness_m", default=0.0254)
     insul_conductivity = ghio_validators.UnitW_MK("insul_conductivity", default=0.04)
     daily_period = ghio_validators.FloatMax24("daily_period", default=24)
 
     def __init__(self, IGH, _geometry, 
-                _name="_unnamed_", _diameter=0.0254, 
-                _insul_thickness=0.0254, _insul_conductivity=0.04, 
+                _name="_unnamed_", _diameter_m=0.0254, 
+                _insul_thickness_m=0.0254, _insul_conductivity=0.04, 
                 _insul_reflective=True, _insul_quality=None, 
                 _daily_period=24.0):
         # type: (gh_io.IGH, Union[Polyline3D, LineSegment3D], str, float, float, float, bool, None, float) -> None
         self.IGH = IGH
         self.geometry = _geometry
         self.display_name = _name
-        self.diameter = _diameter
-        self.insul_thickness = _insul_thickness
+        self.diameter_m = _diameter_m
+        self.insul_thickness_m = _insul_thickness_m
         self.insul_conductivity = _insul_conductivity
         self.insul_reflective = _insul_reflective
         self.insul_quality = _insul_quality
@@ -82,8 +82,8 @@ class _RecircPipeBuilder(object):
             hbph_obj.add_segment(
                 hot_water.PhPipeSegment(
                     segment,
-                    self.diameter,
-                    self.insul_thickness,
+                    self.diameter_m,
+                    self.insul_thickness_m,
                     self.insul_conductivity,
                     self.insul_reflective,
                     self.insul_quality,
@@ -96,13 +96,13 @@ class _RecircPipeBuilder(object):
 class GHCompo_CreateSHWRecircPipes(object):
     """Component Interface"""
     
-    def __init__(self, _IGH, _geometry, _name, _diameter, _insul_thickness, _insul_conductivity,
+    def __init__(self, _IGH, _geometry, _name, _diameter_m, _insul_thickness_m, _insul_conductivity,
                 _insul_reflective, _insul_quality, _daily_period):
         self.IGH = _IGH
         self.geometry = _geometry
         self.name = _name
-        self.diameter = _diameter
-        self.insul_thickness = _insul_thickness
+        self.diameter_m = _diameter_m
+        self.insul_thickness_m = _insul_thickness_m
         self.insul_conductivity = _insul_conductivity
         self.insul_reflective = _insul_reflective
         self.insul_quality = _insul_quality
@@ -116,8 +116,8 @@ class GHCompo_CreateSHWRecircPipes(object):
                     self.IGH,
                     input_tools.clean_get(self.geometry, i),
                     input_tools.clean_get(self.name, i, "_unnamed_"),
-                    input_tools.clean_get(self.diameter, i, 0.0254),
-                    input_tools.clean_get(self.insul_thickness, i, 0.0254), 
+                    input_tools.clean_get(self.diameter_m, i, 0.0254),
+                    input_tools.clean_get(self.insul_thickness_m, i, 0.0254), 
                     input_tools.clean_get(self.insul_conductivity, i, 0.04), 
                     input_tools.clean_get(self.insul_reflective, i, True), 
                     input_tools.clean_get(self.insul_quality, i, None),

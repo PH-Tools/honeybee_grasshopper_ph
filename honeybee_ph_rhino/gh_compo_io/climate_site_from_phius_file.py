@@ -292,7 +292,7 @@ class GHCompo_CreateSiteFromPhiusFile(object):
             longitude=self.monthly_data_collection.longitude,
             site_elevation=self.monthly_data_collection.station_elevation,
             climate_zone=1,
-            hours_from_UTC=-4,
+            hours_from_UTC=-5, # TODO: make automatic somehow?
         )
 
     def _create_monthly_temps(self):
