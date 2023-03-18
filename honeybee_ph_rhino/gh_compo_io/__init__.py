@@ -63,3 +63,6 @@ from honeybee_ph_rhino.gh_compo_io.building_segment import GHCompo_BuildingSegme
 # -- Export
 from honeybee_ph_rhino.gh_compo_io.write_wuif_xml import GHCompo_WriteWufiXml
 from honeybee_ph_rhino.gh_compo_io.write_PHPP import GHCompo_WriteToPHPP
+# -- Foundations
+from honeybee_ph_rhino.gh_compo_io.foundations_add import GHCompo_AddFoundations
+from honeybee_ph_rhino.gh_compo_io.foundations_create import GHCompo_CreateFoundations
