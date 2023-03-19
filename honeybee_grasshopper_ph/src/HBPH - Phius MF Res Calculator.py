@@ -30,7 +30,7 @@ in the Phius Multifamily Workbook. These include MEL, Interior-Lighting, Exterio
 This does NOT include the other residential appliances (fridge, cooking, etc..). Be sure to add those 
 to the Residential Honeybee-Rooms in addition to the elec_equipment_ created by this component.
 -
-EM October 27, 2022
+EM March 19, 2023
 
     Args:
         int_light_HE_frac_: (float) default=1.0 | The % (0-1.0) of interior lighting
@@ -42,6 +42,15 @@ EM October 27, 2022
         garage_light_HE_frac_: (float) default=1.0 | The % (0-1.0) of garage lighting
             that is 'high efficiency'
             
+        include_elevator_: (bool) Default=False. Set to True to include the standard Phius Elevator
+            which is based on the number of stories. (<=6-stories Hyrdaulic, <=20-stories Geared Traction, 21+stories Gearless Traction)
+-
+The calculator will follow the protocol outlined in the Phius Multi-Family Calculator to estimate
+elevator energy usage based on the total height of the building (num stories) and the total 
+number of dwelling units. For more information, see:
+https://www.energystar.gov/sites/default/files/asset/document/ENERGY_STAR_MFNC_Simulation_Guidelines_AppG2016_Version_1_Rev01.pdf
+
+   
         _hb_rooms: (list[room.Room]): A list of the Honeybee Rooms to calculate the Phius Multifamily 
             Elec. Equipment for. 
             
@@ -104,7 +113,7 @@ if DEV:
     reload(gh_compo_io)
 
 
-# ------------------------------------------------------------------------------
+# -------------------z-----------------------------------------------------------
 # -- GH Interface
 IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 
@@ -115,6 +124,7 @@ gh_compo_interface = gh_compo_io.GHCompo_CalcPhiusMFLoads(
         int_light_HE_frac_,
         ext_light_HE_frac_,
         garage_light_HE_frac_,
+        include_elevator_,
         _hb_rooms,
     )
 

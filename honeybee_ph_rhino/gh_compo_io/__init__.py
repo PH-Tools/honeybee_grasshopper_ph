@@ -11,6 +11,7 @@ from honeybee_ph_rhino.gh_compo_io.space_add_spc import GHCompo_AddPHSpaces
 from honeybee_ph_rhino.gh_compo_io.space_create_spc import GHCompo_CreatePHSpaces
 from honeybee_ph_rhino.gh_compo_io.space_get_flr_seg_data import GHCompo_GetFloorSegData
 from honeybee_ph_rhino.gh_compo_io.space_create_vent_rates import GHCompo_CreateSpaceVent
+from honeybee_ph_rhino.gh_compo_io.space_create_from_hb_rooms import GHCompo_CreatePHSpacesFromHBRooms
 # -- Thermal Bridges
 from honeybee_ph_rhino.gh_compo_io.tb_add import GHCompo_AddTBs
 from honeybee_ph_rhino.gh_compo_io.tb_create import GHCompo_CreateTB

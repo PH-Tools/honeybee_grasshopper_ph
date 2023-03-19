@@ -7,7 +7,7 @@
 from collections import defaultdict
 
 try:
-    from typing import List, Optional, Tuple, Any
+    from typing import List, Optional, Tuple, Any, Union, Type
 except ImportError:
     pass  # IronPython 2.7
 
@@ -37,6 +37,11 @@ try:
     from honeybee_ph_standards.programtypes.default_elec_equip import ph_default_equip
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_standards:\n\t{}".format(e))
+
+try:
+    from honeybee_ph_utils.input_tools import input_to_int
+except ImportError as e:
+    raise ImportError("\nFailed to import honeybee_ph_utils.:\n\t{}".format(e))
 
 
 def stories_error(_hb_rooms):
@@ -145,21 +150,38 @@ def sort_rooms_by_story(_hb_rooms):
 
 
 class GHCompo_CalcPhiusMFLoads(object):
+    
     def __init__(
         self,
         _IGH,
         _int_light_HE_frac_,
         _ext_light_HE_frac_,
         _garage_light_HE_frac_,
+        _include_elevator,
         _hb_rooms,
     ):
-        # type: (gh_io.IGH, float, float, float, List[room.Room]) -> None
+        # type: (gh_io.IGH, float, float, float, bool, List[room.Room]) -> None
         self.IGH = _IGH
         self.int_light_HE_frac_ = _int_light_HE_frac_
         self.ext_light_HE_frac_ = _ext_light_HE_frac_
         self.garage_light_HE_frac_ = _garage_light_HE_frac_
+        self.include_elevator = _include_elevator
         self.hb_rooms = _hb_rooms
 
+    @property
+    def num_dwelling_units(self):
+        # type: () -> int
+        return sum(
+            rm.properties.energy.people.properties.ph.number_dwelling_units 
+            for rm in self.hb_rooms 
+            if self._room_is_dwelling(rm)
+        )
+
+    @property
+    def num_of_stories(self):
+        # type: () -> int
+        return len({rm.story for rm in self.hb_rooms})
+   
     def _room_is_dwelling(self, _hb_room):
         # type: (room.Room) -> bool
         """Return True if the Honeybee-Room is a 'dwelling' (residential)?"""
@@ -275,6 +297,26 @@ class GHCompo_CalcPhiusMFLoads(object):
             non_res_totals_,
         )
 
+    def get_elevator_class(self):
+        # type: () -> Type[Union[ph_equipment.PhElevatorHydraulic, ph_equipment.PhElevatorGearedTraction, ph_equipment.PhElevatorGearlessTraction]]
+        """Return the Elevator class, based on the number of stories."""
+        if self.num_of_stories <= 6:
+            return ph_equipment.PhElevatorHydraulic
+        elif self.num_of_stories <= 20:
+            return ph_equipment.PhElevatorGearedTraction
+        else:
+            return ph_equipment.PhElevatorGearlessTraction
+
+    def build_elevator(self):
+        # type: () -> Optional[Union[ph_equipment.PhElevatorHydraulic, ph_equipment.PhElevatorGearedTraction, ph_equipment.PhElevatorGearlessTraction]]
+        """Return a new Elevator object."""
+        elevator_class = self.get_elevator_class()
+        elevator = elevator_class(_num_dwellings=self.num_dwelling_units)
+
+        # -- Split out the energy across all the rooms
+        elevator.energy_demand  = elevator.energy_demand / len(self.hb_rooms)
+        return elevator
+
     def create_new_MF_elec_equip(
         self,
         _hb_res_rooms,
@@ -337,6 +379,9 @@ class GHCompo_CalcPhiusMFLoads(object):
         lighting_garage.comment = "Garage Lighting - Phius MF Calculator"
         lighting_garage.in_conditioned_space = False
         elec_equipment_.append(lighting_garage)
+
+        if self.include_elevator:
+            elec_equipment_.append(self.build_elevator())
 
         return elec_equipment_
 
