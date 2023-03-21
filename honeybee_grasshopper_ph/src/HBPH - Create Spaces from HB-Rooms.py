@@ -44,7 +44,7 @@ from honeybee_ph_rhino import gh_compo_io, gh_io
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create Spaces from HB-Rooms"
-DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev="230319")
+DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
     from honeybee_ph_rhino.gh_compo_io import space_create_from_hb_rooms as gh_compo_io
     reload(gh_compo_io)
