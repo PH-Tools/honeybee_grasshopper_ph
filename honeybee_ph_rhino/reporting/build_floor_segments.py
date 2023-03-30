@@ -261,8 +261,15 @@ def _get_flr_seg_data(_IGH, _get_color, _space):
             msh_edges = _IGH.ghpythonlib_components.MeshEdges(msh).naked_edges
             msh_boundary = _IGH.ghpythonlib_components.JoinCurves(
                 msh_edges, preserve=False)
-            flr_seg_geom_.append(msh_boundary)
-            flr_sef_attrs_.append(crv_attr)
+            
+            # -- Sometimes Join Curves returns a list of items....
+            if isinstance(msh_boundary, list):
+                for crv in msh_boundary:
+                    flr_seg_geom_.append(crv)
+                    flr_sef_attrs_.append(crv_attr)
+            else:
+                flr_seg_geom_.append(msh_boundary)
+                flr_sef_attrs_.append(crv_attr)
 
     return flr_seg_geom_, flr_sef_attrs_
 

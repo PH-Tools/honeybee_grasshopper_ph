@@ -20,27 +20,31 @@
 # @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 #
 """
-Create new PH-Style Ventilation Equpment which can be aded to HB-Rooms.
+Set the Room averge Specific Heat Capacity (Wh/m2-K). If a single value is provided, it
+will be used to set the attribute value of each Honeybee-Room input. If a list is provided, 
+the values will be applied to the Honeybee-Rooms in the order input.
 -
-EM March 22, 2023
+EM March 29, 2023
     Args:
-        system_name_: (str) The name to give to the fresh-air ventilation system.
-            
-        system_type_: Choose either -
-            1-Balanced PH ventilation with HR [Default]
-            2-Extract air unit
-            3-Only window ventilation
-        
-        vent_unit_: (Optional[]) The Venilator (ERV/HRV) to use to ventilate the
-            honeybee-Rooms.
-        
-        duct_01_: The supply cold-air duct (from ventilator to the building-envelope)
-        
-        duct_02_: The exhaust cold-air duct (from ventilator to the building-envelope)
+        _room_spec_capacities: (Wh/m2k) Input either -
+"1-Lightweight" (Default)
+"2-Mixed"
+"3-Massive"
+
+        _hb_rooms: (List[roomn.Room]) A list of the Honeybee Rooms to set the
+            Specific Heat Capacity (Wh/m2k) on.
         
     Returns:
-        vent_system_: The new HBPH Ventilation System object.
+        hb_rooms_: (List[room.Room]) A list of the Honeybee Rooms with their 
+            Specific Heat Capacity (Wh/m2k) set.
 """
+
+import scriptcontext as sc
+import Rhino as rh
+import rhinoscriptsyntax as rs
+import ghpythonlib.components as ghc
+import Grasshopper as gh
+
 
 try:
     from honeybee_ph_utils import preview
@@ -53,25 +57,26 @@ except ImportError as e:
     raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
 
 
-# --- 
+#-------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
-ghenv.Component.Name = "HBPH - Create Ventilation System"
+ghenv.Component.Name = "HBPH - Set Spec Heat Capacity"
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
-    reload(gh_io)
-    from honeybee_ph_rhino.gh_compo_io import mech_create_vent_sys as gh_compo_io
+    from honeybee_ph_rhino.gh_compo_io import set_spec_heat_cap as gh_compo_io
+    reload(gh_compo_io)
 
 
 # ------------------------------------------------------------------------------
-gh_compo_interface = gh_compo_io.GHCompo_CreateVentSystem(
-        system_name_,
-        system_type_,
-        vent_unit_,
-        supply_ducts_,
-        exhaust_ducts_,
+# -- GH Interface
+IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
+
+
+# ------------------------------------------------------------------------------
+gh_compo_interface = gh_compo_io.GHCompo_SetRoomSpecHeatCaps(
+        IGH,
+        _room_spec_capacities,
+        _hb_rooms,
     )
-vent_system_ = gh_compo_interface.run()
 
-# ------------------------------------------------------------------------------
-preview.object_preview(vent_system_)
+hb_rooms_ = gh_compo_interface.run()

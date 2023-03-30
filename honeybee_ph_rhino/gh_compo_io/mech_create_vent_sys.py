@@ -4,7 +4,7 @@
 """GHCompo Interface: HBPH - Create Ventilation System."""
 
 try:
-    from typing import Any, Optional
+    from typing import Union, Optional, List
 except ImportError:
     pass #IronPython 2.7
 
@@ -27,14 +27,36 @@ except ImportError as e:
 class GHCompo_CreateVentSystem(object):
     display_name = ghio_validators.HBName("display_name")
 
-    def __init__(self, _display_name, _sys_type, _vent_unit, _duct_01, _duct_02):
-        # type: (str, int, ventilation.Ventilator, Optional[ducting.PhDuctElement], Optional[ducting.PhDuctElement]) -> None
+    def __init__(self, _display_name, _sys_type, _vent_unit, _supply_ducts, _exhaust_ducts):
+        # type: (str, int, ventilation.Ventilator, List[ducting.PhDuctElement], List[ducting.PhDuctElement]) -> None
         self.display_name = _display_name or "__unnamed_ventilator__"
         self.system_type = _sys_type
         self.vent_unit = _vent_unit
-        self.duct_01 = _duct_01
-        self.duct_02 = _duct_02
+        self._supply_ducts = _supply_ducts
+        self._exhaust_ducts = _exhaust_ducts
 
+    @property
+    def supply_ducts(self):
+        # type: () -> List[ducting.PhDuctElement]
+        return self._supply_ducts or [ducting.PhDuctElement.default_supply_duct()]
+    
+    @supply_ducts.setter
+    def supply_ducts(self, _input):
+        # type: (Union[ducting.PhDuctElement, List[ducting.PhDuctElement]]) -> None
+        if not isinstance(_input, list):
+            self._supply_ducts = [_input]
+    
+    @property
+    def exhaust_ducts(self):
+        # type: () -> List[ducting.PhDuctElement]
+        return self._exhaust_ducts or [ducting.PhDuctElement.default_exhaust_duct()]
+    
+    @exhaust_ducts.setter
+    def exhaust_ducts(self, _input):
+        # type: (Union[ducting.PhDuctElement, List[ducting.PhDuctElement]]) -> None
+        if not isinstance(_input, list):
+            self._supply_ducts = [_input]
+    
     @property
     def system_type(self):
         # type: () -> int
@@ -52,11 +74,7 @@ class GHCompo_CreateVentSystem(object):
         vent_system_.display_name = self.display_name or vent_system_.display_name
         vent_system_.sys_type = self.system_type
         vent_system_.ventilation_unit = self.vent_unit or ventilation.Ventilator()
-
-        if self.duct_01:
-            vent_system_.duct_01 = self.duct_01
-
-        if self.duct_02:
-            vent_system_.duct_02 = self.duct_02
+        vent_system_.supply_ducting = self.supply_ducts
+        vent_system_.exhaust_ducting = self.exhaust_ducts
 
         return vent_system_

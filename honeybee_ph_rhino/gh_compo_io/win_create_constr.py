@@ -4,13 +4,15 @@
 """GHCompo Interface: HBPH - Create PH Window Construction."""
 
 try:
-    from typing import Optional
+    from typing import Optional, Union
 except ImportError:
     pass # IronPython 2.7
 
 try: 
     from honeybee_energy.material.glazing import EnergyWindowMaterialSimpleGlazSys
     from honeybee_energy.construction.window import WindowConstruction
+    from honeybee_energy.construction.windowshade import WindowConstructionShade
+    from honeybee_energy.material.shade import EnergyWindowMaterialShade
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee_energy:\n\t{}'.format(e))
 
@@ -42,18 +44,28 @@ class GHCompo_CreatePhConstruction(object):
     nfrc_shgc = ghio_validators.FloatPercentage("nfrc_shgc", default=None)
     t_vis = ghio_validators.Float("t_vis", default=0.6)
     
-    def __init__(self, _IGH, _display_name, _frame, _glazing, _nfrc_u_factor, _nfrc_shgc, _t_vis):
-        # type: (gh_io.IGH, str, window.PhWindowFrame, window.PhWindowGlazing, float, float, float) -> None
+    def __init__(self, _IGH, _display_name, _frame, _glazing, _nfrc_u_factor, _nfrc_shgc, _t_vis, _shading=None):
+        # type: (gh_io.IGH, str, window.PhWindowFrame, window.PhWindowGlazing, float, float, float, Optional[EnergyWindowMaterialShade] ) -> None
         self.IGH = _IGH
         self.display_name = _display_name or clean_and_id_ep_string("PhWindowConstruction")
         self.frame = _frame
         self.glazing = _glazing
+        self.hb_shade_material = _shading
         self.nfrc_u_factor = _nfrc_u_factor
         self.nfrc_shgc = _nfrc_shgc
         self.t_vis = _t_vis
 
+    def make_hb_window_construction(self, _window_mat):
+        # type: (EnergyWindowMaterialSimpleGlazSys) -> Union[WindowConstruction, WindowConstructionShade]
+        """Return the new HB Window Construction"""
+        window_construction = WindowConstruction(self.display_name, [_window_mat])
+        if self.hb_shade_material:
+            return WindowConstructionShade(self.display_name, window_construction, self.hb_shade_material)
+        else:
+            return window_construction
+
     def run(self):
-        # type: () -> Optional[WindowConstruction]
+        # type: () -> Optional[Union[WindowConstruction, WindowConstructionShade]]
         """Return a new HB-Window-Construction with values set by the PH Elements."""
         
         # ---------------------------------------------------------------------
@@ -74,7 +86,7 @@ class GHCompo_CreatePhConstruction(object):
 
         # -------------------------------------------------------------------------------------
         # -- Create a new HB Window Construction
-        hb_win_construction_ = WindowConstruction(self.display_name, [window_mat])
+        hb_win_construction_ = self.make_hb_window_construction(window_mat)
 
         # -------------------------------------------------------------------------------------
         # -- Set the PH Properties on the WindowConstructionProperties

@@ -492,7 +492,6 @@ def bake_geometry_object(_IGH, _geom_obj, _attr_obj, _layer_name):
     --------
         * (None)
     """
-
     doc_object = _IGH.rhinoscriptsyntax.coercerhinoobject(_geom_obj, True, True)
     geometry = doc_object.Geometry
 
