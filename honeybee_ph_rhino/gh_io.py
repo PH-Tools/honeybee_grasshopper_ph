@@ -77,6 +77,11 @@ class IGH:
         self.ghpythonlib_components = _ghc
         self.Grasshopper = _gh
 
+    @property
+    def rs(self):
+        """Convenience Attribute Alias."""
+        return self.rhinoscriptsyntax
+
     def gh_compo_find_input_index_by_name(self, _input_name):
         # type: (str) -> int
         """

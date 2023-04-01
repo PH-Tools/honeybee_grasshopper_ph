@@ -5,7 +5,7 @@
 These are called when the component is instantiated within the Grasshopper canvas.
 """
 
-RELEASE_VERSION = "Honeybee-PH v1.0.28"
+RELEASE_VERSION = "Honeybee-PH v1.0.29"
 CATEGORY = "HB-PH"
 SUB_CATEGORIES = {
     0: "00 | Utils",
@@ -336,6 +336,24 @@ COMPONENT_PARAMS = {
         "Category": CATEGORY,
         "SubCategory": 1,
     },
+    "HBPH - Import Flixo Materials": {
+        "NickName": "Import Flixo Mats.",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
+    "HBPH - Create Detailed Constructions": {
+        "NickName": "Create Detailed Constructions",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
+    "HBPH - Calc Air Layer HB Material": {
+        "NickName": "Create Air Layer Mat",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
     # -- Shading
     "HBPH - Create Building Shading": {
         "NickName": "Create Shading",
@@ -414,6 +432,25 @@ COMPONENT_PARAMS = {
     },
     "HBPH - Create Foundation": {
         "NickName": "Create Foundation",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 4,
+    },
+    # -- Utility
+    "HBPH - Get Brep Subface Materials": {
+        "NickName": "Get Subface Mats",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 4,
+    },
+    "HBPH - Create Custom Collection": {
+        "NickName": "Create Collection",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 4,
+    },
+    "HBPH - Get From Custom Collection": {
+        "NickName": "Get From Collection",
         "Message": RELEASE_VERSION,
         "Category": CATEGORY,
         "SubCategory": 4,

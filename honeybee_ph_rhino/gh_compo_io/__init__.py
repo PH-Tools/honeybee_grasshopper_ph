@@ -25,6 +25,9 @@ from honeybee_ph_rhino.gh_compo_io.win_calc_phius_blind import GHCompo_CalcPhius
 # -- Envelope
 from honeybee_ph_rhino.gh_compo_io.assmbly_create_sd_const import GHCompo_CreateSDConstructions
 from honeybee_ph_rhino.gh_compo_io.assmbly_create_mixed_mat import GHCompo_CreateMixedHBMaterial
+from honeybee_ph_rhino.gh_compo_io.assmbly_import_flixo_mats import GHCompo_ImportFlixoMaterials
+from honeybee_ph_rhino.gh_compo_io.assmbly_create_detailed_const import GHCompo_CreateDetailedConstructions
+from honeybee_ph_rhino.gh_compo_io.assmbly_create_air_layer_mat import GHCompo_AirLayerMaterial
 from honeybee_ph_rhino.gh_compo_io.set_spec_heat_cap import GHCompo_SetRoomSpecHeatCaps
 # -- Mech
 from honeybee_ph_rhino.gh_compo_io.mech_create_vent_sys import GHCompo_CreateVentSystem
@@ -69,3 +72,7 @@ from honeybee_ph_rhino.gh_compo_io.write_PHPP import GHCompo_WriteToPHPP
 # -- Foundations
 from honeybee_ph_rhino.gh_compo_io.foundations_add import GHCompo_AddFoundations
 from honeybee_ph_rhino.gh_compo_io.foundations_create import GHCompo_CreateFoundations
+# -- Utility
+from honeybee_ph_rhino.gh_compo_io.util_create_collection import  GHCompo_CreateCustomCollection
+from honeybee_ph_rhino.gh_compo_io.util_get_from_collection import  GHCompo_GetFromCustomCollection
+from honeybee_ph_rhino.gh_compo_io.util_get_brep_subface_mats import  GHCompo_GetSubFaceMaterials
