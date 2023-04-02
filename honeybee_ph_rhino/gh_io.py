@@ -82,6 +82,11 @@ class IGH:
         """Convenience Attribute Alias."""
         return self.rhinoscriptsyntax
 
+    @property
+    def ghc(self):
+        """Convenience Attribute Alias."""
+        return self.ghpythonlib_components
+    
     def gh_compo_find_input_index_by_name(self, _input_name):
         # type: (str) -> int
         """

@@ -4,7 +4,7 @@
 """GHCompo Interface: HBPH - Create Site From Phius File."""
 
 try:
-    from typing import List, Union, Dict, Optional
+    from typing import List, Dict, Optional
 except ImportError:
     pass # IronPython 2.7
 
@@ -18,6 +18,11 @@ try:
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee_ph:\n\t{}'.format(e))
 
+try:
+    from honeybee_ph_rhino import gh_io
+    from honeybee_ph_rhino.gh_compo_io import ghio_validators
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
 
 def remove_non_ascii(string):
     return ''.join(char for char in string if ord(char) < 128)
@@ -225,13 +230,15 @@ class PeakLoadInputCollection(object):
 
 class GHCompo_CreateSiteFromPhiusFile(object):
     """Interface for the GH Component"""
+    site_elevation = ghio_validators.UnitM("station_elevation")
 
-    def __init__(self, _IGH, _source_file_path):
-        # type: (gh_io.IGH, str) -> None
+    def __init__(self, _IGH, _source_file_path, _site_elevation, *args, **kwargs):
+        # type: (gh_io.IGH, str, str, List, Dict) -> None
         self.IGH = _IGH
         self.data = self._read_file(_source_file_path)
         self.monthly_data_collection = MonthlyDataInputCollection()
         self.peak_load_data_collection = PeakLoadInputCollection()
+        self.site_elevation = _site_elevation
 
     def _read_file(self, _source_file_path):
         # type: (Optional[str]) -> List[str]
@@ -287,10 +294,12 @@ class GHCompo_CreateSiteFromPhiusFile(object):
     def _create_location(self):
         # type: () -> site.Location
         
+        site_elevation = self.site_elevation or self.monthly_data_collection.station_elevation
+
         return site.Location(
             latitude=self.monthly_data_collection.latitude,
             longitude=self.monthly_data_collection.longitude,
-            site_elevation=self.monthly_data_collection.station_elevation,
+            site_elevation=site_elevation,
             climate_zone=1,
             hours_from_UTC=-5, # TODO: make automatic somehow?
         )
