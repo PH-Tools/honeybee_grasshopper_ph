@@ -79,7 +79,10 @@ class GHCompo_CreateCustomCollection(object):
     def key(self, _item):
         # type: (T) -> str
         """Return the Key to use when storing the value. Returns id(item) by default."""
-        if self.key_name:
+        if self.key_name and "," in self.key_name:
+            values = [str(getattr(_item, str(_).strip())) for _ in self.key_name.split(",")]
+            return "_".join(values)
+        elif self.key_name:
             return str(getattr(_item, self.key_name))
         else:
             return str(id(_item))
