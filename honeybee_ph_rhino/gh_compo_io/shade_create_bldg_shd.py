@@ -91,6 +91,7 @@ def create_window_reveal(_hb_aperture):
     return [
         from_face3d(Face3D.from_extrusion(seg, extrusion_vector))
         for seg in _hb_aperture.geometry.boundary_segments
+        if extrusion_vector.magnitude != 0 
     ]
 
 
