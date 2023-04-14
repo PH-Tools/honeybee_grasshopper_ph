@@ -50,7 +50,7 @@ class CustomCollection(object):
 
     def __str__(self):
         # type: () -> str
-        return '{} {} ({} items)\n{}'.format(
+        return '{}: "{}" ({} items)\n{}'.format(
             self.__class__.__name__,
             self.display_name,
             len(self._storage),

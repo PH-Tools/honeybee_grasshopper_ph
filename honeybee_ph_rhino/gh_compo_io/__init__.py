@@ -78,3 +78,4 @@ from honeybee_ph_rhino.gh_compo_io.util_create_collection import  GHCompo_Create
 from honeybee_ph_rhino.gh_compo_io.util_get_from_collection import  GHCompo_GetFromCustomCollection
 from honeybee_ph_rhino.gh_compo_io.util_get_brep_subface_mats import  GHCompo_GetSubFaceMaterials
 from honeybee_ph_rhino.gh_compo_io.util_create_objs_from_csv import  GHCompo_CreateObjectsFromCSV
+from honeybee_ph_rhino.gh_compo_io.util_sort_geom_objs_by_level import  GHCompo_SortGeomObjectsByLevel
