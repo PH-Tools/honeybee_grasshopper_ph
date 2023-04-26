@@ -87,6 +87,11 @@ class IGH:
         """Convenience Attribute Alias."""
         return self.ghpythonlib_components
     
+    @property
+    def sc(self):
+        """Convenience Attribute Alias."""
+        return self.scriptcontext
+
     def gh_compo_find_input_index_by_name(self, _input_name):
         # type: (str) -> int
         """
@@ -438,6 +443,11 @@ class IGH:
         else:
             level = self.Grasshopper.Kernel.GH_RuntimeMessageLevel.Remark
             self.ghenv.Component.AddRuntimeMessage(level, _in)
+
+    def get_rhino_unit_system_name(self):
+        # type: () -> str
+        """Returns the Rhino Unit System Name as a string."""
+        return self.sc.doc.ModelUnitSystem
 
 
 class ComponentInput:

@@ -38,6 +38,12 @@ try:
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
 
+try:
+    from ph_units.converter import convert
+except ImportError as e:
+    raise ImportError('\nFailed to import ph_units:\n\t{}'.format(e))
+
+
 def create_punched_geometry(_hb_rooms):
     # type: (Collection[room.Room]) -> List[rg.Brep]
     """Return a list of all of the 'punched' surfaces from the HB-Model."""
@@ -82,12 +88,21 @@ def create_inset_aperture_surfaces(_hb_rooms):
     return inset_window_surfaces
 
 
-def create_window_reveal(_hb_aperture):
-    # type: (aperture.Aperture) -> List[rg.Brep]
+def create_window_reveal(_hb_aperture, _rh_units_name):
+    # type: (aperture.Aperture, str) -> List[rg.Brep]
     """Return a list of the Aperture 'reveal' surfaces."""
-    ap_prop_ph = _hb_aperture.properties.ph # type: AperturePhProperties
+    
+    # -- Convert the Aperture's install depth to Rhino units
+    try:
+        ap_prop_ph = _hb_aperture.properties.ph # type: AperturePhProperties
+        ap_install_depth_in_m = ap_prop_ph.install_depth
+        ap_install_depth_in_r_units = convert(ap_install_depth_in_m, "M", _rh_units_name) 
+    except Exception as e:
+        msg = "Error converting Aperture's install depth to Rhino units: {}?\t{}".format(_rh_units_name, e)
+        raise Exception(msg)
+
     extrusion_vector = _hb_aperture.normal.reverse(
-    ) * ap_prop_ph.install_depth
+    ) * ap_install_depth_in_r_units
     return [
         from_face3d(Face3D.from_extrusion(seg, extrusion_vector))
         for seg in _hb_aperture.geometry.boundary_segments
@@ -95,15 +110,15 @@ def create_window_reveal(_hb_aperture):
     ]
 
 
-def create_window_reveals(_hb_rooms):
-    # type: (Collection[room.Room]) -> List[rg.Brep]
+def create_window_reveals(_hb_rooms, _rh_units_name):
+    # type: (Collection[room.Room], str) -> List[rg.Brep]
     """Return a list of all the aperture 'reveals' in the Honeybee-Model"""
 
     reveals = []
     for room in _hb_rooms:
         for face in room.faces:
             for aperture in face.apertures:
-                reveals.extend(create_window_reveal(aperture))
+                reveals.extend(create_window_reveal(aperture, _rh_units_name))
     return reveals
 
 
@@ -116,9 +131,10 @@ class GHCompo_CreateBuildingShading(object):
     def run(self):
         # type: () -> Tuple[List[rg.Brep], List[rg.Brep], List[room.Room]]
 
+        rh_units_name = self.IGH.get_rhino_unit_system_name()
         shading_surfaces_ = []
         shading_surfaces_.extend(create_punched_geometry(self.hb_rooms))
-        shading_surfaces_.extend(create_window_reveals(self.hb_rooms))
+        shading_surfaces_.extend(create_window_reveals(self.hb_rooms, rh_units_name))
 
         window_surfaces_ = create_inset_aperture_surfaces(self.hb_rooms)
         hb_rooms_ = self.hb_rooms

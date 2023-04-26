@@ -21,6 +21,7 @@ try:
     from ladybug_rhino.togeometry import to_point3d
 except ImportError as e:
     raise ImportError("\nFailed to import ladybug_rhino:\n\t{}".format(e))
+
 try:
     from ladybug_geometry import geometry3d
 except ImportError as e:
