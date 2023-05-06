@@ -35,7 +35,14 @@ EM October 2, 2022
         _summer_sky_matrix: Optional summer-period Ladybug Sky Matrix. Default
             if None is supplied is June 1 - September 30
             
-        _shading_mesh_setings: Optional Rhino Mesh settings. 
+        _window_mesh_settings_: Optional Rhino Mesh Settings for the window 
+            surface geometry. Use this if you want to controlexactly how the 
+            window surfaces are gridded for analysis. For instance, if you supply a 
+            Grasshopper Mesh Settings Custom, and set the "Min" and "Max" to "16", 
+            you will always get exactly 16 segments for your analysis, which can 
+            then be used to match other tools like DesignPH.
+            
+        _shading_mesh_setings: Optional Rhino Mesh settings for the shading geometry. 
             default = Rhino.Geometry.MeshingParameters.Default
             
         _grid_size: default=1.0
@@ -74,6 +81,7 @@ reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Shading Factor Settings - LBT Rad"
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
+    from honeybee_ph_rhino.gh_compo_io import shade_LBT_rad_settings as gh_compo_io
     reload(gh_compo_io)
     reload(gh_io)
 
@@ -92,7 +100,8 @@ gh_compo_interface = gh_compo_io.GHCompo_CreateLBTRadSettings(
         _shading_mesh_settings_,
         _grid_size_,
         _legend_par_,
-        _cpus_ 
+        _cpus_,
+        _window_mesh_settings_,
     )
 settings_ = gh_compo_interface.run()
 

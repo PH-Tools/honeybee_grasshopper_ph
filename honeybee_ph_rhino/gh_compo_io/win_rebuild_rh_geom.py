@@ -4,7 +4,7 @@
 """GHCompo Interface: HBPH - Rebuild Window Surfaces."""
 
 try:
-    from typing import Dict, List, Tuple
+    from typing import Dict, List, Tuple, Union
 except ImportError:
     pass #IronPython 2.7
 
@@ -14,7 +14,12 @@ except ImportError as e:
     raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
 
 
+from ph_units.parser import parse_input
+from ph_units.converter import convert
+
 class GHCompo_RebuildWindowSurfaces(object):
+
+
     def __init__(self, _IGH, _window_surfaces, _widths, _heights, *args, **kwargs):
         # type: (gh_io.IGH, List, List[float], List[float], List, Dict) -> None
         self.IGH = _IGH
@@ -22,6 +27,36 @@ class GHCompo_RebuildWindowSurfaces(object):
         self.widths = _widths
         self.heights = _heights
     
+    def get_height(self, i):
+        # type: (int) -> Union[int, float]
+        """Get the user-supplied height of the i-th window surface, handle unit conversions."""
+        val, unit = parse_input(self.widths[i])
+        if not unit:
+            return float(val)
+        
+        rh_unit = self.IGH.get_rhino_unit_system_name()
+        result = convert(val, unit, rh_unit)
+        if not result:
+            msg = "Failed to convert the input width from {} to {}?".format(unit, rh_unit)
+            raise Exception(msg)
+        print("Converted height {} {} to {} {}".format(val, unit, result, rh_unit))
+        return result
+
+    def get_width(self, i):
+        # type: (int) -> Union[int, float]
+        """Get the user-supplied width of the i-th window surface, handle unit conversions."""
+        val, unit = parse_input(self.heights[i])
+        if not unit:
+            return float(val)
+        
+        rh_unit = self.IGH.get_rhino_unit_system_name()
+        result = convert(val, unit, rh_unit)
+        if not result:
+            msg = "Failed to convert the input width from {} to {}?".format(unit, rh_unit)
+            raise Exception(msg)
+        print("Converted width {} {} to {} {}".format(val, unit, result, rh_unit))
+        return result
+
     @property
     def names(self):
         # type: () -> List[Guid]
@@ -38,7 +73,7 @@ class GHCompo_RebuildWindowSurfaces(object):
         old_centroid = self.IGH.ghc.Area(_surface_guid).centroid
         
         # -- Build the new Geometry
-        new_perim = self.IGH.ghc.Rectangle(plane, self.widths[_i], self.heights[_i], RADIUS).rectangle
+        new_perim = self.IGH.ghc.Rectangle(plane, self.get_width(_i), self.get_height(_i), RADIUS).rectangle
         new_surface = self.IGH.ghc.BoundarySurfaces(new_perim)
         
         # -- Align new geom to old geom

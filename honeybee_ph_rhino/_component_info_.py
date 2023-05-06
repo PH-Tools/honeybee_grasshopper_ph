@@ -5,7 +5,7 @@
 These are called when the component is instantiated within the Grasshopper canvas.
 """
 
-RELEASE_VERSION = "Honeybee-PH v1.0.38"
+RELEASE_VERSION = "Honeybee-PH v1.0.39"
 CATEGORY = "HB-PH"
 SUB_CATEGORIES = {
     0: "00 | Utils",
@@ -262,7 +262,7 @@ COMPONENT_PARAMS = {
         "Category": CATEGORY,
         "SubCategory": 1,
     },
-    # -- Windows 
+    # -- Windows
     "HBPH - Create PH Window Frame Element": {
         "NickName": "Create Frame Element",
         "Message": RELEASE_VERSION,
@@ -293,13 +293,13 @@ COMPONENT_PARAMS = {
         "Category": CATEGORY,
         "SubCategory": 1,
     },
-    "HBPH - Set Window Install Depth" :{
+    "HBPH - Set Window Install Depth": {
         "NickName": " Window Install Depth",
         "Message": RELEASE_VERSION,
         "Category": CATEGORY,
         "SubCategory": 1,
     },
-    "HBPH - Calculate Phius Blind Transmittance" :{
+    "HBPH - Calculate Phius Blind Transmittance": {
         "NickName": " Calc. Phius Blind",
         "Message": RELEASE_VERSION,
         "Category": CATEGORY,

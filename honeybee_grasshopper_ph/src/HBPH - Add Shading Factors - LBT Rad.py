@@ -90,6 +90,7 @@ reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Add Shading Factors - LBT Rad"
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
+    from honeybee_ph_rhino.gh_compo_io import shade_solve_LBT_rad as gh_compo_io
     reload(gh_compo_io)
     reload(gh_io)
 
@@ -106,4 +107,7 @@ gh_compo_interface = gh_compo_io.GHCompo_SolveLBTRad(
         _shading_surfaces_summer,
         _hb_rooms, 
         _run)
-legend_, winter_rad_mesh_, summer_rad_mesh_, hb_rooms_ = gh_compo_interface.run()
+(legend_, 
+winter_rad_mesh_, winter_shading_factors_,
+summer_rad_mesh_, summer_shading_factors_,
+hb_rooms_, aperture_names_) = gh_compo_interface.run()
