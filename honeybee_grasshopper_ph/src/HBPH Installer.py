@@ -29,7 +29,7 @@ This tool will download and install several new libraries into the Ladybug-Tools
 python interpreter, and will download and install new Grasshopper components which
 will be added to your Rhino / Grasshopper installation.
 -
-EM March 6, 2023
+EM May 7, 2023
     Args:
         _install: (bool) Set to True to install Honeybee-PH on your computer.
         
@@ -67,7 +67,7 @@ EM March 6, 2023
 COMPONENT = ghenv.Component # type: ignore
 COMPONENT.Name = 'HBPH Installer'
 COMPONENT.NickName = 'HBPHInstall'
-COMPONENT.Message = 'MAR_06_2023'
+COMPONENT.Message = 'MAY_07_2023'
 COMPONENT.Category = 'Honeybee-PH'
 COMPONENT.SubCategory = '00 | Utils'
 COMPONENT.AdditionalHelpFromDocStrings = '0'
@@ -140,18 +140,20 @@ def check_rhino_version_compatibility(_min_version_allowed):
     """
     
     # -- Only check against Major / Minor version
-    minimum_major_version = _min_version_allowed[0]
-    minimum_minor_version = _min_version_allowed[1]
-    
-    if Rhino.RhinoApp.Version.Major >= minimum_major_version:
-        if Rhino.RhinoApp.Version.Minor >= minimum_minor_version:
-            print ("Rhino version: {}.{} found.".format(Rhino.RhinoApp.Version.Major, Rhino.RhinoApp.Version.Minor))
-            return True
+    rh_min_version_allowed = (_min_version_allowed[0], _min_version_allowed[1])
+    rh_version_found = (Rhino.RhinoApp.Version.Major, Rhino.RhinoApp.Version.Minor)
+
+    if rh_version_found > rh_min_version_allowed:
+        print ("Rhino version: {}.{} found.".format(Rhino.RhinoApp.Version.Major, Rhino.RhinoApp.Version.Minor))
+        return True
     
     msg = "Error: Honeybee-PH requires Rhino version: "\
-        "{}.{} or better. Please update Rhino before proceeding.".format(
+        "{}.{} or better. Please update Rhino before proceeding. "\
+        "Got version: {}.{}".format(
             minimum_major_version,
-            minimum_minor_version
+            minimum_minor_version,
+            Rhino.RhinoApp.Version.Major,
+            Rhino.RhinoApp.Version.Minor,
         )
     print(msg)
     raise Exception(msg)
