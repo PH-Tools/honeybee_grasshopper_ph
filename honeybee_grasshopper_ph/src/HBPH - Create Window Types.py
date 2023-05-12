@@ -20,25 +20,34 @@
 # @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 #
 """
-Sort a set of Geometry by that geometry's Z-Height. A new output branch will
-be created for each set of geometry objects at that level. Use the '_tolernce' input 
-to adjust if the groupings are not correct at first. This is useful if you are drawing
-the floor plates for a multi-story building and want to organize them by level or
-similar operations.
+Create the Window Unit Type objects. Each window unit type can be made of one 
+or more window 'Elements' (sashes) which are arranged in columns and rows to 
+form gangs of windows in a grid. When supplying the '_pos_cols' and '_pos_rows'
+be sure that the IDS can be sorted in order to get all the elements in the right
+position. The column IDS should go from left to right, and the row IDs should go
+from bottom to top. For instance
+      c1   c2
+    ----- -----
+r2 |  x  |  x  |
+   |-----|-----|
+r1 |  x  |  x  |
+    ----- -----
+
 -
 EM May 12, 2023
     Args:
-        _geom: (List[Guid]) A List of Geometry to sort by height.
+        _type_names: (List[str]) A list of the type names to use.
         
-        _tolerance: (float) Default=0.001
+        _ widths: (List[float) A list of the window widths to use.
         
+        _heights: (List[float]) A list of the window heights to use.
+        
+        _pos_cols: (List[str]) A list of the window Column Position IDs to use.
+        
+        _pos_rows: (List[str]) A list of the window Row Position IDs to use.
+    
     Returns:
-        geom_: (DataTree[Rhino.Geometry]) The geometry objects, sorted by height.
-        
-        names_: (DataTree[str]) The names of all the geometry objects, sorted by height
-        
-        user_text_: (DataTree[dict]] The user-text dictionaries of all the geometry objects, 
-            sorted by height
+        window_types_ (List[Rhino.Geometry.Brep]}:
 """
 
 import scriptcontext as sc
@@ -52,10 +61,10 @@ from honeybee_ph_rhino import gh_compo_io, gh_io
 # ------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
-ghenv.Component.Name = "HBPH - Sort Geom by Level"
+ghenv.Component.Name = "HBPH - Create Window Types"
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
-    from honeybee_ph_rhino.gh_compo_io import util_sort_geom_objs_by_level as gh_compo_io
+    from honeybee_ph_rhino.gh_compo_io import win_create_types as gh_compo_io
     reload(gh_compo_io)
 
 # ------------------------------------------------------------------------------
@@ -63,5 +72,12 @@ if DEV:
 IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 
 # ------------------------------------------------------------------------------
-gh_compo_interface = gh_compo_io.GHCompo_SortGeomObjectsByLevel(IGH, _geom, _tolerance)
-geom_, names_, user_text_ = gh_compo_interface.run()
+gh_compo_interface = gh_compo_io.GHCompo_CreateWindowUnitTypes(
+    IGH,
+    _type_names,
+    _widths,
+    _heights,
+    _pos_cols,
+    _pos_rows,
+    )
+window_types_ = gh_compo_interface.run()

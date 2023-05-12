@@ -6,24 +6,30 @@
 try:
     from typing import Dict, List, Tuple, Any
 except ImportError:
-    pass # IronPython 2.7
+    pass  # IronPython 2.7
+
+try:
+    from itertools import izip  # type: ignore
+except ImportError:
+    izip = zip  # Python 3
 
 from collections import defaultdict
 
 try:
-    from Grasshopper.Kernel.Data import GH_Path # type: ignore
-    from Grasshopper import DataTree # type: ignore
-    from System import Object # type: ignore
-    import Rhino # type: ignore
-    from Rhino.Geometry import GeometryBase # type: ignore
+    from Grasshopper.Kernel.Data import GH_Path  # type: ignore
+    from Grasshopper import DataTree  # type: ignore
+    from System import Object  # type: ignore
+    import Rhino  # type: ignore
+    from Rhino.Geometry import GeometryBase  # type: ignore
 except:
-    pass # Outside Rhino
+    pass  # Outside Rhino
 
 try:
     from honeybee_ph_rhino import gh_io
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
-        
+    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
+
+
 class GHCompo_SortGeomObjectsByLevel(object):
     """Utility for sorting any Rhino Geometry objects by their Z-location (height)."""
 
@@ -31,7 +37,11 @@ class GHCompo_SortGeomObjectsByLevel(object):
         # type: (gh_io.IGH, List[Rhino.Geometry.GeometryBase], float) -> None
         self.IGH = _IGH
         self.geom = _geom
-        self.items_by_level = defaultdict(list) # type: defaultdict[str, List[GeometryBase]]
+        self.geom_by_level = defaultdict(
+            list
+        )  # type: defaultdict[str, List[GeometryBase]]
+        self.names_by_level = defaultdict(list)  # type: defaultdict[str, List[str]]
+        self.user_text_by_level = defaultdict(list)  # type: defaultdict[str, List[Dict]]
         self.tolerance = _tolerance or 0.001
 
     def get_z_height(self, _geom):
@@ -46,27 +56,39 @@ class GHCompo_SortGeomObjectsByLevel(object):
         """
         z_height = self.get_z_height(_geom)
 
-        for k in self.items_by_level.keys():
+        for k in self.geom_by_level.keys():
             # -- try to add to an existing key first, if it can.
             if abs(float(k) - z_height) < self.tolerance:
                 return k
         else:
             # -- if not, add a new key
-            return'{0:.{precision}f}'.format(z_height, precision=4)
+            return "{0:.{precision}f}".format(z_height, precision=4)
 
     def run(self):
         # type: () -> Tuple[List[float], List[GeometryBase], List[Dict]]
         """Returns a DataTree with the geometry organized into branches by their 'level'"""
 
+        # -- Get all the Geom attributes from the GH Scene
+        geom_input_idx = self.IGH.gh_compo_find_input_index_by_name("_geom")
+        obj_attributes = self.IGH.get_rh_obj_UserText_dict(
+            self.IGH.gh_compo_get_input_guids(geom_input_idx)
+        )
+
         # -- Get all the Geom object info from the RH Scene
         with self.IGH.context_rh_doc():
-            for geom in self.geom:
+            for attrs, geom in izip(obj_attributes, self.geom):
                 dict_key = self.get_dict_key(geom)
-                self.items_by_level[dict_key].append(geom)
-        
-        # -- Package up for output
-        output = DataTree[Object]()
-        for i, k in enumerate(sorted(self.items_by_level.keys(), key=lambda n: float(n))):
-            output.AddRange([_ for _ in self.items_by_level[k]], GH_Path(i))
+                self.geom_by_level[dict_key].append(geom)
+                self.names_by_level[dict_key].append(attrs.pop("Object Name"))
+                self.user_text_by_level[dict_key].append(attrs)
 
-        return output
+        # -- Package up for output
+        geom_ = DataTree[Object]()
+        names_ = DataTree[Object]()
+        user_text_ = DataTree[Object]()
+        for i, k in enumerate(sorted(self.geom_by_level.keys(), key=lambda n: float(n))):
+            geom_.AddRange([_ for _ in self.geom_by_level[k]], GH_Path(i))
+            names_.AddRange([_ for _ in self.names_by_level[k]], GH_Path(i))
+            user_text_.AddRange([_ for _ in self.user_text_by_level[k]], GH_Path(i))
+
+        return geom_, names_, user_text_
