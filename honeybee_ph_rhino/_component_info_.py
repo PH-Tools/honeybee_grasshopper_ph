@@ -5,7 +5,7 @@
 These are called when the component is instantiated within the Grasshopper canvas.
 """
 
-RELEASE_VERSION = "Honeybee-PH v1.0.40"
+RELEASE_VERSION = "Honeybee-PH v1.0.41"
 CATEGORY = "HB-PH"
 SUB_CATEGORIES = {
     0: "00 | Utils",
@@ -164,7 +164,7 @@ COMPONENT_PARAMS = {
         "SubCategory": 1,
     },
     "HBPH - Create SHW Recirculation Pipes": {
-        "NickName": "Create Recric Pipes",
+        "NickName": "Create Recirc Pipes",
         "Message": RELEASE_VERSION,
         "Category": CATEGORY,
         "SubCategory": 1,
@@ -300,7 +300,19 @@ COMPONENT_PARAMS = {
         "SubCategory": 1,
     },
     "HBPH - Calculate Phius Blind Transmittance": {
-        "NickName": " Calc. Phius Blind",
+        "NickName": "Calc Phius Blind",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
+    "HBPH - Create Window Types": {
+        "NickName": "Create Win Types",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
+    "HBPH - Create Window Geometry": {
+        "NickName": "Create Geom",
         "Message": RELEASE_VERSION,
         "Category": CATEGORY,
         "SubCategory": 1,
@@ -461,11 +473,37 @@ COMPONENT_PARAMS = {
         "Category": CATEGORY,
         "SubCategory": 4,
     },
+    "HBPH - Get Object Attributes": {
+        "NickName": "Get Attributes",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 4,
+    },
+    "HBPH - Set Object Attributes": {
+        "NickName": "Set Attributes",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 4,
+    },
     "HBPH - Create Objects From CSV": {
         "NickName": "Create Objs from CSV",
         "Message": RELEASE_VERSION,
         "Category": CATEGORY,
         "SubCategory": 4,
+    },
+    # -- Visualize
+    "HBPH - Visualize Spaces": {
+        "NickName": "Visualize HBPH Spaces",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
+    # -- Organize
+    "HBPH - Organize Spaces": {
+        "NickName": "Organize HBPH Spaces",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
     },
 }
 
