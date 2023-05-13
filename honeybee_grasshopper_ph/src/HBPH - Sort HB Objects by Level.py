@@ -24,14 +24,28 @@ Sort a set of Honeybee-Objects (Rooms, Apertures, etc..) by their Z-Height. A ne
 be created for each set of hb-objects at that level. Use the '_tolerance' input 
 to adjust if the groupings are not correct at first.
 -
-EM May 12, 2023
+EM May 13, 2023
     Args:
         _hb_objects: (List) A List of HB-Objects (Rooms, Apertures) to sort by their Z-Height
         
         _tolerance: (float) Default=0.001
         
+        _groups_: (Optional[int]) If a target number of groups is provided, will attempt
+            to split the objects into that many groups.
+        
+        _steps: (Optional[DataTree[Domain]): Enter the 'steps' as domains (ie: "0 To 3", etc..)
+            and the component will attempt to sort to objects into the specified steps. This 
+            is especially useful if attemptinto sort 2 sets of objects with different bounds (
+            (for instance, sorting a group of HB Rooms and a group of HB Apertures into the same
+            groups). The 'steps_' output from one component can be input into a second in order 
+            ensure that the groups maintain the same 'splitting' levels.
+        
     Returns:
         hb_apertures_: (DataTree[Aperture]) The HB-Apertures, sorted by height.
+        
+        steps_: (DataTre[Domain]): The 'steps' used to group the HB-Objects. This output 
+            can be input into another 'HBPH - Sort HB Objects by Level' if you are trying 
+            to filtter two sets of objects into similar groups.
 """
 
 import scriptcontext as sc
@@ -56,5 +70,11 @@ if DEV:
 IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 
 # ------------------------------------------------------------------------------
-gh_compo_interface = gh_compo_io.GHCompo_SortHbObjectsByLevel(IGH, _hb_objects, _tolerance)
-hb_objects_ = gh_compo_interface.run()
+gh_compo_interface = gh_compo_io.GHCompo_SortHbObjectsByLevel(
+    IGH,
+    _hb_objects,
+    _tolerance,
+    _groups,
+    _steps,
+    )
+hb_objects_, steps_ = gh_compo_interface.run()
