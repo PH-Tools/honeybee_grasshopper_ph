@@ -157,6 +157,9 @@ from honeybee_ph_rhino.gh_compo_io.util_sort_hb_objects_by_level import (
 )
 from honeybee_ph_rhino.gh_compo_io.util_get_attributes import GHCompo_GetObjectAttributes
 from honeybee_ph_rhino.gh_compo_io.util_set_attributes import GHCompo_SetObjectAttributes
+from honeybee_ph_rhino.gh_compo_io.util_diagnose_hb_rooms import (
+    GHCompo_DiagnoseBadHBRoomGeometry,
+)
 
 # -- Visualize
 from honeybee_ph_rhino.gh_compo_io.visualize_spaces import GHCompo_VisualizeSpaces

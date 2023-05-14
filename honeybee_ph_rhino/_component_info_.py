@@ -5,7 +5,7 @@
 These are called when the component is instantiated within the Grasshopper canvas.
 """
 
-RELEASE_VERSION = "Honeybee-PH v1.0.43"
+RELEASE_VERSION = "Honeybee-PH v1.0.44"
 CATEGORY = "HB-PH"
 SUB_CATEGORIES = {
     0: "00 | Utils",
@@ -493,6 +493,12 @@ COMPONENT_PARAMS = {
     },
     "HBPH - Create Objects From CSV": {
         "NickName": "Create Objs from CSV",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 4,
+    },
+    "HBPH - Diagnose HB Rooms": {
+        "NickName": "Diagnose HB Rooms",
         "Message": RELEASE_VERSION,
         "Category": CATEGORY,
         "SubCategory": 4,
