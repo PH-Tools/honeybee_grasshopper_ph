@@ -24,13 +24,22 @@ Convert an HBJSON file into a new WUFI-XML file which can then be opened using
 WUFI-Passive. This will read in the HBJSON, rebuild the HB-Model before converting the 
 Model into a WUFI-Passive file.
 -
-EM October 2, 2022
+EM May 20, 2023
     Args:
         _filename: (str) The filename for the WUFI XML file.
         
         _save_folder: (str) The folder path to save the WUFI XML file to.
         
         _hb_json_file: (str) The path to the HBJSON file to convert into WUFI XML.
+        
+        _group_components: (bool) Default=True. Set False to keep each component
+            (face) in the WUFI Model separate.
+        
+        _merge_faces: (bool) Default=False. Set True to try and merge together 
+            touching faces in order to simplify the model. This operation can 
+            somethimes have unexpected results with some geometry, so only use 
+            it if you really need to reduce the complexity of the WUFI model and 
+            be sure to careufully check the resulting model faces for errors.
         
         _write_xml: (bool) Set True to run. 
             
@@ -62,6 +71,7 @@ reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Write WUFI XML"
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
+    from honeybee_ph_rhino.gh_compo_io import write_wuif_xml as gh_compo_io
     reload(gh_compo_io)
     reload(gh_io)
     
@@ -77,5 +87,7 @@ gh_compo_interface = gh_compo_io.GHCompo_WriteWufiXml(
         _save_folder,
         _hb_json_file,
         _write_xml,
+        _group_components,
+        _merge_faces,
 )
 xml_file_ = gh_compo_interface.run()

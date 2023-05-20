@@ -76,6 +76,16 @@ class GHCompo_CreateDetailedConstructions(object):
 
         return materials_w_thickness_added_
 
+    def create_hb_constructions(self, _const_data):
+        # type: (Dict[str, Any]) -> OpaqueConstruction
+        """Create a Honeybee construction from the input data."""
+        hb_const = OpaqueConstruction(
+            identifier=clean_ep_string(_const_data.get("identifier")),
+            materials=self.create_materials(_const_data),
+        )
+        hb_const.display_name = _const_data.get("display_name", hb_const.identifier)
+        return hb_const
+
     def run(self):
         # type: () -> List[OpaqueConstruction]
         """Return a list of constructions with the materials with thicknesses set."""
@@ -93,12 +103,6 @@ class GHCompo_CreateDetailedConstructions(object):
             return []
 
         # -- Build the constructions with the materials (with thickness added)
-        constructions_ = [
-            OpaqueConstruction(
-                identifier=clean_ep_string(const_data["identifier"]),
-                materials=self.create_materials(const_data),
-            )
-            for const_data in input_data.values()
+        return [
+            self.create_hb_constructions(const_data) for const_data in input_data.values()
         ]
-
-        return constructions_
