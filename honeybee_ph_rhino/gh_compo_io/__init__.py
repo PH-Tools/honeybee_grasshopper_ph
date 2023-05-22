@@ -105,6 +105,9 @@ from honeybee_ph_rhino.gh_compo_io.shade_solve_LBT_rad import GHCompo_SolveLBTRa
 from honeybee_ph_rhino.gh_compo_io.shade_solve_shading_dims import (
     GHCompo_SolveShadingDims,
 )
+from honeybee_ph_rhino.gh_compo_io.win_set_monthly_shd_fac import (
+    GHCompo_SetWindowMonthlyShadeFactor,
+)
 
 # -- Climate
 from honeybee_ph_rhino.gh_compo_io.climate_peak_load import GHCompo_CreatePeakLoad
