@@ -103,7 +103,8 @@ class WindowUnitType(object):
     def build_origin_plane(self, _base_curve):
         # type: (LineCurve) -> Plane
         start_pt, end_pt = self.IGH.ghc.EndPoints(_base_curve)
-        return self.IGH.ghc.ConstructPlane(start_pt, self.x_vector, self.y_vector)
+        pl = self.IGH.ghc.ConstructPlane(start_pt, self.x_vector, self.y_vector)
+        return pl
 
     def build_srfc_base_crv(self, _width, _origin_plane):
         # type: (float, Plane) -> LineCurve
@@ -126,7 +127,15 @@ class WindowUnitType(object):
 
         # -- Walk through each column, and each row in each column
         for col_element_lists in self.elements_by_column(self.elements):
-            # 2) Build the base-curve for the Column;s elements
+            if not origin_plane:
+                msg = (
+                    "Error: Something went wrong building the origin planes for "
+                    "the window geometry? Note this window builder ONLY works for vertical "
+                    "planar windows. Skylights or windows on sloped surfaces are not supported"
+                )
+                raise Exception(msg)
+
+            # 2) Build the base-curve for the Column's elements
             width = col_element_lists[0].width
             base_curve = self.build_srfc_base_crv(width, origin_plane)
 

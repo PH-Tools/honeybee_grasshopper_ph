@@ -35,6 +35,9 @@ class GHCompo_CreateWindowRhinoGeometry(object):
         self.win_names = _win_names
 
     def check_input(self):
+        if not self.win_baselines or not self.win_names:
+            return
+
         if len(self.win_baselines) != len(self.win_names):
             msg = "The number of window-baselines and window-names must be the same."
             raise Exception(msg)

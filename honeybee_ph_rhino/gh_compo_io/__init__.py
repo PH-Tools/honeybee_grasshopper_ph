@@ -166,6 +166,9 @@ from honeybee_ph_rhino.gh_compo_io.util_diagnose_hb_rooms import (
 
 # -- Visualize
 from honeybee_ph_rhino.gh_compo_io.visualize_spaces import GHCompo_VisualizeSpaces
+from honeybee_ph_rhino.gh_compo_io.visualize_win_frames import (
+    GHCompo_VisualizeWindowFrameElements,
+)
 
 # -- Organize
 from honeybee_ph_rhino.gh_compo_io.organize_spaces import GHCompo_OrganizeSpaces
