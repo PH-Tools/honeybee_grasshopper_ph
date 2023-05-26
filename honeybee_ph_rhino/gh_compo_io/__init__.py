@@ -130,6 +130,10 @@ from honeybee_ph_rhino.gh_compo_io.cert_PHI import GHCompo_PhiCertification
 
 # -- Building Segment
 from honeybee_ph_rhino.gh_compo_io.building_segment import GHCompo_BuildingSegment
+from honeybee_ph_rhino.gh_compo_io.building_set_project_data import GHCompo_SetProjectData
+from honeybee_ph_rhino.gh_compo_io.building_create_team_member import (
+    GHCompo_CreateProjectTeamMember,
+)
 
 # -- Export
 from honeybee_ph_rhino.gh_compo_io.write_wuif_xml import GHCompo_WriteWufiXml

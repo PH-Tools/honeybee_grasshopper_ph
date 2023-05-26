@@ -54,12 +54,13 @@ class GHCompo_WriteWufiXml(object):
     def run(self):
         # type: () -> Optional[str]
         if self.write_xml and self.hb_json_file:
-            d, f = PHX.run.convert_hbjson_to_WUFI_XML(
+            save_dir, save_filename = PHX.run.convert_hbjson_to_WUFI_XML(
                 self.hb_json_file,
                 self.filename,
                 self.save_folder,
                 self.group_components,
                 self.merge_faces,
             )
-            xml_file_ = os.path.join(d, f)
+            save_filename += ".xml"
+            xml_file_ = os.path.join(save_dir, save_filename)
             return xml_file_
