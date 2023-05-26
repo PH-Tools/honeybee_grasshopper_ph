@@ -4,30 +4,34 @@
 """GHCompo Interface: HBPH - Bldg Segment."""
 
 try:
-    from typing import List, Tuple
+    from typing import List, Tuple, Dict
 except ImportError:
     pass  # IronPython 2.7
 
 try:
     from honeybee import room
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
 try:
     from honeybee_ph import bldg_segment, phi, phius, site
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_ph:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee_ph:\n\t{}".format(e))
 
 try:
-    from honeybee_ph_standards.sourcefactors import factors, phius_CO2_factors, phius_source_energy_factors
+    from honeybee_ph_standards.sourcefactors import (
+        factors,
+        phius_CO2_factors,
+        phius_source_energy_factors,
+    )
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_ph_standards:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee_ph_standards:\n\t{}".format(e))
 
 try:
     from honeybee_ph_rhino import gh_io
     from honeybee_ph_rhino.gh_compo_io import ghio_validators
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
 
 class _SetPoints(object):
@@ -42,7 +46,7 @@ class _SetPoints(object):
         self.summer = _summer
 
     def __str__(self):
-        return '{}()'.format(self.__class__.__name__)
+        return "{}()".format(self.__class__.__name__)
 
     def __repr__(self):
         return str(self)
@@ -52,10 +56,12 @@ class _SetPoints(object):
 
 
 class GHCompo_BuildingSegment(object):
-    _allowed_fuels = list(set(
-            list(phius_source_energy_factors.factors_2021.keys()) +
-            list(phius_CO2_factors.factors_2021.keys())
-        ))
+    _allowed_fuels = list(
+        set(
+            list(phius_source_energy_factors.factors_2021.keys())
+            + list(phius_CO2_factors.factors_2021.keys())
+        )
+    )
     display_name = ghio_validators.HBName("display_name")
     num_floor_levels = ghio_validators.IntegerNonZero("num_floor_levels", default=1)
     num_dwelling_units = ghio_validators.IntegerNonZero("num_dwelling_units", default=1)
@@ -64,35 +70,60 @@ class GHCompo_BuildingSegment(object):
     phi_certification = ghio_validators.NotNone("phi_certification")
     mech_room_temp = ghio_validators.UnitDegreeC("mech_room_temp", default=20.0)
 
-    def __init__(self, _IGH, _segment_name, _num_floor_levels, _num_dwelling_units, _site,
-            _source_energy_factors, _co2_factors,
-            _phius_certification, _phi_certification, _winter_set_temp, _summer_set_temp, _mech_room_temp, _hb_rooms):
-        # type: (gh_io.IGH, str, int, int, site.Site, List, List, phius.PhiusCertification, phi.PhiCertification, str, str, str, List[room.Room]) -> None
+    def __init__(
+        self,
+        _IGH,
+        _segment_name,
+        _num_floor_levels,
+        _num_dwelling_units,
+        _site,
+        _source_energy_factors,
+        _co2_factors,
+        _phius_certification,
+        _phi_certification,
+        _winter_set_temp,
+        _summer_set_temp,
+        _mech_room_temp,
+        _hb_rooms,
+        _non_combustible_materials=False,
+        *args,
+        **kwargs
+    ):
+        # type: (gh_io.IGH, str, int, int, site.Site, List, List, phius.PhiusCertification, phi.PhiCertification, str, str, str, List[room.Room], bool, List, Dict) -> None
         self.IGH = _IGH
-        self.display_name = _segment_name or '_unnamed_bldg_segment_'
+        self.display_name = _segment_name or "_unnamed_bldg_segment_"
         self.num_floor_levels = _num_floor_levels
         self.num_dwelling_units = _num_dwelling_units
-        self.site = _site or  site.Site()
+        self.site = _site or site.Site()
         self.phius_certification = _phius_certification or phius.PhiusCertification()
         self.phi_certification = _phi_certification or phi.PhiCertification()
         self.hb_rooms = _hb_rooms
         self.set_points = _SetPoints(_winter_set_temp, _summer_set_temp)
         self.mech_room_temp = _mech_room_temp
         self.thermal_bridges = {}
+        self.non_combustible_materials = _non_combustible_materials or False
         self._create_tb_dict()
 
         # -------------------------------------------------------------------------------------
         # -- Sort out the fuel factors and any inputs
         self._source_energy_factors = factors.FactorCollection(
-            'Source_Energy', self._default_phius_source_energy_factors)
+            "Source_Energy", self._default_phius_source_energy_factors
+        )
         self._co2e_factors = factors.FactorCollection(
-            'CO2', self._default_phius_CO2_factors)
-        
-        for factor in factors.build_factors_from_library(phius_source_energy_factors.factors_2021) + _source_energy_factors:
-            self.source_energy_factors.add_factor(factor) 
-        for factor in factors.build_factors_from_library(phius_CO2_factors.factors_2021) + _co2_factors:
-            self.co2e_factors.add_factor(factor) 
-        
+            "CO2", self._default_phius_CO2_factors
+        )
+
+        for factor in (
+            factors.build_factors_from_library(phius_source_energy_factors.factors_2021)
+            + _source_energy_factors
+        ):
+            self.source_energy_factors.add_factor(factor)
+        for factor in (
+            factors.build_factors_from_library(phius_CO2_factors.factors_2021)
+            + _co2_factors
+        ):
+            self.co2e_factors.add_factor(factor)
+
         self.co2e_factors.validate_fuel_types(self._allowed_fuels)
 
     @property
@@ -119,7 +150,9 @@ class GHCompo_BuildingSegment(object):
     def _default_phius_source_energy_factors(self):
         # type: () -> List[factors.Factor]
         """Return a list of default source-energy factors."""
-        return factors.build_factors_from_library(phius_source_energy_factors.factors_2021)
+        return factors.build_factors_from_library(
+            phius_source_energy_factors.factors_2021
+        )
 
     @property
     def _default_phius_CO2_factors(self):
@@ -136,13 +169,13 @@ class GHCompo_BuildingSegment(object):
 
     def _create_tb_dict(self):
         # -- Collect all the Thermal Bridges from all the Rooms input
-        # -- note that only one instance of each TB will be maintained on the 
+        # -- note that only one instance of each TB will be maintained on the
         # -- final Building Segment
         tb_dict = {}
         for room in self.hb_rooms:
             if not room:
                 continue
-            tb_dict.update(room.properties.ph.ph_bldg_segment.thermal_bridges) # type: ignore
+            tb_dict.update(room.properties.ph.ph_bldg_segment.thermal_bridges)  # type: ignore
         self.thermal_bridges = tb_dict
 
     def _create_bldg_segment(self):
@@ -152,7 +185,7 @@ class GHCompo_BuildingSegment(object):
         obj = bldg_segment.BldgSegment()
         ignore = ["IGH", "user_data", "identifier"]
         for attr_name in vars(obj).keys():
-            if attr_name.startswith('_'):
+            if attr_name.startswith("_"):
                 continue
             elif attr_name in ignore:
                 continue
@@ -165,7 +198,7 @@ class GHCompo_BuildingSegment(object):
 
     def run(self):
         # type: () -> Tuple[List[room.Room], bldg_segment.BldgSegment]
-        
+
         # -------------------------------------------------------------------------------------
         # -- Create the actual HBPH Building Segment Object
         hbph_segment = self._create_bldg_segment()
@@ -176,18 +209,18 @@ class GHCompo_BuildingSegment(object):
         for hb_room in self.hb_rooms:
             if not hb_room:
                 continue
-            
+
             new_room = hb_room.duplicate()
-            new_room.properties.ph.ph_bldg_segment = hbph_segment # type: ignore
+            new_room.properties.ph.ph_bldg_segment = hbph_segment  # type: ignore
             hb_rooms_.append(new_room)
 
         return hb_rooms_, hbph_segment
-    
+
     def __str__(self):
-        return '{}()'.format(self.__class__.__name__)
-    
+        return "{}()".format(self.__class__.__name__)
+
     def __repr__(self):
         return str(self)
-    
+
     def ToString(self):
         return str(self)

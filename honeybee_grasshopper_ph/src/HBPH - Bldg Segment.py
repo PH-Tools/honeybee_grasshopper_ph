@@ -33,7 +33,7 @@ model. Only Honeybee Faces with boundary conditions of "Outdoors", "Ground" and
 -
 Use this before passing the honeybee-rooms on to the 'HB Model' component.
 -
-EM March 16, 2023
+EM May 26, 2023
     Args:
         segment_name_: Name for the building-segment
                
@@ -133,6 +133,7 @@ gh_compo_interface = gh_compo_io.GHCompo_BuildingSegment(
         summer_set_temp_,
         mech_room_temp_,
         _hb_rooms,
+        non_combustible_materials_
 )
 hb_rooms_, hbph_segment = gh_compo_interface.run()
 
