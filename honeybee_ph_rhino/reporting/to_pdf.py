@@ -6,7 +6,7 @@
 import os
 
 try:
-    from itertools import izip_longest # type: ignore
+    from itertools import izip_longest  # type: ignore
 except:
     from itertools import zip_longest as izip_longest
 
@@ -16,20 +16,20 @@ except ImportError:
     pass  # IronPython 2.7
 
 try:
-    from System.Drawing import Color, Size # type: ignore
-    from System import Guid # type: ignore
+    from System.Drawing import Color, Size  # type: ignore
+    from System import Guid  # type: ignore
 except ImportError:
     pass  # Outside .NET
 
 try:
-    from Rhino.Geometry import Mesh, Hatch, TextJustification, Point3d, Rectangle3d, Transform # type: ignore
-    from Rhino.DocObjects import ObjectAttributes, DetailViewObject # type: ignore
-    from Rhino.DocObjects.DimensionStyle import MaskFrame # type: ignore
+    from Rhino.Geometry import Mesh, Hatch, TextJustification, Point3d, Rectangle3d, Transform  # type: ignore
+    from Rhino.DocObjects import ObjectAttributes, DetailViewObject  # type: ignore
+    from Rhino.DocObjects.DimensionStyle import MaskFrame  # type: ignore
 except ImportError:
     pass  # Outside Rhino
 
 try:
-    from Grasshopper import DataTree # type: ignore
+    from Grasshopper import DataTree  # type: ignore
 except ImportError:
     pass  # Outside Grasshopper
 
@@ -38,7 +38,7 @@ try:
     from honeybee_ph_rhino.reporting.annotations import TextAnnotation
     from honeybee_ph_rhino.reporting.build_floor_segments import ClippingPlaneLocation
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
 
 def _transform_annotation(_IGH, _annotation, _transform):
@@ -57,8 +57,7 @@ def _transform_annotation(_IGH, _annotation, _transform):
     """
 
     new_obj = _annotation.duplicate()
-    new_obj.location = _IGH.ghpythonlib_components.Transform(
-        new_obj.location, _transform)
+    new_obj.location = _IGH.ghpythonlib_components.Transform(new_obj.location, _transform)
 
     return new_obj
 
@@ -99,10 +98,12 @@ def gen_file_paths(_save_folder, _file_names, _target_length):
         return file_paths
 
     if _file_names.BranchCount != _target_length:
-        raise Exception("Error: The number of geometry branches ({}) does not"
-                        " match the number of file-names ({})?".format(
-                            _target_length, _file_names.BranchCount)
-                        )
+        raise Exception(
+            "Error: The number of geometry branches ({}) does not"
+            " match the number of file-names ({})?".format(
+                _target_length, _file_names.BranchCount
+            )
+        )
 
     # --- Save folder
     if not os.path.exists(_save_folder):
@@ -167,16 +168,20 @@ def set_active_view_by_name(_IGH, _view_name):
 
     # active view and non-active view names
     active_view_name = get_active_view_name(_IGH)
-    non_active_views = [(view.ActiveViewport.Name, view)
-                        for view in _IGH.scriptcontext.doc.Views if view.ActiveViewport.Name != active_view_name]
+    non_active_views = [
+        (view.ActiveViewport.Name, view)
+        for view in _IGH.scriptcontext.doc.Views
+        if view.ActiveViewport.Name != active_view_name
+    ]
 
     if _view_name != active_view_name:
         if _view_name in [seq[0] for seq in non_active_views]:
-            _IGH.scriptcontext.doc.Views.ActiveView = [seq[1]
-                                                       for seq in non_active_views if seq[0] == _view_name][0]
+            _IGH.scriptcontext.doc.Views.ActiveView = [
+                seq[1] for seq in non_active_views if seq[0] == _view_name
+            ][0]
             # print("Setting Active View to: '{}'".format(_view_name))
         else:
-            msg = "\"{0}\" is not a valid view name?".format(_view_name)
+            msg = '"{0}" is not a valid view name?'.format(_view_name)
             _IGH.error(msg)
 
 
@@ -193,7 +198,8 @@ def set_active_layer_by_name(_IGH, _layer_name):
     with _IGH.context_rh_doc():
         if _layer_name not in _IGH.rhinoscriptsyntax.LayerNames():
             raise Exception(
-                "Error: Cannot find the Layer with name: '{}'?".format(_layer_name))
+                "Error: Cannot find the Layer with name: '{}'?".format(_layer_name)
+            )
         _IGH.rhinoscriptsyntax.CurrentLayer(_layer_name)
 
 
@@ -240,7 +246,7 @@ def find_layers_with_detail_views(_IGH):
         for i in range(len(layer_IDs_)):
             # Get the Layer and any parents
             layer_path = _IGH.scriptcontext.doc.Layers[layer_IDs_[i]].FullPath
-            layer_names = list(layer_path.Split(':'))  # type: List[str]
+            layer_names = list(layer_path.Split(":"))  # type: List[str]
 
             for layerName in layer_names:
                 layer_names_.append(layer_path)
@@ -253,9 +259,10 @@ def get_current_layer_visibilities(_IGH):
     # type: (gh_io.IGH) -> List[bool]
     """Return a list of current Layer visibilities"""
     with _IGH.context_rh_doc():
-        return [_IGH.rhinoscriptsyntax.LayerVisible(layer)
-                for layer
-                in _IGH.rhinoscriptsyntax.LayerNames()]
+        return [
+            _IGH.rhinoscriptsyntax.LayerVisible(layer)
+            for layer in _IGH.rhinoscriptsyntax.LayerNames()
+        ]
 
 
 def turn_off_all_layers(_IGH, _except_layers):
@@ -303,7 +310,10 @@ def reset_all_layer_visibility(_IGH, _layer_vis_settings):
     with _IGH.context_rh_doc():
         layers = _IGH.rhinoscriptsyntax.LayerNames()
 
-        for layer, vis_setting, in izip_longest(layers, _layer_vis_settings):
+        for (
+            layer,
+            vis_setting,
+        ) in izip_longest(layers, _layer_vis_settings):
             _IGH.rhinoscriptsyntax.LayerVisible(layer, vis_setting)
 
         _IGH.Rhino.RhinoDoc.ActiveDoc.Views.RedrawEnabled = True
@@ -408,32 +418,45 @@ def mesh2Hatch(_IGH, mesh):
 
         # Calculate the average color of the face.
         if face.IsQuad:
-            hatchColorR = (faceColorList[0].R + faceColorList[1].R +
-                           faceColorList[2].R + faceColorList[3].R) / 4
-            hatchColorG = (faceColorList[0].G + faceColorList[1].G +
-                           faceColorList[2].G + faceColorList[3].G) / 4
-            hatchColorB = (faceColorList[0].B + faceColorList[1].B +
-                           faceColorList[2].B + faceColorList[3].B) / 4
+            hatchColorR = (
+                faceColorList[0].R
+                + faceColorList[1].R
+                + faceColorList[2].R
+                + faceColorList[3].R
+            ) / 4
+            hatchColorG = (
+                faceColorList[0].G
+                + faceColorList[1].G
+                + faceColorList[2].G
+                + faceColorList[3].G
+            ) / 4
+            hatchColorB = (
+                faceColorList[0].B
+                + faceColorList[1].B
+                + faceColorList[2].B
+                + faceColorList[3].B
+            ) / 4
         else:
-            hatchColorR = (faceColorList[0].R +
-                           faceColorList[1].R + faceColorList[2].R) / 3
-            hatchColorG = (faceColorList[0].G +
-                           faceColorList[1].G + faceColorList[2].G) / 3
-            hatchColorB = (faceColorList[0].B +
-                           faceColorList[1].B + faceColorList[2].B) / 3
-        hatchColor = Color.FromArgb(
-            255, hatchColorR, hatchColorG, hatchColorB)
+            hatchColorR = (
+                faceColorList[0].R + faceColorList[1].R + faceColorList[2].R
+            ) / 3
+            hatchColorG = (
+                faceColorList[0].G + faceColorList[1].G + faceColorList[2].G
+            ) / 3
+            hatchColorB = (
+                faceColorList[0].B + faceColorList[1].B + faceColorList[2].B
+            ) / 3
+        hatchColor = Color.FromArgb(255, hatchColorR, hatchColorG, hatchColorB)
 
         # Create the outline of a new hatch.
         hatchCurveInit = _IGH.Rhino.Geometry.PolylineCurve(facePointList)
         if face.IsQuad:
-            hatchExtra = _IGH.Rhino.Geometry.LineCurve(
-                facePointList[0], facePointList[3])
+            hatchExtra = _IGH.Rhino.Geometry.LineCurve(facePointList[0], facePointList[3])
         else:
-            hatchExtra = _IGH.Rhino.Geometry.LineCurve(
-                facePointList[0], facePointList[2])
+            hatchExtra = _IGH.Rhino.Geometry.LineCurve(facePointList[0], facePointList[2])
         hatchCurve = _IGH.Rhino.Geometry.Curve.JoinCurves(
-            [hatchCurveInit, hatchExtra], _IGH.scriptcontext.doc.ModelAbsoluteTolerance)[0]
+            [hatchCurveInit, hatchExtra], _IGH.scriptcontext.doc.ModelAbsoluteTolerance
+        )[0]
 
         # Create the hatch.
         try:
@@ -444,21 +467,27 @@ def mesh2Hatch(_IGH, mesh):
             else:
                 # We have to split the quad face into two triangles.
                 hatchCurveInit1 = _IGH.Rhino.Geometry.PolylineCurve(
-                    [facePointList[0], facePointList[1], facePointList[2]])
+                    [facePointList[0], facePointList[1], facePointList[2]]
+                )
                 hatchExtra1 = _IGH.Rhino.Geometry.LineCurve(
-                    facePointList[0], facePointList[2])
+                    facePointList[0], facePointList[2]
+                )
                 hatchCurve1 = _IGH.Rhino.Geometry.Curve.JoinCurves(
-                    [hatchCurveInit1, hatchExtra1], _IGH.scriptcontext.doc.ModelAbsoluteTolerance)[0]
-                meshFaceHatch1 = _IGH.Rhino.Geometry.Hatch.Create(hatchCurve1, 0, 0, 0)[
-                    0]
+                    [hatchCurveInit1, hatchExtra1],
+                    _IGH.scriptcontext.doc.ModelAbsoluteTolerance,
+                )[0]
+                meshFaceHatch1 = _IGH.Rhino.Geometry.Hatch.Create(hatchCurve1, 0, 0, 0)[0]
                 hatchCurveInit2 = _IGH.Rhino.Geometry.PolylineCurve(
-                    [facePointList[2], facePointList[3], facePointList[0]])
+                    [facePointList[2], facePointList[3], facePointList[0]]
+                )
                 hatchExtra2 = _IGH.Rhino.Geometry.LineCurve(
-                    facePointList[2], facePointList[0])
+                    facePointList[2], facePointList[0]
+                )
                 hatchCurve2 = _IGH.Rhino.Geometry.Curve.JoinCurves(
-                    [hatchCurveInit2, hatchExtra2], _IGH.scriptcontext.doc.ModelAbsoluteTolerance)[0]
-                meshFaceHatch2 = _IGH.Rhino.Geometry.Hatch.Create(hatchCurve2, 0, 0, 0)[
-                    0]
+                    [hatchCurveInit2, hatchExtra2],
+                    _IGH.scriptcontext.doc.ModelAbsoluteTolerance,
+                )[0]
+                meshFaceHatch2 = _IGH.Rhino.Geometry.Hatch.Create(hatchCurve2, 0, 0, 0)[0]
 
                 hatches.extend([meshFaceHatch1, meshFaceHatch2])
                 colors.extend([hatchColor, hatchColor])
@@ -470,7 +499,7 @@ def mesh2Hatch(_IGH, mesh):
 
 def bake_geometry_object(_IGH, _geom_obj, _attr_obj, _layer_name):
     # type: (gh_io.IGH, Guid, Optional[ObjectAttributes], str) -> None
-    """ Takes in a geom obj Guid and attributes, then bakes to a Layer
+    """Takes in a geom obj Guid and attributes, then bakes to a Layer
 
     If the Object is a Mesh, will bake that using the Mesh's Vertex Colors. To
     set these, use the Grasshopper MeshColor component (ghc.MeshColours() ) before
@@ -501,7 +530,8 @@ def bake_geometry_object(_IGH, _geom_obj, _attr_obj, _layer_name):
         if _IGH.rhinoscriptsyntax.IsMesh(geometry):
             # Find the target layer index
             parentLayerIndex = _IGH.Rhino.DocObjects.Tables.LayerTable.FindByFullPath(
-                layer_table, _layer_name, True)
+                layer_table, _layer_name, True
+            )
 
             # Create a hatch from the mesh
             guids = []
@@ -514,7 +544,9 @@ def bake_geometry_object(_IGH, _geom_obj, _attr_obj, _layer_name):
                 attr.ObjectColor = colors[count]
                 attr.PlotColor = colors[count]
                 attr.ColorSource = _IGH.Rhino.DocObjects.ObjectColorSource.ColorFromObject
-                attr.PlotColorSource = _IGH.Rhino.DocObjects.ObjectPlotColorSource.PlotColorFromObject
+                attr.PlotColorSource = (
+                    _IGH.Rhino.DocObjects.ObjectPlotColorSource.PlotColorFromObject
+                )
 
                 if _attr_obj and _attr_obj.DisplayOrder:
                     attr.DisplayOrder = _attr_obj.DisplayOrder  # 1 = Front, -1 = Back
@@ -528,7 +560,8 @@ def bake_geometry_object(_IGH, _geom_obj, _attr_obj, _layer_name):
 
         elif isinstance(geometry, _IGH.Rhino.Geometry.Curve):
             rhino_geom = _IGH.scriptcontext.doc.Objects.Add(
-                geometry, _attr_obj or doc_object.Attributes)
+                geometry, _attr_obj or doc_object.Attributes
+            )
 
             # Set the new Object's Layer
             if not _IGH.rhinoscriptsyntax.IsLayer(_layer_name):
@@ -538,7 +571,8 @@ def bake_geometry_object(_IGH, _geom_obj, _attr_obj, _layer_name):
         else:
             # Just bake the regular Geometry with default attributes
             rhino_geom = _IGH.scriptcontext.doc.Objects.Add(
-                geometry, doc_object.Attributes)
+                geometry, doc_object.Attributes
+            )
 
             # Set the new Object's Layer
             if not _IGH.rhinoscriptsyntax.IsLayer(_layer_name):
@@ -546,7 +580,9 @@ def bake_geometry_object(_IGH, _geom_obj, _attr_obj, _layer_name):
             _IGH.rhinoscriptsyntax.ObjectLayer(rhino_geom, _layer_name)
 
 
-def bake_annotation_object(_IGH, _annotation, _target_layer, _avoid_collisions=False, _neighbors=None):
+def bake_annotation_object(
+    _IGH, _annotation, _target_layer, _avoid_collisions=False, _neighbors=None
+):
     # type: (gh_io.IGH, TextAnnotation, str, bool, Optional[List[Rectangle3d]]) -> Optional[Rectangle3d]
     """Add a new Text element to the Rhino document.
 
@@ -567,16 +603,20 @@ def bake_annotation_object(_IGH, _annotation, _target_layer, _avoid_collisions=F
     bounding_rect = None
     _neighbors = _neighbors or []
     with _IGH.context_rh_doc():
-
         # The base-plane for the Text
         origin = _annotation.location
         basePlane_origin = _IGH.Rhino.Geometry.Point3d(origin)
         basePlan_normal = _IGH.Rhino.Geometry.Vector3d(0, 0, 1)  # Assumes Top View
         basePlane = _IGH.Rhino.Geometry.Plane(
-            origin=basePlane_origin, normal=basePlan_normal)
+            origin=basePlane_origin, normal=basePlan_normal
+        )
 
         # Create the txt object
         txt = _IGH.Rhino.Geometry.TextEntity()
+        try:
+            txt.Font = _IGH.Rhino.DocObjects.Font("Source Code Pro")
+        except:
+            pass
         txt.Text = _annotation.text
         txt.Plane = basePlane
         txt.TextHeight = _annotation.text_size
@@ -588,54 +628,65 @@ def bake_annotation_object(_IGH, _annotation, _target_layer, _avoid_collisions=F
         txt.DrawTextFrame = _annotation.mask_draw_frame
 
         if _avoid_collisions:
-            raise NotImplementedError('Not yet....')
+            raise NotImplementedError("Not yet....")
             #  Test against the other text items on the sheet
             # First, find / create the bounding box rectangle of the text note
             this_bounding_box = txt.GetBoundingBox(txt.Plane)
             box_x_dim = abs(this_bounding_box.Min.X - this_bounding_box.Max.X)
             box_y_dim = abs(this_bounding_box.Min.Y - this_bounding_box.Max.Y)
             domain_x = _IGH.ghpythonlib_components.ConstructDomain(
-                (box_x_dim/2)*-1,  box_x_dim/2)
+                (box_x_dim / 2) * -1, box_x_dim / 2
+            )
             domain_y = _IGH.ghpythonlib_components.ConstructDomain(
-                (box_y_dim/2)*-1,  box_y_dim/2)
+                (box_y_dim / 2) * -1, box_y_dim / 2
+            )
             bounding_rect = _IGH.ghpythonlib_components.Rectangle(
-                txt.Plane, domain_x, domain_y, 0).rectangle
+                txt.Plane, domain_x, domain_y, 0
+            ).rectangle
 
             # Compare the current text note to the others already in the scene
             # Move the current tag if necessary
             for eachNeighbor in _neighbors:
                 intersection = _IGH.ghpythonlib_components.CurveXCurve(
-                    eachNeighbor, bounding_rect)
+                    eachNeighbor, bounding_rect
+                )
                 if intersection.points != None:
                     neighbor = _IGH.ghpythonlib_components.DeconstuctRectangle(
-                        eachNeighbor)  # The overlapping textbox
+                        eachNeighbor
+                    )  # The overlapping textbox
                     neighborY = neighbor.Y  # Returns a domain
                     # neighborY = abs(neighborY[0] - neighborY[1]) # Total Y distance
 
                     neighborCP = neighbor.base_plane.Origin
                     thisCP = _IGH.ghpythonlib_components.DeconstuctRectangle(
-                        bounding_rect).base_plane.Origin
+                        bounding_rect
+                    ).base_plane.Origin
 
                     if thisCP.Y > neighborCP.Y:
                         # Move the tag 'up'
                         neighborMaxY = neighborCP.Y + neighborY[1]
-                        thisMinY = thisCP.Y - (box_y_dim/2)
+                        thisMinY = thisCP.Y - (box_y_dim / 2)
                         moveVector = _IGH.Rhino.Geometry.Vector3d(
-                            0, neighborMaxY-thisMinY, 0)
+                            0, neighborMaxY - thisMinY, 0
+                        )
                         bounding_rect = _IGH.ghpythonlib_components.Move(
-                            bounding_rect, moveVector).geometry
+                            bounding_rect, moveVector
+                        ).geometry
                     else:
                         # Move the tag 'down'
                         neighborMinY = neighborCP.Y - neighborY[1]
-                        thisMaxY = thisCP.Y + (box_y_dim/2)
+                        thisMaxY = thisCP.Y + (box_y_dim / 2)
                         moveVector = _IGH.Rhino.Geometry.Vector3d(
-                            0, neighborMinY-thisMaxY, 0)
+                            0, neighborMinY - thisMaxY, 0
+                        )
                         bounding_rect = _IGH.ghpythonlib_components.Move(
-                            bounding_rect, moveVector).geometry
+                            bounding_rect, moveVector
+                        ).geometry
 
                     # Re-Set the text tag's origin to the new location
                     txt.Plane = _IGH.ghpythonlib_components.DeconstuctRectangle(
-                        bounding_rect).base_plane
+                        bounding_rect
+                    ).base_plane
 
         # Add the new text object to the Scene
         txtObj = _IGH.Rhino.RhinoDoc.ActiveDoc.Objects.AddText(txt)
@@ -672,7 +723,8 @@ def export_single_pdf(_IGH, _file_path, _dpi=300, _raster=True):
     # Ref: https://developer.rhino3d.com/api/RhinoCommon/html/P_Rhino_RhinoDoc_PageUnitSystem.htm
     page_unit_system_number = _IGH.rhinoscriptsyntax.UnitSystem(in_model_units=False)
     page_unit_scale = _IGH.rhinoscriptsyntax.UnitScale(
-        8, page_unit_system_number)  # Type 8 = Inches
+        8, page_unit_system_number
+    )  # Type 8 = Inches
 
     page_height = page_height * page_unit_scale
     page_width = page_width * page_unit_scale
@@ -680,9 +732,10 @@ def export_single_pdf(_IGH, _file_path, _dpi=300, _raster=True):
     page_width = round(page_width, 2)
 
     pdf = _IGH.Rhino.FileIO.FilePdf.Create()
-    size = Size(page_width*_dpi, page_height*_dpi)
+    size = Size(page_width * _dpi, page_height * _dpi)
     settings = _IGH.Rhino.Display.ViewCaptureSettings(
-        _IGH.scriptcontext.doc.Views.ActiveView, size, _dpi)
+        _IGH.scriptcontext.doc.Views.ActiveView, size, _dpi
+    )
     settings.RasterMode = _raster
     settings.OutputColor = _IGH.Rhino.Display.ViewCaptureSettings.ColorMode.DisplayColor
     pdf.AddPage(settings)
@@ -716,17 +769,14 @@ def add_clipping_plane(_IGH, _cp_location, _cp_layer, _dtl_view_objs):
         * (System.Guid)
     """
 
-    pl = _IGH.Rhino.Geometry.Plane(
-        _cp_location.origin,
-        _cp_location.normal
-    )
+    pl = _IGH.Rhino.Geometry.Plane(_cp_location.origin, _cp_location.normal)
 
     with _IGH.context_rh_doc():
         cp_id = _IGH.scriptcontext.doc.Objects.AddClippingPlane(
             plane=pl,
             uMagnitude=1,
             vMagnitude=1,
-            clippedViewportIds=[dv.Id for dv in _dtl_view_objs]
+            clippedViewportIds=[dv.Id for dv in _dtl_view_objs],
         )
 
         # Set the new ClippingPlane's Layer
@@ -740,7 +790,18 @@ def add_clipping_plane(_IGH, _cp_location, _cp_layer, _dtl_view_objs):
     return cp_id
 
 
-def export_pdfs(_IGH, _file_paths, _layout_names, _layers_on, _cp_loc, _geom, _geom_attrs, _labels, _annotations, _raster):
+def export_pdfs(
+    _IGH,
+    _file_paths,
+    _layout_names,
+    _layers_on,
+    _cp_loc,
+    _geom,
+    _geom_attrs,
+    _labels,
+    _annotations,
+    _raster,
+):
     # type: (gh_io.IGH, List[str], List[str], List[str], DataTree[ClippingPlaneLocation],DataTree[Guid], DataTree[ObjectAttributes], DataTree[TextAnnotation], DataTree[TextAnnotation], bool) -> None
     """
 
@@ -765,7 +826,6 @@ def export_pdfs(_IGH, _file_paths, _layout_names, _layers_on, _cp_loc, _geom, _g
 
     # -- Bake objects
     for branch_num, geom_list in enumerate(_geom.Branches):
-
         # -- Setup the right layers
         set_active_view_by_name(_IGH, _layout_names[branch_num])
         layers_with_detail_views = find_layers_with_detail_views(_IGH)
@@ -782,7 +842,7 @@ def export_pdfs(_IGH, _file_paths, _layout_names, _layers_on, _cp_loc, _geom, _g
         cp_layer = create_bake_layer(_IGH)  # Clipping Planes
 
         # -- Bake the Geometry into the Scene
-        set_active_view_by_name(_IGH, 'Top')  # Change to 'Top' View for Baking
+        set_active_view_by_name(_IGH, "Top")  # Change to 'Top' View for Baking
         for i, geom_obj in enumerate(geom_list):
             # -- Object Attribute
             attr_obj = _geom_attrs.Branch(branch_num)[i]
@@ -809,10 +869,13 @@ def export_pdfs(_IGH, _file_paths, _layout_names, _layers_on, _cp_loc, _geom, _g
         if _annotations.BranchCount != 0:
             # -- Warning
             if len(dtl_view_objs) != 1:
-                msg = "Warning. There are {} Detail Views found on '{}'. Text annotations"\
-                    " require one viewport, and may not work right when multiple Detail Views "\
+                msg = (
+                    "Warning. There are {} Detail Views found on '{}'. Text annotations"
+                    " require one viewport, and may not work right when multiple Detail Views "
                     " are present on a single Layout page.".format(
-                        len(dtl_view_objs), _layout_names[branch_num])
+                        len(dtl_view_objs), _layout_names[branch_num]
+                    )
+                )
                 _IGH.warning(msg)
 
             # -- Bake the Annotations to the Rhino Scene
@@ -821,7 +884,8 @@ def export_pdfs(_IGH, _file_paths, _layout_names, _layers_on, _cp_loc, _geom, _g
                 # -- Transform the Annotation's Location to Paperspace
                 try:
                     annotation = _transform_annotation(
-                        _IGH, annotation, dtl_view_transforms[0])
+                        _IGH, annotation, dtl_view_transforms[0]
+                    )
                 except IndexError:
                     msg = "Error: Cannot find a viewport in the _layers_on set? Check that the Layout Viewport's layer is in the list."
                     raise Exception(msg)
