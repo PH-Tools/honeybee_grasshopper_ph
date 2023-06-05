@@ -150,7 +150,6 @@ def sort_rooms_by_story(_hb_rooms):
 
 
 class GHCompo_CalcPhiusMFLoads(object):
-    
     def __init__(
         self,
         _IGH,
@@ -172,8 +171,8 @@ class GHCompo_CalcPhiusMFLoads(object):
     def num_dwelling_units(self):
         # type: () -> int
         return sum(
-            rm.properties.energy.people.properties.ph.number_dwelling_units 
-            for rm in self.hb_rooms 
+            rm.properties.energy.people.properties.ph.number_dwelling_units
+            for rm in self.hb_rooms
             if self._room_is_dwelling(rm)
         )
 
@@ -181,12 +180,14 @@ class GHCompo_CalcPhiusMFLoads(object):
     def num_of_stories(self):
         # type: () -> int
         return len({rm.story for rm in self.hb_rooms})
-   
+
     def _room_is_dwelling(self, _hb_room):
         # type: (room.Room) -> bool
         """Return True if the Honeybee-Room is a 'dwelling' (residential)?"""
-        hb_room_prop_e = _hb_room.properties.energy # type: RoomEnergyProperties
-        hb_room_prop_e_prop_ph = hb_room_prop_e.people.properties.ph # type: PeoplePhProperties
+        hb_room_prop_e = _hb_room.properties.energy  # type: RoomEnergyProperties
+        hb_room_prop_e_prop_ph = (
+            hb_room_prop_e.people.properties.ph
+        )  # type: PeoplePhProperties
         return hb_room_prop_e_prop_ph.is_residential
 
     def calc_res_electric_consumption(self, _hb_res_rooms):
@@ -199,6 +200,7 @@ class GHCompo_CalcPhiusMFLoads(object):
         phius_stories = [
             phius_mf.PhiusResidentialStory(room_list) for room_list in rooms_by_story
         ]
+        phius_stories = sorted(phius_stories, reverse=True)
 
         # ---------------------------------------------------------------------------
         # -- Calculate the total Res. Elec. Energy Consumption
@@ -314,7 +316,7 @@ class GHCompo_CalcPhiusMFLoads(object):
         elevator = elevator_class(_num_dwellings=self.num_dwelling_units)
 
         # -- Split out the energy across all the rooms
-        elevator.energy_demand  = elevator.energy_demand / len(self.hb_rooms)
+        elevator.energy_demand = elevator.energy_demand / len(self.hb_rooms)
         return elevator
 
     def create_new_MF_elec_equip(
