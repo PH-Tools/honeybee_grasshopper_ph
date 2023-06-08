@@ -158,13 +158,17 @@ class GHCompo_CalcPhiusMFLoads(object):
         _garage_light_HE_frac_,
         _include_elevator,
         _hb_rooms,
+        _include_garage=False,
+        *args, 
+        **kwargs
     ):
-        # type: (gh_io.IGH, float, float, float, bool, List[room.Room]) -> None
+        # type: (gh_io.IGH, float, float, float, bool, List[room.Room], bool, *Any, **Any) -> None
         self.IGH = _IGH
         self.int_light_HE_frac_ = _int_light_HE_frac_
         self.ext_light_HE_frac_ = _ext_light_HE_frac_
         self.garage_light_HE_frac_ = _garage_light_HE_frac_
         self.include_elevator = _include_elevator
+        self.include_garage = bool(_include_garage)
         self.hb_rooms = _hb_rooms
 
     @property
@@ -319,6 +323,17 @@ class GHCompo_CalcPhiusMFLoads(object):
         elevator.energy_demand = elevator.energy_demand / len(self.hb_rooms)
         return elevator
 
+    def build_garage_lighting(self, _bldg_avg_lighting_garage):
+        # type: (float) -> ph_equipment.PhCustomAnnualLighting
+        """Return a new Garage Lighting object."""
+        lighting_garage = ph_equipment.PhCustomAnnualLighting(
+            _defaults=ph_default_equip["PhCustomAnnualLighting"]["PHIUS"]
+        )
+        lighting_garage.energy_demand = _bldg_avg_lighting_garage
+        lighting_garage.comment = "Garage Lighting - Phius MF Calculator"
+        lighting_garage.in_conditioned_space = False
+        return lighting_garage
+
     def create_new_MF_elec_equip(
         self,
         _hb_res_rooms,
@@ -374,13 +389,8 @@ class GHCompo_CalcPhiusMFLoads(object):
         lighting_ext.comment = "Exterior Lighting - Phius MF Calculator"
         elec_equipment_.append(lighting_ext)
 
-        lighting_garage = ph_equipment.PhCustomAnnualLighting(
-            _defaults=ph_default_equip["PhCustomAnnualLighting"]["PHIUS"]
-        )
-        lighting_garage.energy_demand = bldg_avg_lighting_garage
-        lighting_garage.comment = "Garage Lighting - Phius MF Calculator"
-        lighting_garage.in_conditioned_space = False
-        elec_equipment_.append(lighting_garage)
+        if self.include_garage:
+            elec_equipment_.append(self.build_garage_lighting(bldg_avg_lighting_garage))
 
         if self.include_elevator:
             elec_equipment_.append(self.build_elevator())

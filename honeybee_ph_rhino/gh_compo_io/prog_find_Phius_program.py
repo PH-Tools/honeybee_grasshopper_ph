@@ -27,6 +27,18 @@ except ImportError as e:
 class GHCompo_FindPhiusProgram(object):
     def __init__(self, _IGH, _name, _description, _protocol, _base_program):
         # type: (gh_io.IGH, str, str, str, str) -> None
+        """Initialize the GHCompo_FindPhiusProgram class.
+
+        Args:
+            _IGH: The Grasshopper input/output handler.
+            _name: The name of the space to find a program for.
+            _description: The description of the space to find a program for.
+            _protocol: The protocol to use for the program.
+            _base_program: The base program to use for the program.
+
+        Returns:
+            None
+        """
         self.IGH = _IGH
         self.name = _name
         self.description = _description
@@ -35,7 +47,11 @@ class GHCompo_FindPhiusProgram(object):
 
     def run(self):
         # type: () -> Optional[List[ProgramType]]
+        """Run the GHCompo_FindPhiusProgram class.
 
+        Returns:
+            Optional[List[ProgramType]]: A list of program types.
+        """
         # -- Get the data from in the Phius data set
         if not self.name and not self.description:
             msg = "Input a name or a description of the space to find a Program."

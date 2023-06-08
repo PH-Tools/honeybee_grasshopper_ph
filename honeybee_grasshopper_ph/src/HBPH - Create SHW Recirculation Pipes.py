@@ -22,7 +22,7 @@
 """
 Create new HBPH DHW Recirculation Piping Object.
 -
-EM October 2, 2022
+EM June 8, 2023
 
     Args:
         _geometry: (List[Curve]) A list of curves representing the SHW Recirculation
@@ -63,7 +63,8 @@ EM October 2, 2022
         
         _daily_period: (List[float]) The daily operating period in hours.
         
-
+        _water_temp: (List[float]) The temp [C] of the water in the recirculation piping.
+        
     Returns:
         dhw_recirc_piping_: (List[PhPipeElement]) A list of the new HBPH Piping
             objects created. These can be added to HB Rooms using the 'Add PH DHW Piping'
@@ -85,6 +86,9 @@ reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create SHW Recirculation Pipes"
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
+    from honeybee_energy_ph.hvac import hot_water
+    reload(hot_water)
+    from honeybee_ph_rhino.gh_compo_io import shw_create_recirc_pipes as gh_compo_io
     reload(gh_compo_io)
     reload(gh_io)
 
@@ -104,6 +108,7 @@ gh_compo_interface = gh_compo_io.GHCompo_CreateSHWRecircPipes(
     _insul_reflective,
     _insul_quality,
     _daily_period,
+    _water_temp,
 )
 dhw_recirc_piping_ = gh_compo_interface.run()
 
