@@ -38,7 +38,11 @@ class GHCompo_CreateVentSystem(object):
     @property
     def supply_ducts(self):
         # type: () -> List[ducting.PhDuctElement]
-        return self._supply_ducts or [ducting.PhDuctElement.default_supply_duct()]
+        return self._supply_ducts or [
+            ducting.PhDuctElement.default_supply_duct(
+                _display_name="{}_supply".format(self.display_name)
+            )
+        ]
     
     @supply_ducts.setter
     def supply_ducts(self, _input):
@@ -49,7 +53,11 @@ class GHCompo_CreateVentSystem(object):
     @property
     def exhaust_ducts(self):
         # type: () -> List[ducting.PhDuctElement]
-        return self._exhaust_ducts or [ducting.PhDuctElement.default_exhaust_duct()]
+        return self._exhaust_ducts or [
+            ducting.PhDuctElement.default_exhaust_duct(
+                _display_name="{}_exhaust".format(self.display_name)
+            )
+        ]
     
     @exhaust_ducts.setter
     def exhaust_ducts(self, _input):

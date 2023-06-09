@@ -82,6 +82,7 @@ from honeybee_ph_rhino.gh_compo_io.mech_create_exhaust_vent import (
 )
 from honeybee_ph_rhino.gh_compo_io.mech_add_exhaust_vent import GHCompo_AddExhaustVent
 from honeybee_ph_rhino.gh_compo_io.mech_create_vent_duct import GHCompo_CreateVentDuct
+from honeybee_ph_rhino.gh_compo_io.mech_create_supportive_device import GHCompo_CreateSupportiveDevice
 
 # -- Program [Schedule / Load]
 from honeybee_ph_rhino.gh_compo_io.prog_add_elec_equip import GHCompo_AddElecEquip

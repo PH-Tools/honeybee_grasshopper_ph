@@ -22,13 +22,18 @@
 """
 Add HBPH mechanical ventilation, heating, and cooling to HB-Rooms.
 -
-EM October 2, 2022
+EM June 9, 2023
     Args:
         _vent_system: (PhVentilationSystem) Enter the type of heating system.
         
-        _space_heating_systems: (list[PhHeatingSystem]) A list of the HBPH Heating Systems to add to the hb-rooms.
+        _space_heating_systems: (list[PhHeatingSystem]) A list of the HBPH Heating 
+            Systems to add to the hb-rooms.
         
-        _space_cooling_systems: (list[PhCoolingSystem]) A list of the HBPH Cooling Systems to add to the hb-rooms.
+        _space_cooling_systems: (list[PhCoolingSystem]) A list of the HBPH Cooling 
+            Systems to add to the hb-rooms.
+        
+        _supportive_devices: (List[]) A list of the HBPH Supportive Devices (extra pumps, fans, etc)
+            to add to the hb-rooms.
         
         _hb_rooms: (list[Room]) A list of the hb-rooms to add the mechanical systems to.
         
@@ -48,6 +53,7 @@ reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Add Mech Systems"
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
+    from honeybee_ph_rhino.gh_compo_io import mech_add_mech_systems as gh_compo_io
     reload(gh_compo_io)
     reload(gh_io)
 
@@ -59,5 +65,6 @@ gh_compo_interface = gh_compo_io.GHCompo_AddMechSystems(
         _space_heating_systems,
         _space_cooling_systems,
         _hb_rooms,
+        _supportive_devices,
     )
 hb_rooms_ = gh_compo_interface.run()
