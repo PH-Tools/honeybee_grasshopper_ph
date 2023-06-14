@@ -4,7 +4,7 @@
 """GHCompo Interface: HBPH - Bldg Segment."""
 
 try:
-    from typing import List, Tuple, Dict
+    from typing import List, Tuple, Any
 except ImportError:
     pass  # IronPython 2.7
 
@@ -15,6 +15,8 @@ except ImportError as e:
 
 try:
     from honeybee_ph import bldg_segment, phi, phius, site
+    from honeybee_ph.properties.room import RoomPhProperties
+    from honeybee_ph.bldg_segment import PhVentilationSummerBypassMode
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph:\n\t{}".format(e))
 
@@ -32,6 +34,11 @@ try:
     from honeybee_ph_rhino.gh_compo_io import ghio_validators
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
+
+try:
+    from honeybee_ph_utils.input_tools import input_to_int
+except ImportError as e:
+    raise ImportError("\nFailed to import honeybee_ph_utils:\n\t{}".format(e))
 
 
 class _SetPoints(object):
@@ -86,10 +93,11 @@ class GHCompo_BuildingSegment(object):
         _mech_room_temp,
         _hb_rooms,
         _non_combustible_materials=False,
+        _hvr_summer_bypass_mode="4",
         *args,
         **kwargs
     ):
-        # type: (gh_io.IGH, str, int, int, site.Site, List, List, phius.PhiusCertification, phi.PhiCertification, str, str, str, List[room.Room], bool, List, Dict) -> None
+        # type: (gh_io.IGH, str, int, int, site.Site, List, List, phius.PhiusCertification, phi.PhiCertification, str, str, str, List[room.Room], bool, str, *Any, **Any) -> None
         self.IGH = _IGH
         self.display_name = _segment_name or "_unnamed_bldg_segment_"
         self.num_floor_levels = _num_floor_levels
@@ -125,6 +133,7 @@ class GHCompo_BuildingSegment(object):
             self.co2e_factors.add_factor(factor)
 
         self.co2e_factors.validate_fuel_types(self._allowed_fuels)
+        self.summer_hrv_bypass_mode = _hvr_summer_bypass_mode or "4"
 
     @property
     def source_energy_factors(self):
@@ -159,6 +168,18 @@ class GHCompo_BuildingSegment(object):
         # type: () -> List[factors.Factor]
         return factors.build_factors_from_library(phius_CO2_factors.factors_2021)
 
+    @property
+    def summer_hrv_bypass_mode(self):
+        # type: () -> PhVentilationSummerBypassMode
+        return self._summer_hrv_bypass_mode
+
+    @summer_hrv_bypass_mode.setter
+    def summer_hrv_bypass_mode(self, _input):
+        # type: (str) -> None
+        self._summer_hrv_bypass_mode = PhVentilationSummerBypassMode(
+            input_to_int(_input) or 4
+        )
+
     def _create_hbph_set_points(self):
         # type: () -> bldg_segment.SetPoints
         """Return a new HBPH SetPoints object with attributes from user input."""
@@ -175,7 +196,8 @@ class GHCompo_BuildingSegment(object):
         for room in self.hb_rooms:
             if not room:
                 continue
-            tb_dict.update(room.properties.ph.ph_bldg_segment.thermal_bridges)  # type: ignore
+            room_prop_ph = room.properties.ph  # type: RoomPhProperties
+            tb_dict.update(room_prop_ph.ph_bldg_segment.thermal_bridges)
         self.thermal_bridges = tb_dict
 
     def _create_bldg_segment(self):
