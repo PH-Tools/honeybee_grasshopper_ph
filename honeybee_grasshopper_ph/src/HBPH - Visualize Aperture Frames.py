@@ -23,16 +23,30 @@
 Pull out all the frame and glazing surfaces from a given list of HB-Apertures. This
 will create Rhino geometry for each of the elements which can be visualized in the
 scene and used to check the model construction.
+- -
+Note: This will only return the edges in the proper order when it is used on Honeybee-Apertures
+that at already hosted in a Honeybee-Room. This is due to the modifications that Honeybee
+makes to the geometry planes and surface normals during the Aperture hosting operations. If you
+use this on Apertures before they are hosted in a Room, the edge order will return incorrectly.
 -
-EM May 24, 2023
+EM June 15, 2023
     Args:
         _aperture: (List[Aperture]) The list of HB-Aperatures to get the frame and 
             glass geometry for.
             
     Returns:
-        frame_surfaces_: The resulting frame element surfaces.
+        frame_surfaces_: The aperture frame element surfaces.
             
-        glazing_surfaces_: The resulting glazing surfaces.
+        glazing_surfaces_: The aperture glazing surfaces.
+        
+        frame_typenames_: The display-name of each frame element. This 
+            is mostly useful for debugging.
+        
+        aperture_edges_: A DataTree of the aperture edge geometry in 
+            order (Top, Right, Bottom, Left). This is useful for debugging.
+            
+        aperture_planes_: A DataTree of the aperture surface planes. This 
+            is mostly useful for debugging.
 """
 
 import scriptcontext as sc
@@ -62,4 +76,9 @@ gh_compo_interface = gh_compo_io.GHCompo_VisualizeWindowFrameElements(
     IGH,
     _apertures,
     )
-frame_surfaces_, glazing_surfaces_  = gh_compo_interface.run()
+    
+(frame_surfaces_,
+glazing_surfaces_,
+frame_typenames_,
+aperture_edges_, 
+aperture_planes_) = gh_compo_interface.run()
