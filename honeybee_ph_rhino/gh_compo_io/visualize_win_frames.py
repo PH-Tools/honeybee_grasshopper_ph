@@ -19,12 +19,12 @@ try:
     from System import Object  # type: ignore
     from Grasshopper import DataTree  # type: ignore
     from Grasshopper.Kernel.Data import GH_Path  # type: ignore
-    from Rhino.Geometry import Brep, Point3d  # type: ignore
+    from Rhino.Geometry import Brep, Point3d, Plane, Vector3d, LineCurve, Interval  # type: ignore
 except ImportError:
     pass  # Outside Rhino
 
 try:
-    from ladybug_geometry.geometry3d import LineSegment3D, Plane
+    from ladybug_geometry.geometry3d import LineSegment3D
 except ImportError as e:
     raise ImportError("\nFailed to import ladybug_geometry:\n\t{}".format(e))
 
@@ -40,8 +40,14 @@ except ImportError as e:
 
 try:
     from honeybee.aperture import Aperture
+    from honeybee_energy.construction.window import WindowConstruction
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
+
+from honeybee_energy_ph.properties.construction.window import (
+    WindowConstructionPhProperties,
+)
+from honeybee_energy_ph.construction.window import PhWindowFrame, PhWindowFrameElement
 
 try:
     from honeybee_ph_rhino import gh_io
@@ -56,57 +62,56 @@ class GHCompo_VisualizeWindowFrameElements(object):
         self.apertures = _apertures
         self.tolerance = _IGH.sc.doc.ModelAbsoluteTolerance
 
-    def calc_edge_angle_about_origin(self, _edge, _center_pt, _pl, _tol=0.0001):
-        # type: (LineSegment3D, Point3d, Plane, float) -> float
-        """Calculate the angle of an edge about the origin of its parent plane."""
+    def get_edge_midpoint(self, _edge):
+        # type: (LineCurve) -> Point3d
+        """Return the midpoint of a Rhino.Geometry.LineCurve."""
+        new_domain = Interval(0, 1)
+        _edge.Domain = new_domain
+        return _edge.PointAt(0.5)
 
-        rh_edge = from_linesegment3d(_edge)
-        edge_midpoint = self.IGH.ghc.CurveMiddle(rh_edge)
-        v = self.IGH.ghc.Vector2Pt(_center_pt, edge_midpoint, False).vector
-        (
-            local_origin,
-            local_x_axis,
-            local_y_axis,
-            local_z_axis,
-        ) = self.IGH.ghc.DeconstructPlane(_pl)
-        angle = math.degrees(self.IGH.ghc.Angle(local_y_axis, v, _pl).angle)
+    def calc_edge_angle_about_origin(self, _edge, _center_pt, _pl, _tol=0.0001):
+        # type: (LineCurve, Point3d, Plane, float) -> float
+        """Return the angle of an edge's midpoint about the origin of its parent plane."""
+
+        # -- Find the vector from the edge's midpoint to the center
+        edge_midpoint = self.get_edge_midpoint(_edge)
+        vec = edge_midpoint - _center_pt
+
+        # -- Find the angle between the edge vector and the parent plane's local-Y axis
+        angle = math.degrees(Vector3d.VectorAngle(_pl.YAxis, vec, _pl))
         angle = round(angle, 2)
 
+        # -- Ensure no floating-point errors
         if abs(angle - 360.0) <= _tol:
             angle = 0.0
 
         return angle
 
-    def get_ap_edges(self, _aperture):
-        # type: (Aperture) -> List[LineSegment3D]
+    def sort_aperture_edges(self, _ap_edges, _ap_center_point, _ap_local_plane):
+        # type: (List[LineCurve], Point3d, Plane) -> List[LineSegment3D]
         """Sort the edges of the aperture based on their angle about the aperture's center point.
 
         Note: the native Honeybee .get_left_right_edges methods don't seem to work properly?
-        So using this custom implementation instead.
+        So using this 'calc_edge_angle_about_origin' custom implementation instead.
         """
-        aperture_face = from_face3d(_aperture.geometry)
-        aperture_local_plane = from_plane(_aperture.geometry.plane)
-        apeture_center_point = self.IGH.ghc.Area(aperture_face).centroid
         edges_sorted = sorted(
-            _aperture.geometry.boundary_segments,
+            _ap_edges,
             reverse=True,
             key=lambda e: self.calc_edge_angle_about_origin(
-                e, apeture_center_point, aperture_local_plane
+                e, _ap_center_point, _ap_local_plane
             ),
         )
-
         return edges_sorted
 
     def create_frame_surface(self, _ap_edges, _ap_frame_elements, ap_ctr_pt):
-        # type: (Iterable, Iterable, Point3d) -> List[Brep]
+        # type: (Iterable[LineCurve], Iterable, Point3d) -> List[Brep]
         """Create the frame surfaces for the aperture."""
         frame_surfaces = []
         for edge, frame in izip(_ap_edges, _ap_frame_elements):
-            edge_rh = from_linesegment3d(edge)
-            crv_mid_pt = from_point3d(edge.midpoint)
+            crv_mid_pt = self.get_edge_midpoint(edge)
             extrusion_vector = self.IGH.ghc.Vector2Pt(crv_mid_pt, ap_ctr_pt, True).vector
             extrusion_vector = self.IGH.ghc.Amplitude(extrusion_vector, frame.width)
-            ext = self.IGH.ghc.Extrude(base=edge_rh, direction=extrusion_vector)
+            ext = self.IGH.ghc.Extrude(base=edge, direction=extrusion_vector)
             frame_surfaces.append(ext)
 
         return frame_surfaces
@@ -119,6 +124,7 @@ class GHCompo_VisualizeWindowFrameElements(object):
         win_srfcs = self.IGH.ghc.SurfaceSplit(_ap_srfc, edges)
 
         # -- Figure out which of the split surfaces is the glazing surface
+        # -- by choosing the surface with the closest point to the aperture's center point
         ct_pt_distances = []
         for test_srfc in win_srfcs:
             ct_pt_distances.append(
@@ -128,53 +134,72 @@ class GHCompo_VisualizeWindowFrameElements(object):
 
         return glazing_srfc
 
+    def get_aperture_ph_frame_elements(self, _aperture):
+        # type: (Aperture) -> Tuple[List[PhWindowFrameElement], List[str]]
+        """Get the Passive House PhWindowFrameElements for of the aperture;s PH-Frame."""
+        ap_const = _aperture.properties.energy.construction  # type: ignore
+        ap_prop_ph = ap_const.properties.ph  # type: WindowConstructionPhProperties
+        ap_ph_frame = ap_prop_ph.ph_frame
+
+        if not ap_ph_frame:
+            msg = "Error: The Aperture {} does not have a Passive House window frame?, skipping...".format(
+                _aperture.display_name
+            )
+            self.IGH.warning(msg)
+            return [], []
+
+        el_names = [el.display_name for el in ap_ph_frame.elements]
+        return ap_ph_frame.elements, el_names
+
+    def get_aperture_geometry(self, _aperture):
+        # type: (Aperture) -> tuple[Brep, Point3d, Plane, List[LineSegment3D]]
+        """Get the geometric elements of the Honeybee-Aperture as Rhino Geometry."""
+        ap_srfc = from_face3d(_aperture.geometry)
+        ap_ctr_pt = self.IGH.ghc.Area(ap_srfc).centroid
+        ap_local_plane = from_plane(_aperture.geometry.plane)
+        ap_edges = [from_linesegment3d(s) for s in _aperture.geometry.boundary_segments]
+        ap_edges_sorted = self.sort_aperture_edges(ap_edges, ap_ctr_pt, ap_local_plane)
+        return ap_srfc, ap_ctr_pt, ap_local_plane, ap_edges_sorted
+
     def run(self):
         # type: () -> tuple[DataTree[Object], DataTree[Object], DataTree[str], DataTree[str], DataTree[str]]
         """Run the component."""
-        frame_surfaces_ = DataTree[Object]()
-        glazing_surfaces_ = DataTree[Object]()
-        frame_element_type_names_ = DataTree[Object]()
-        ap_edges_ = DataTree[Object]()
-        ap_planes_ = DataTree[Object]()
+        frame_srfcs_ = DataTree[Object]()
+        glazing_srfcs_ = DataTree[Object]()
+        frame_element_type_names_ = DataTree[str]()
+        edges_ = DataTree[LineCurve]()
+        planes_ = DataTree[Plane]()
 
         for i, ap in enumerate(self.apertures):
             # -----------------------------------------------------------------------
-            # -- Pull out all the relevant Aperture data needed
-            ap_srfc_rh = from_face3d(ap.geometry)
-            ap_ctr_pt = self.IGH.ghc.Area(ap_srfc_rh).centroid
-            ap_edges = self.get_ap_edges(ap)
-            ap_const = ap.properties.energy.construction  # type: ignore
-            ap_frame_elements = ap_const.properties.ph.ph_frame.elements
+            # -- Pull out all the relevant Aperture data that is needed throughout
+            # -- Convert to from Ladubug to Rhino geometry for all the later operations.
+            srfc, ctr_pt, local_plane, edges = self.get_aperture_geometry(ap)
+            hbph_frame_elements, element_names = self.get_aperture_ph_frame_elements(ap)
+
+            if not hbph_frame_elements:
+                continue
 
             # -----------------------------------------------------------------------
-            # -- Frame Geometry
-            frame_surfaces = self.create_frame_surface(
-                ap_edges, ap_frame_elements, ap_ctr_pt
-            )
-            frame_surfaces_.AddRange(frame_surfaces, GH_Path(i))
+            # -- Create all the Frame-Element Geometry
+            frame_surfaces = self.create_frame_surface(edges, hbph_frame_elements, ctr_pt)
+            frame_srfcs_.AddRange(frame_surfaces, GH_Path(i))
 
             # -----------------------------------------------------------------------
-            # -- Glazing Geometry
-            glazing_surfaces_.Add(
-                self.create_glazing_surface(frame_surfaces, ap_srfc_rh, ap_ctr_pt),
-                GH_Path(i),
-            )
+            # -- Create the Glazing Geometry
+            glazing_srfc = self.create_glazing_surface(frame_surfaces, srfc, ctr_pt)
+            glazing_srfcs_.Add(glazing_srfc, GH_Path(i))
 
             # -----------------------------------------------------------------------
             # -- Get the other bits for debugging
-            frame_element_type_names_.AddRange(
-                [el.display_name for el in ap_frame_elements],
-                GH_Path(i),
-            )
-            ap_edges_.AddRange(
-                [from_linesegment3d(_) for _ in self.get_ap_edges(ap)], GH_Path(i)
-            )
-            ap_planes_.Add(from_plane(ap.geometry.plane), GH_Path(i))
+            frame_element_type_names_.AddRange(element_names, GH_Path(i))
+            edges_.AddRange(edges, GH_Path(i))
+            planes_.Add(local_plane, GH_Path(i))
 
         return (
-            frame_surfaces_,
-            glazing_surfaces_,
+            frame_srfcs_,
+            glazing_srfcs_,
             frame_element_type_names_,
-            ap_edges_,
-            ap_planes_,
+            edges_,
+            planes_,
         )
