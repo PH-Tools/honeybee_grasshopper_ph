@@ -41,6 +41,10 @@ class GHCompo_GetObjectAttributes(object):
 
         for object in self.objects:
             for i, key in enumerate(self.keys):
-                values_.Add(getattr(object, key), GH_Path(i))
+                _ = getattr(object, key)
+                if isinstance(_, list):
+                    values_.AddRange(_, GH_Path(i))
+                else:
+                    values_.Add(_, GH_Path(i))
 
         return values_

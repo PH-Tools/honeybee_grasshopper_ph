@@ -183,3 +183,15 @@ from honeybee_ph_rhino.gh_compo_io.visualize_win_frames import (
 
 # -- Organize
 from honeybee_ph_rhino.gh_compo_io.organize_spaces import GHCompo_OrganizeSpaces
+
+
+# -- AirTable
+from honeybee_ph_rhino.gh_compo_io.airtable_download_data import (
+    GHCompo_AirTableDownloadTableData,
+)
+from honeybee_ph_rhino.gh_compo_io.airtable_create_mat_layers import (
+    GHCompo_AirTableCreateMaterialLayers,
+)
+from honeybee_ph_rhino.gh_compo_io.airtable_create_constructions import (
+    GHCompo_AirTableCreateConstructions,
+)

@@ -3,22 +3,35 @@
 
 """GHCompo Interface: HBPH - Create Detailed Constructions."""
 
+import os
+import json
+
 try:
     from typing import List, Optional, Dict, Any
 except ImportError:
     pass  # IronPython 2.7
 
-import os
-import json
+try:
+    from honeybee.typing import clean_ep_string
+except ImportError:
+    raise ImportError("Failed to import honeybee.typing")
 
-from honeybee_energy.material.opaque import EnergyMaterial
-from honeybee_energy.construction.opaque import OpaqueConstruction
-from honeybee.typing import clean_ep_string
+try:
+    from honeybee_energy.material.opaque import EnergyMaterial
+    from honeybee_energy.construction.opaque import OpaqueConstruction
+except ImportError:
+    raise Exception("Error importing honeybee_energy modules?")
 
-from ph_units.parser import parse_input
-from ph_units.converter import convert
+try:
+    from ph_units.parser import parse_input
+    from ph_units.converter import convert
+except ImportError as e:
+    raise ImportError("\nFailed to import ph_units:\n\t{}".format(e))
 
-from honeybee_ph_rhino import gh_io
+try:
+    from honeybee_ph_rhino import gh_io
+except ImportError as e:
+    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
 
 class GHCompo_CreateDetailedConstructions(object):
@@ -97,8 +110,8 @@ class GHCompo_CreateDetailedConstructions(object):
         try:
             with open(self.path) as json_file:
                 input_data = json.load(json_file)
-        except:
-            msg = "Failed to load the JSON file at {}.".format(self.path)
+        except Exception as e:
+            msg = "Failed to load the JSON file at {}. \n{}".format(self.path, e)
             self.IGH.warning(msg)
             return []
 

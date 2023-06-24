@@ -3,7 +3,7 @@
 
 """GHCompo Interface: HBPH - Create Window Types."""
 
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 
 try:
     from itertools import izip  # type: ignore
@@ -12,7 +12,7 @@ except ImportError:
     izip = zip
 
 try:
-    from typing import List, Tuple
+    from typing import List, Tuple, Dict, Any
 except ImportError:
     pass  # IronPython 2.7
 
@@ -35,13 +35,14 @@ class WindowElement(object):
     height = ghio_validators.UnitM("height")
 
     def __init__(self, _width, _height, _col, _row):
+        # type: (float, float, int, int) -> None
         self.width = _width
         self.height = _height
         self.col = _col
         self.row = _row
 
-    @property
-    def display_name(self):
+    def get_display_name(self):
+        # type: () -> str
         return "{}{}".format(self.col, self.row)
 
     def __str__(self):
@@ -115,11 +116,11 @@ class WindowUnitType(object):
         return self.IGH.ghc.Line(pt_1, pt_2)
 
     def build(self, _base_curve):
-        # type: (LineCurve) -> Tuple[List[Brep], List[str]]
+        # type: (LineCurve) -> Tuple[List[Brep], OrderedDict[int, Dict[str, Any]]]
         """Create the window's Rhino geometry based on the Elements."""
 
         surfaces_ = []
-        names_ = []
+        id_data_ = OrderedDict()
 
         # 1)  Get the Base Plane and create a starting origin plane from it
         self.base_curve = _base_curve
@@ -140,6 +141,7 @@ class WindowUnitType(object):
             base_curve = self.build_srfc_base_crv(width, origin_plane)
 
             for row_element in self.elements_by_row(col_element_lists):
+                el_id_data = {}
                 # -- Extrude the surface
                 height = row_element.height
                 surfaces_.append(
@@ -148,8 +150,12 @@ class WindowUnitType(object):
                     )
                 )
 
-                # -- Keep track of the names
-                names_.append("{}_{}".format(self.type_name, row_element.display_name))
+                # 2.b)-- Keep track of the id-data for the surface
+                el_name = row_element.get_display_name()
+                el_id_data["type_name"] = self.type_name
+                el_id_data["row"] = row_element.row
+                el_id_data["col"] = row_element.col
+                id_data_[el_name] = el_id_data
 
                 # 3) Move the base curve up
                 base_curve = self.IGH.ghc.Move(
@@ -161,7 +167,7 @@ class WindowUnitType(object):
                 origin_plane, self.IGH.ghc.Amplitude(self.x_vector, width)
             ).geometry
 
-        return surfaces_, names_
+        return surfaces_, id_data_
 
     def __str__(self):
         return "{}()".format(self.__class__.__name__)
@@ -177,7 +183,7 @@ class WindowUnitType(object):
 
 class GHCompo_CreateWindowUnitTypes(object):
     def __init__(self, _IGH, _type_names, _widths, _heights, _pos_cols, _pos_rows):
-        # type: (gh_io.IGH, List[str], List[str], List[str], List[str], List[str]) -> None
+        # type: (gh_io.IGH, List[str], List[float], List[float], List[int], List[int]) -> None
         self.IGH = _IGH
         self.type_names = _type_names
         self.widths = _widths
