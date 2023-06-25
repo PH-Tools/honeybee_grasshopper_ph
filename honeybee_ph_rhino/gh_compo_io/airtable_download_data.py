@@ -6,7 +6,7 @@
 import json
 
 try:
-    from typing import List, Any, Dict, TypeVar
+    from typing import Any, ItemsView, KeysView, List, Any, Dict, TypeVar
 
     T = TypeVar("T")
 except ImportError:
@@ -24,6 +24,8 @@ except ImportError as e:
 
 
 class TableFields(object):
+    """A class for storing the fields of a single AirTable record."""
+
     def __init__(self, *args, **kwargs):
         for k, v in kwargs.items():
             setattr(self, str(k).upper(), v)
@@ -37,22 +39,38 @@ class TableFields(object):
     def ToString(self):
         return str(self)
 
-    def get(self, k, _default=None):
-        # type: (str, T) -> T
-        return self.__dict__.get(str(k).upper(), _default)
+    def get(self, key, _default=None):
+        # type: (str, Any) -> Any
+        return self.__dict__.get(str(key).upper(), _default)
 
     def __getitem__(self, key):
-        return getattr(self, str(key).upper(), None)
+        # type: (str) -> Any
+        return self.__dict__[str(key).upper()]
+
+    def __getattr__(self, key):
+        return self.__dict__.get(str(key).upper())
 
     def items(self):
+        # type: () -> ItemsView
         return self.__dict__.items()
+
+    def keys(self):
+        # type: () -> KeysView[str]
+        return self.__dict__.keys()
 
 
 class TableRecord(object):
+    """A single AirTable record data object."""
+
     def __init__(self, *args, **kwargs):
         self.ID = kwargs.get("id", "")
         self.CREATEDTIME = kwargs.get("createdTime", "")
         self.FIELDS = TableFields(**kwargs.get("fields", {}))
+
+    @property
+    def fields(self):
+        """Convenience property to get the fields of the record."""
+        return self.FIELDS
 
     def __repr__(self):
         return "AirtableDownloadTableData({})".format(self.__dict__)

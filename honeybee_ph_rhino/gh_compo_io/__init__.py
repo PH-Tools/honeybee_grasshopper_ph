@@ -195,3 +195,6 @@ from honeybee_ph_rhino.gh_compo_io.airtable_create_mat_layers import (
 from honeybee_ph_rhino.gh_compo_io.airtable_create_constructions import (
     GHCompo_AirTableCreateConstructions,
 )
+from honeybee_ph_rhino.gh_compo_io.airtable_create_window_constructions import (
+    GHCompo_AirTableCreateWindowConstructions,
+)
