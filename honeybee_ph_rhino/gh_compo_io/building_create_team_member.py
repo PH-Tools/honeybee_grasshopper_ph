@@ -23,7 +23,7 @@ class GHCompo_CreateProjectTeamMember(object):
     def __init__(
         self, _IGH, _name, _street, _city, _post_code, _telephone, _email, *args, **kwargs
     ):
-        # type: (gh_io.IGH, str, str, str, str, str, str, List, Dict) -> None
+        # type: (gh_io.IGH, Optional[str], Optional[str], Optional[str], Optional[str], Optional[str], Optional[str], List, Dict) -> None
         self.IGH = _IGH
         self.name = _name
         self.street = _street
@@ -33,6 +33,7 @@ class GHCompo_CreateProjectTeamMember(object):
         self.email = _email
 
     def __bool__(self):
+        # type: () -> bool
         return any(
             {
                 self.name,
@@ -45,17 +46,18 @@ class GHCompo_CreateProjectTeamMember(object):
         )
 
     def __nonzero__(self):
+        # type: () -> bool
         return self.__bool__()
 
     def run(self):
         # type: () -> Optional[ProjectTeamMember]
         new_team_member = ProjectTeamMember()
 
-        new_team_member.name = self.name or ""
-        new_team_member.street = self.street or ""
-        new_team_member.city = self.city or ""
-        new_team_member.post_code = self.post_code or ""
-        new_team_member.telephone = self.telephone or ""
-        new_team_member.email = self.email or ""
+        new_team_member.name = self.name
+        new_team_member.street = self.street
+        new_team_member.city = self.city
+        new_team_member.post_code = self.post_code
+        new_team_member.telephone = self.telephone
+        new_team_member.email = self.email
 
         return new_team_member
