@@ -84,16 +84,44 @@ class GHCompo_AirTableCreateWindowConstructions(object):
 
         return hbph_glazing
 
-    def create_new_hbph_frame_elememt(self, record):
+    def get_float_value_with_warning(self, record, key):
+        # type: (TableFields, str) -> float
+        try:
+            return float(record[key])
+        except KeyError:
+            msg = (
+                "The record '{}' is missing the required field '{}'."
+                "\nPlease check the AirTable heading format."
+                "\nKeys found in the table include only: {}."
+                "\nEnsure that the record's values are not 'None'.".format(
+                    record.display_name, key, record.keys()
+                )
+            )
+            raise KeyError(msg)
+        except ValueError:
+            msg = "The record '{}' has an invalid value for the field '{}'. Got the value: '{}'".format(
+                record.display_name, key, record[key]
+            )
+            raise ValueError(msg)
+
+    def create_new_hbph_frame_element(self, record):
         # type: (TableRecord) -> PhWindowFrameElement
         """Create a new Honeybee Window Frame Element from a TableRecord."""
         frame_data = record.FIELDS
 
         hbph_frame_element = PhWindowFrameElement(frame_data.display_name)
         hbph_frame_element.display_name = frame_data.display_name
-        hbph_frame_element.width = float(frame_data["WIDTH [MM]"]) / 1000
-        hbph_frame_element.u_factor = float(frame_data["U-VALUE [W/M2K]"])
-        hbph_frame_element.psi_glazing = float(frame_data["PSI-GLAZING [W/MK]"])
+
+        hbph_frame_element.width = (
+            self.get_float_value_with_warning(frame_data, "WIDTH [MM]") / 1000
+        )
+        hbph_frame_element.u_factor = self.get_float_value_with_warning(
+            frame_data, "U-VALUE [W/M2K]"
+        )
+        hbph_frame_element.psi_glazing = self.get_float_value_with_warning(
+            frame_data, "PSI-GLAZING [W/MK]"
+        )
+
         hbph_frame_element.psi_install = 0.0
         hbph_frame_element.chi_value = 0.0
 
@@ -153,7 +181,7 @@ class GHCompo_AirTableCreateWindowConstructions(object):
         hbph_glazing = self._get_glazing_type(window_data)
 
         # # -------------------------------------------------------------------------------------
-        # -- Build the HB Window Materal and Construction
+        # -- Build the HB Window Material and Construction
         hbph_mat = self.create_new_hbph_window_material(
             hbph_display_name, hbph_frame, hbph_glazing
         )
@@ -179,7 +207,7 @@ class GHCompo_AirTableCreateWindowConstructions(object):
 
         # -- Build the Ph-Window Frame Element Collection
         for record in self.frame_element_records:
-            hbph_frame_element = self.create_new_hbph_frame_elememt(record)
+            hbph_frame_element = self.create_new_hbph_frame_element(record)
             self.hbph_frame_elements[hbph_frame_element.display_name] = hbph_frame_element
 
         # -- Build the Ph-Window Frames Collection
