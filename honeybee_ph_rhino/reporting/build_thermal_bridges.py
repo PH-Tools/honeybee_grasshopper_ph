@@ -11,36 +11,40 @@ except ImportError:
     pass  # Python 2.7
 
 try:
-    from System import Object # type: ignore
-    from System.Drawing import Color # type: ignore
+    from System import Object  # type: ignore
+    from System.Drawing import Color  # type: ignore
 except ImportError:
     pass  # Outside .NET
 
 try:
-    from Rhino.Geometry import Curve # type: ignore
-    from Rhino.DocObjects import ObjectAttributes # type: ignore
+    from Rhino.Geometry import Curve  # type: ignore
+    from Rhino.DocObjects import ObjectAttributes  # type: ignore
 except ImportError:
     pass  # Outside Rhino
 
 try:
-    from ladybug_rhino.fromgeometry import from_polyline3d, from_linesegment3d, from_face3d
+    from ladybug_rhino.fromgeometry import (
+        from_polyline3d,
+        from_linesegment3d,
+        from_face3d,
+    )
 except ImportError as e:
-    raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import ladybug_rhino:\n\t{}".format(e))
 
 try:
     from honeybee import model
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
 try:
     from honeybee_energy_ph.construction import thermal_bridge
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_energy_ph:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
 
 try:
     from honeybee_ph_rhino import gh_io
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
 
 def _create_rh_attr_object(_IGH, _color, _weight):
@@ -52,14 +56,19 @@ def _create_rh_attr_object(_IGH, _color, _weight):
     new_attr_obj.ObjectColor = _color
     new_attr_obj.PlotColor = _color
     new_attr_obj.ColorSource = _IGH.Rhino.DocObjects.ObjectColorSource.ColorFromObject
-    new_attr_obj.PlotColorSource = _IGH.Rhino.DocObjects.ObjectPlotColorSource.PlotColorFromObject
+    new_attr_obj.PlotColorSource = (
+        _IGH.Rhino.DocObjects.ObjectPlotColorSource.PlotColorFromObject
+    )
 
     new_attr_obj.PlotWeight = _weight
-    new_attr_obj.PlotWeightSource = _IGH.Rhino.DocObjects.ObjectPlotWeightSource.PlotWeightFromObject
+    new_attr_obj.PlotWeightSource = (
+        _IGH.Rhino.DocObjects.ObjectPlotWeightSource.PlotWeightFromObject
+    )
 
     # new_attr_obj.DisplayOrder = 0  # 1 = Front, -1 = Back
 
     return new_attr_obj
+
 
 def _get_all_tb_groups_from_model(_hb_model):
     # type: (model.Model) -> Dict[str, List[thermal_bridge.PhThermalBridge]]
@@ -78,6 +87,7 @@ def _get_all_tb_groups_from_model(_hb_model):
 
     return tb_groups
 
+
 def _get_all_tb_names(_hb_model):
     # type: (model.Model) -> List[str]
     """Return a list of all the unique TB object display_names found in the model."""
@@ -88,6 +98,7 @@ def _get_all_tb_names(_hb_model):
             tb_names.add(tb.display_name)
 
     return sorted(list(tb_names))
+
 
 def _get_tb_geometry(_hbph_tb):
     # type: (thermal_bridge.PhThermalBridge) -> Curve
@@ -106,8 +117,16 @@ def _get_tb_geometry(_hbph_tb):
     except:
         return from_linesegment3d(_hbph_tb.geometry)
 
-def get_tb_data(_IGH, _hb_model, _highlight_outline_color, _highlight_outline_weight,
-                _default_srfc_color, _default_outline_color, _default_outline_weight):
+
+def get_tb_data(
+    _IGH,
+    _hb_model,
+    _highlight_outline_color,
+    _highlight_outline_weight,
+    _default_srfc_color,
+    _default_outline_color,
+    _default_outline_weight,
+):
     # type: (gh_io.IGH, model.Model, Color, float, Color, Color, float) -> Tuple
     """Return a Tuple of the geometry and attribute DataTrees with the TB data.
 
@@ -117,9 +136,9 @@ def get_tb_data(_IGH, _hb_model, _highlight_outline_color, _highlight_outline_we
         * _hb_model (model.Model): The Honeybee Model to use as the source.
         * _highlight_outline_color (System.Drawing.Color): The color to use for the TB Curve outlines
         * _highlight_outline_weight (float): The plot-weight to use for the TB Curve outlines.
-        * _default_srfc_color (System.Drawing.Color): 
-        * _default_outline_color (System.Drawing.Color): 
-        * _default_outline_weight (float): 
+        * _default_srfc_color (System.Drawing.Color):
+        * _default_outline_color (System.Drawing.Color):
+        * _default_outline_weight (float):
 
 
     Returns:
@@ -138,12 +157,13 @@ def get_tb_data(_IGH, _hb_model, _highlight_outline_color, _highlight_outline_we
         return tb_names_tree_, tb_geom_tree_, tb_attr_tree_, tb_lengths_tree_
 
     # -- Build the RH AttributeObjects
-    rh_attr_srfc_default = _create_rh_attr_object(
-        _IGH, _default_srfc_color, 0)
+    rh_attr_srfc_default = _create_rh_attr_object(_IGH, _default_srfc_color, 0)
     rh_attr_curve_highlight = _create_rh_attr_object(
-        _IGH, _highlight_outline_color, _highlight_outline_weight)
+        _IGH, _highlight_outline_color, _highlight_outline_weight
+    )
     rh_attr_curve_default = _create_rh_attr_object(
-        _IGH, _default_outline_color, _default_outline_weight)
+        _IGH, _default_outline_color, _default_outline_weight
+    )
 
     # -- Build the background building Mesh geometry which gets added to each output branch
     bldg_srfc_geom = []
@@ -153,23 +173,30 @@ def get_tb_data(_IGH, _hb_model, _highlight_outline_color, _highlight_outline_we
         for hb_face in hb_room.faces:
             # -- Surface
             mesh = _IGH.ghpythonlib_components.MeshColours(
-                from_face3d(hb_face.geometry), rh_attr_srfc_default.ObjectColor)
+                from_face3d(hb_face.geometry), rh_attr_srfc_default.ObjectColor
+            )
             bldg_srfc_geom.append(mesh)
             bldg_srfc_attrs.append(rh_attr_srfc_default)
 
             # -- Boundary Edges
             msh_edges = _IGH.ghpythonlib_components.MeshEdges(mesh).naked_edges
             msh_boundary = _IGH.ghpythonlib_components.JoinCurves(
-                msh_edges, preserve=False)
-            bldg_srfc_geom.append(msh_boundary)
-            bldg_srfc_attrs.append(rh_attr_curve_default)
+                msh_edges, preserve=False
+            )
+            if isinstance(msh_boundary, list):
+                bldg_srfc_geom.extend(msh_boundary)
+                bldg_srfc_attrs.extend(
+                    [rh_attr_curve_default for _ in range(len((msh_boundary)))]
+                )
+            else:
+                bldg_srfc_geom.append(msh_boundary)
+                bldg_srfc_attrs.append(rh_attr_curve_default)
 
     # -- Get all the TB objects from the model
     tb_groups = _get_all_tb_groups_from_model(_hb_model)
 
     # -- Build the thermal bridge curve geometry (with background meshes)
     for i, tb_name in enumerate(_get_all_tb_names(_hb_model)):
-
         # -- TB Geom and Rhino ObjectAttributes
         for tb in tb_groups[tb_name]:
             # -- Add the background model geom to each branch
