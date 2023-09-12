@@ -53,7 +53,7 @@ class GHCompo_CreateWindowRhinoGeometry(object):
             msg = "Failed to create window geometry for window type: {}".format(_win_type)
             raise Exception(msg)
 
-    def creat_names(self, _id_data):
+    def create_names(self, _id_data):
         # type: (OrderedDict[int, Dict[str, Any]]) -> List[str]
         """Create names for the window surfaces."""
         names = []
@@ -80,12 +80,21 @@ class GHCompo_CreateWindowRhinoGeometry(object):
 
         win_surfaces_, srfc_names_ = [], []
         for baseline, name in izip(self.win_baselines, self.win_names):
-            win_type = self.win_collection[name]
+            try:
+                win_type = self.win_collection[name]
+            except KeyError:
+                msg = (
+                    "Failed to find window type named: '{}' in the window-type-collection?\n"
+                    "Valid type-names include: [{}]".format(
+                        name, ", ".join(list(self.win_collection.keys()))
+                    )
+                )
+                raise KeyError(msg)
             srfcs, id_data = win_type.build(baseline)
             self.check_result(win_type, srfcs, id_data)
             win_surfaces_ += srfcs
 
             # -- Create the name from the id-data
-            srfc_names_ += self.creat_names(id_data)
+            srfc_names_ += self.create_names(id_data)
 
         return win_surfaces_, srfc_names_
