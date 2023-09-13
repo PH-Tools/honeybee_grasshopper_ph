@@ -89,6 +89,9 @@ from honeybee_ph_rhino.gh_compo_io.mech_add_renewable_system import (
     GHCompo_AddRenewableEnergyDevices,
 )
 from honeybee_ph_rhino.gh_compo_io.mech_create_pv_system import GHCompo_CreatePVDevice
+from honeybee_ph_rhino.gh_compo_io.mech_add_supportive_devices import (
+    GHCompo_AddMechSupportiveDevices,
+)
 
 # -- Program [Schedule / Load]
 from honeybee_ph_rhino.gh_compo_io.prog_add_elec_equip import GHCompo_AddElecEquip
