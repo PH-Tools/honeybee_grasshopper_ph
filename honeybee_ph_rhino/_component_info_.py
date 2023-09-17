@@ -169,8 +169,20 @@ COMPONENT_PARAMS = {
         "Category": CATEGORY,
         "SubCategory": 1,
     },
-    "HBPH - Create SHW Branch Pipes": {
+    "HBPH - Create SHW Pipe | Trunks": {
+        "NickName": "Create Trunk Pipes",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
+    "HBPH - Create SHW Pipe | Branches": {
         "NickName": "Create Branch Pipes",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
+    "HBPH - Create SHW Pipe | Fixtures": {
+        "NickName": "Create Fixture/Twig Pipes",
         "Message": RELEASE_VERSION,
         "Category": CATEGORY,
         "SubCategory": 1,

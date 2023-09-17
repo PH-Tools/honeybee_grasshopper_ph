@@ -2,11 +2,17 @@
 # -- Hot Water
 from honeybee_ph_rhino.gh_compo_io.shw_apply_shw import GHCompo_ApplySHWSys
 from honeybee_ph_rhino.gh_compo_io.shw_create_system import GHCompo_CreateSHWSystem
-from honeybee_ph_rhino.gh_compo_io.shw_create_branch_pipes import (
-    GHCompo_CreateSHWBranchPipes,
-)
 from honeybee_ph_rhino.gh_compo_io.shw_create_recirc_pipes import (
     GHCompo_CreateSHWRecircPipes,
+)
+from honeybee_ph_rhino.gh_compo_io.shw_create_pipe_trunks import (
+    GHCompo_CreateSHWTrunkPipes,
+)
+from honeybee_ph_rhino.gh_compo_io.shw_create_pipe_branches import (
+    GHCompo_CreateSHWBranchPipes,
+)
+from honeybee_ph_rhino.gh_compo_io.shw_create_pipe_fixtures import (
+    GHCompo_CreateSHWFixturePipes,
 )
 from honeybee_ph_rhino.gh_compo_io.shw_create_tank import GHCompo_CreateSHWTank
 from honeybee_ph_rhino.gh_compo_io.shw_create_heater import GHCompo_CreateSHWHeater
