@@ -9,7 +9,10 @@ except ImportError:
     pass  # IronPython 2.7
 
 from ladybug_rhino.togeometry import to_polyline3d
+from ladybug_geometry.geometry2d.polyline import Polyline2D
+from ladybug_geometry.geometry2d.pointvector import Point2D
 from ladybug_geometry.geometry3d.polyline import Polyline3D, LineSegment3D
+from ladybug_geometry.geometry3d.pointvector import Point3D, Vector3D
 
 from honeybee_energy_ph.hvac import hot_water
 from honeybee_ph_rhino import gh_io
@@ -27,15 +30,17 @@ class _TrunkPipeBuilder(object):
         self,
         IGH,
         dhw_branches,
+        multiplier,
         display_name,
         demand_recirculation,
         pipe_material,
         pipe_diameter,
         geometry,
     ):
-        # type: (gh_io.IGH, List, str, bool, int, int, Union[Polyline3D, LineSegment3D]) -> None
+        # type: (gh_io.IGH, List, int, str, bool, int, int, Union[Polyline3D, LineSegment3D]) -> None
         self.IGH = IGH
         self.dhw_branches = dhw_branches
+        self.multiplier = multiplier
         self.display_name = display_name
         self.demand_recirculation = demand_recirculation
         self.pipe_material = pipe_material
@@ -57,9 +62,11 @@ class _TrunkPipeBuilder(object):
     def geometry(self, _input):
         """Set geometry input. Will convert input to LBT-Polyline3D."""
         try:
+            # -- First, assume it is Rhino geometry and convert it to an LBT Polyline3D
             self._geometry = to_polyline3d(_input)
         except:
             try:
+                # -- If that fails, try and convert it to a Rhino Polyline, then an LBT one
                 self._geometry = to_polyline3d(self._convert_to_polyline(_input))
             except Exception as e:
                 raise Exception(
@@ -89,6 +96,7 @@ class _TrunkPipeBuilder(object):
         # -- Build the new PH-Trunk
         hbph_obj = hot_water.PhPipeTrunk()
         hbph_obj.display_name = self.display_name
+        hbph_obj.multiplier = self.multiplier
 
         for geom_segment in self.geometry_segments:
             hbph_obj.pipe_element.add_segment(
@@ -106,7 +114,20 @@ class _TrunkPipeBuilder(object):
 
         # -- Add the Branch piping
         for hbph_branch in self.dhw_branches:
-            hbph_obj.add_branch(hbph_branch)
+            if hasattr(hbph_branch, "fixtures"):
+                # -- Its a branch, so just add it to the trunk
+                hbph_obj.add_branch(hbph_branch)
+            else:
+                hbph_fixture = hbph_branch
+                if len(hbph_obj.branches) == 0:
+                    # -- Create a new branch, and add the input as a fixture
+                    new_branch = hot_water.PhPipeBranch()
+                    new_branch.display_name = self.display_name
+                    new_branch.add_fixture(hbph_fixture)
+                    hbph_obj.add_branch(new_branch)
+                else:
+                    # -- Host the fixture on the existing branch
+                    hbph_obj.branches[0].add_fixture(hbph_fixture)
 
         return hbph_obj
 
@@ -118,15 +139,17 @@ class GHCompo_CreateSHWTrunkPipes(object):
         self,
         _IGH,
         _dhw_branches,
+        _multipliers,
         _display_name,
         _demand_recirculation,
         _pipe_material,
         _pipe_diameter,
         _geometry,
     ):
-        # type: (gh_io.IGH, List[hot_water.PhPipeElement], List[str], List[bool], List[str], List[str], List[Union[Polyline3D, LineSegment3D]]) -> None
+        # type: (gh_io.IGH, List[hot_water.PhPipeElement], List[int], List[str], List[bool], List[str], List[str], List[Union[Polyline3D, LineSegment3D]]) -> None
         self.IGH = _IGH
         self.dhw_branches = _dhw_branches
+        self.multipliers = _multipliers
         self.display_name = _display_name
         self.demand_recirculation = _demand_recirculation
         self.pipe_material = _pipe_material
@@ -142,6 +165,7 @@ class GHCompo_CreateSHWTrunkPipes(object):
                 {
                     "IGH": self.IGH,
                     "dhw_branches": self.dhw_branches,
+                    "multiplier": clean_get(self.multipliers, i, 1),
                     "display_name": clean_get(self.display_name, i, "_unnamed_trunk_"),
                     "demand_recirculation": clean_get(
                         self.demand_recirculation, i, False

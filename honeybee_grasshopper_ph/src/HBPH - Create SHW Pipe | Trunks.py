@@ -31,6 +31,11 @@ EM September 19, 2022
         _dhw_branches: (List[PhPipeBranch]) A list of the 'Branch' pipes that should 
             be connected to this 'trunk' line.
             
+        _multiplier: (List[int]) default=1. A list of multiplier values. In WUFI, this will set the 
+            'Count Units or floors" attribute for the trunk. This is useful if you want to 
+            model one floor's set of fixture/branches and then use the multiplier to 
+            set the number of identical floors with the same fixtures.
+            
         _display_name: (Optional[str]) An optional name for the trunk line.
         
         _demand_recirculation: (bool) Default=False. Mark true if this line includes
@@ -97,6 +102,7 @@ IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 gh_compo_interface = gh_compo_io.GHCompo_CreateSHWTrunkPipes(
         IGH,
         _dhw_branches,
+        _multiplier,
         _display_name,
         _demand_recirculation,
         _material,
