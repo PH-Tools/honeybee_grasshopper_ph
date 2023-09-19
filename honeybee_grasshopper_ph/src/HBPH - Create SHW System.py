@@ -25,7 +25,7 @@ using the 'Apply SHW System' component. Note that many elements here replicate t
 Honeybee-Energy "HB SHW System" component, but allow for additional HB-PH elements such as 
 piping and storage tanks to be added as well.
 -
-EM October 13, 2022
+EM September 19, 2023
 
     Args:
         _system_type: [str] Text for the specific type of service hot water system and equipment.
@@ -65,8 +65,10 @@ EM October 13, 2022
     
         _heaters: List[PhHotWaterHeater] A list of any PH style HW-Heaters to add to the SHW System.
     
-        _branch_piping: List[PhPipeElement] A List of any Branch Piping elements to
-            add to the SHW System.
+        _distribution_piping: List[PhPipeTrunk] A list of HBPH 'Trunk' pipes which are part of this
+            system. These 'Trunks' should have branches and fixtures which will also become part 
+            of this hot-water system. Note that you can also pass in Fixture pipes directly, but they 
+            will have a 0-length 'trunk' and 'branch' created automatically for each fixture.
         
         _num_tap_points_: (Optional[int]) Allows for manual setting of the number 
             of 'tap points' (faucets or sim.) in the system. If None is input here, 
@@ -104,10 +106,9 @@ reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create SHW System"
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
-    reload(gh_compo_io)
-    reload(gh_io)
     from honeybee_ph_rhino.gh_compo_io import shw_create_system as gh_compo_io
     reload(gh_compo_io)
+    reload(gh_io)
 
 
 # ------------------------------------------------------------------------------
@@ -127,7 +128,7 @@ gh_compo_interface = gh_compo_io.GHCompo_CreateSHWSystem(
     _buffer_tank_,
     _solar_tank_,
     _heaters, 
-    _branch_piping,
+    _distribution_piping,
     _num_tap_points_,
     _recirc_piping,
 )
