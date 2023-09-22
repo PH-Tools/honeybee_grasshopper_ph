@@ -28,10 +28,10 @@ h1 {
 }
 
 h2 {
-  font-weight: 500;
-  font-size: 26px;
-  margin-top: 40px;
-  border-bottom: 1px dashed var(--color-grey-light);
+  font-weight: 600;
+  font-size: 28px;
+  margin-top: 100px;
+  border-bottom: 3px dashed var(--color-grey-dark);
   padding-bottom: 10px;
 }
 
