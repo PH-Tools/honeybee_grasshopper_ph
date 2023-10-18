@@ -23,15 +23,22 @@
 Visualize HBPH 'Spaces' as Rhino Geometry. Use the "Get Spaces" 
 component in order collect all the HBPH Spaces from Hooneybee-Rooms.
 -
-EM May 10, 2023
+EM October 18, 2023
 
     Args:
-        _spaces: (list[Space])
+        _spaces: (list[Space]) A list of the HBPH Spaces that you would like
+            to visualize in the Rhino scene.
+        
+        _attribute_: The Floor-Segment attribute to visualize by. Input either -
+"display_name"
+"weighting_factor"
+"weighted_floor_area"
+"floor_area"
             
     Returns:
-        space_floor_segments_:
+        space_floor_segments_: The space floor-segments as Rhino surfaces.
         
-        space_volumes_:
+        space_volumes_: The space volumes as Rhino Breps.
 """
 
 import scriptcontext as sc
@@ -60,5 +67,6 @@ IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 gh_compo_interface = gh_compo_io.GHCompo_VisualizeSpaces(
     IGH,
     _spaces,
+    _attribute_,
     )
-space_floor_segments_, space_volumes_ = gh_compo_interface.run()
+space_floor_segments_, space_volumes_, wireframe_, legend_, values_ = gh_compo_interface.run()

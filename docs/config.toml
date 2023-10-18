@@ -3,30 +3,30 @@ title = "PH-Tools.honeybee-grasshopper-ph"
 theme = "ph_tools"
 
 [Params]
-  author = "PH-Tools"
-  copyright = "bldgtyp, llc"
-  contact = "phtools@bldgtyp.com"
-  ph_tools_home_url = "http://www.passivehousetools.com/"
-  github_url = "https://github.com/PH-Tools/honeybee_grasshopper_ph"
-  youtube_url = "https://www.youtube.com/channel/UCADxgnNCFNZ3uhaSvezReQA/playlists"
-  package_name = "PHX"
-  gh_pages_name = "honeybee_grasshopper_ph"
-  installer_download_url = "https://github.com/PH-Tools/honeybee_grasshopper_ph/raw/main/hbph_installer.gh"
-  youtube_SF_source_files = "https://github.com/PH-Tools/honeybee_grasshopper_ph/raw/main/docs/static/downloads/Single_Family_Home_Source_Files.zip"
-  download_wrkshp_parsons_220923 = "https://github.com/PH-Tools/honeybee_grasshopper_ph/raw/main/docs/static/downloads/example_wufi_model.zip"
+author = "PH-Tools"
+copyright = "bldgtyp, llc"
+contact = "phtools@bldgtyp.com"
+ph_tools_home_url = "http://www.passivehousetools.com/"
+github_url = "https://github.com/PH-Tools/honeybee_grasshopper_ph"
+youtube_url = "https://www.youtube.com/channel/UCADxgnNCFNZ3uhaSvezReQA/playlists"
+package_name = "PHX"
+gh_pages_name = "honeybee_grasshopper_ph"
+installer_download_url = "https://github.com/PH-Tools/honeybee_grasshopper_ph/raw/main/hbph_installer.gh"
+youtube_SF_source_files = "https://github.com/PH-Tools/honeybee_grasshopper_ph/raw/main/docs/static/downloads/Single_Family_Home_Source_Files.zip"
+download_wrkshp_parsons_220923 = "https://github.com/PH-Tools/honeybee_grasshopper_ph/raw/main/docs/static/downloads/example_wufi_model.zip"
 
 [menu]
-  [[menu.main]]
-    identifier = "quick_start"
-    name = "Quick Start"
-    url = "/quick_start"
+[[menu.main]]
+identifier = "quick_start"
+name = "Quick Start"
+url = "/quick_start"
 
-  [[menu.main]]
-    identifier = "learn_more"
-    name = "Learn More"
-    url = "/learn_more"
+[[menu.main]]
+identifier = "learn_more"
+name = "Learn More"
+url = "/learn_more"
 
-  [[menu.main]]
-    identifier = "contact"
-    name = "Contact & Help"
-    url = "/contact"
+[[menu.main]]
+identifier = "contact"
+name = "Contact & Help"
+url = "/contact"
