@@ -25,7 +25,7 @@ TFA/iCFA or Fresh-air ventilation data. This component will read through the
 Honeybee-Model and pull out relevant data and prepare it for export using
 the "HBPH - Export PDFs" component.
 -
-EM October 2, 2022
+EM October 22, 2023
     Args:
         _hb_model: (honeybee.model.Model) The honeybee Model to use as the source.
         
@@ -57,9 +57,10 @@ import rhinoscriptsyntax as rs
 import ghpythonlib.components as ghc
 import Grasshopper as gh
 
-from honeybee_ph_rhino.reporting import build_floor_segments
-from honeybee_ph_rhino import gh_io
-from honeybee_ph_utils import input_tools
+try:
+    from honeybee_ph_rhino import gh_compo_io, gh_io
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
 
 # ------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
@@ -67,34 +68,24 @@ reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Report Space Floor Segments"
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
-    reload(build_floor_segments)
-
+    from honeybee_ph_rhino.reporting import annotations
+    reload(annotations)
+    reload(gh_io)
+    from honeybee_ph_rhino.reporting import build_floor_segments as gh_compo_io
+    reload(gh_compo_io)
 
 # ------------------------------------------------------------------------------
 # -- GH Interface
 IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 
-
 # ------------------------------------------------------------------------------
-graphic_type = input_tools.input_to_int(_type, 1)
-if graphic_type == 1: # TFA-Plans
-    colors = build_floor_segments.color_by_TFA
-    text = build_floor_segments.text_by_TFA
-elif graphic_type == 2: # Ventilation Plans
-    colors = build_floor_segments.color_by_Vent
-    text = build_floor_segments.text_by_Vent
-else:
-    IGH.error("Error: Plan type: {} is not suppported?".format(_type))
-    
+gh_compo_interface = gh_compo_io.GHCompo_CreateFloorSegmentPDFGeometry(
+        IGH,
+        _hb_model,
+        _type,
+        _units_,
+        _flr_anno_txt_size,
+        )
 
-# ------------------------------------------------------------------------------
-results = build_floor_segments.create_flr_segment_data(
-            IGH,
-            _hb_model,
-            colors,
-            text,
-            _units_ or 'SI',
-            _flr_anno_txt_size or 1.0,
-            )
-
-floor_names_, clipping_plane_locations_, floor_geom_, floor_rh_attributes_, floor_annotations_ = results
+(floor_names_, clipping_plane_locations_, floor_geom_,
+        floor_rh_attributes_, floor_annotations_) = gh_compo_interface.run()

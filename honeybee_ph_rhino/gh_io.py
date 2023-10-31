@@ -8,7 +8,6 @@ could figure out how to get Rhino dependencies to be recognized by testing frame
 probably would not need something like this? I suppose it does help reduce coupling?
 """
 
-
 try:
     from typing import Any, Sequence, Union, List, Dict
 except ImportError:
@@ -21,6 +20,7 @@ except ImportError:
 
 from GhPython import Component # type: ignore
 import System # type: ignore
+from System import Object # type: ignore
 
 from contextlib import contextmanager
 from copy import deepcopy
@@ -91,6 +91,16 @@ class IGH:
     def sc(self):
         """Convenience Attribute Alias."""
         return self.scriptcontext
+
+    def DataTree(self, _type=Object):
+        # type: (Any) -> Any
+        """Facade for Grasshopper.DataTree[_type]"""
+        return self.Grasshopper.DataTree[_type]()  # type: ignore
+
+    def GH_Path(self, _i):
+        # type: (int) -> Any
+        """Facade for Grasshopper.Kernel.Data.GH_Path"""
+        return self.Grasshopper.Kernel.Data.GH_Path(_i)
 
     def gh_compo_find_input_index_by_name(self, _input_name):
         # type: (str) -> int
@@ -449,6 +459,29 @@ class IGH:
         """Returns the Rhino Unit System Name as a string."""
         return self.sc.doc.ModelUnitSystem
 
+    def duplicate_data_to_branches(self, _data, _branch_count=1, _shallow=True):
+        # type: (List[Any], int, bool) -> DataTree[Object]
+        """Duplicate a list of data into a DataTree with the specified number of branches.
+        
+        Arguments:
+        ----------
+            * data: (Iterable[Any]) The data that you would like to duplicate onto the new branches.
+            * branch_count: (int) The number of branches that you would like to create.
+            * shallow: (bool) default=True. If set to True, the data will be 'shallow' copied onto the new branches.
+
+        Returns:
+        --------
+            * DataTree[Object]: A DataTree with data copied onto the specified number of branches.
+        """
+        output_tree_ = self.DataTree()
+        if _shallow == True:
+            for i in range(_branch_count):
+                output_tree_.AddRange(_data, self.GH_Path(i))
+        else:
+            for i in range(_branch_count):
+                output_tree_.AddRange(deepcopy(_data), self.GH_Path(i))
+
+        return output_tree_
 
 class ComponentInput:
     """GH-Component Input Node data class."""

@@ -11,7 +11,7 @@ except:
     from itertools import zip_longest as izip_longest
 
 try:
-    from typing import List, Tuple, Any, Optional
+    from typing import List, Tuple, Any, Optional, Iterable
 except ImportError:
     pass  # IronPython 2.7
 
@@ -39,27 +39,6 @@ try:
     from honeybee_ph_rhino.reporting.build_floor_segments import ClippingPlaneLocation
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
-
-
-def _transform_annotation(_IGH, _annotation, _transform):
-    # type: (gh_io.IGH, TextAnnotation, Transform) -> TextAnnotation
-    """Applies a transform to a TextAnnotation object. Returns a copy of the Annotation.
-
-    Arguments:
-    ----------
-        * _IGH (gh_io.IGH):
-        * _annotation (TextAnnotation):
-        * _transform (Any):
-
-    Returns:
-    --------
-        * (TextAnnotation): The new TextAnnotation with the .location transformed.
-    """
-
-    new_obj = _annotation.duplicate()
-    new_obj.location = _IGH.ghpythonlib_components.Transform(new_obj.location, _transform)
-
-    return new_obj
 
 
 def _clean_filename(_input_str):
@@ -214,6 +193,25 @@ def get_detail_views_for_active_view(_IGH):
         except:
             # If its not a Layout View....
             return []
+
+
+def get_layout_view_transform(_IGH, _dtl_view_objs, _layout_name):
+    # type: (gh_io.IGH, List[DetailViewObject], str) -> Transform
+    """Return the Transform for the Layout View. Raises an error if there are multiple Detail-Views on the Layout-Page."""
+    
+    all_dtl_view_transforms = {vw.WorldToPageTransform for vw in _dtl_view_objs}
+    if len(all_dtl_view_transforms) != 1:
+        msg = (
+            "Warning: There are {} Detail-Views found on Layout-Page: '{}'."
+            "Model-Annotations may not align properly when multiple Detail-Views "
+            "are present on a single Layout-Page. Try splitting up the Detail-Views "
+            "onto multiple Layout-Pages, or make sure that the orientation of each "
+            "Detail-View on the Layout-Page is the same.".format(
+                len(_dtl_view_objs), _layout_name
+            )
+        )
+        _IGH.warning(msg)
+    return all_dtl_view_transforms.pop()
 
 
 def find_layers_with_detail_views(_IGH):
@@ -600,17 +598,11 @@ def bake_annotation_object(
     """
 
     # https://developer.rhino3d.com/api/RhinoCommon/html/T_Rhino_Geometry_TextEntity.htm
+    # https://discourse.mcneel.com/t/adding-text-to-instancedefinition-block/99346
+
     bounding_rect = None
     _neighbors = _neighbors or []
     with _IGH.context_rh_doc():
-        # The base-plane for the Text
-        origin = _annotation.location
-        basePlane_origin = _IGH.Rhino.Geometry.Point3d(origin)
-        basePlan_normal = _IGH.Rhino.Geometry.Vector3d(0, 0, 1)  # Assumes Top View
-        basePlane = _IGH.Rhino.Geometry.Plane(
-            origin=basePlane_origin, normal=basePlan_normal
-        )
-
         # Create the txt object
         txt = _IGH.Rhino.Geometry.TextEntity()
         try:
@@ -618,7 +610,7 @@ def bake_annotation_object(
         except:
             pass
         txt.Text = _annotation.text
-        txt.Plane = basePlane
+        txt.Plane = _IGH.ghc.Move(_annotation.plane, _IGH.ghc.Amplitude(_annotation.plane.Normal, 0.1)).geometry
         txt.TextHeight = _annotation.text_size
         txt.Justification = _annotation.justification
         txt.MaskEnabled = _annotation.mask_draw
@@ -626,6 +618,7 @@ def bake_annotation_object(
         txt.MaskOffset = _annotation.mask_offset
         txt.MaskFrame = _annotation.mask_frame
         txt.DrawTextFrame = _annotation.mask_draw_frame
+        txt.DrawForward = False
 
         if _avoid_collisions:
             raise NotImplementedError("Not yet....")
@@ -790,6 +783,21 @@ def add_clipping_plane(_IGH, _cp_location, _cp_layer, _dtl_view_objs):
     return cp_id
 
 
+def align_to_detail_view(_model_annotations):
+    # type: (Iterable[TextAnnotation]) -> bool
+    """Check if all the model-annotations have the same 'Align to Layout View' attribute value."""
+
+    all_values = {a.align_to_layout_view for a in _model_annotations}
+
+    if all_values == {True}:  # All True
+        return True
+    elif all_values == {False}:  # All False
+        return False
+    else:
+        msg = "Error: Model-Annotation 'Align to Layout View' attribute values are not all the same?"
+        raise Exception(msg)
+
+
 def export_pdfs(
     _IGH,
     _file_paths,
@@ -798,8 +806,8 @@ def export_pdfs(
     _cp_loc,
     _geom,
     _geom_attrs,
-    _labels,
-    _annotations,
+    _model_annotations,
+    _layout_annotations,
     _raster,
 ):
     # type: (gh_io.IGH, List[str], List[str], List[str], DataTree[ClippingPlaneLocation],DataTree[Guid], DataTree[ObjectAttributes], DataTree[TextAnnotation], DataTree[TextAnnotation], bool) -> None
@@ -811,9 +819,12 @@ def export_pdfs(
         * _file_paths (List[str]): A list of the full file-paths to save out to.
         * _layout_name (str): The name of the Layout (View) to export as PDF
         * _layers_on (List[str]): A list of the layer-names to leave 'on' during export.
+        * _cp_loc (DataTree[ClippingPlaneLocation]):
         * _geom (DataTree[Guid]):
         * _geom_attrs (DataTree[ObjectAttributes]):
-        * _labels (DataTree[LayoutPageLabel]):
+        * _model_annotations (DataTree[LayoutPageLabel]):
+        * _layout_annotations (DataTree[LayoutPageLabel]):
+        * _raster (bool): Use raster output mode. default=False.
 
     Returns:
     --------
@@ -826,90 +837,101 @@ def export_pdfs(
 
     # -- Bake objects
     for branch_num, geom_list in enumerate(_geom.Branches):
-        # -- Setup the right layers
-        set_active_view_by_name(_IGH, _layout_names[branch_num])
+        # --------------------------------------------------------------------------------------------------------------
+        # -- Setup the right layers for the Layout View being printed
+        layout_view_name = _layout_names[branch_num]
+        set_active_view_by_name(_IGH, layout_view_name)
         layers_with_detail_views = find_layers_with_detail_views(_IGH)
         layers_on = _layers_on + layers_with_detail_views
         turn_off_all_layers(_IGH, _except_layers=layers_on)
 
-        # -- Find the detail-view objects
-        dtl_view_objs = get_detail_views_for_active_view(_IGH)
-        dtl_view_transforms = [vw.WorldToPageTransform for vw in dtl_view_objs]
 
+        # --------------------------------------------------------------------------------------------------------------
+        # -- Find the Layout's Detail-View objects and View-Transform
+        dtl_view_objs = get_detail_views_for_active_view(_IGH)
+        dtl_view_transform = get_layout_view_transform(_IGH, dtl_view_objs, layout_view_name)
+
+
+        # --------------------------------------------------------------------------------------------------------------
         # -- Create new temporary output layers
         geom_bake_layer = create_bake_layer(_IGH)  # Geometry
         label_bake_layer = create_bake_layer(_IGH)  # Text Labels
         cp_layer = create_bake_layer(_IGH)  # Clipping Planes
-
-        # -- Bake the Geometry into the Scene
-        set_active_view_by_name(_IGH, "Top")  # Change to 'Top' View for Baking
-        for i, geom_obj in enumerate(geom_list):
-            # -- Object Attribute
-            attr_obj = _geom_attrs.Branch(branch_num)[i]
-
-            # -- Bake Geometry to the specified layer
-            bake_geometry_object(_IGH, geom_obj, attr_obj, geom_bake_layer)
-
-        # -- Add any ClippingPlanes into the scene
+        
         try:
-            for cp in _cp_loc.Branch(branch_num):
-                add_clipping_plane(_IGH, cp, cp_layer, dtl_view_objs)
-        except ValueError:
-            pass
+            # ----------------------------------------------------------------------------------------------------------
+            # -- Bake the Geometry into the Scene
+            set_active_view_by_name(_IGH, "Top")  # Change to 'Top' View for Baking
+            for i, geom_obj in enumerate(geom_list):
+                # -- Object Attribute
+                attr_obj = _geom_attrs.Branch(branch_num)[i]
 
-        # -- Bake Titleblock Labels to the specified layer
-        set_active_view_by_name(_IGH, _layout_names[branch_num])
-        try:
-            for label in _labels.Branch(branch_num):
-                bake_annotation_object(_IGH, label, label_bake_layer)
-        except ValueError:
-            pass
+                # -- Bake Geometry to the specified layer
+                bake_geometry_object(_IGH, geom_obj, attr_obj, geom_bake_layer)
 
-        # -- Bake Annotations (text in the RH model space)
-        if _annotations.BranchCount != 0:
-            # -- Warning
-            if len(dtl_view_objs) != 1:
-                msg = (
-                    "Warning. There are {} Detail Views found on '{}'. Text annotations"
-                    " require one viewport, and may not work right when multiple Detail Views "
-                    " are present on a single Layout page.".format(
-                        len(dtl_view_objs), _layout_names[branch_num]
+
+            # ----------------------------------------------------------------------------------------------------------
+            # -- Add any ClippingPlanes into the scene
+            try:
+                for cp in _cp_loc.Branch(branch_num):
+                    add_clipping_plane(_IGH, cp, cp_layer, dtl_view_objs)
+            except ValueError:
+                pass
+            
+
+            # ----------------------------------------------------------------------------------------------------------
+            # -- Bake Model-Space Annotations (text in the RH model space)
+            if _model_annotations.BranchCount != 0:
+                # -- Set the right view for baking
+                align_annotations = align_to_detail_view(_model_annotations.Branch(branch_num))
+                if align_annotations == True:
+                    set_active_view_by_name(_IGH, layout_view_name)
+                else:
+                    set_active_view_by_name(_IGH, "Perspective")
+
+                # -- Bake the Annotations to the Rhino Scene
+                text_bounding_boxes = []  # the annotations's bounding boxes
+                for model_annotation in _model_annotations.Branch(branch_num):
+                    # -- If the annotation needs to be rotated to match the view, execute the transform
+                    if align_annotations == True:
+                        # -- Transform (Rotate) the Annotation's Location to match the Detail-View
+                        model_annotation = model_annotation.transform(dtl_view_transform)
+                    
+                    # -- Bake the text to the Rhino view
+                    text_bounding_box = bake_annotation_object(
+                        _IGH=_IGH,
+                        _annotation=model_annotation,
+                        _target_layer=label_bake_layer,
+                        _avoid_collisions=False,
+                        _neighbors=text_bounding_boxes,
                     )
-                )
-                _IGH.warning(msg)
 
-            # -- Bake the Annotations to the Rhino Scene
-            text_bounding_boxes = []  # the note bounding boxes
-            for annotation in _annotations.Branch(branch_num):
-                # -- Transform the Annotation's Location to Paperspace
-                try:
-                    annotation = _transform_annotation(
-                        _IGH, annotation, dtl_view_transforms[0]
-                    )
-                except IndexError:
-                    msg = "Error: Cannot find a viewport in the _layers_on set? Check that the Layout Viewport's layer is in the list."
-                    raise Exception(msg)
+                    # -- Keep track of bounding boxes for collision detection later
+                    text_bounding_boxes.append(text_bounding_box)
 
-                # -- Bake text
-                text_bounding_box = bake_annotation_object(
-                    _IGH=_IGH,
-                    _annotation=annotation,
-                    _target_layer=label_bake_layer,
-                    _avoid_collisions=False,
-                    _neighbors=text_bounding_boxes,
-                )
 
-                # -- Keep track of bounding boxes for collision detection
-                text_bounding_boxes.append(text_bounding_box)
+            # ----------------------------------------------------------------------------------------------------------
+            # -- Bake Paper-Space Title-block Labels to the specified layer
+            set_active_view_by_name(_IGH, layout_view_name)
+            try:
+                for layout_annotation in _layout_annotations.Branch(branch_num):
+                    bake_annotation_object(_IGH, layout_annotation, label_bake_layer)
+            except ValueError:
+                pass
 
-        # # -- Export PDF file
-        set_active_view_by_name(_IGH, _layout_names[branch_num])
-        export_single_pdf(_IGH, _file_paths[branch_num], _raster=_raster)
 
-        # -- Cleanup baked items
-        remove_bake_layer(_IGH, geom_bake_layer)
-        remove_bake_layer(_IGH, label_bake_layer)
-        remove_bake_layer(_IGH, cp_layer)
+            # ----------------------------------------------------------------------------------------------------------
+            # # -- Export PDF file
+            set_active_view_by_name(_IGH, layout_view_name)
+            export_single_pdf(_IGH, _file_paths[branch_num], _raster=_raster)
+        except Exception as e:
+            raise Exception(e)
+        finally:
+            # ----------------------------------------------------------------------------------------------------------
+            # -- Cleanup baked items
+            remove_bake_layer(_IGH, geom_bake_layer)
+            remove_bake_layer(_IGH, label_bake_layer)
+            remove_bake_layer(_IGH, cp_layer)
 
     # -- Cleanup layer vis and active view
     reset_all_layer_visibility(_IGH, starting_layer_visibilities)

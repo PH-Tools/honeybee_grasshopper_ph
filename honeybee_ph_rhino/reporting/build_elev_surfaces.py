@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 # -*- Python Version: 2.7 -*-
 
-"""Functions for getting / """
+"""Create the 'Elevation' Geometry for Export to PDF."""
 
 import math
+from collections import defaultdict
 
 try:
-    from typing import Tuple, List
+    from typing import Tuple, List, Any, Dict, Iterable, Set
 except ImportError:
     pass  # IronPython 2.7
 
@@ -23,23 +24,24 @@ except ImportError:
 
 try:
     from Grasshopper import DataTree # type: ignore
+    from Grasshopper.Kernel.Data import GH_Path # type: ignore
 except ImportError:
     pass  # Outside Grasshopper
 
 try:
-    from Rhino.Geometry import TextJustification # type: ignore
+    from Rhino.Geometry import TextJustification, Brep, Mesh, Curve, Plane # type: ignore
     from Rhino.DocObjects import ObjectAttributes # type: ignore
 except ImportError:
     pass  # Outside Rhino
 
 try:
+    from ladybug_geometry.geometry3d import plane
     from ladybug_rhino.fromgeometry import from_face3d, from_plane, from_point3d
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
 try:
-    from honeybee import boundarycondition
-    from honeybee import model
+    from honeybee import boundarycondition, model, face
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
 
@@ -49,128 +51,194 @@ except ImportError as e:
     raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
 
 
-def _create_rh_attr_object(_IGH, _color, _weight):
-    # type: (gh_io.IGH, Color, float) -> ObjectAttributes
-    """Return a new Rhino.DocObjects.ObjectAttributes object with specified settings."""
+class GHCompo_CreateElevationPDFGeometry(object):
 
-    new_attr_obj = _IGH.Rhino.DocObjects.ObjectAttributes()
+    def __init__(self, _IGH, hb_model, surface_color, line_color, lineweight, branch_count, *args, **kwargs):
+        # type: (gh_io.IGH, model.Model, Color, Color, float, int, Any, Any) -> None
+        self.IGH = _IGH
+        self.hb_model = hb_model
+        self.surface_color = surface_color or Color.FromArgb(255, 255, 255) # type: ignore
+        self.line_color = line_color or Color.FromArgb(0, 0, 0) # type: ignore
+        self.lineweight = lineweight or 0.25
+        self.branch_count = branch_count or 1
+        self.error = []
 
-    new_attr_obj.ObjectColor = _color
-    new_attr_obj.PlotColor = _color
-    new_attr_obj.ColorSource = _IGH.Rhino.DocObjects.ObjectColorSource.ColorFromObject
-    new_attr_obj.PlotColorSource = _IGH.Rhino.DocObjects.ObjectPlotColorSource.PlotColorFromObject
+    def find_all_room_ids(self):
+        # type: () -> Set[str]
+        """Return a set of all the Room identifiers in the model."""
+        return {room.identifier for room in self.hb_model.rooms}
 
-    new_attr_obj.PlotWeight = _weight
-    new_attr_obj.PlotWeightSource = _IGH.Rhino.DocObjects.ObjectPlotWeightSource.PlotWeightFromObject
+    def get_exterior_hb_faces_by_const_type(self):
+        # type: () -> Dict[str, List[face.Face]]
+        """Return a Dict of all the 'Exterior' Honeybee Faces, keyed by construction-type and surface normal direction."""
+        
+        def _clean_val(val, tolerance=0000.1):
+            # type: (float, float) -> float
+            """Handle rounding the the -0 problem."""
+            val = round(val, 4)
+            if val - 0.0 < tolerance:
+                return 0.0
+            else:
+                return val
+        
+        def _interior_surface(hb_face):
+            # type: (face.Face) -> bool
+            """Return True if the face is an 'Interior' Surface exposure."""
+            if isinstance(hb_face.boundary_condition, boundarycondition.Surface):
+                adjacent_room_name = hb_face.boundary_condition.boundary_condition_objects[-1]
+                if adjacent_room_name in all_room_ids:
+                    return True
+            return False
 
-    # new_attr_obj.DisplayOrder = 0  # 1 = Front, -1 = Back
+        all_room_ids = self.find_all_room_ids()
+        hb_faces_by_const_type = defaultdict(list)
+        
+        for room in self.hb_model.rooms:
+            for hb_face in room.faces:
+                # -- Filter out any 'Interior' Surface exposure faces.
+                # -- If the face is a 'Surface' exposure, BUT the other side is NOT in the model, keep the face. 
+                if _interior_surface(hb_face):
+                    continue
+                
+                key = "{}-{:.4f}-{:.4f}-{:.4f}".format(
+                    hb_face.properties.energy.construction.display_name,
+                    _clean_val(hb_face.geometry.normal.x),
+                    _clean_val(hb_face.geometry.normal.y),
+                    _clean_val(hb_face.geometry.normal.z),
+                    )
+                hb_faces_by_const_type[key].append(hb_face)
+        
+        return hb_faces_by_const_type
+    
+    def get_punched_breps(self, _hb_face):
+        # type: (List[face.Face]) -> List[Brep]
+        """Return a list of the 'Punched' Breps for a group of HB-Faces."""
+        breps_ = []
+        for hb_face in _hb_face:
+            if not hb_face.apertures:
+                breps_.append(from_face3d(hb_face.geometry))
+            else:
+                breps_.append(from_face3d(hb_face.punched_geometry))
+        return breps_
 
-    return new_attr_obj
+    def get_centered_aperture_plane(self, _aperture):
+        # type (aperture.Aperture) -> plane.Plane
+        """Return the 'Aperture' Plane centered on the Aperture's center point."""
+        ap_cp = from_point3d(_aperture.geometry.center)
+        ap_plane = from_plane(_aperture.geometry.plane)
+        move_vec = self.IGH.ghpythonlib_components.Vector2Pt(ap_plane.Origin, ap_cp, False).vector
+        centered_plane = self.IGH.ghpythonlib_components.Move(ap_plane, move_vec).geometry
 
-def _get_exterior_env_surfaces(_hb_model):
-    # type: (model.Model) -> List
+        # -- Ensure that the plane's Y-Axis is always pointing up.
+        if centered_plane.YAxis.Z < 0:
+            centered_plane.Rotate(math.pi, centered_plane.Normal)
 
-    envelope_surfaces = []
-    for room in _hb_model.rooms:
-        for face in room.faces:
-            if isinstance(face.boundary_condition, boundarycondition.Surface):
-                continue
-            envelope_surfaces.append(from_face3d(face.geometry))
+        return centered_plane
 
-    return envelope_surfaces
+    def get_aperture_breps(self, _hb_faces):
+        # type: (Iterable[face.Face]) -> Tuple[List[Brep], List[str], List[plane.Plane]]
+        """Return a list of all the 'Aperture' Breps (and names / planes) for a group of HB-Faces."""
+        return (
+            [from_face3d(ap.geometry) for hb_face in _hb_faces for ap in hb_face.apertures ],
+            [ap.display_name for hb_face in _hb_faces for ap in hb_face.apertures],
+            [self.get_centered_aperture_plane(ap) for hb_face in _hb_faces for ap in hb_face.apertures],
+        )
 
-def _to_mesh(_IGH, _srfc, _color):
-    return _IGH.ghpythonlib_components.MeshColours(_srfc, _color)
+    def breps_to_meshes(self, _breps):
+        # type: (Iterable[Brep]) -> List[Mesh]
+        """Convert a group of Brep-Surface into to list of Meshes."""
+        meshes_ = []
+        for brep in _breps:
+            meshes_.append( self.IGH.ghpythonlib_components.MeshColours(
+                brep,
+                self.surface_color
+            ))
+        return meshes_
 
-def _merge_rh_srfc(_IGH, _rh_surfaces):
-    # type: (gh_io.IGH, List) -> List
-    joined_breps = _IGH.ghpythonlib_components.BrepJoin(_rh_surfaces).breps
-    if not isinstance(joined_breps, list):
-        joined_breps = [joined_breps]
-    merged_breps = _IGH.ghpythonlib_components.MergeFaces(joined_breps).breps
+    def get_mesh_naked_edges(self, _mesh):
+        # type: (Mesh) -> List[Curve]
+        """Extract the naked edges of a Mesh and return them as Curves."""
 
-    if not isinstance(merged_breps, list):
-        merged_breps = [merged_breps]
+        srfc_edgs = self.IGH.ghc.MeshEdges(_mesh).naked_edges
+        srfc_edgs = self.IGH.ghc.JoinCurves(srfc_edgs, True)
+        
+        if not isinstance(srfc_edgs, list):
+            srfc_edgs = [srfc_edgs]
 
-    for brep in merged_breps:
-        brep.Edges.MergeAllEdges((math.pi)/2)
+        return srfc_edgs
 
-    return merged_breps
+    def merge_rh_breps(self, _rh_breps):
+        # type: (Iterable[Brep]) -> List[Brep]
+        """Try to join and merge a group of Rhino Breps together."""
 
-def _get_edges(_IGH, _rh_breps):
-    # type: (gh_io.IGH, List) -> List
-    if not isinstance(_rh_breps, list):
-        _rh_breps = [_rh_breps]
+        joined_breps = self.IGH.ghpythonlib_components.BrepJoin(_rh_breps).breps
+        if not isinstance(joined_breps, list):
+            joined_breps = [joined_breps]
+        
+        merged_breps = self.IGH.ghpythonlib_components.MergeFaces(joined_breps).breps
+        if not isinstance(merged_breps, list):
+            merged_breps = [merged_breps]
 
-    edges = []
-    for brep in _rh_breps:
-        e = _IGH.ghpythonlib_components.DeconstructBrep(brep).edges
-        c = _IGH.ghpythonlib_components.JoinCurves(e, True)
-        edges.append(c)
+        for brep in merged_breps:
+            brep.Edges.MergeAllEdges((math.pi)/2)
 
-    return edges
+        return merged_breps
+    
+    def create_rh_attr_object(self, _color, _lineweight):
+        # type: (Color, float) -> ObjectAttributes
+        """Return a Rhino Object Attributes object."""
+        
+        new_attr_obj = self.IGH.Rhino.DocObjects.ObjectAttributes()
 
-def _get_window_surfaces(_IGH, _hb_model):
-    # type: (gh_io.IGH, model.Model) -> Tuple[List, List]
-    win_surfaces = []
-    win_planes = []
-    for room in _hb_model.rooms:
-        for face in room.faces:
-            for aperture in face.apertures:
-                win_srfc = from_face3d(aperture.geometry)
-                win_srfc.SetUserString('display_name', aperture.display_name)
-                win_surfaces.append(win_srfc)
-                win_cp = from_point3d(aperture.geometry.center)
-                win_plane = from_plane(aperture.geometry.plane)
-                move_vec = _IGH.ghpythonlib_components.Vector2Pt(
-                    win_plane.Origin, win_cp, False).vector
-                centered_plane = _IGH.ghpythonlib_components.Move(
-                    win_plane, move_vec).geometry
-                win_planes.append(centered_plane)
+        new_attr_obj.ObjectColor = _color
+        new_attr_obj.PlotColor = _color
+        new_attr_obj.ColorSource = self.IGH.Rhino.DocObjects.ObjectColorSource.ColorFromObject
+        new_attr_obj.PlotColorSource = self.IGH.Rhino.DocObjects.ObjectPlotColorSource.PlotColorFromObject
+        new_attr_obj.PlotWeight = _lineweight
+        new_attr_obj.PlotWeightSource = self.IGH.Rhino.DocObjects.ObjectPlotWeightSource.PlotWeightFromObject
+        new_attr_obj.DisplayOrder = 0
+        
+        return new_attr_obj
 
-    return win_surfaces, win_planes
+    def run(self):
+        # type: () -> Tuple
+        all_geom, all_geom_attributes, all_aperture_names, all_aperture_planes = [], [], [], []
 
-def make(_IGH, _hb_model):
-    # type: (gh_io.IGH, model.Model) -> Tuple[DataTree, DataTree]
+        if not self.hb_model:
+            return self.error, all_geom, all_geom_attributes, all_aperture_names, all_aperture_planes
 
-    # -- Output Trees
-    env_geom_ = _IGH.Grasshopper.DataTree[Object]()
-    env_geom_attrs_ = _IGH.Grasshopper.DataTree[Object]()
+        ext_hb_faces = self.get_exterior_hb_faces_by_const_type()
+        
+        # -- Get all the Surface and Aperture Meshes, Edges, and Rhino-Attributes
+        for face_group in ext_hb_faces.values():
+            srfc_punched_breps = self.merge_rh_breps(self.get_punched_breps(face_group))
+            srfc_aperture_breps, srfc_aperture_names, srfc_aperture_planes  = self.get_aperture_breps(face_group)
 
-    c_light_grey = Color.FromArgb(255, 240, 240, 240)
-    c_black = Color.FromArgb(255, 0, 0, 0)
+            # -- Base surfaces (wall, floor, roof, etc.)
+            for srfc_msh in self.breps_to_meshes(srfc_punched_breps):
+                all_geom.append(srfc_msh)
+                all_geom_attributes.append(self.create_rh_attr_object(self.surface_color, self.lineweight))
 
-    # -- Build the Envelope Surfaces
-    rh_surfaces = _get_exterior_env_surfaces(_hb_model)
-    rh_merged_surfaces = _merge_rh_srfc(_IGH, rh_surfaces)
-    rh_merged_edges = _get_edges(_IGH, rh_merged_surfaces)
-    for srfc in rh_merged_surfaces:
-        env_geom_.Add(_to_mesh(_IGH, srfc, c_light_grey))
-        env_geom_attrs_.Add(_create_rh_attr_object(_IGH, c_light_grey, .10))
+                for edge in self.get_mesh_naked_edges(srfc_msh):
+                    all_geom.append(edge)
+                    all_geom_attributes.append(self.create_rh_attr_object(self.line_color, self.lineweight))
+            
+            # -- Apertures (windows, doors, etc.)
+            all_aperture_names.extend(srfc_aperture_names)
+            all_aperture_planes.extend(srfc_aperture_planes)
+            for ap_msh in self.breps_to_meshes(srfc_aperture_breps):
+                all_geom.append(ap_msh)
+                all_geom_attributes.append(self.create_rh_attr_object(self.surface_color, self.lineweight))
+                
+                for edge in self.get_mesh_naked_edges(ap_msh):
+                    all_geom.append(edge)
+                    all_geom_attributes.append(self.create_rh_attr_object(self.line_color, self.lineweight))
 
-    # -- Add the edges
-    for edge_list in rh_merged_edges:
-        for e in edge_list:
-            env_geom_.Add(e)
-            env_geom_attrs_.Add(_create_rh_attr_object(_IGH, c_black, 0.10))
-
-    # -- Add the windows
-    rh_win_surfaces, rh_win_planes = _get_window_surfaces(_IGH, _hb_model)
-    for srfc, srfc_plane in izip(rh_win_surfaces, rh_win_planes):
-        srfc_edge_lists = _get_edges(_IGH, srfc)
-        for srfc_edge in srfc_edge_lists:
-            # -- Add the window outline curve
-            env_geom_.Add(srfc_edge)
-            env_geom_attrs_.Add(_create_rh_attr_object(_IGH, c_black, 0.25))
-
-        # -- Add the a Text label object for the Window
-        txt_obj = _IGH.Rhino.Geometry.TextEntity()
-        txt_obj.Text = srfc.GetUserString('display_name')
-        txt_obj.Plane = srfc_plane
-        txt_obj.TextHeight = 0.18
-        txt_obj.Justification = TextJustification.MiddleCenter
-        for crv in txt_obj.Explode():
-            env_geom_.Add(crv)
-            env_geom_attrs_.Add(_create_rh_attr_object(_IGH, c_black, 0.01))
-
-    return env_geom_, env_geom_attrs_
+        # -- Package up the data into DataTrees for Export
+        # -- This is required to ensure the geom branches match the layout-views being printed.
+        geom_ = self.IGH.duplicate_data_to_branches(all_geom, self.branch_count)
+        geom_attributes_ = self.IGH.duplicate_data_to_branches(all_geom_attributes, self.branch_count)
+        aperture_names_ = self.IGH.duplicate_data_to_branches(all_aperture_names, self.branch_count)
+        aperture_planes_ = self.IGH.duplicate_data_to_branches(all_aperture_planes, self.branch_count)
+        
+        return self.error, geom_, geom_attributes_, aperture_names_, aperture_planes_

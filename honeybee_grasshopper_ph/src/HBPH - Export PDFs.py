@@ -37,7 +37,7 @@ cause all sorts of unexpected results sometimes.
 -
 Set the component '_export_pdfs' to 'True' to run the exporter.
 -
-EM October 2, 2022
+EM October 22, 2023
     Args:
         _save_folder: (str) The name of the target folder to save the PDF files to.
         
@@ -114,7 +114,7 @@ if file_paths_ and _geom and layout_names_ and _export_pdfs:
                 _clipping_plane_locations,
                 _geom,
                 _geom_attributes,
-                _layout_annotations,
                 _model_annotations,
+                _layout_annotations,
                 _raster,
-                )
+            )

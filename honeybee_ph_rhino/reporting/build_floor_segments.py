@@ -6,7 +6,7 @@
 from collections import defaultdict, OrderedDict
 
 try:
-    from typing import Tuple, List, Dict, Optional, Callable
+    from typing import Tuple, List, Dict, Optional, Callable, Any
 except ImportError:
     pass  # Python 2.7
 
@@ -42,6 +42,11 @@ try:
     from honeybee_ph_rhino.reporting.annotations import TextAnnotation
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
+
+try:
+    from honeybee_ph_utils.input_tools import input_to_int
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee_ph_utils:\n\t{}'.format(e))
 
 try:
     from ph_units.converter import convert
@@ -209,7 +214,10 @@ def _group_hb_rooms_by_story(_hb_model):
     # -- If model has Story data, just use that instead.
     rooms_grouped_by_story = defaultdict(list)
     for hb_room in _hb_model.rooms:
-        rooms_grouped_by_story[hb_room.story].append(hb_room)
+        try:
+            rooms_grouped_by_story["{:02d}".format(int(hb_room.story))].append(hb_room)
+        except:
+            rooms_grouped_by_story[hb_room.story].append(hb_room)
 
     # -- Sort the room groups by their Key (which is their Story name)
     sorted_rooms_grouped_by_story = OrderedDict()
@@ -348,77 +356,86 @@ def _build_annotation_leader_marker(_IGH, _cp, _radius=0.0075):
 
 # -----------------------------------------------------------------------------
 
-def create_flr_segment_data(_IGH, _hb_model, _get_color, _create_annotation_text, _units, _flr_anno_txt_size):
-    # type: (gh_io.IGH, model.Model, Callable, Callable, str, float) -> Tuple
-    """Create the SpaceFloorSegment geometry, attributes and text-annotations for a Floor Plan view.
+class GHCompo_CreateFloorSegmentPDFGeometry(object):
 
-    Arguments:
-    ----------
-        * _IGH (gh_io.IGH): Grasshopper Interface.
-        * _hb_model (model.Model): The Honeybee-Model to use as the source.
-        * _get_color (Callable): The function which returns the floor-segment color.
-        * _create_annotation_text (Callable): The function which returns the annotation text.
-        * _units (str): IP or SI units
-        * _flr_anno_txt_size (float): The text annotation size
+    def __init__(self, _IGH, _hb_model, _drawing_type, _units_, _flr_anno_txt_size, *args, **kwargs):
+        # type: (gh_io.IGH, model.Model, str, str, float, *Any, **Any) -> None
+        self.IGH = _IGH
+        self.hb_model = _hb_model
+        self.units = _units_ or "SI"
+        self.flr_anno_txt_size = _flr_anno_txt_size or 1.0
 
-    Returns:
-    --------
-        * Tuple[DataTree, DataTree, DataTree, DataTree, DataTree, DataTree]
-    """
+        drawing_type = input_to_int(_drawing_type, 1)
+        if drawing_type == 1: # TFA-Plans
+            self.colors = color_by_TFA
+            self.text = text_by_TFA
+        elif drawing_type == 2: # Ventilation Plans
+            self.colors = color_by_Vent
+            self.text = text_by_Vent
+        else:
+            self.IGH.error("Error: Plan type: {} is not suppported?".format(_drawing_type))
 
-    # -- Output Trees
-    floor_names_ = _IGH.Grasshopper.DataTree[str]()
-    clipping_plane_locations_ = _IGH.Grasshopper.DataTree[Object]()
-    floor_geom_ = _IGH.Grasshopper.DataTree[Object]()
-    floor_attributes_ = _IGH.Grasshopper.DataTree[ObjectAttributes]()
-    floor_annotations_ = _IGH.Grasshopper.DataTree[TextAnnotation]()
-    pth = _IGH.Grasshopper.Kernel.Data.GH_Path
+    def run(self):
+        # type: () -> Tuple
+        
+        # -- Output Trees
+        floor_names_ = self.IGH.DataTree(str)
+        clipping_plane_locations_ = self.IGH.DataTree()
+        floor_geom_ = self.IGH.DataTree()
+        floor_attributes_ = self.IGH.DataTree(ObjectAttributes)
+        floor_annotations_ = self.IGH.DataTree(TextAnnotation)
+        pth = self.IGH.GH_Path
 
-    if not _hb_model:
+        if not self.hb_model:
+            return floor_names_, clipping_plane_locations_, floor_geom_, floor_attributes_, floor_annotations_
+
+        # -- Find the floor levels
+        rooms_grouped_by_story = _group_hb_rooms_by_story(self.hb_model)
+        
+        # -- Build the TextAnnotation objects
+        for i, item in enumerate(rooms_grouped_by_story.items()):
+            level_name, hb_rm_group = item
+            floor_names_.Add(level_name, pth(i))
+            clipping_plane_locations_.AddRange(
+                _get_clipping_plane_locations(self.IGH, hb_rm_group), pth(i))
+
+            # -- Create space floor Geometry and Annotation
+            spaces = _get_hbph_spaces(hb_rm_group)
+            for space in spaces:
+                #  -- Add the Floor segment geometry
+                flr_seg_geom, flr_seg_attrs = _get_flr_seg_data(self.IGH, self.colors, space)
+                floor_geom_.AddRange(flr_seg_geom, pth(i))
+                floor_attributes_.AddRange(flr_seg_attrs, pth(i))
+
+                # -- Add Leader Lines from Annotation to each FloorSegment CenterPoint
+                anno_cp = _find_space_annotation_location(self.IGH, space)
+                flr_seg_cps = _get_all_space_floor_segment_center_points(self.IGH, space)
+                for flr_cp in flr_seg_cps:
+                    # -- add the leader line itself
+                    ldr, ldr_attr = _build_annotation_leader_line(self.IGH, anno_cp, flr_cp)
+                    floor_geom_.Add(ldr, pth(i))
+                    floor_attributes_.Add(ldr_attr, pth(i))
+
+                    # -- add a dot marker at the leader line end point
+                    marker_geom, marker_attrs = _build_annotation_leader_marker(
+                        self.IGH, flr_cp, 0.05)
+                    floor_geom_.Add(marker_geom, pth(i))
+                    floor_attributes_.Add(marker_attrs, pth(i))
+
+                # -- Add the text Annotation object
+                txt_annotation = TextAnnotation(
+                    self.IGH,
+                    _text=self.text(space, self.units),
+                    _size=self.flr_anno_txt_size,
+                    _location=anno_cp,
+                    _format="{}",
+                    _justification=4,
+                    _mask_draw=True,
+                    _mask_offset=self.flr_anno_txt_size,
+                    _mask_draw_frame=True,
+                    _align_to_layout_view=True,
+                )
+                floor_annotations_.Add(txt_annotation, pth(i))
+
         return floor_names_, clipping_plane_locations_, floor_geom_, floor_attributes_, floor_annotations_
-
-    # -- Find the floor levels
-    rooms_grouped_by_story = _group_hb_rooms_by_story(_hb_model)
-    for i, item in enumerate(rooms_grouped_by_story.items()):
-        level_name, hb_rm_group = item
-        floor_names_.Add(level_name, pth(i))
-        clipping_plane_locations_.AddRange(
-            _get_clipping_plane_locations(_IGH, hb_rm_group), pth(i))
-
-        # -- Create space floor Geometry and Annotation
-        spaces = _get_hbph_spaces(hb_rm_group)
-        for space in spaces:
-            #  -- Add the Floor segment geometry
-            flr_seg_geom, flr_seg_attrs = _get_flr_seg_data(_IGH, _get_color, space)
-            floor_geom_.AddRange(flr_seg_geom, pth(i))
-            floor_attributes_.AddRange(flr_seg_attrs, pth(i))
-
-            # -- Add Leader Lines from Annotation to each FloorSegment CenterPoint
-            anno_cp = _find_space_annotation_location(_IGH, space)
-            flr_seg_cps = _get_all_space_floor_segment_center_points(_IGH, space)
-            for flr_cp in flr_seg_cps:
-                # -- add the leader line itself
-                ldr, ldr_attr = _build_annotation_leader_line(_IGH, anno_cp, flr_cp)
-                floor_geom_.Add(ldr, pth(i))
-                floor_attributes_.Add(ldr_attr, pth(i))
-
-                # -- add a dot marker at the leader line end point
-                marker_geom, marker_attrs = _build_annotation_leader_marker(
-                    _IGH, flr_cp, 0.05)
-                floor_geom_.Add(marker_geom, pth(i))
-                floor_attributes_.Add(marker_attrs, pth(i))
-
-            # -- Add the text Annotation object
-            txt_annotation = TextAnnotation(
-                _text=_create_annotation_text(space, _units),
-                _size=_flr_anno_txt_size,
-                _location=anno_cp,
-                _format="{}",
-                _justification=4,
-                _mask_draw=True,
-                _mask_offset=_flr_anno_txt_size,
-                _mask_draw_frame=True,
-            )
-            floor_annotations_.Add(txt_annotation, pth(i))
-
-    return floor_names_, clipping_plane_locations_, floor_geom_, floor_attributes_, floor_annotations_
+            

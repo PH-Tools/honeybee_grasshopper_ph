@@ -24,7 +24,7 @@ Create a new Text Annotation object which can be used during PDF Export. These
 annotations can be used to add titles or other data to Layouts, or to add notes or 
 text directly into the Rhino-scene as well.
 -
-EM October 2, 2022
+EM October 22, 2023
     Args:
         _text: (str) The Text for the annotation to show.
         
@@ -53,14 +53,16 @@ EM October 2, 2022
             the "HBPH - Export PDFs" component when exporting PDF documents.
 """
 
+import scriptcontext as sc
+import Rhino as rh
+import rhinoscriptsyntax as rs
+import ghpythonlib.components as ghc
+import Grasshopper as gh
 
-from System import Object
-from Grasshopper import DataTree
-from Grasshopper.Kernel.Data import GH_Path
-from Rhino.Geometry import Point3d
-
-from honeybee_ph_rhino.reporting import to_pdf
-from honeybee_ph_utils import input_tools
+try:
+    from honeybee_ph_rhino import gh_compo_io, gh_io
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
 
 # ------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
@@ -68,23 +70,22 @@ reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create Text Annotation"
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
-    reload(to_pdf)
-    reload(input_tools)
+    from honeybee_ph_rhino.reporting import annotations as gh_compo_io
+    reload(gh_compo_io)
 
-text_annotations_ = DataTree[to_pdf.TextAnnotation]()
 
-for i, branch in enumerate(_text.Branches):
-    for k, txt in enumerate(branch):
-        loc_branch = input_tools.clean_tree_get(_location, i, _default=[Point3d(0,0,0)])
-        size_branch = input_tools.clean_tree_get(_size, i, _default=[0.25])
-        format_branch = input_tools.clean_tree_get(_format, i, _default=["{}"])
-        justify_branch = input_tools.clean_tree_get(_justification, i, _default=[4]) # Middle-Center
-        
-        location = input_tools.clean_get(loc_branch, k)
-        size = input_tools.clean_get(size_branch, k)
-        format = input_tools.clean_get(format_branch, k)
-        justification = input_tools.clean_get(justify_branch, k)
-    
-        new_label = to_pdf.TextAnnotation(txt, size, location, format, justification)
-        text_annotations_.Add(new_label, GH_Path(i))
+# ------------------------------------------------------------------------------
+# -- GH Interface
+IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 
+
+# ------------------------------------------------------------------------------
+gh_compo_interface = gh_compo_io.GHCompo_CreateTextAnnotations(    
+    IGH,
+    _text,
+    _size,
+    _location,
+    _format,
+    _justification,
+)
+text_annotations_ = gh_compo_interface.run()

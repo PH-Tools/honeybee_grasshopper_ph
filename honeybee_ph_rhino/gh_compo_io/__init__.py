@@ -207,3 +207,9 @@ from honeybee_ph_rhino.gh_compo_io.airtable_create_constructions import (
 from honeybee_ph_rhino.gh_compo_io.airtable_create_window_constructions import (
     GHCompo_AirTableCreateWindowConstructions,
 )
+
+# -- Reporting
+from honeybee_ph_rhino.reporting.build_pdf_geom_and_attrs import GHCompo_CreatePDFGeometryAndAttributes
+from honeybee_ph_rhino.reporting.build_elev_surfaces import GHCompo_CreateElevationPDFGeometry
+from honeybee_ph_rhino.reporting.annotations import GHCompo_CreateTextAnnotations
+from honeybee_ph_rhino.reporting.build_floor_segments import GHCompo_CreateFloorSegmentPDFGeometry
