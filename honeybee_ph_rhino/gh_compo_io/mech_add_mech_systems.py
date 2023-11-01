@@ -18,7 +18,7 @@ except ImportError as e:
 
 try:
     from honeybee_energy_ph.properties.hvac.idealair import IdealAirSystemPhProperties
-    from honeybee_energy_ph.hvac import ventilation, heating, cooling
+    from honeybee_energy_ph.hvac import ventilation, heating, heat_pumps
     from honeybee_energy_ph.hvac.supportive_device import PhSupportiveDevice
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
@@ -28,18 +28,16 @@ class GHCompo_AddMechSystems(object):
     def __init__(
         self,
         _vent_sys,
-        _htg_sys,
-        _clg_sys,
-        _hb_rooms=[],
+        _conditioning_systems,
         _supportive_devices=[],
+        _hb_rooms=[],
         *args,
         **kwargs
     ):
-        # type: (ventilation.PhVentilationSystem, List[heating.PhHeatingSystem], List[cooling.PhCoolingSystem], List[room.Room], List[PhSupportiveDevice], *Any, **Any) -> None
+        # type: (ventilation.PhVentilationSystem, List[heating.PhHeatingSystem], List[PhSupportiveDevice], List[room.Room],  *Any, **Any) -> None
 
         self.ventilation_system = _vent_sys
-        self.heating_systems = _htg_sys
-        self.cooling_systems = _clg_sys
+        self.conditioning_systems = _conditioning_systems
         self.supportive_devices = _supportive_devices
         self.hb_rooms = _hb_rooms
 
@@ -57,7 +55,7 @@ class GHCompo_AddMechSystems(object):
                 new_hvac_prop.ph
             )  # type: IdealAirSystemPhProperties # type: ignore
 
-            # --------------------------------------------------------------------------
+            # ---------------------------------------------------------------------------
             # -- Fresh-Air Ventilation
             if self.ventilation_system:
                 if not self.ventilation_system.ventilation_unit:
@@ -73,17 +71,15 @@ class GHCompo_AddMechSystems(object):
                 )
                 new_hvac.demand_controlled_ventilation = True
 
-            # --------------------------------------------------------------------------
-            # -- Space Heating
-            for ph_heating_system in self.heating_systems:
-                new_hvac_prop_ph.heating_systems.add(ph_heating_system)
+            # ---------------------------------------------------------------------------
+            # -- Space Heating / Cooling
+            for ph_conditioning_system in self.conditioning_systems:
+                if isinstance(ph_conditioning_system, heat_pumps.PhHeatPumpSystem):
+                    new_hvac_prop_ph.heat_pump_systems.add(ph_conditioning_system)   
+                else:
+                    new_hvac_prop_ph.heating_systems.add(ph_conditioning_system)
 
-            # --------------------------------------------------------------------------
-            # -- Space Cooling
-            for ph_cooling_system in self.cooling_systems:
-                new_hvac_prop_ph.cooling_systems.add(ph_cooling_system)
-
-            # --------------------------------------------------------------------------
+            # ---------------------------------------------------------------------------
             # -- Supportive Devices
             for supportive_device in self.supportive_devices:
                 new_hvac_prop_ph.supportive_devices.add(supportive_device)

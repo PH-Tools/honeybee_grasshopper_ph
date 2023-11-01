@@ -76,10 +76,10 @@ from honeybee_ph_rhino.gh_compo_io.mech_create_vent_sys import GHCompo_CreateVen
 from honeybee_ph_rhino.gh_compo_io.mech_create_ventilator import (
     GHCompo_CreatePhVentilator,
 )
-from honeybee_ph_rhino.gh_compo_io.mech_create_heating_sys import (
-    GHCompo_CreateHeatingSystem,
+from honeybee_ph_rhino.gh_compo_io.mech_create_space_conditioning_sys import (
+    GHCompo_CreateSpaceConditioningSystem,
 )
-from honeybee_ph_rhino.gh_compo_io.mech_create_cooling_sys import (
+from honeybee_ph_rhino.gh_compo_io.mech_create_cooling_params import (
     GHCompo_CreateCoolingSystem,
 )
 from honeybee_ph_rhino.gh_compo_io.mech_add_mech_systems import GHCompo_AddMechSystems

@@ -20,25 +20,23 @@
 # @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 #
 """
-Add HBPH mechanical ventilation, heating, and cooling to HB-Rooms.
+Add HBPH mechanical ventilation, heating, and cooling systems to the HB-Rooms.
 -
-EM June 9, 2023
+EM November 1, 2023
     Args:
-        _vent_system: (PhVentilationSystem) Enter the type of heating system.
+        _ventilation_system: (PhVentilationSystem) Enter the type of heating system.
         
-        _space_heating_systems: (list[PhHeatingSystem]) A list of the HBPH Heating 
-            Systems to add to the hb-rooms.
+        _space_conditioning_systems: (List) A list of the HBPH 'Space Conditioning' 
+            (Heating/Cooling) Systems to add to the HB-Rooms. Use the 'HBPH - Create
+            Space Conditioning System' component in order to create heating and cooling equipment.
         
-        _space_cooling_systems: (list[PhCoolingSystem]) A list of the HBPH Cooling 
-            Systems to add to the hb-rooms.
-        
-        _supportive_devices: (List[]) A list of the HBPH Supportive Devices (extra pumps, fans, etc)
+        _supportive_devices: (List) A list of any HBPH Supportive Devices (extra pumps, fans, etc)
             to add to the hb-rooms.
         
-        _hb_rooms: (list[Room]) A list of the hb-rooms to add the mechanical systems to.
+        _hb_rooms: (List[Room]) A list of the hb-rooms to add the mechanical systems to.
         
     Returns:
-        hb_rooms_: The input hb-rooms with the new HBPH Mechanical Systems added.
+        hb_rooms_: A copy of the hb-rooms input, with the new HBPH Mechanical Systems added.
 """
 
 try:
@@ -53,18 +51,17 @@ reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Add Mech Systems"
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
+    reload(gh_io)
     from honeybee_ph_rhino.gh_compo_io import mech_add_mech_systems as gh_compo_io
     reload(gh_compo_io)
-    reload(gh_io)
 
 
 #-------------------------------------------------------------------------------
 # -- Add the new Systems to the HB-Rooms
 gh_compo_interface = gh_compo_io.GHCompo_AddMechSystems(
-        _vent_system,
-        _space_heating_systems,
-        _space_cooling_systems,
-        _hb_rooms,
+        _ventilation_system,
+        _space_conditioning_systems,
         _supportive_devices,
+        _hb_rooms,
     )
 hb_rooms_ = gh_compo_interface.run()

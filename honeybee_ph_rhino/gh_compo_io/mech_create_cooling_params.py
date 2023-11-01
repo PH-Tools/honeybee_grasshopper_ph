@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # -*- Python Version: 2.7 -*-
 
-"""GHCompo Interface: HBPH - Create Cooling System."""
+"""GHCompo Interface: HBPH - Create Cooling Params."""
 
 from copy import copy
 
@@ -23,7 +23,7 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
 try:
-    from honeybee_energy_ph.hvac import cooling
+    from honeybee_energy_ph.hvac import heat_pumps
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
 
@@ -61,7 +61,7 @@ inputs_ventilation.update(
         3: ComponentInput(
             _name="annual_COP",
             _description="(float) The Annual COP (W/W) of the equipment.",
-            _type_hint=Component.NewFloatHint(),
+            _type_hint=Component.NewStrHint(),
         ),
         4: ComponentInput(
             _name="single_speed",
@@ -81,14 +81,13 @@ inputs_ventilation.update(
     }
 )
 
-
 inputs_recirculation = copy(inputs_base)
 inputs_recirculation.update(
     {
         3: ComponentInput(
             _name="annual_COP",
             _description="(float) The Annual COP (W/W) of the equipment.",
-            _type_hint=Component.NewFloatHint(),
+            _type_hint=Component.NewStrHint(),
         ),
         4: ComponentInput(
             _name="single_speed",
@@ -124,7 +123,7 @@ inputs_dehumidification.update(
         3: ComponentInput(
             _name="annual_COP",
             _description="(float) The Annual COP (W/W) of the equipment.",
-            _type_hint=Component.NewFloatHint(),
+            _type_hint=Component.NewStrHint(),
         ),
         4: ComponentInput(
             _name="useful_heat_loss",
@@ -140,7 +139,7 @@ inputs_panel.update(
         3: ComponentInput(
             _name="annual_COP",
             _description="(float) The Annual COP (W/W) of the equipment.",
-            _type_hint=Component.NewFloatHint(),
+            _type_hint=Component.NewStrHint(),
         ),
     }
 )
@@ -157,14 +156,14 @@ input_groups = {
 }
 
 
-def get_component_inputs(_cooling_type):
+def get_component_inputs(_param_type):
     # type: (str) -> dict
-    """Select the component input-node group based on the 'cooling_type' specified"""
+    """Select the component input-node group based on the '_param_type' specified"""
 
-    if not _cooling_type:
+    if not _param_type:
         return {}
 
-    input_type_id = input_to_int(_cooling_type)
+    input_type_id = input_to_int(_param_type)
     if not input_type_id:
         raise InputTypeNotFoundError(input_type_id)
 
@@ -175,31 +174,30 @@ def get_component_inputs(_cooling_type):
 
 
 # -----------------------------------------------------------------------------
-# -- Facades for System Constructors (So they can do input validation and unit conversion)
-
+# -- Facades for Cooling-Param Constructors (So they can do input validation and unit conversion)
+# -- DEV-NOTE: Do not use .get() during __init__ since the interface may pass a None value.
+# -- Instead, use square brackets and the 'or' keyword to set a default value.
 
 class FacadePhCoolingVentilation(object):
     display_name = ghio_validators.HBName(
         "display_name", default="_unnamed_ventilation_cooling_"
     )
-    percent_coverage = ghio_validators.FloatPercentage("percent_coverage", default=1.0)
     min_coil_temp = ghio_validators.UnitDegreeC("min_coil_temp", default=12)
     capacity = ghio_validators.UnitKW("capacity", default=10)
 
     def __init__(self, _input_dict):
         # type: (Dict) -> None
         self.display_name = _input_dict["display_name"]
-        self.percent_coverage = _input_dict["percent_coverage"]
         self.single_speed = _input_dict["single_speed"] or False
         self.min_coil_temp = _input_dict["min_coil_temp"]
         self.capacity = _input_dict["capacity"]
         self.annual_COP = _input_dict["annual_COP"] or 2.0
 
     def build(self):
-        # type: () -> cooling.PhCoolingVentilation
-        obj = cooling.PhCoolingVentilation()
+        # type: () -> heat_pumps.PhHeatPumpCoolingParams_Ventilation
+        obj = heat_pumps.PhHeatPumpCoolingParams_Ventilation()
+        obj.used = True
         obj.display_name = self.display_name
-        obj.percent_coverage = self.percent_coverage
         obj.single_speed = self.single_speed
         obj.min_coil_temp = self.min_coil_temp
         obj.capacity = self.capacity
@@ -211,7 +209,6 @@ class FacadePhCoolingRecirculation(object):
     display_name = ghio_validators.HBName(
         "display_name", default="_unnamed_recirculation_cooling_"
     )
-    percent_coverage = ghio_validators.FloatPercentage("percent_coverage", default=1.0)
     min_coil_temp = ghio_validators.UnitDegreeC("min_coil_temp", default=12)
     flow_rate_m3_s = ghio_validators.UnitM3_S("flow_rate_m3_s", default=0.0278)
     capacity = ghio_validators.UnitKW("capacity", default=10)
@@ -219,7 +216,6 @@ class FacadePhCoolingRecirculation(object):
     def __init__(self, _input_dict):
         # type: (Dict) -> None
         self.display_name = _input_dict["display_name"]
-        self.percent_coverage = _input_dict["percent_coverage"]
         self.single_speed = _input_dict["single_speed"] or False
         self.min_coil_temp = _input_dict["min_coil_temp"]
         self.flow_rate_m3_s = _input_dict["flow_rate_m3_s"]
@@ -228,10 +224,10 @@ class FacadePhCoolingRecirculation(object):
         self.annual_COP = _input_dict["annual_COP"] or 2.0
 
     def build(self):
-        # type: () -> cooling.PhCoolingRecirculation
-        obj = cooling.PhCoolingRecirculation()
+        # type: () -> heat_pumps.PhHeatPumpCoolingParams_Recirculation
+        obj = heat_pumps.PhHeatPumpCoolingParams_Recirculation()
+        obj.used = True
         obj.display_name = self.display_name
-        obj.percent_coverage = self.percent_coverage
         obj.single_speed = self.single_speed
         obj.min_coil_temp = self.min_coil_temp
         obj.flow_rate_m3_hr = self.flow_rate_m3_s * 60 * 60
@@ -250,15 +246,14 @@ class FacadePhCoolingDehumidification(object):
     def __init__(self, _input_dict):
         # type: (Dict) -> None
         self.display_name = _input_dict["display_name"]
-        self.percent_coverage = _input_dict["percent_coverage"]
         self.useful_heat_loss = _input_dict["useful_heat_loss"] or False
         self.annual_COP = _input_dict["annual_COP"] or 2.0
 
     def build(self):
-        # type: () -> cooling.PhCoolingDehumidification
-        obj = cooling.PhCoolingDehumidification()
+        # type: () -> heat_pumps.PhHeatPumpCoolingParams_Dehumidification
+        obj = heat_pumps.PhHeatPumpCoolingParams_Dehumidification()
+        obj.used = True
         obj.display_name = self.display_name
-        obj.percent_coverage = self.percent_coverage
         obj.useful_heat_loss = self.useful_heat_loss
         obj.annual_COP = self.annual_COP
         return obj
@@ -273,14 +268,13 @@ class FacadePhCoolingPanel(object):
     def __init__(self, _input_dict):
         # type: (Dict) -> None
         self.display_name = _input_dict["display_name"]
-        self.percent_coverage = _input_dict["percent_coverage"]
         self.annual_COP = _input_dict["annual_COP"] or 2.0
 
     def build(self):
-        # type: () -> cooling.PhCoolingPanel
-        obj = cooling.PhCoolingPanel()
+        # type: () -> heat_pumps.PhHeatPumpCoolingParams_Panel
+        obj = heat_pumps.PhHeatPumpCoolingParams_Panel()
+        obj.used = True
         obj.display_name = self.display_name
-        obj.percent_coverage = self.percent_coverage
         obj.annual_COP = self.annual_COP
         return obj
 
@@ -290,53 +284,53 @@ class FacadePhCoolingPanel(object):
 
 
 class GHCompo_CreateCoolingSystem(object):
-    cooling_classes = {
+    cooling_param_classes = {
         1: FacadePhCoolingVentilation,
         2: FacadePhCoolingRecirculation,
         3: FacadePhCoolingDehumidification,
         4: FacadePhCoolingPanel,
     }
 
-    valid_cooling_types = [
-        "1-ventilation",
-        "2-recirculation",
-        "3-dehumidification",
-        "4-panel",
+    valid_cooling_param_types = [
+        "1-Ventilation Air",
+        "2-Recirculating Air",
+        "3-Dehumidification",
+        "4-Radiant Panel",
     ]
 
-    def __init__(self, _IGH, _system_type, _input_dict):
-        # type: (gh_io.IGH, int, Dict[str, Any]) -> None
+    def __init__(self, _IGH, _param_type, _input_dict, *args, **kwargs):
+        # type: (gh_io.IGH, int, Dict[str, Any], *Any, **Any) -> None
         self.IGH = _IGH
-        self.system_type = _system_type
+        self.param_type = _param_type
         self.input_dict = _input_dict
 
     @property
-    def system_type(self):
+    def param_type(self):
         # type: () -> Optional[int]
         return self._system_type
 
-    @system_type.setter
-    def system_type(self, _in):
+    @param_type.setter
+    def param_type(self, _in):
         self._system_type = input_tools.input_to_int(_in)
 
     def run(self):
-        # type: () -> Optional[cooling.PhCoolingSystem]
+        # type: () -> Optional[heat_pumps.PhHeatPumpCoolingParams_Base]
         """Find the right System Builder and create the new System from the user inputs."""
 
-        if not self.system_type:
-            msg = "Set the '_system_type' to configure the user-inputs."
+        if not self.param_type:
+            msg = "Set the '_cooling_type' to configure the input options."
             self.IGH.warning(msg)
             return None
 
-        # -- Figure out which Cooling system type is being built
+        # -- Figure out which Cooling Param type is being built
         try:
-            cooling_class = self.cooling_classes[self.system_type]
+            cooling_param_class = self.cooling_param_classes[self.param_type]
         except KeyError as e:
             raise Exception(
-                "Error: Input Cooling type: '{}' not supported by this GH-Component. "
-                "Please only input: {}".format(self.system_type, self.valid_cooling_types)
+                "Error: Input '_cooling_type' value of: '{}' is not supported by this GH-Component. "
+                "Please only input one of the types: {}".format(self.param_type, self.valid_cooling_param_types)
             )
 
         # --- Build the Cooling system from the user_inputs
-        cooling_builder = cooling_class(self.input_dict)
-        return cooling_builder.build()
+        cooling_param_builder = cooling_param_class(self.input_dict)
+        return cooling_param_builder.build()

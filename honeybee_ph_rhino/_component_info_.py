@@ -5,7 +5,7 @@
 These are called when the component is instantiated within the Grasshopper canvas.
 """
 
-RELEASE_VERSION = "Honeybee-PH v1.0.68"
+RELEASE_VERSION = "Honeybee-PH v1.0.69"
 CATEGORY = "HB-PH"
 SUB_CATEGORIES = {
     0: "00 | Utils",
@@ -224,18 +224,6 @@ COMPONENT_PARAMS = {
         "Category": CATEGORY,
         "SubCategory": 1,
     },
-    "HBPH - Create Heating System": {
-        "NickName": "Create Heating",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 1,
-    },
-    "HBPH - Create Cooling System": {
-        "NickName": "Create Cooling",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 1,
-    },
     "HBPH - Create Ventilation System": {
         "NickName": "Create Vent",
         "Message": RELEASE_VERSION,
@@ -268,6 +256,18 @@ COMPONENT_PARAMS = {
     },
     "HBPH - Add Mech Supportive Devices": {
         "NickName": "Add Supportive Devices",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
+    "HBPH - Create Space Conditioning System": {
+        "NickName": "Create Heating / Cooling",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
+    "HBPH - Create Cooling Params": {
+        "NickName": "Create Cooling Parameters",
         "Message": RELEASE_VERSION,
         "Category": CATEGORY,
         "SubCategory": 1,
