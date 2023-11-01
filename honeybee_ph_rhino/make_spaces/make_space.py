@@ -6,7 +6,7 @@
 from collections import namedtuple
 
 try:
-    from typing import Dict, List
+    from typing import Dict, List, Tuple
 except ImportError:
     pass  # IronPython 2.7
 
@@ -109,35 +109,8 @@ def set_absolute_ventilation(_hb_room, _new_room_airflow):
 
     return _hb_room
 
-
-# def my_is_point_inside(self, point, test_vector=Vector3D(1, 0, 0)):
-#     """Test whether a Point3D lies inside or outside the polyface.
-
-#     Note that, if this polyface is not solid, the result will always be False.
-
-#     Args:
-#         point: A Point3D for which the inside/outside relationship will be tested.
-#         test_vector: Optional vector to set the direction in which intersections
-#             with the polyface faces will be evaluated to determine if the
-#             point is inside. Default is the X-unit vector.
-
-#     Returns:
-#         A boolean denoting whether the point lies inside (True) or outside (False).
-#     """
-#     if not self.is_solid:
-#         return False
-#     test_ray = Ray3D(point, test_vector)
-#     n_int = 0
-#     for _f in self.faces:
-#         if _f.intersect_line_ray(test_ray):
-#             n_int += 1
-#     if n_int % 2 == 0:
-#         return False
-#     return True
-
-
 def add_spaces_to_honeybee_rooms(_spaces, _hb_rooms, _inherit_names=False):
-    # type: (list[space.Space], list[room.Room], bool) -> tuple[list[room.Room], list[SpaceData]]
+    # type: (List[space.Space], List[room.Room], bool) -> Tuple[List[room.Room], List[SpaceData], List[room.Room]]
     """Sorts a list of Spaces, checks which are 'in' which HB-Room, and adds the space to that room.
 
     Arguments:
@@ -163,12 +136,20 @@ def add_spaces_to_honeybee_rooms(_spaces, _hb_rooms, _inherit_names=False):
     # -------------------------------------------------------------------------
     # -- Add the spaces to the host-rooms
     new_rooms = []
+    open_rooms = []
     for hb_room in _hb_rooms:
         dup_room = hb_room.duplicate()  # type: room.Room # type: ignore
+
+        # -- Check to ensure that the room is actually solid first
+        if not dup_room.geometry.is_solid:
+            print("Error: Room {} not solid. Cannot host spaces.".format(dup_room.display_name))
+            open_rooms.append(dup_room)
+            continue
 
         # -- See if any of the Space Reference points are inside the Room Geometry
         for space_data_id, space_data in spaces_dict.items():
             for pt in space_data.reference_points:
+                
                 if not dup_room.geometry.is_point_inside(pt):
                     continue
 
@@ -222,4 +203,4 @@ def add_spaces_to_honeybee_rooms(_spaces, _hb_rooms, _inherit_names=False):
         for space in spaces_dict.values():
             un_hosted_spaces.append(space)
 
-    return new_rooms, un_hosted_spaces
+    return new_rooms, un_hosted_spaces, open_rooms

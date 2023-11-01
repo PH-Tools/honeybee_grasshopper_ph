@@ -45,8 +45,13 @@ class GHCompo_AddPHSpaces(object):
         self.inherit_room_names = _inh_rm_nms
         self.hb_rooms = _hb_rooms
 
+    def ready(self):
+        return all([len(self.spaces) != 0 and len(self.hb_rooms) != 0])
+
     def run(self):
-        # type: () -> Tuple[List[room.Room], List[rg.Point3D]]
+        # type: () -> Tuple[List[room.Room], List[rg.Point3D], List[room.Room]]
+        if not self.ready():
+            return self.hb_rooms, [], []
 
         # ---------------------------------------------------------------------
         # -- Clean up the input spaces, host in the HB-Rooms
@@ -55,12 +60,18 @@ class GHCompo_AddPHSpaces(object):
             make_space.offset_space_reference_points(self.IGH, sp, offset_dist)
             for sp in self.spaces
         ]
-        hb_rooms_, un_hosted_spaces = make_space.add_spaces_to_honeybee_rooms(
+        hb_rooms_, un_hosted_spaces, open_rooms_ = make_space.add_spaces_to_honeybee_rooms(
             spaces, self.hb_rooms, self.inherit_room_names
         )
 
         # ---------------------------------------------------------------------
-        # -- if any un_hosted_spaces, pull out their center points for troubleshooting
+        # -- Warn if any open rooms
+        if open_rooms_:
+            msg = "Error: Honeybee-Room are not closed: {}".format(open_rooms_)
+            self.IGH.error(msg)
+
+        # ---------------------------------------------------------------------
+        # -- If any un_hosted_spaces, pull out their center points for troubleshooting
         # -- and raise a user-warning
         check_pts_ = [
             from_point3d(lbt_pt)
@@ -74,4 +85,4 @@ class GHCompo_AddPHSpaces(object):
             self.IGH.error(msg)
 
         # ---------------------------------------------------------------------
-        return hb_rooms_, check_pts_
+        return hb_rooms_, check_pts_, open_rooms_

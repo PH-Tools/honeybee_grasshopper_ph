@@ -25,7 +25,7 @@ can be made up of one or more individual volumes. This is useful if you are calc
 interior net-floor-area or volume as in the Passive House models. Each Space will map to 
 a single entry in the WUFI 'Ventilation Rooms' or a PHPP 'Additional Ventilation'.
 -
-EM October 2, 2022
+EM November 1, 2023
     Args:
         _spaces: (list[Space]) A list of the new PH-Spaces to add to the Honeybee-Rooms.
         
@@ -64,6 +64,9 @@ reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Add Spaces"
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
+    from honeybee_ph_rhino.make_spaces import make_space
+    reload(make_space)
+    from honeybee_ph_rhino.gh_compo_io import space_add_spc as gh_compo_io
     reload(gh_compo_io)
     reload(gh_io)
 
@@ -79,4 +82,4 @@ gh_compo_interface = gh_compo_io.GHCompo_AddPHSpaces(
     inherit_room_names_,
     _hb_rooms,
     )
-hb_rooms_, check_pts_ = gh_compo_interface.run()
+hb_rooms_, check_pts_, open_rooms_ = gh_compo_interface.run()
