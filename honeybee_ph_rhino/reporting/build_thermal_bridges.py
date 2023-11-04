@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # -*- Python Version: 2.7 -*-
 
-"""Functions for getting / sorting all the Honeybee-Model Thermal Bridges."""
+"""Functions for getting / sorting all the Honeybee-Model Thermal Bridges ."""
 
 from collections import defaultdict
 

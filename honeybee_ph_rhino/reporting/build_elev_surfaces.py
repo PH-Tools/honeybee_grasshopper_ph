@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # -*- Python Version: 2.7 -*-
 
-"""Create the 'Elevation' Geometry for Export to PDF."""
+"""Create the 'Elevation' Geometry for Export to PDF. """
 
 import math
 from collections import defaultdict

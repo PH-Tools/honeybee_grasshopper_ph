@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # -*- Python Version: 2.7 -*-
 
-"""Functions for getting / sorting all the Honeybee-Model TFA Floor Surfaces."""
+"""Functions for getting / sorting all the Honeybee-Model TFA Floor Surfaces. """
 
 from collections import defaultdict, OrderedDict
 
