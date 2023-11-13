@@ -60,31 +60,30 @@ def create_punched_geometry(_hb_rooms):
     return envelope_surfaces_punched
 
 
-def create_inset_aperture_surface(_aperture):
-    # type: (aperture.Aperture) -> Optional[rg.Brep]
+def create_inset_aperture_surface(_hb_aperture, _rh_units_name):
+    # type: (aperture.Aperture, str) -> Optional[rg.Brep]
     """Return Rhino.Geometry.Brep of an aperture's face, inset."""
-    ap_prop_ph = _aperture.properties.ph # type: AperturePhProperties
-    inset_face = from_face3d(
-        _aperture.geometry.move(
-            _aperture.geometry.normal.reverse() * ap_prop_ph.install_depth
-        )
-    )  # type: Optional[rg.Brep]
+    ap_prop_ph = _hb_aperture.properties.ph # type: AperturePhProperties # type: ignore
+    ap_install_depth_in_m = ap_prop_ph.install_depth
+    ap_install_depth_in_r_units = convert(ap_install_depth_in_m, "M", _rh_units_name) 
+    extrusion_vector = _hb_aperture.geometry.normal.reverse() * ap_install_depth_in_r_units
+    inset_face = from_face3d(_hb_aperture.geometry.move(extrusion_vector)) # type: Optional[rg.Brep]
 
     if inset_face:
-        inset_face.SetUserString('display_name', _aperture.display_name)
+        inset_face.SetUserString('display_name', _hb_aperture.display_name)
 
     return inset_face
 
 
-def create_inset_aperture_surfaces(_hb_rooms):
-    # type: (Collection[room.Room]) -> List[rg.Brep]
+def create_inset_aperture_surfaces(_hb_rooms, _rh_units_name):
+    # type: (Collection[room.Room], str) -> List[rg.Brep]
     """Return a list of aperture Rhino.Geometry.Brep surfaces, inset."""
 
     inset_window_surfaces = []
     for room in _hb_rooms:
         for face in room.faces:
             for aperture in face.apertures:
-                inset_window_surfaces.append(create_inset_aperture_surface(aperture))
+                inset_window_surfaces.append(create_inset_aperture_surface(aperture, _rh_units_name))
     return inset_window_surfaces
 
 
@@ -101,8 +100,7 @@ def create_window_reveal(_hb_aperture, _rh_units_name):
         msg = "Error converting Aperture's install depth to Rhino units: {}?\t{}".format(_rh_units_name, e)
         raise Exception(msg)
 
-    extrusion_vector = _hb_aperture.normal.reverse(
-    ) * ap_install_depth_in_r_units
+    extrusion_vector = _hb_aperture.normal.reverse() * ap_install_depth_in_r_units
     return [
         from_face3d(Face3D.from_extrusion(seg, extrusion_vector))
         for seg in _hb_aperture.geometry.boundary_segments
@@ -136,7 +134,7 @@ class GHCompo_CreateBuildingShading(object):
         shading_surfaces_.extend(create_punched_geometry(self.hb_rooms))
         shading_surfaces_.extend(create_window_reveals(self.hb_rooms, rh_units_name))
 
-        window_surfaces_ = create_inset_aperture_surfaces(self.hb_rooms)
+        window_surfaces_ = create_inset_aperture_surfaces(self.hb_rooms, rh_units_name)
         hb_rooms_ = self.hb_rooms
 
         return (window_surfaces_, shading_surfaces_, hb_rooms_)
