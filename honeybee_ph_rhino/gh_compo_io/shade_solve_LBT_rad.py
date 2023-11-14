@@ -17,19 +17,19 @@ except ImportError:
 
 try:
     from System import Object  # type: ignore
-except ImportError:
-    pass  # Outside .NET
+except ImportError as e:
+    raise ImportError("\nFailed to import System:\n\t{}".format(e))
 
 try:
     import Rhino.Geometry as rg  # type: ignore
-except ImportError:
-    pass  # Outside Rhino
+except ImportError as e:
+    raise ImportError("\nFailed to import Rhino.Geometry:\n\t{}".format(e))
 
 try:
     from Grasshopper import DataTree  # type: ignore
     from Grasshopper.Kernel.Data import GH_Path  # type: ignore
-except ImportError:
-    pass  # Outside Grasshopper
+except ImportError as e:
+    raise ImportError("\nFailed to import Grasshopper:\n\t{}".format(e))
 
 try:
     from honeybee import room
@@ -163,7 +163,7 @@ def create_shading_mesh(_bldg_shading_breps, _mesh_params):
         if new_mesh:
             shade_mesh.Append(new_mesh)
         else:
-            srfc_name = brep.GetUserStrings().Get("display_name")
+            surface_name = brep.GetUserStrings().Get("display_name")
             msg = (
                 "Error: Something is wrong with surface: {}. \n"
                 "Cannot create a mesh properly for some reason. \n"
@@ -171,7 +171,7 @@ def create_shading_mesh(_bldg_shading_breps, _mesh_params):
                 "and check that the Honeybee surfaces are all being created correctly? \n"
                 "If that surface has windows hosted on it, be sure the windows are not \n"
                 "overlapping and that they are being generated correctly?".format(
-                    srfc_name
+                    surface_name
                 )
             )
             raise Exception(msg)
@@ -212,7 +212,7 @@ def deconstruct_sky_matrix(_sky_mtx):
 def build_window_meshes(
     _window_surface, _grid_size, _shading_mesh_params, _window_mesh_params=None
 ):
-    # type: (Any, float, rg.MeshingParameters, Optional[rg.MeshingParameters]) -> Tuple[List[Point3D], List[Normal], Mesh3D, Mesh3D]
+    # type: (Any, float, rg.MeshingParameters, Optional[rg.MeshingParameters]) -> Tuple[List[Point3D], List[Normal], Mesh3D, Optional[Mesh3D], rg.Mesh]
     """Create the Ladybug Mesh3D grided mesh for the window being analyzed
 
     Arguments:
@@ -226,9 +226,10 @@ def build_window_meshes(
         * points: (list: Ladybug Point3D) All the analysis points on the window
         * normals: (list: Ladybug Normal) All the normals for the analysis points
         * window_mesh: (ladybug_geometry.geometry3d.Mesh3D) The window
-        * window_back_mesh: (ladybug_geometry.geometry3d.Mesh3D) A copy of the window shifted 'back'
+        * window_back_mesh: (Optional[ladybug_geometry.geometry3d.Mesh3D]) A copy of the window shifted 'back'
             just a little bit (0.1 units). Used when solving the 'unshaded' situation.
-    """
+        * window_rh_mesh: (Rhino.Geometry.Mesh): The window as a Rhino-Mesh
+   """
 
     # Create the gridded mesh for the window surface
     # ---------------------------------------------------------------------------
@@ -432,6 +433,9 @@ class GHCompo_SolveLBTRad(object):
         if not self.run_solver or not self.settings or not self.hb_rooms:
             return (None, None, [], None, [], self.hb_rooms, [])
 
+        # -- Get the current Rhino doc's unit system
+        rh_units_name = self.IGH.get_rhino_unit_system_name()
+
         # -- Create context Shade meshes
         # ---------------------------------------------------------------------
         shade_mesh_winter = create_shading_mesh(
@@ -468,7 +472,7 @@ class GHCompo_SolveLBTRad(object):
 
             for face in new_room.faces:
                 for aperture in face.apertures:
-                    window_surface = create_inset_aperture_surface(aperture)
+                    window_surface = create_inset_aperture_surface(aperture, rh_units_name)
 
                     # Build the meshes
                     # ----------------------------------------------------------------------
