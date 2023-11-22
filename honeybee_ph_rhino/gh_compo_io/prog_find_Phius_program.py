@@ -52,6 +52,16 @@ class GHCompo_FindPhiusProgram(object):
         Returns:
             Optional[List[ProgramType]]: A list of program types.
         """
+        # -- Give some helpful output
+        if not self.protocol:
+            protocols = programtypes.get_all_valid_protocol_names()
+            print("No protocol specified. Select either: '{}'".format(protocols))
+
+        if self.protocol and not self.name and not self.description:
+            program_names = programtypes.get_all_valid_program_names_of_protocol(self.protocol)
+            print("No program name specified. Select either: '{}'".format(program_names))
+
+
         # -- Get the data from in the Phius data set
         if not self.name and not self.description:
             msg = "Input a name or a description of the space to find a Program."
