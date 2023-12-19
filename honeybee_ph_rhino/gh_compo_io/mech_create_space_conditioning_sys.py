@@ -6,7 +6,7 @@
 from copy import copy # Use copy so that specific equipments can overwrite base with their own hints
 
 try:
-    from typing import Optional, Dict, Any, Type, Union
+    from typing import Optional, Dict, Any, Type, Union, List, Iterable
 except ImportError:
     pass # IronPython 2.7
 
@@ -31,6 +31,11 @@ try:
     from honeybee_ph_utils import input_tools
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee_ph_utils:\n\t{}'.format(e))
+
+try:
+    from ph_units import parser, converter
+except ImportError as e:
+    raise ImportError("\nFailed to import ph-units:\n\t{}".format(e))
 
 
 # -----------------------------------------------------------------------------
@@ -85,8 +90,16 @@ inputs_heat_pump_annual.update({
 
 inputs_heat_pump_monthly = copy(inputs_base)
 inputs_heat_pump_monthly.update({
-    3: ComponentInput(_name='monthly_COPS', _description='(list[float]): A List of COP values.', _access=1, _type_hint=Component.NewStrHint()),
-    4: ComponentInput(_name='monthly_temps', _description='(list[float]): A List of temp [deg C] values.', _access=1, _type_hint=Component.NewStrHint()),
+    3: ComponentInput(_name='monthly_COPS', 
+                      _description='(list[float]): A List of COP values.', 
+                      _access=1, 
+                      _type_hint=Component.NewStrHint(),
+                      _target_unit='W/W'),
+    4: ComponentInput(_name='monthly_temps', 
+                      _description='(list[float]): A List of temp [deg C] values.', 
+                      _access=1, 
+                      _type_hint=Component.NewStrHint(),
+                      _target_unit='C'),
     6: ComponentInput(_name="_percent_bldg_cooling_covered",
                       _description=""),
     7: ComponentInput(_name="_cooling_params_ventilation_air",
@@ -97,6 +110,7 @@ inputs_heat_pump_monthly.update({
                       _description=""),
     10: ComponentInput(_name="_cooling_params_chilled_panel",
                       _description=""),
+
 })
 
 # -----------------------------------------------------------------------------
@@ -134,6 +148,12 @@ def get_component_inputs(_system_type):
             'Error: Heating type ID: "{}" is not a valid equip type.'.format(input_type_id)
         )
 
+def get_component_input_by_name(_input_group, _name):
+    # type: (Dict[int, ComponentInput], str) -> Optional[ComponentInput]
+    """Get the component input from the input group by name."""
+    for k, v in _input_group.items():
+        if v.name == _name:
+            return v
 class GHCompo_CreateSpaceConditioningSystem(object):
     
     system_classes = { 
@@ -169,6 +189,32 @@ class GHCompo_CreateSpaceConditioningSystem(object):
     def system_type(self, _in):
         self._system_type = input_tools.input_to_int(_in)
 
+    @property
+    def gh_component_input_group(self):
+        # type: () -> Dict[int, ComponentInput]
+        """Get the GH-Component input group dict for this system type."""
+        if self.system_type:
+            return get_component_inputs(str(self.system_type))
+        else:
+            return {}
+
+    def convert_input(self, _input, _target_unit):
+        # type: (str, str) -> Optional[Union[float, int]]
+        """Convert a single input to the target unit."""
+        user_input, input_unit = parser.parse_input(_input)
+        user_input = converter.convert(user_input, input_unit, _target_unit)
+        return user_input
+
+    def convert_list_of_inputs(self, _input_list, _target_unit):
+        # type: (Iterable[Any], str) -> List[Optional[Union[float, int]]]
+        """Convert a list of inputs to the target unit."""
+        user_input = []
+        for val in _input_list:
+            val, input_unit = parser.parse_input(val)
+            val = converter.convert(val, input_unit, _target_unit)
+            user_input.append(val)
+        return user_input
+    
     def run(self):
         # type: () -> Optional[Union[heating.PhHeatingSystem, heat_pumps.PhHeatPumpSystem]]
         """Build the new PH Heating/Cooling System object."""
@@ -187,17 +233,34 @@ class GHCompo_CreateSpaceConditioningSystem(object):
                 "{}".format(self.system_type, self.valid_system_types)
             )
         
-        # --- Build the system
+        # -- Build the heat-pump system
         new_system = system_class()
         for attr_name in dir(new_system):
             if attr_name.startswith('_'):
                 continue
+            
+            # -- Pull out the user-input-value for this attribute
+            user_input = self.input_dict.get(attr_name, None)
 
-            input_val = self.input_dict.get(attr_name)
-            if input_val:
-                setattr(new_system, attr_name, input_val)
+            # -- Find the GH-Component's Input Node for the attribute so we can check the unit-conversion (if any)
+            gh_compo_input = get_component_input_by_name(self.gh_component_input_group, attr_name)
+            if gh_compo_input:
+                target_unit = gh_compo_input.target_unit
+            else:
+                target_unit = None
+            
+            # -- Convert the user-input-value, if necessary
+            if user_input and target_unit:
+                if isinstance(user_input, (list, tuple, set)):
+                    user_input = self.convert_list_of_inputs(user_input, target_unit)
+                else:
+                    user_input = self.convert_input(user_input, target_unit)
         
-        # -- If its not a heat-pump with cooling, just return it
+            # -- Set the attribute value
+            if user_input:
+                setattr(new_system, attr_name, user_input)
+        
+        # -- If its not a heat-pump with cooling, just return it.
         if isinstance(new_system, heating.PhHeatingSystem):
             return new_system
 
@@ -224,7 +287,6 @@ class GHCompo_CreateSpaceConditioningSystem(object):
     def set_cooling_params(self, _user_input_clg_params, _system_clg_params):
         # type: (str, heat_pumps.PhHeatPumpCoolingParams_Base) -> None
         """Set all the System's Cooling parameters to match the user-inputs"""
-        print(_user_input_clg_params)
         if not _user_input_clg_params or _user_input_clg_params == "None":
             return
         

@@ -62,6 +62,7 @@ inputs_ventilation.update(
             _name="annual_COP",
             _description="(float) The Annual COP (W/W) of the equipment.",
             _type_hint=Component.NewStrHint(),
+            _target_unit='W/W',
         ),
         4: ComponentInput(
             _name="single_speed",
@@ -72,11 +73,13 @@ inputs_ventilation.update(
             _name="min_coil_temp",
             _description="(float) Deg. C",
             _type_hint=Component.NewStrHint(),
+            _target_unit='C',
         ),
         6: ComponentInput(
             _name="capacity",
             _description="(float) Maximum kW output.",
             _type_hint=Component.NewStrHint(),
+            _target_unit='KW',
         ),
     }
 )
@@ -88,6 +91,7 @@ inputs_recirculation.update(
             _name="annual_COP",
             _description="(float) The Annual COP (W/W) of the equipment.",
             _type_hint=Component.NewStrHint(),
+            _target_unit='W/W',
         ),
         4: ComponentInput(
             _name="single_speed",
@@ -98,16 +102,19 @@ inputs_recirculation.update(
             _name="min_coil_temp",
             _description="(float) Deg. C",
             _type_hint=Component.NewStrHint(),
+            _target_unit='C',
         ),
         6: ComponentInput(
             _name="capacity",
             _description="(float) Maximum kW output.",
             _type_hint=Component.NewStrHint(),
+            _target_unit='KW',
         ),
         7: ComponentInput(
             _name="flow_rate_m3_s",
             _description="(float) The maximum airflow rate in m3/s",
             _type_hint=Component.NewStrHint(),
+            _target_unit='=M3/S',
         ),
         8: ComponentInput(
             _name="flow_rate_variable",
@@ -124,6 +131,7 @@ inputs_dehumidification.update(
             _name="annual_COP",
             _description="(float) The Annual COP (W/W) of the equipment.",
             _type_hint=Component.NewStrHint(),
+            _target_unit='W/W',
         ),
         4: ComponentInput(
             _name="useful_heat_loss",
@@ -140,6 +148,7 @@ inputs_panel.update(
             _name="annual_COP",
             _description="(float) The Annual COP (W/W) of the equipment.",
             _type_hint=Component.NewStrHint(),
+            _target_unit='W/W',
         ),
     }
 )

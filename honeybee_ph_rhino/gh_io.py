@@ -9,7 +9,7 @@ probably would not need something like this? I suppose it does help reduce coupl
 """
 
 try:
-    from typing import Any, Sequence, Union, List, Dict
+    from typing import Any, Sequence, Union, List, Dict, Optional
 except ImportError:
     pass  # Python 3
 
@@ -486,12 +486,13 @@ class IGH:
 class ComponentInput:
     """GH-Component Input Node data class."""
 
-    def __init__(self, _name='-', _description='', _access=0, _type_hint=Component.NoChangeHint()):
-        # type: (str, str, int, Component.NoChangeHint) -> None
+    def __init__(self, _name='-', _description='', _access=0, _type_hint=Component.NoChangeHint(), _target_unit=None):
+        # type: (str, str, int, Component.NoChangeHint, Optional[str]) -> None
         self.name = _name
         self.description = _description
         self.access = _access  # 0='item, 1='list', 2='tree'
         self.type_hint = _type_hint
+        self.target_unit = _target_unit
 
     def __str__(self):
         return '{}(name={})'.format(self.__class__.__name__, self.name, self.access, self.type_hint)

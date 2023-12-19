@@ -124,6 +124,9 @@ from honeybee_ph_rhino.gh_compo_io.shade_solve_shading_dims import (
 from honeybee_ph_rhino.gh_compo_io.win_set_monthly_shd_fac import (
     GHCompo_SetWindowMonthlyShadeFactor,
 )
+from honeybee_ph_rhino.gh_compo_io.win_set_reveal_distance import (
+    GHCompo_SetApertureRevealDistance,
+)
 
 # -- Climate
 from honeybee_ph_rhino.gh_compo_io.climate_peak_load import GHCompo_CreatePeakLoad
@@ -189,6 +192,7 @@ from honeybee_ph_rhino.gh_compo_io.visualize_spaces import GHCompo_VisualizeSpac
 from honeybee_ph_rhino.gh_compo_io.visualize_win_frames import (
     GHCompo_VisualizeWindowFrameElements,
 )
+from honeybee_ph_rhino.gh_compo_io.util_clean_input_breps import GHCompo_CleanInputBreps
 
 # -- Organize
 from honeybee_ph_rhino.gh_compo_io.organize_spaces import GHCompo_OrganizeSpaces

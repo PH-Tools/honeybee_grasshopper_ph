@@ -168,7 +168,15 @@ class GHCompo_AirTableCreateWindowConstructions(object):
     def _get_glazing_type(self, _window_data):
         # type: (TableFields) -> PhWindowGlazing
         """Return a HB Window Glazing from the collection"""
-        glazing_names = _window_data.glazing_name  # type: List[str]
+        
+        # -- "GLAZING_NAME" will return a list since its a link 
+        # -- to another sheet
+        glazing_names = _window_data.glazing_name
+        
+        if not glazing_names:
+            msg = "Error: Glazing-Name for window unit: '{}' is not-defined.".format(_window_data.display_name)
+            raise Exception(msg)
+
         glazing_name = glazing_names[0]
         return self.hbph_glazings[glazing_name]
 
@@ -177,6 +185,7 @@ class GHCompo_AirTableCreateWindowConstructions(object):
         """Return the new HB Window Construction"""
         window_data = record.FIELDS
         hbph_display_name = str(window_data.display_name)
+        
         hbph_frame = self._get_frame_type(hbph_display_name, window_data)
         hbph_glazing = self._get_glazing_type(window_data)
 
@@ -214,8 +223,8 @@ class GHCompo_AirTableCreateWindowConstructions(object):
         for record in self.window_unit_records:
             hbph_window_frame = self.create_new_hbph_window_frame(record)
             self.hbph_window_frames[hbph_window_frame.display_name] = hbph_window_frame
-
-        # -- Build all the HBPH Window Constructions
+        
+        # # -- Build all the HBPH Window Constructions
         for record in self.window_unit_records:
             window_constructions_.append(self.create_new_hbph_window_construction(record))
 
