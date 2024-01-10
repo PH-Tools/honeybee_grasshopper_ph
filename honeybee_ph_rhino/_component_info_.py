@@ -5,7 +5,7 @@
 These are called when the component is instantiated within the Grasshopper canvas.
 """
 
-RELEASE_VERSION = "Honeybee-PH v1.0.77"
+RELEASE_VERSION = "Honeybee-PH v1.1.00"
 CATEGORY = "HB-PH"
 SUB_CATEGORIES = {
     0: "00 | Utils",
@@ -575,6 +575,12 @@ COMPONENT_PARAMS = {
         "Category": CATEGORY,
         "SubCategory": 4,
     },
+    "HBPH - Create Objects from Key-Values": {
+        "NickName": "Create Object",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 4,
+    },
     "HBPH - Clean Input Breps": {
         "NickName": "Clean Input Breps",
         "Message": RELEASE_VERSION,
@@ -635,6 +641,22 @@ class ComponentNameError(Exception):
         print(error)
         super(ComponentNameError, self).__init__(self.message)
 
+def turn_off_old_tag(ghenv):
+    """Turn off the old tag that displays on GHPython components.
+    Copied from 'ladybug-rhino.grasshopper.turn_off_old_tag()'
+
+    Arguments:
+    __________
+        * ghenv: The Grasshopper Component 'ghenv' variable.
+
+    Returns:
+    --------
+        * None:
+    """
+    try:  # try to turn off the OLD tag on the component
+        ghenv.Component.ToggleObsolete(False)
+    except Exception:
+        pass  # older version of Rhino that does not have the Obsolete method
 
 def set_component_params(ghenv, dev=False):
     # type (ghenv, Optional[str | bool]) -> bool
@@ -673,5 +695,6 @@ def set_component_params(ghenv, dev=False):
     ghenv.Component.Category = CATEGORY
     ghenv.Component.SubCategory = sub_cat_name
     ghenv.Component.IconDisplayMode = ghenv.Component.IconDisplayMode.application
+    turn_off_old_tag(ghenv) # For Rhino 8
 
     return dev

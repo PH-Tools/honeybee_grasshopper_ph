@@ -28,6 +28,9 @@ try:
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
+AT_COLUMN_NAMES = {
+    "name": "DISPLAY_NAME",
+}
 
 class GHCompo_AirTableCreateConstructions(object):
     """GHCompo Interface: HBPH - Airtable Create Constructions."""
@@ -75,7 +78,7 @@ class GHCompo_AirTableCreateConstructions(object):
 
         constructions_ = []
         for record in self.const_records:
-            const_name = clean_ep_string(record.FIELDS["DISPLAY_NAME"])
+            const_name = clean_ep_string(record.FIELDS[AT_COLUMN_NAMES["name"]])
             layers = self.get_layers(record)
 
             mats = []

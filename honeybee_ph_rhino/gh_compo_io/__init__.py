@@ -186,6 +186,7 @@ from honeybee_ph_rhino.gh_compo_io.util_set_attributes import GHCompo_SetObjectA
 from honeybee_ph_rhino.gh_compo_io.util_diagnose_hb_rooms import (
     GHCompo_DiagnoseBadHBRoomGeometry,
 )
+from honeybee_ph_rhino.gh_compo_io.util_create_objs_from_key_value import GHCompo_CreateObjectsFromKeyValues
 
 # -- Visualize
 from honeybee_ph_rhino.gh_compo_io.visualize_spaces import GHCompo_VisualizeSpaces

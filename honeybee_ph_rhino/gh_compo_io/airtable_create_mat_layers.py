@@ -21,6 +21,15 @@ try:
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
+AT_COLUMN_NAMES = {
+    "name": "DISPLAY_NAME",
+    "material": "LAYER_MATERIAL",
+    "thickness_mm": "LAYER_THICKNESS [MM]",
+    "conductivity_w_mk": "CONDUCTIVITY_W_MK",
+    "data": "DATA_SHEET",
+    "notes": "NOTES",
+    "link" : "LINK"
+}
 
 class EpMaterialCollection(object):
     def __init__(self):
@@ -88,16 +97,16 @@ class GHCompo_AirTableCreateMaterialLayers(object):
 
         # -- Pull out the Layer Data
         layer_data = _record.FIELDS
-        layer_mat_id_list = layer_data.get("LAYER MATERIAL", None)
+        layer_mat_id_list = layer_data.get(AT_COLUMN_NAMES['material'], None)
         if not layer_mat_id_list:
             msg = "Layer Material not found for layer: {}".format(
-                layer_data["DISPLAY_NAME"]
+                layer_data[AT_COLUMN_NAMES['name']]
             )
             self.IGH.warning(msg)
             return None
-        layer_thickness_mm = float(layer_data.get("LAYER THICKNESS [MM]", 1.0))
+        layer_thickness_mm = float(layer_data.get(AT_COLUMN_NAMES['thickness_mm'], 1.0))
         layer_thickness_m = layer_thickness_mm / 1000.00
-        layer_name = layer_data.get("DISPLAY_NAME", "__unnamed__")
+        layer_name = layer_data.get(AT_COLUMN_NAMES['name'], "__unnamed__")
 
         # -- Get the Layer Material Data
         layer_mat_id = layer_mat_id_list[0]
@@ -107,7 +116,7 @@ class GHCompo_AirTableCreateMaterialLayers(object):
         hb_mat = EnergyMaterial(
             clean_ep_string(self.clean_name(layer_name)),
             layer_thickness_m,
-            float(layer_mat["CONDUCTIVITY_W_MK"]),
+            float(layer_mat[AT_COLUMN_NAMES["conductivity_w_mk"]]),
             self.DENSITY,
             self.SPEC_HEAT,
             self.ROUGHNESS,
