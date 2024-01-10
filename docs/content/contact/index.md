@@ -10,11 +10,17 @@ weight: 40
 ## Get Help...
 Having trouble and can't find the answer? Consider the [How to Ask for Help](/{{< gh_pages_name >}}/contact/#how-to-ask-for-help) section below.
 - Check our the [Learn More](/{{< gh_pages_name >}}/learn_more/) page for detailed how-to guides and tutorials.
+
 - Installation Issues? Check our the [Install](/{{< gh_pages_name >}}/install/#install-trouble) page.
+
 - Rhino or Grasshopper Trouble? Check out the [Rhino Forum.](https://discourse.mcneel.com/)
+
 - Ladybug-Tools or Honeybee Trouble? Check out the [Ladybug-Tools Forum](https://discourse.ladybug.tools/) for folks who have run into similar issues.
+
 - If you can't find the answer anywhere above, try posting a question to the [Ladybug-Tools Forum](https://discourse.ladybug.tools/). For most questions, we encourage you to ask them publicly on the forum, that way when we are able the answer them they become a resource for future users who run into the same issue. Consider the [How to Ask for Help](/{{< gh_pages_name >}}/contact/#how-to-ask-for-help) section below.
+
 - Found a Bug? Feel free to open a new [Issue on the GitHub page](https://github.com/PH-Tools/honeybee_grasshopper_ph/issues) anytime.
+
 - If you still can't find the answer you are looking for, you can always email us at: phtools@bldgtyp.com Consider the [How to Ask for Help](/{{< gh_pages_name >}}/contact/#how-to-ask-for-help) section below.
 
 ## How to Ask for Help
@@ -33,7 +39,7 @@ to do that we need you to provide enough information for us to know what is happ
 - Operating System and version (Windows, Mac, etc)
 - Rhino version you are running
 - Ladybug Tools version you are running
-- PHPP version and language if exporing to PHPP
+- PHPP version and language if exporting to PHPP
 - WUFI-Passive version if exporting to WUFI
 - Versions of any other relevant plugins you are using?
 
@@ -42,10 +48,15 @@ to do that we need you to provide enough information for us to know what is happ
 
 **Example Files:**
 If you are providing sample files, remember some important things:
+
 - We don't have access to your computer or network, so ensure any linked files or references are 'internalized to the GH file. 
+
 - For weather files, use the download weather file LBT tool, since as with the above, hard-coded paths to files on your computer will cause errors for the file receiver.
+
 - With things like geometry, remember also that the geometry does not travel with the GH file automatically either, so things like *pipelines* will not work.
+
 - We don't have the same GH plugins that you having installed, so remove anything other than vanilla-GH, honeybee, or honeybee-ph components from your GH definition before sharing.
+
 - When troubleshooting, it is always helpful to distill the GH definition down to the bare minimum and isolate the offending bit. Often just by doing that you can find the place where things are going wrong. So try pulling out the bare minimum geometry and components and see if the function in question still gives you trouble.
 
 
@@ -57,5 +68,7 @@ If you want to contact us regarding any aspect of the Honeybee-PH toolkit, email
 
 ## Relevant Links
 - Honeybee-Grasshopper-PH [GitHub repository](https://github.com/PH-Tools/honeybee_grasshopper_ph)
+
 - Honeybee-PH [GitHub repository](https://github.com/PH-Tools/honeybee_ph)
+
 - PHX [Github repository](https://github.com/PH-Tools/PHX)

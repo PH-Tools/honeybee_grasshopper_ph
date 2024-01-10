@@ -21,31 +21,35 @@ except ImportError as e:
     raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
 
 try:
-    import PHX.run
+    from PHX import run
 except ImportError as e:
     raise ImportError('\nFailed to import PHX:\n\t{}'.format(e))
 
 
 class GHCompo_WriteToPHPP(object):
-                
+              
     def __init__(self, _IGH, _hb_json_file, _activate_variants, _write):
         # type: (gh_io.IGH, str, str, bool) -> None
         self.IGH = _IGH
         self.hb_json_file = _hb_json_file
         self.activate_variants = _activate_variants or "False"
         self.write = _write or False
-        
-        #-------------------------------------------------------------------------------
-        if os.name != 'nt':
-            msg = "Error: This PHPP writer is only supported on Windows OS. It looks like "\
-                "you are running '{}'?".format(os.name)
-            self.IGH.error(msg)
+
+    def os_name(self, _os_name):
+        # type: (str) -> str
+        """Return the OS name as a nice string."""
+        if _os_name == "nt":
+            return "Windows"
+        elif _os_name == "posix":
+            return "Mac/Linux"
+        else:
+            return _os_name
 
     def run(self):
         # type: () -> None
         if self.write and self.hb_json_file:
             hb_python_site_packages = honeybee.config.folders.python_package_path
-            stdout, stderr = PHX.run.write_hbjson_to_phpp(self.hb_json_file, hb_python_site_packages, self.activate_variants)
+            stdout, stderr = run.write_hbjson_to_phpp(self.hb_json_file, hb_python_site_packages, self.activate_variants)
             self.check_for_verification_version_warning(stdout)
         else:
             msg = "Please open a valid PHPP file in Excel, and set '_write' to True."
@@ -62,4 +66,4 @@ class GHCompo_WriteToPHPP(object):
                     "'Building Segment', and set the '_phpp_version' to '10'."
                     )
                 self.IGH.warning(msg)
-                return 
+                return None

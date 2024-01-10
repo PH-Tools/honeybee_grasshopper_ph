@@ -29,7 +29,7 @@ This tool will download and install several new libraries into the Ladybug-Tools
 python interpreter, and will download and install new Grasshopper components which
 will be added to your Rhino / Grasshopper installation.
 -
-EM June 1, 2023
+EM January 10, 2024
     Args:
         _install: (bool) Set to True to install Honeybee-PH on your computer.
         
@@ -67,17 +67,25 @@ EM June 1, 2023
 COMPONENT = ghenv.Component # type: ignore
 COMPONENT.Name = 'HBPH Installer'
 COMPONENT.NickName = 'HBPHInstall'
-COMPONENT.Message = 'JUN_01_2023'
+COMPONENT.Message = 'JAN_10_2024'
 COMPONENT.Category = 'Honeybee-PH'
 COMPONENT.SubCategory = '00 | Utils'
 COMPONENT.AdditionalHelpFromDocStrings = '0'
+COMPONENT.ToggleObsolete(False)
 
 # -- Required Versions
 MIN_VER_RHINO = (7, 18)
-MIN_VER_LBT_GH = (1, 6, 20)
+MIN_VER_LBT_GH = (1, 7, 26)
 
 import os
 import sys
+import json
+import subprocess
+
+try:
+    import ctypes
+except:
+    pass # MacOs
 
 try:
     from typing import Optional, Tuple
@@ -100,7 +108,7 @@ except ImportError:
     pass # Outside Rhino/Grasshopper
 
 try:
-    from ladybug_rhino.versioning import change
+    #from ladybug_rhino.versioning import change
     from ladybug_rhino import grasshopper as lbt_gh
     from ladybug_rhino.config import folders as lbr_folders
     lbr_loaded = True
@@ -124,6 +132,34 @@ except ImportError as e:
             'Please make sure Ladybug and Honeybee are installed properly before proceeding.\t{}'.format(e)
     raise ImportError(msg)
 
+
+# -- Required for Rhino 8, otherwise the new py3.9 hijacks the pip install
+CUSTOM_ENV = os.environ.copy()
+CUSTOM_ENV['PYTHONHOME'] = ''
+
+def require_admin(_component_input):
+    # type: (Optional[bool]) -> bool
+    """There may be cases where the user wants to install WITHOUT admin."""
+    if _component_input is not None:
+        return _component_input
+    else:
+        return True
+
+def is_windows_user_admin():
+    # type: () -> bool
+    """For Windows only, return True if the user opened Rhino 'As Administrator' and False if not."""
+    if (os.name != 'nt'): # In case used on MacOs
+        return True
+    
+    try:
+        mode = ctypes.windll.shell32.IsUserAnAdmin() != 0
+    except Exception as e:
+        raise Exception(e)
+    
+    if mode != 0:
+        return True
+    else:
+        return False
 
 def check_rhino_version_compatibility(_min_version_allowed):
     # type: (Tuple[int, int]) -> bool
@@ -200,8 +236,57 @@ def check_LBT_GH_version_compatibility(_min_version_allowed):
     
     return True
 
-def pip_install(_package_name, _package_version, _lbt_python_exe_path, _lbt_python_package_path, _package_install_folder_name=None):
-    # type: (str, Optional[str], str, str, Optional[str]) -> None
+def update_libraries_pip(python_exe, package_name, version=None, target=None, _env=None):
+    # type: (str, str, str, str, Optional[Dict]) -> str
+    """Update/Install Python libraries using pip.
+    
+    Args:
+        python_exe: The path to the Python executable to be used for installation.
+        package_name: The name of the PyPI package to install
+        version: An optional string for the version of the package to install.
+        target: An optional target directory into which the package will be installed.
+        _env: The OS Environment to be used for the Pip-Install
+    Returns:
+        error_msg (str)
+    """
+    
+    # Set the environment for pip install to fix Rhino-8 issues
+    if _env == None:
+        _env = os.environ
+        
+    # build up the command using the inputs
+    if version is not None:
+            package_name = '{}=={}'.format(package_name, version)
+    
+    cmds = [python_exe, '-m', 'pip', 'install', package_name]
+    
+    if version is None:
+        cmds.append('-U')
+    
+    if target is not None:
+        cmds.extend(['--target', target, '--upgrade'])
+
+    # execute the command and print any errors
+    print('Installing "{}" version via pip'.format(package_name))
+    
+    use_shell = True if os.name == 'nt' else False
+    
+    # Use the ENV passed in to fix any Rhino-8 issues
+    process = subprocess.Popen(
+        cmds, shell=use_shell, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=_env)
+    
+    output = process.communicate()
+    
+    stdout, stderr = output
+    
+    error_msg = 'Package "{}" may not have been updated correctly' \
+        'or its usage in the plugin may have changed. See pip stderr below:' \
+        '{}'.format(package_name, stderr)
+    
+    return error_msg
+
+def pip_install(_package_name, _package_version, _lbt_python_exe_path, _lbt_python_package_path, _package_install_folder_name=None, _env=None):
+    # type: (str, Optional[str], str, str, Optional[str], Optional[Dict]) -> None
     """PIP install a specified package from PyPi to the Ladybug Tools Python.
     
     Arguments:
@@ -217,23 +302,32 @@ def pip_install(_package_name, _package_version, _lbt_python_exe_path, _lbt_pyth
             different than the package name (ie: "honeybee-ph" --> "honeybee_ph"). If None
             is supplied, will try and automatically create the folder name by replacing all
             hyphens with underscores.
-    
+        * _env: The OS Environment to use for the Pip-Install
     Returns:
     --------
         * None
     """
+    
+    # Set the environment for pip install to fix Rhino-8 issues
+    if _env == None:
+        _env = os.environ
+    
     if not _package_install_folder_name:
         _package_install_folder_name = _package_name.replace("-", "_")
-
-    print('- '*25)
-    print('Installing Python package: {}.'.format(_package_name))
-    stderr = change.update_libraries_pip(_lbt_python_exe_path, _package_name, _package_version)
-    package_install_folder = os.path.join(_lbt_python_package_path, "{}-{}.dist-info".format(_package_install_folder_name, _package_version))
     
-    if os.path.isdir(package_install_folder):
-        print('Package {} v{} successfully installed to: {} '.format(_package_name, _package_version, _lbt_python_package_path))
+    package_dist_folder_name = "{}-{}.dist-info".format(_package_install_folder_name, _package_version)
+    package_dist_folder_path = os.path.join(_lbt_python_package_path, package_dist_folder_name)
+    
+    print('- '*25)
+    print('Installing Python package: {} (v{}) to: {}'.format(_package_name, _package_version, _lbt_python_package_path))
+    stderr = update_libraries_pip(_lbt_python_exe_path, _package_name, _package_version, _env=_env)
+    package_install_folder = os.path.join(_package_install_folder_name, package_dist_folder_name)
+    
+    if os.path.isdir(package_dist_folder_path):
+        print("Package '{}' (v-{}) successfully installed to: {}".format(_package_name, _package_version, _lbt_python_package_path))
     else:
-        print('Package {} v{} failed to install to: '.format(_package_name, _package_version, _lbt_python_package_path))
+        print("Could not find {}".format(package_dist_folder_path))
+        print("Package '{}' (v-{}) failed to install to: {}".format(_package_name, _package_version, _lbt_python_package_path))
         lbt_gh.give_warning(COMPONENT, stderr)
         print(stderr)
 
@@ -366,8 +460,7 @@ def copy_grasshopper_components_to_UserObjects(_repo_name, _download_directory, 
     print("Removing directory: {}".format(repo_download_directory))
     futil.nukedir(repo_download_directory, True)
 
-def install_from_GitHub(_hbph_branch, _phx_branch, _hbph_gh_branch, _rich_version, 
-                        _xlwings_version, _lbt_python_exe_path, _lbt_python_package_path):
+def install_from_GitHub(_hbph_branch, _phx_branch, _hbph_gh_branch, _rich_version, _xlwings_version, _lbt_python_exe_path, _lbt_python_package_path):
     # type: (Optional[str], Optional[str], Optional[str], Optional[str], Optional[str], str, str) -> None
     """Download all the files directly from the GitHub repositories into the Ladybug Python site-packages.
     
@@ -412,8 +505,45 @@ def install_from_GitHub(_hbph_branch, _phx_branch, _hbph_gh_branch, _rich_versio
     lbt_gh.give_popup_message(''.join([success_msg, restart_msg]), 'Installation Successful!')
     return
 
-def install_from_PyPi(_hbph_version, _phx_version, _hbph_gh_branch, _lbt_python_exe_path, _lbt_python_package_path):
-    # type: (Optional[str], Optional[str], Optional[str], str, str) -> None
+def update_pip(python_exe, _env=None):
+    # type: (str, Optional[Dict]) -> str
+    """Update 'Pip' to avoid seeing those error.
+    
+    Args:
+        _env: The OS Environment to be used for the Pip-Install
+    Returns:
+        error_msg (str)
+    """
+    
+    # Set the environment for pip install to fix Rhino-8 issues
+    if _env == None:
+        _env = os.environ
+        
+    # build up the command using the inputs
+    cmds = [python_exe, '-m', 'pip', 'install', '--upgrade', 'pip']
+    
+    # execute the command and print any errors
+    print('Updating Pip...')
+    
+    use_shell = True if os.name == 'nt' else False
+    
+    # Use the ENV passed in to fix any Rhino-8 issues
+    try:
+        process = subprocess.Popen(
+            cmds, shell=use_shell, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=_env)
+        
+        output = process.communicate()
+        
+        stdout, stderr = output
+        
+        error_msg = 'Command: {} may have failed for some reason'.format(cmds)
+    except Exception as e:
+        error_msg = e
+
+    return error_msg
+
+def install_from_PyPi(_hbph_version, _phx_version, _hbph_gh_branch, _lbt_python_exe_path, _lbt_python_package_path, _env=None):
+    # type: (Optional[str], Optional[str], Optional[str], str, str, Optional[Dict]) -> None
     """Install Honeybee-PH and PHX Packages from PIP, download Grasshopper components from Github.
     
     Arguments:
@@ -426,16 +556,22 @@ def install_from_PyPi(_hbph_version, _phx_version, _hbph_gh_branch, _lbt_python_
             install. If None is supplied, 'main' will be used.
         * _lbt_python_exe_path (str): The path to the Ladybug Tools python.exe
         * _lbt_python_package_path (str): The path to the Ladybug Tools python site-packages directory.
+        * _env: The os.environ dict to use for pip-install
     
     Returns:
     --------
         * None
     """
-
+    
+    # Set the environment for pip install to fix Rhino-8 issues
+    if _env == None:
+        _env = os.environ
+    
     # -------------------------------------------------------------------------
     # Install the Honeybee-PH and PHX packages from PyPi
-    pip_install('honeybee-ph', _hbph_version, _lbt_python_exe_path, _lbt_python_package_path)
-    pip_install('phx', _phx_version, _lbt_python_exe_path, _lbt_python_package_path)
+    #update_pip(_lbt_python_exe_path, _env=_env)
+    pip_install('honeybee-ph', _hbph_version, _lbt_python_exe_path, _lbt_python_package_path, _env=_env)
+    pip_install('phx', _phx_version, _lbt_python_exe_path, _lbt_python_package_path, _env=_env)
     
     # -------------------------------------------------------------------------
     # -- Install the Rhino / Grasshopper Components and Libraries from GitHub
@@ -451,17 +587,8 @@ def install_from_PyPi(_hbph_version, _phx_version, _hbph_gh_branch, _lbt_python_
     lbt_gh.give_popup_message(''.join([success_msg, restart_msg]), 'Installation Successful!')
     return
 
-def require_admin(_component_input):
-    # type: (Optional[bool]) -> bool
-    """There may be cases where the user wants to install WITHOUT admin."""
-    if _component_input is not None:
-        return _component_input
-    else:
-        return True
-
-
-def install_honeybee_ph(_install, _hbph_branch, _hbph_gh_branch, _phx_branch, _hbph_version, _phx_version, _min_ver_rhino, _min_ver_lbt_gh, _require_admin):
-    # type: (bool, Optional[str], Optional[str], Optional[str], Optional[str], Optional[str], Tuple[int, int], Tuple[int, int, int], bool) -> None
+def install_honeybee_ph(_install, _hbph_branch, _hbph_gh_branch, _phx_branch, _hbph_version, _phx_version, _min_ver_rhino, _min_ver_lbt_gh, _require_admin, _env=None):
+    # type: (bool, Optional[str], Optional[str], Optional[str], Optional[str], Optional[str], Tuple[int, int], Tuple[int, int, int], bool, Optional[Dict]) -> None
     """Install the Honeybee-PH plugin.
     
     Arguments:
@@ -475,12 +602,17 @@ def install_honeybee_ph(_install, _hbph_branch, _hbph_gh_branch, _phx_branch, _h
         * _min_ver_rhino (Tuple[int, int]):
         * _min_ver_lbt_gh (Tuple[int, int, int]):
         * _require_admin (bool):
+        * _env: The os.environ dict to use for pip-install
     
     Returns:
     --------
         * None
     """
-
+    
+    # Set the environment for pip install to fix Rhino-8 issues
+    if _env == None:
+        _env = os.environ
+    
     # -------------------------------------------------------------------------
     # -- Check version compatibility
     check_rhino_version_compatibility(_min_ver_rhino)
@@ -492,7 +624,7 @@ def install_honeybee_ph(_install, _hbph_branch, _hbph_gh_branch, _phx_branch, _h
     # -- up all sorts of things. This error should be raised BEFORE any installation 
     # -- to ensure that nothing gets mistakenly installed elsewhere on the user's system.
     if _require_admin:
-        if (os.name == 'nt') and (not lbt_gh.is_user_admin()):
+        if not is_windows_user_admin():
             msg = "Warning: You must have 'Admin' privileges on this computer in order "\
                 "to properly install Honeybee-PH. Try restarting Rhino using "\
                 "'Run as administrator' before proceeding."
@@ -526,8 +658,10 @@ def install_honeybee_ph(_install, _hbph_branch, _hbph_gh_branch, _phx_branch, _h
                             _hbph_gh_branch, 
                             hb_folders.python_exe_path,
                             hb_folders.python_package_path,
+                            _env=_env
                         )
         return
+
 
 # ---
 admin = require_admin(_require_admin)
@@ -535,7 +669,8 @@ admin = require_admin(_require_admin)
 # ---
 if _install:
     install_honeybee_ph(_install, _hbph_branch, _hbph_gh_branch, _phx_branch,
-                        _hbph_version, _phx_version, MIN_VER_RHINO, MIN_VER_LBT_GH, admin)
+                        _hbph_version, _phx_version, MIN_VER_RHINO,
+                        MIN_VER_LBT_GH, admin, CUSTOM_ENV)
 else:
     msg = 'Please:'\
     '- Be sure you have already installed Ladybug Tools.'\

@@ -5,11 +5,14 @@ weight: 30
 
 ## [Video] Introduction to Honeybee-PH
 
-This high-level overview of the Honeybee-PH project is helpful if you are looking to better understand the goals and uses of the tools. This 1 hour session, delivered for the [Passive House Network](https://naphnetwork.org/) in October of 2022 can be found here: [YouTube](https://youtu.be/8lPkArXUUoA)
+Several 'Introduction to HBPH' sessions have been recorded and are available trough YouTube:
 
-[![YouTube Logo](/honeybee_grasshopper_ph/img/learn_more/Intro_to_HBPH_Splash.png)](https://youtu.be/8lPkArXUUoA)
+- [Passive House Network: An Introduction to HBPH (1 hour) | Oct, 2022 ](https://youtu.be/8lPkArXUUoA)
 
-## [Video] WUFI-Passive Tutorial
+- [New York Passive House: Regenerative Metropolis Workshop (2 hours) | Nov. 2023](https://www.youtube.com/watch?v=924P8LYrKVs)
+{{< download_btn_wrkshp_parsons_220923 >}}
+
+## [Video] WUFI-Passive Single-Family Tutorials
 
 Check out the first Honeybee-PH to [WUFI-Passive](https://wufi.de/en/software/wufi-passive/) video tutorial series here: [YouTube](https://youtube.com/playlist?list=PLi6KNBJLE8H9i0O_Y7NYoZuu4ZYOEd0RE)
 
@@ -19,9 +22,7 @@ In this 14 episode series, we take a simple single-family home building from a b
 
 [![YouTube Logo](/honeybee_grasshopper_ph/img/learn_more/WUFI_YouTube_Splash.png)](https://youtube.com/playlist?list=PLi6KNBJLE8H9i0O_Y7NYoZuu4ZYOEd0RE)
 
-## [Workshop] Parsons Regenerative Metropolis Symposium
 
-{{< download_btn_wrkshp_parsons_220923 >}}
 
 <!-- - - -
 ## Windows

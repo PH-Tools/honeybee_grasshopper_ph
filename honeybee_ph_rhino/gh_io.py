@@ -427,6 +427,10 @@ class IGH:
         extrusion_vector = self.ghpythonlib_components.UnitZ(_dist)
         rh_brep = from_face3d(_face3D)
         volume_geom = self.ghpythonlib_components.Extrude(rh_brep, extrusion_vector)
+        try:
+            volume_geom = volume_geom.ToBrep()
+        except AttributeError:
+            pass
 
         return self.convert_to_LBT_geom(volume_geom)[0]
 
