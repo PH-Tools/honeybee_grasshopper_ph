@@ -7,10 +7,13 @@ weight: 30
 
 Several 'Introduction to HBPH' sessions have been recorded and are available trough YouTube:
 
-- [Passive House Network: An Introduction to HBPH (1 hour) | Oct, 2022 ](https://youtu.be/8lPkArXUUoA)
+- [Jan. 2024 | Phius Webinar: Introduction to HBPH (1 hour)](https://www.phius.org/honeybee-ph-ed-may)
 
-- [New York Passive House: Regenerative Metropolis Workshop (2 hours) | Nov. 2023](https://www.youtube.com/watch?v=924P8LYrKVs)
+- [Nov. 2023 | New York Passive House: Regenerative Metropolis Workshop (2 hours)](https://www.youtube.com/watch?v=924P8LYrKVs)
 {{< download_btn_wrkshp_parsons_220923 >}}
+
+- [Oct. 2022 | Passive House Network: An Introduction to HBPH (1 hour)](https://youtu.be/8lPkArXUUoA)
+
 
 ## [Video] WUFI-Passive Single-Family Tutorials
 
