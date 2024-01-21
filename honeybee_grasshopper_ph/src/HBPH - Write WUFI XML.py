@@ -24,7 +24,7 @@ Convert an HBJSON file into a new WUFI-XML file which can then be opened using
 WUFI-Passive. This will read in the HBJSON, rebuild the HB-Model before converting the 
 Model into a WUFI-Passive file.
 -
-EM May 20, 2023
+EM January 21, 2024
     Args:
         _filename: (str) The filename for the WUFI XML file.
         
@@ -35,11 +35,23 @@ EM May 20, 2023
         _group_components: (bool) Default=True. Set False to keep each component
             (face) in the WUFI Model separate.
         
-        _merge_faces: (bool) Default=False. Set True to try and merge together 
+        _merge_faces: (bool | float [tolerance]) Default=False. Set True to try and merge together 
             touching faces in order to simplify the model. This operation can 
             somethimes have unexpected results with some geometry, so only use 
             it if you really need to reduce the complexity of the WUFI model and 
-            be sure to careufully check the resulting model faces for errors.
+            be sure to careufully check the resulting model faces for errors. If you
+            have errors when merging, try passing in a smaller tolerance value here (0.0001, etc) 
+            and see if that helps.
+
+        _generate_log_files: (int) Default=0 Input a log-level here if you would like PHX to generate log-files
+            which record the operations and progress of the HBJSON->XML process. Input either:
+
+50 = CRITICAL
+40 = ERROR
+30 = WARNING
+20 = INFO
+10 = DEBUG
+0 = NO LOGS (DEFAULT)
         
         _write_xml: (bool) Set True to run. 
             
@@ -71,6 +83,8 @@ reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Write WUFI XML"
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
+    from PHX import run
+    reload(run)
     from honeybee_ph_rhino.gh_compo_io import write_wuif_xml as gh_compo_io
     reload(gh_compo_io)
     reload(gh_io)
@@ -80,7 +94,7 @@ if DEV:
 IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 
 
-# -------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 gh_compo_interface = gh_compo_io.GHCompo_WriteWufiXml(
         IGH,
         _filename,
@@ -89,5 +103,6 @@ gh_compo_interface = gh_compo_io.GHCompo_WriteWufiXml(
         _write_xml,
         _group_components,
         _merge_faces,
+        _generate_log_files,
 )
 xml_file_ = gh_compo_interface.run()
