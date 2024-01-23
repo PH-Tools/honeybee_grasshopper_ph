@@ -77,8 +77,8 @@ class GHCompo_CreateWindowRhinoGeometry(object):
         # type: () -> Tuple[List[Brep], List[str]]
         """Return a list of window surfaces and their names."""
         self.check_input()
-
-        win_surfaces_, srfc_names_ = [], []
+        
+        win_surfaces_, surface_names_ = [], []
         for baseline, name in izip(self.win_baselines, self.win_names):
             try:
                 win_type = self.win_collection[name]
@@ -90,11 +90,11 @@ class GHCompo_CreateWindowRhinoGeometry(object):
                     )
                 )
                 raise KeyError(msg)
-            srfcs, id_data = win_type.build(baseline)
-            self.check_result(win_type, srfcs, id_data)
-            win_surfaces_ += srfcs
+            surfaces, id_data = win_type.build(baseline)
+            self.check_result(win_type, surfaces, id_data)
+            win_surfaces_ += surfaces
 
             # -- Create the name from the id-data
-            srfc_names_ += self.create_names(id_data)
+            surface_names_ += self.create_names(id_data)
 
-        return win_surfaces_, srfc_names_
+        return win_surfaces_, surface_names_

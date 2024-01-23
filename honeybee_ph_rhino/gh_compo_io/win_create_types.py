@@ -118,23 +118,22 @@ class WindowUnitType(object):
     def build(self, _base_curve):
         # type: (LineCurve) -> Tuple[List[Brep], OrderedDict[int, Dict[str, Any]]]
         """Create the window's Rhino geometry based on the Elements."""
-
         surfaces_ = []
         id_data_ = OrderedDict()
 
         # 1)  Get the Base Plane and create a starting origin plane from it
         self.base_curve = _base_curve
         origin_plane = self.build_origin_plane(_base_curve)
+        if not origin_plane:
+            msg = (
+                "Error: Something went wrong building the Origin-Planes for "
+                "the window with base-curve: {}. Note this window builder ONLY works for vertical "
+                "planar windows. Skylights or windows on sloped surfaces are not supported".format(_base_curve)
+            )
+            raise Exception(msg)
 
         # -- Walk through each column, and each row in each column
         for col_element_lists in self.elements_by_column(self.elements):
-            if not origin_plane:
-                msg = (
-                    "Error: Something went wrong building the origin planes for "
-                    "the window geometry? Note this window builder ONLY works for vertical "
-                    "planar windows. Skylights or windows on sloped surfaces are not supported"
-                )
-                raise Exception(msg)
 
             # 2) Build the base-curve for the Column's elements
             width = col_element_lists[0].width

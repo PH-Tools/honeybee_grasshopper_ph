@@ -57,6 +57,7 @@ class GHCompo_WriteWufiXml(object):
         else:
             self.merge_faces = float(_merge_faces) # Tolerance
 
+
     def give_user_warnings(self, _stdout):
         # type: (str) -> None
         """Give user warnings if any."""
@@ -68,6 +69,7 @@ class GHCompo_WriteWufiXml(object):
     def run(self):
         # type: () -> Optional[str]
         if self.write_xml and self.hb_json_file:
+            print("Logging with log-level: {}".format(self.generate_log_files))
             save_dir, save_filename, stdout, stderr = PHX.run.convert_hbjson_to_WUFI_XML(
                 self.hb_json_file,
                 self.filename,
