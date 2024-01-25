@@ -2,7 +2,7 @@
 
 Honeybee-PH plugins and components for Rhino / Grasshopper.
 
-<img width="978" alt="image" src="https://user-images.githubusercontent.com/69652712/193476135-cfe77702-21e1-4e5e-905e-98191ce5c3e3.png">
+![Screenshot 2024-01-25 at 6 50 49 PM](https://github.com/PH-Tools/honeybee_grasshopper_ph/assets/69652712/47b0556a-bcb8-4266-8fe3-99548bbccf36)
 
 This repository contains all PH (Passive House) modeling Grasshopper components for the Honeybee-PH plugin. Once installed, these new Grasshopper components will allow you to add detailed 'Passive House' style data to your Honeybee models, and to export the Honeybee models to both the Passive House Planning Package (PHPP) and WUFI-Passive. The package includes both the userobjects (`.ghuser`) and the Python source (`.py`). Note that this library only possesses the Grasshopper components. In order to use the plugin the core Honeybee, Honeybee-PH and PHX libraries must also be installed in a way that they can be found by Rhino (see dependencies and install instructions below).
 
