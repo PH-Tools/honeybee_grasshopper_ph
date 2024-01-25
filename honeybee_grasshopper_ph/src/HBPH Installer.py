@@ -29,7 +29,7 @@ This tool will download and install several new libraries into the Ladybug-Tools
 python interpreter, and will download and install new Grasshopper components which
 will be added to your Rhino / Grasshopper installation.
 -
-EM January 12, 2024
+EM January 25, 2024
     Args:
         _install: (bool) Set to True to install Honeybee-PH on your computer.
         
@@ -67,7 +67,7 @@ EM January 12, 2024
 COMPONENT = ghenv.Component # type: ignore
 COMPONENT.Name = 'HBPH Installer'
 COMPONENT.NickName = 'HBPHInstall'
-COMPONENT.Message = 'JAN_12_2024'
+COMPONENT.Message = 'JAN_25_2024'
 COMPONENT.Category = 'Honeybee-PH'
 COMPONENT.SubCategory = '00 | Utils'
 COMPONENT.AdditionalHelpFromDocStrings = '0'
@@ -453,10 +453,22 @@ def copy_grasshopper_components_to_UserObjects(_repo_name, _download_directory, 
         print(msg)
         return
     
-    target = os.path.join(_target_directory[0], 'honeybee_grasshopper_ph')
+    target = os.path.join(_target_directory[0], _repo_name)
     
+    # -- Clean out any existing files in the target directory.
+    if os.path.exists(target):
+        for file_name in os.listdir(dest_dir):
+            file_path = os.path.join(dest_dir, file_name)
+            try:
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+            except Exception as e:
+                print("Error deleting file or directory: {}".format(e))
+
     print('- '*25)
-    print('Copying Honeybee-PH Grasshopper Components from::{} to::{}'.format(hbph_gh_source_folder, target))
+    print('Copying Grasshopper Components from::{} to::{}'.format(hbph_gh_source_folder, target))
     
     futil.copy_file_tree(hbph_gh_source_folder, target, overwrite=True)
     
@@ -492,12 +504,20 @@ def install_from_GitHub(_hbph_branch, _phx_branch, _hbph_gh_branch, _rich_versio
     pip_install('rich', _rich_version, _lbt_python_exe_path, _lbt_python_package_path)
     pip_install('xlwings', _xlwings_version, _lbt_python_exe_path, _lbt_python_package_path)
 
-    # -- Get the required Honeybee-PH repo's from GitHub
+    # -- Get the Honeybee-PH and PHX from GitHub
     # -------------------------------------------------------------------------
     get_files_from_github_repo('honeybee_ph', hb_folders.python_package_path, _hbph_branch or 'main')
     get_files_from_github_repo('PHX', hb_folders.python_package_path, _phx_branch or 'main')
-    get_files_from_github_repo('honeybee_grasshopper_ph', hb_folders.python_package_path, _hbph_gh_branch or 'main')
+
+    # -- Get the Honeybee-PH Grasshopper Components from GitHub
+    # -------------------------------------------------------------------------
+    get_files_from_github_repo('honeybee_grasshopper_ph', hb_folders.python_package_path, 'main')
     copy_grasshopper_components_to_UserObjects('honeybee_grasshopper_ph', hb_folders.python_package_path, UserObjectFolders)
+
+    # -- Get the Honeybee-PH+ Grasshopper Components from GitHub
+    # -------------------------------------------------------------------------
+    get_files_from_github_repo('honeybee_grasshopper_ph_plus', hb_folders.python_package_path, 'main')
+    copy_grasshopper_components_to_UserObjects('honeybee_grasshopper_ph_plus', hb_folders.python_package_path, UserObjectFolders)
 
     # -------------------------------------------------------------------------
     # -- Give a success message
@@ -577,9 +597,14 @@ def install_from_PyPi(_hbph_version, _phx_version, _hbph_gh_branch, _lbt_python_
     pip_install('phx', _phx_version, _lbt_python_exe_path, _lbt_python_package_path, _env=_env)
     
     # -------------------------------------------------------------------------
-    # -- Install the Rhino / Grasshopper Components and Libraries from GitHub
+    # -- Install the Honeybee-PH Grasshopper Components and Libraries from GitHub
     get_files_from_github_repo('honeybee_grasshopper_ph', hb_folders.python_package_path, _hbph_gh_branch or 'main')
     copy_grasshopper_components_to_UserObjects('honeybee_grasshopper_ph', hb_folders.python_package_path, UserObjectFolders)
+    
+    # -------------------------------------------------------------------------
+    # -- Install the Honeybee-PH+ Grasshopper Components and Libraries from GitHub
+    get_files_from_github_repo('honeybee_grasshopper_ph_plus', hb_folders.python_package_path, _hbph_gh_branch or 'main')
+    copy_grasshopper_components_to_UserObjects('honeybee_grasshopper_ph_plus', hb_folders.python_package_path, UserObjectFolders)
     
     # -------------------------------------------------------------------------
     # Give a success message
