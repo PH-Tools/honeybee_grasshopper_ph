@@ -457,8 +457,8 @@ def copy_grasshopper_components_to_UserObjects(_repo_name, _download_directory, 
     
     # -- Clean out any existing files in the target directory.
     if os.path.exists(target):
-        for file_name in os.listdir(dest_dir):
-            file_path = os.path.join(dest_dir, file_name)
+        for file_name in os.listdir(target):
+            file_path = os.path.join(target, file_name)
             try:
                 if os.path.isfile(file_path):
                     os.unlink(file_path)

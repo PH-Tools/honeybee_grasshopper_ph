@@ -43,15 +43,6 @@ from honeybee_ph_rhino.gh_compo_io.win_set_inst_depth import (
 from honeybee_ph_rhino.gh_compo_io.win_calc_phius_blind import (
     GHCompo_CalcPhiusShadeTransmittance,
 )
-from honeybee_ph_rhino.gh_compo_io.win_rebuild_rh_geom import (
-    GHCompo_RebuildWindowSurfaces,
-)
-from honeybee_ph_rhino.gh_compo_io.win_create_types import (
-    GHCompo_CreateWindowUnitTypes,
-)
-from honeybee_ph_rhino.gh_compo_io.win_create_geom import (
-    GHCompo_CreateWindowRhinoGeometry,
-)
 
 # -- Envelope
 from honeybee_ph_rhino.gh_compo_io.assmbly_create_sd_const import (
@@ -59,9 +50,6 @@ from honeybee_ph_rhino.gh_compo_io.assmbly_create_sd_const import (
 )
 from honeybee_ph_rhino.gh_compo_io.assmbly_create_mixed_mat import (
     GHCompo_CreateMixedHBMaterial,
-)
-from honeybee_ph_rhino.gh_compo_io.assmbly_import_flixo_mats import (
-    GHCompo_ImportFlixoMaterials,
 )
 from honeybee_ph_rhino.gh_compo_io.assmbly_create_detailed_const import (
     GHCompo_CreateDetailedConstructions,
@@ -167,7 +155,6 @@ from honeybee_ph_rhino.gh_compo_io.visualize_spaces import GHCompo_VisualizeSpac
 from honeybee_ph_rhino.gh_compo_io.visualize_win_frames import (
     GHCompo_VisualizeWindowFrameElements,
 )
-from honeybee_ph_rhino.gh_compo_io.util_clean_input_breps import GHCompo_CleanInputBreps
 
 # -- Organize
 from honeybee_ph_rhino.gh_compo_io.organize_spaces import GHCompo_OrganizeSpaces
