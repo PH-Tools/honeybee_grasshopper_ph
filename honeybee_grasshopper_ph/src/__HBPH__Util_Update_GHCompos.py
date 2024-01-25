@@ -1,12 +1,12 @@
 """
 Updates all the GH-Components in the Source dir (Github)
 -
-EM January 10, 2024
+EM January 25, 2024
 """
 
 ghenv.Component.Name = "__HBPH__Util_Update_GHCompos"
 ghenv.Component.NickName = "HBPH_Update_Source"
-ghenv.Component.Message = 'JAN_10_2024'
+ghenv.Component.Message = 'JAN_25_2024'
 ghenv.Component.IconDisplayMode = ghenv.Component.IconDisplayMode.application
 ghenv.Component.Category = "Honeybee-PH"
 ghenv.Component.SubCategory = "00 | Utils"
@@ -17,21 +17,24 @@ import Grasshopper.Kernel as ghK
 import shutil
 
 class AllComponents():
-    def __init__(self, _source_dir, _ghdoc, _ghK):
+    def __init__(self, _name_identifier, _source_dir, _ghdoc, _ghK):
+        # type: (str, str, Any, Any) -> None
+        self.name_identifier = _name_identifier
         self.source_dir = _source_dir
         self.compos = []
         self.ghdoc = _ghdoc
         self.ghK = _ghK
     
     def __enter__(self):
-        print('Adding all the Components to the Canvas')
+        print('Adding all {} the Components to the Canvas'.format(self.name_identifier))
         ghuserFileNames = os.listdir(self.source_dir)
         
         for eachCompoName in ghuserFileNames:
             if '.' == eachCompoName[0]: continue # Fucking Mac OS....
-            if 'HBPH' not in eachCompoName: continue
+            if self.name_identifier not in eachCompoName: continue
             if '__' == eachCompoName[:2]: continue
             
+            print "Adding: {}".format(eachCompoName)
             compo_address = self.source_dir + eachCompoName
             compo = self.ghK.GH_UserObject(compo_address).InstantiateObject()
             self.ghdoc = ghenv.Component.OnPingDocument()
@@ -55,7 +58,7 @@ def copy_py_code(_save_address):
     objs = list(doc.Objects)
     
     for obj in objs:    
-        if obj.Category not in ['Honeybee-PH', 'HB-PH']:
+        if obj.Category not in ['Honeybee-PH', 'HB-PH', 'HB-PH+']:
             continue
         
         if 'Code' not in dir(obj):
@@ -83,7 +86,7 @@ def copy_ghuser(_source_address, _save_address):
     objs = list(doc.Objects)
     
     for obj in objs:
-        if obj.Category not in ['Honeybee-PH', 'HB-PH']:
+        if obj.Category not in ['Honeybee-PH', 'HB-PH', 'HB-PH+']:
             continue
         
         if 'HBPH' in str(obj.Name)[:10]:
@@ -107,11 +110,22 @@ def make_dir(_dir_address):
 
 
 if _runIt:
-    #------ Sort out the folders
-    source_dir = str(r"/Users/em/Library/Application Support/McNeel/Rhinoceros/8.0/Plug-ins/Grasshopper (b45a29b1-4343-4035-989e-044e8580d9cf)/UserObjects/honeybee_grasshopper_ph/")
-    save_dir_ghuser    = str(r"/Users/em/Dropbox/bldgtyp-00/00_PH_Tools/honeybee_grasshopper_ph/honeybee_grasshopper_ph/user_objects/")
-    save_dir_ghuser_py = str(r"/Users/em/Dropbox/bldgtyp-00/00_PH_Tools/honeybee_grasshopper_ph/honeybee_grasshopper_ph/src/")
 
-    with AllComponents(source_dir, ghdoc, ghK):
-        copy_ghuser(source_dir, save_dir_ghuser) #----- Copy over the HBPH GH-Components
-        copy_py_code(save_dir_ghuser_py) #----- Copy over all the PY Code from HBPH GH-Components
+    # - - - - - - HBPH Components
+    hbph_source_dir = str(r"/Users/em/Library/Application Support/McNeel/Rhinoceros/8.0/Plug-ins/Grasshopper (b45a29b1-4343-4035-989e-044e8580d9cf)/UserObjects/honeybee_grasshopper_ph/")
+    hbph_save_dir_ghuser    = str(r"/Users/em/Dropbox/bldgtyp-00/00_PH_Tools/honeybee_grasshopper_ph/honeybee_grasshopper_ph/user_objects/")
+    hbph_save_dir_ghuser_py = str(r"/Users/em/Dropbox/bldgtyp-00/00_PH_Tools/honeybee_grasshopper_ph/honeybee_grasshopper_ph/src/")
+
+    with AllComponents("HBPH", hbph_source_dir, ghdoc, ghK):
+        copy_ghuser(hbph_source_dir, hbph_save_dir_ghuser) #--------------- Copy over the HBPH GH-Components
+        copy_py_code(hbph_save_dir_ghuser_py) #---------------------------- Copy over all the PY Code from HBPH GH-Components
+
+
+    # - - - - - HBPH+ Components
+    hbph_plus_source_dir = str(r"/Users/em/Library/Application Support/McNeel/Rhinoceros/8.0/Plug-ins/Grasshopper (b45a29b1-4343-4035-989e-044e8580d9cf)/UserObjects/honeybee_grasshopper_ph_plus/")
+    hbph_plus_save_dir_ghuser    = str(r"/Users/em/Dropbox/bldgtyp-00/00_PH_Tools/honeybee_grasshopper_ph_plus/honeybee_grasshopper_ph_plus/user_objects/")
+    hbph_plus_save_dir_ghuser_py = str(r"/Users/em/Dropbox/bldgtyp-00/00_PH_Tools/honeybee_grasshopper_ph_plus/honeybee_grasshopper_ph_plus/src/")
+    
+    with AllComponents("HBPH", hbph_plus_source_dir, ghdoc, ghK):
+        copy_ghuser(hbph_plus_source_dir, hbph_plus_save_dir_ghuser) #----- Copy over the HBPH+ GH-Components
+        copy_py_code(hbph_plus_save_dir_ghuser_py) #---------------------------- Copy over all the PY Code from HBPH+ GH-Components

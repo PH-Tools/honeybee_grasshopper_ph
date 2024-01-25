@@ -162,32 +162,6 @@ from honeybee_ph_rhino.gh_compo_io.write_PHPP import GHCompo_WriteToPHPP
 from honeybee_ph_rhino.gh_compo_io.foundations_add import GHCompo_AddFoundations
 from honeybee_ph_rhino.gh_compo_io.foundations_create import GHCompo_CreateFoundations
 
-# -- Utility
-from honeybee_ph_rhino.gh_compo_io.util_create_collection import (
-    GHCompo_CreateCustomCollection,
-)
-from honeybee_ph_rhino.gh_compo_io.util_get_from_collection import (
-    GHCompo_GetFromCustomCollection,
-)
-from honeybee_ph_rhino.gh_compo_io.util_get_brep_subface_mats import (
-    GHCompo_GetSubFaceMaterials,
-)
-from honeybee_ph_rhino.gh_compo_io.util_create_objs_from_csv import (
-    GHCompo_CreateObjectsFromCSV,
-)
-from honeybee_ph_rhino.gh_compo_io.util_sort_geom_objs_by_level import (
-    GHCompo_SortGeomObjectsByLevel,
-)
-from honeybee_ph_rhino.gh_compo_io.util_sort_hb_objects_by_level import (
-    GHCompo_SortHbObjectsByLevel,
-)
-from honeybee_ph_rhino.gh_compo_io.util_get_attributes import GHCompo_GetObjectAttributes
-from honeybee_ph_rhino.gh_compo_io.util_set_attributes import GHCompo_SetObjectAttributes
-from honeybee_ph_rhino.gh_compo_io.util_diagnose_hb_rooms import (
-    GHCompo_DiagnoseBadHBRoomGeometry,
-)
-from honeybee_ph_rhino.gh_compo_io.util_create_objs_from_key_value import GHCompo_CreateObjectsFromKeyValues
-
 # -- Visualize
 from honeybee_ph_rhino.gh_compo_io.visualize_spaces import GHCompo_VisualizeSpaces
 from honeybee_ph_rhino.gh_compo_io.visualize_win_frames import (
@@ -197,24 +171,3 @@ from honeybee_ph_rhino.gh_compo_io.util_clean_input_breps import GHCompo_CleanIn
 
 # -- Organize
 from honeybee_ph_rhino.gh_compo_io.organize_spaces import GHCompo_OrganizeSpaces
-
-
-# -- AirTable
-from honeybee_ph_rhino.gh_compo_io.airtable_download_data import (
-    GHCompo_AirTableDownloadTableData,
-)
-from honeybee_ph_rhino.gh_compo_io.airtable_create_mat_layers import (
-    GHCompo_AirTableCreateMaterialLayers,
-)
-from honeybee_ph_rhino.gh_compo_io.airtable_create_constructions import (
-    GHCompo_AirTableCreateConstructions,
-)
-from honeybee_ph_rhino.gh_compo_io.airtable_create_window_constructions import (
-    GHCompo_AirTableCreateWindowConstructions,
-)
-
-# -- Reporting
-from honeybee_ph_rhino.reporting.build_pdf_geom_and_attrs import GHCompo_CreatePDFGeometryAndAttributes
-from honeybee_ph_rhino.reporting.build_elev_surfaces import GHCompo_CreateElevationPDFGeometry
-from honeybee_ph_rhino.reporting.annotations import GHCompo_CreateTextAnnotations
-from honeybee_ph_rhino.reporting.build_floor_segments import GHCompo_CreateFloorSegmentPDFGeometry

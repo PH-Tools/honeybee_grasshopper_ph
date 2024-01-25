@@ -5,7 +5,7 @@
 These are called when the component is instantiated within the Grasshopper canvas.
 """
 
-RELEASE_VERSION = "Honeybee-PH v1.1.03"
+RELEASE_VERSION = "Honeybee-PH v1.2.01"
 CATEGORY = "HB-PH"
 SUB_CATEGORIES = {
     0: "00 | Utils",
@@ -353,18 +353,6 @@ COMPONENT_PARAMS = {
         "Category": CATEGORY,
         "SubCategory": 1,
     },
-    "HBPH - Create Window Types": {
-        "NickName": "Create Win Types",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 1,
-    },
-    "HBPH - Create Window Geometry": {
-        "NickName": "Create Geom",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 1,
-    },
     "HBPH - Set Monthly Shade Factor": {
         "NickName": "Set Shade Factor",
         "Message": RELEASE_VERSION,
@@ -404,12 +392,6 @@ COMPONENT_PARAMS = {
     },
     "HBPH - Set Spec Heat Capacity": {
         "NickName": "Set Spec Heat Cap.",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 1,
-    },
-    "HBPH - Import Flixo Materials": {
-        "NickName": "Import Flixo Mats.",
         "Message": RELEASE_VERSION,
         "Category": CATEGORY,
         "SubCategory": 1,
@@ -464,49 +446,6 @@ COMPONENT_PARAMS = {
         "Category": CATEGORY,
         "SubCategory": 3,
     },
-    # -- Export PDF
-    "HBPH - Report Envelope Data": {
-        "NickName": "Report Envelope",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 4,
-    },
-    "HBPH - Report Thermal Bridge Data": {
-        "NickName": "Report TB",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 4,
-    },
-    "HBPH - Report Space Floor Segments": {
-        "NickName": "Report Floor Segments",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 4,
-    },
-    "HBPH - Create Text Annotation": {
-        "NickName": "Create Text Annotation",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 4,
-    },
-    "HBPH - Create PDF Geometry": {
-        "NickName": "Create PDF Geometry",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 4,
-    },
-    "HBPH - Create Elevation PDF Geometry": {
-        "NickName": "Report Elevations",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 4,
-    },
-    "HBPH - Export PDFs": {
-        "NickName": "Export PDFs",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 4,
-    },
     # -- Foundations
     "HBPH - Add Foundations": {
         "NickName": "Add Foundations",
@@ -516,73 +455,6 @@ COMPONENT_PARAMS = {
     },
     "HBPH - Create Foundation": {
         "NickName": "Create Foundation",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 4,
-    },
-    # -- Utility
-    "HBPH - Get Brep Subface Materials": {
-        "NickName": "Get Subface Mats",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 4,
-    },
-    "HBPH - Create Custom Collection": {
-        "NickName": "Create Collection",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 4,
-    },
-    "HBPH - Get From Custom Collection": {
-        "NickName": "Get From Collection",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 4,
-    },
-    "HBPH - Sort Geom by Level": {
-        "NickName": "Sort Geom by Level",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 4,
-    },
-    "HBPH - Sort HB Objects by Level": {
-        "NickName": "Sort HB-Objs by Level",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 4,
-    },
-    "HBPH - Get Object Attributes": {
-        "NickName": "Get Attributes",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 4,
-    },
-    "HBPH - Set Object Attributes": {
-        "NickName": "Set Attributes",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 4,
-    },
-    "HBPH - Create Objects From CSV": {
-        "NickName": "Create Objs from CSV",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 4,
-    },
-    "HBPH - Diagnose HB Rooms": {
-        "NickName": "Diagnose HB Rooms",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 4,
-    },
-    "HBPH - Create Objects from Key-Values": {
-        "NickName": "Create Object",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 4,
-    },
-    "HBPH - Clean Input Breps": {
-        "NickName": "Clean Input Breps",
         "Message": RELEASE_VERSION,
         "Category": CATEGORY,
         "SubCategory": 4,
@@ -607,31 +479,7 @@ COMPONENT_PARAMS = {
         "Category": CATEGORY,
         "SubCategory": 1,
     },
-    # -- AirTable
-    "HBPH - Airtable Download Table Data": {
-        "NickName": "Download Table Data",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 1,
-    },
-    "HBPH - Airtable Create Material Layers": {
-        "NickName": "Airtable Material Layers",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 1,
-    },
-    "HBPH - Airtable Create Constructions": {
-        "NickName": "Airtable Opaque Constructions",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 1,
-    },
-    "HBPH - Airtable Create Window Constructions": {
-        "NickName": "Airtable Window Constructions",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 1,
-    },
+
 }
 
 
