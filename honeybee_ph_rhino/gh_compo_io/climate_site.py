@@ -11,17 +11,18 @@ except ImportError:
 try:
     from honeybee_ph import site
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_ph:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee_ph:\n\t{}".format(e))
 
 try:
     from honeybee_ph_rhino import gh_io
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
 
 class GHCompo_Site(object):
-
-    def __init__(self,_IGH, _display_name,_location,_climate_data,_phpp_library_codes):
+    def __init__(
+        self, _IGH, _display_name, _location, _climate_data, _phpp_library_codes
+    ):
         # type: (gh_io.IGH, Optional[str], Optional[site.Location], Optional[site.Climate], Optional[site.PHPPCodes]) -> None
         self.IGH = _IGH
         self.display_name = _display_name or "_unnamed_"

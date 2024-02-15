@@ -6,17 +6,17 @@
 try:  # import the core honeybee dependencies
     from honeybee.typing import clean_and_id_ep_string
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
 try:
     from honeybee_energy_ph.construction import window
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_energy_ph:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
 
 try:
     from honeybee_ph_rhino.gh_compo_io import ghio_validators
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
 
 class GHCompo_CreatePhGlazing(object):

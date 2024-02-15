@@ -4,34 +4,42 @@
 """GHCompo Interface: HBPH - Create SHW Recirculation Pipes."""
 
 try:
-    from typing import Union, List, Any
+    from typing import Any, List, Union
 except ImportError:
     pass  # IronPython 2.7
 
-from ladybug_rhino.togeometry import to_polyline3d
-from ladybug_geometry.geometry3d.polyline import Polyline3D, LineSegment3D
-
 from honeybee_energy_ph.hvac import hot_water
+from honeybee_ph_utils import input_tools
+from ladybug_geometry.geometry3d.polyline import LineSegment3D, Polyline3D
+from ladybug_rhino.togeometry import to_polyline3d
+
 from honeybee_ph_rhino import gh_io
 from honeybee_ph_rhino.gh_compo_io import ghio_validators
-from honeybee_ph_utils import input_tools
+
 
 class _RecircPipeBuilder(object):
     """Interface for collect and clean DHW Recirculation Piping user-inputs"""
-    
+
     diameter_m = ghio_validators.UnitM("diameter_m", default=0.0254)
-    display_name = ghio_validators.HBName(
-        "display_name", default="_unnamed_recirc_pipe_")
+    display_name = ghio_validators.HBName("display_name", default="_unnamed_recirc_pipe_")
     insul_thickness_m = ghio_validators.UnitM("insul_thickness_m", default=0.0254)
     insul_conductivity = ghio_validators.UnitW_MK("insul_conductivity", default=0.04)
     daily_period = ghio_validators.FloatMax24("daily_period", default=24)
     water_temp = ghio_validators.UnitDegreeC("water_temp", default=60)
 
-    def __init__(self, IGH, _geometry, 
-                _name="_unnamed_", _diameter_m=0.0254, 
-                _insul_thickness_m=0.0254, _insul_conductivity=0.04, 
-                _insul_reflective=True, _insul_quality=None, 
-                _daily_period=24.0, _water_temp=60.0):
+    def __init__(
+        self,
+        IGH,
+        _geometry,
+        _name="_unnamed_",
+        _diameter_m=0.0254,
+        _insul_thickness_m=0.0254,
+        _insul_conductivity=0.04,
+        _insul_reflective=True,
+        _insul_quality=None,
+        _daily_period=24.0,
+        _water_temp=60.0,
+    ):
         # type: (gh_io.IGH, Union[Polyline3D, LineSegment3D], str, float, float, float, bool, None, float, float) -> None
         self.IGH = IGH
         self.geometry = _geometry
@@ -60,12 +68,12 @@ class _RecircPipeBuilder(object):
             self._geometry = to_polyline3d(_input)
         except:
             try:
-                self._geometry = to_polyline3d(
-                    self._convert_to_polyline(_input))
+                self._geometry = to_polyline3d(self._convert_to_polyline(_input))
             except Exception as e:
                 raise Exception(
                     "{}\nError: Geometry input {} cannot be converted to an LBT Polyline3D?".format(
-                        e, _input)
+                        e, _input
+                    )
                 )
 
     def create_hbph_dhw_recirc_pipe(self):
@@ -96,11 +104,25 @@ class _RecircPipeBuilder(object):
 
         return hbph_obj
 
+
 class GHCompo_CreateSHWRecircPipes(object):
     """Component Interface"""
-    
-    def __init__(self, _IGH, _geometry, _name, _diameter_m, _insul_thickness_m, _insul_conductivity,
-                _insul_reflective, _insul_quality, _daily_period, _water_temp, *args, **kwargs):
+
+    def __init__(
+        self,
+        _IGH,
+        _geometry,
+        _name,
+        _diameter_m,
+        _insul_thickness_m,
+        _insul_conductivity,
+        _insul_reflective,
+        _insul_quality,
+        _daily_period,
+        _water_temp,
+        *args,
+        **kwargs
+    ):
         # type: (gh_io.IGH, List[Union[Polyline3D, LineSegment3D]], List[str], List[float], List[float], List[float], List[bool], List[None], List[float], List[float], *Any, **Any) -> None
         self.IGH = _IGH
         self.geometry = _geometry
@@ -118,18 +140,18 @@ class GHCompo_CreateSHWRecircPipes(object):
         dhw_recirc_piping_ = []
         for i in range(len(self.geometry)):
             recirc_pipe_builder = _RecircPipeBuilder(
-                    self.IGH,
-                    input_tools.clean_get(self.geometry, i),
-                    input_tools.clean_get(self.name, i, "_unnamed_"),
-                    input_tools.clean_get(self.diameter_m, i, 0.0254),
-                    input_tools.clean_get(self.insul_thickness_m, i, 0.0254), 
-                    input_tools.clean_get(self.insul_conductivity, i, 0.04), 
-                    input_tools.clean_get(self.insul_reflective, i, True), 
-                    input_tools.clean_get(self.insul_quality, i, None),
-                    input_tools.clean_get(self.daily_period, i, 24),
-                    input_tools.clean_get(self.water_temp, i, 60.0)
-                )
+                self.IGH,
+                input_tools.clean_get(self.geometry, i),
+                input_tools.clean_get(self.name, i, "_unnamed_"),
+                input_tools.clean_get(self.diameter_m, i, 0.0254),
+                input_tools.clean_get(self.insul_thickness_m, i, 0.0254),
+                input_tools.clean_get(self.insul_conductivity, i, 0.04),
+                input_tools.clean_get(self.insul_reflective, i, True),
+                input_tools.clean_get(self.insul_quality, i, None),
+                input_tools.clean_get(self.daily_period, i, 24),
+                input_tools.clean_get(self.water_temp, i, 60.0),
+            )
 
             dhw_recirc_piping_.append(recirc_pipe_builder.create_hbph_dhw_recirc_pipe())
-            
+
         return dhw_recirc_piping_

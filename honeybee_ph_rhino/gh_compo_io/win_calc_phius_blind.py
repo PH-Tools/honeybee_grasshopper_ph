@@ -6,16 +6,15 @@
 try:
     from typing import Tuple
 except ImportError:
-    pass #IronPython 2.7
+    pass  # IronPython 2.7
 
 try:
     from honeybee_ph_rhino.gh_compo_io import ghio_validators
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
 
 class GHCompo_CalcPhiusShadeTransmittance(object):
-
     transmittance = ghio_validators.FloatPercentage("transmittance")
 
     def __init__(self, _transmittance, _inside):
@@ -29,10 +28,10 @@ class GHCompo_CalcPhiusShadeTransmittance(object):
         """Calculate the effective reduction factor according to Phius Guidebook v3.1, Appendix N-8"""
 
         if self.inside is False:
-            transmittance_eff = 1 - (1-self.transmittance) * (1 - 0.6)
+            transmittance_eff = 1 - (1 - self.transmittance) * (1 - 0.6)
         else:
             transmittance_eff = 0.3 + (0.7 * self.transmittance)
 
-        reflectance = 1.0  - transmittance_eff
+        reflectance = 1.0 - transmittance_eff
 
         return (transmittance_eff, reflectance)

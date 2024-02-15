@@ -4,26 +4,28 @@
 """GHCompo Interface: HBPH - Create Space PH Ventilation."""
 
 try:
-    from Grasshopper import DataTree # type: ignore
+    from Grasshopper import DataTree  # type: ignore
 except ImportError:
     pass  # outside Grasshopper
 
 try:
-    from itertools import izip_longest # type: ignore
+    from itertools import izip_longest  # type: ignore
 except:
     # Python 3+
     from itertools import zip_longest as izip_longest
 
-from honeybee_ph_rhino import gh_io
 from honeybee_ph_utils import input_tools
+
+from honeybee_ph_rhino import gh_io
 from honeybee_ph_rhino.gh_compo_io import ghio_validators
 
 
 class SpacePhVentFlowRates(object):
     """Temporary dataclass to store flow-rate info"""
-    v_sup = ghio_validators.UnitM3_S('v_sup')
-    v_eta = ghio_validators.UnitM3_S('v_eta')
-    v_tran = ghio_validators.UnitM3_S('v_tran')
+
+    v_sup = ghio_validators.UnitM3_S("v_sup")
+    v_eta = ghio_validators.UnitM3_S("v_eta")
+    v_tran = ghio_validators.UnitM3_S("v_tran")
 
     def __init__(self, _v_sup, _v_eta, _v_tran):
         # type: (float, float, float) -> None
@@ -47,8 +49,9 @@ class SpacePhVentFlowRates(object):
             return self + other
 
     def __str__(self):
-        return '{}(v_sup={:.4f} m3/s, v_eta={:.4f} m3/s, v_tran={:.4f} m3/s)'.format(
-            self.__class__.__name__, self.v_sup, self.v_eta, self.v_tran)
+        return "{}(v_sup={:.4f} m3/s, v_eta={:.4f} m3/s, v_tran={:.4f} m3/s)".format(
+            self.__class__.__name__, self.v_sup, self.v_eta, self.v_tran
+        )
 
     def __repr__(self):
         return str(self)
@@ -58,7 +61,7 @@ class SpacePhVentFlowRates(object):
 
 
 class GHCompo_CreateSpaceVent(object):
-    """Grasshopper Component Interface for """
+    """Grasshopper Component Interface for"""
 
     def __init__(self, _IGH, _v_sups, _v_etas, _v_trans):
         # type: (gh_io.IGH, DataTree, DataTree, DataTree) -> None
@@ -76,7 +79,7 @@ class GHCompo_CreateSpaceVent(object):
             izip_longest(
                 self.v_sup_tree.Branches,
                 self.v_eta_tree.Branches,
-                self.v_tran_tree.Branches
+                self.v_tran_tree.Branches,
             )
         ):
             # -- Any branch might be None, give empty list if so
@@ -92,14 +95,15 @@ class GHCompo_CreateSpaceVent(object):
                     SpacePhVentFlowRates(
                         input_tools.clean_get(s, i, 0.0),
                         input_tools.clean_get(e, i, 0.0),
-                        input_tools.clean_get(t, i, 0.0)
-                    ), pth(branch_num)
+                        input_tools.clean_get(t, i, 0.0),
+                    ),
+                    pth(branch_num),
                 )
 
         return output
 
     def __str__(self):
-        return '{}()'.format(self.__class__.__name__)
+        return "{}()".format(self.__class__.__name__)
 
     def __repr__(self):
         return str(self)

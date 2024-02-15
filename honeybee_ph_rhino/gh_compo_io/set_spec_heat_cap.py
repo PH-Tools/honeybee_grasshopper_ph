@@ -25,7 +25,6 @@ except ImportError as e:
 
 
 class GHCompo_SetRoomSpecHeatCaps(object):
-    
     def __init__(self, _IGH, _spec_capacities, _hb_rooms):
         # type: (gh_io.IGH, List[str], List[room.Room]) -> None
         self.IGH = _IGH
@@ -49,10 +48,9 @@ class GHCompo_SetRoomSpecHeatCaps(object):
 
     def run(self):
         # type: () -> List[room.Room]
-        hb_rooms_ = [room.duplicate() for room in self.hb_rooms] # type: List[room.Room]
+        hb_rooms_ = [room.duplicate() for room in self.hb_rooms]  # type: List[room.Room]
 
         for i, room in enumerate(hb_rooms_):
             room.properties.ph.specific_heat_capacity = self.spec_capacity(i)
 
         return hb_rooms_
-

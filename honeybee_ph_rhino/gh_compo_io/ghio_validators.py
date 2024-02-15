@@ -22,11 +22,11 @@ class MyClassWithValidation(object):
 """
 
 try:  # import the core honeybee dependencies
-    from honeybee.typing import clean_ep_string, clean_and_id_ep_string
+    from honeybee.typing import clean_and_id_ep_string, clean_ep_string
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 try:
-    from ph_units import parser, converter
+    from ph_units import converter, parser
 except ImportError as e:
     raise ImportError("\nFailed to import ph-units:\n\t{}".format(e))
 

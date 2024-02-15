@@ -5,20 +5,21 @@
 
 from copy import copy
 
-# Note: Use copy so that specific equipments can overwrite base with their own hints
-
 from GhPython import Component  # type: ignore
 from Grasshopper.Kernel.Parameters import Hints  # type: ignore
 
+# Note: Use copy so that specific equipments can overwrite base with their own hints
+
+
 try:
-    from typing import Optional, Dict, Any
+    from typing import Any, Dict, Optional
 except ImportError:
     pass  # IronPython 2.7
 
 try:
     from honeybee_ph_rhino import gh_io
     from honeybee_ph_rhino.gh_compo_io import ghio_validators
-    from honeybee_ph_rhino.gh_io import input_to_int, ComponentInput
+    from honeybee_ph_rhino.gh_io import ComponentInput, input_to_int
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
@@ -62,7 +63,7 @@ inputs_ventilation.update(
             _name="annual_COP",
             _description="(float) The Annual COP (W/W) of the equipment.",
             _type_hint=Component.NewStrHint(),
-            _target_unit='W/W',
+            _target_unit="W/W",
         ),
         4: ComponentInput(
             _name="single_speed",
@@ -73,13 +74,13 @@ inputs_ventilation.update(
             _name="min_coil_temp",
             _description="(float) Deg. C",
             _type_hint=Component.NewStrHint(),
-            _target_unit='C',
+            _target_unit="C",
         ),
         6: ComponentInput(
             _name="capacity",
             _description="(float) Maximum kW output.",
             _type_hint=Component.NewStrHint(),
-            _target_unit='KW',
+            _target_unit="KW",
         ),
     }
 )
@@ -91,7 +92,7 @@ inputs_recirculation.update(
             _name="annual_COP",
             _description="(float) The Annual COP (W/W) of the equipment.",
             _type_hint=Component.NewStrHint(),
-            _target_unit='W/W',
+            _target_unit="W/W",
         ),
         4: ComponentInput(
             _name="single_speed",
@@ -102,19 +103,19 @@ inputs_recirculation.update(
             _name="min_coil_temp",
             _description="(float) Deg. C",
             _type_hint=Component.NewStrHint(),
-            _target_unit='C',
+            _target_unit="C",
         ),
         6: ComponentInput(
             _name="capacity",
             _description="(float) Maximum kW output.",
             _type_hint=Component.NewStrHint(),
-            _target_unit='KW',
+            _target_unit="KW",
         ),
         7: ComponentInput(
             _name="flow_rate_m3_s",
             _description="(float) The maximum airflow rate in m3/s",
             _type_hint=Component.NewStrHint(),
-            _target_unit='=M3/S',
+            _target_unit="=M3/S",
         ),
         8: ComponentInput(
             _name="flow_rate_variable",
@@ -131,7 +132,7 @@ inputs_dehumidification.update(
             _name="annual_COP",
             _description="(float) The Annual COP (W/W) of the equipment.",
             _type_hint=Component.NewStrHint(),
-            _target_unit='W/W',
+            _target_unit="W/W",
         ),
         4: ComponentInput(
             _name="useful_heat_loss",
@@ -148,7 +149,7 @@ inputs_panel.update(
             _name="annual_COP",
             _description="(float) The Annual COP (W/W) of the equipment.",
             _type_hint=Component.NewStrHint(),
-            _target_unit='W/W',
+            _target_unit="W/W",
         ),
     }
 )
@@ -186,6 +187,7 @@ def get_component_inputs(_param_type):
 # -- Facades for Cooling-Param Constructors (So they can do input validation and unit conversion)
 # -- DEV-NOTE: Do not use .get() during __init__ since the interface may pass a None value.
 # -- Instead, use square brackets and the 'or' keyword to set a default value.
+
 
 class FacadePhCoolingVentilation(object):
     display_name = ghio_validators.HBName(
@@ -337,7 +339,9 @@ class GHCompo_CreateCoolingSystem(object):
         except KeyError as e:
             raise Exception(
                 "Error: Input '_cooling_type' value of: '{}' is not supported by this GH-Component. "
-                "Please only input one of the types: {}".format(self.param_type, self.valid_cooling_param_types)
+                "Please only input one of the types: {}".format(
+                    self.param_type, self.valid_cooling_param_types
+                )
             )
 
         # --- Build the Cooling system from the user_inputs

@@ -6,7 +6,7 @@
 from copy import copy
 
 try:
-    from typing import List, Any
+    from typing import Any, List
 except ImportError:
     pass  # IronPython 2.7
 
@@ -17,9 +17,9 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
 try:
-    from honeybee_energy_ph.properties.hvac.idealair import IdealAirSystemPhProperties
-    from honeybee_energy_ph.hvac import ventilation, heating, heat_pumps
+    from honeybee_energy_ph.hvac import heat_pumps, heating, ventilation
     from honeybee_energy_ph.hvac.supportive_device import PhSupportiveDevice
+    from honeybee_energy_ph.properties.hvac.idealair import IdealAirSystemPhProperties
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
 
@@ -75,7 +75,7 @@ class GHCompo_AddMechSystems(object):
             # -- Space Heating / Cooling
             for ph_conditioning_system in self.conditioning_systems:
                 if isinstance(ph_conditioning_system, heat_pumps.PhHeatPumpSystem):
-                    new_hvac_prop_ph.heat_pump_systems.add(ph_conditioning_system)   
+                    new_hvac_prop_ph.heat_pump_systems.add(ph_conditioning_system)
                 else:
                     new_hvac_prop_ph.heating_systems.add(ph_conditioning_system)
 

@@ -11,21 +11,21 @@ except ImportError:
 try:
     from honeybee_ph import site
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_ph:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee_ph:\n\t{}".format(e))
 
 try:
     from ph_units.converter import convert
     from ph_units.parser import parse_input
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_ph_utils:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee_ph_utils:\n\t{}".format(e))
 
 try:
     from honeybee_ph_rhino import gh_io
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
+
 
 class GHCompo_MonthlyTemps(object):
-
     def __init__(self, _IGH, _air_temps, _dewpoints, _sky_temps, _ground_temps):
         # type: (gh_io.IGH, List[float], List[float], List[float], List[float]) -> None
         self.IGH = _IGH
@@ -38,11 +38,13 @@ class GHCompo_MonthlyTemps(object):
         # type: (List[float]) -> List[float]
         """Validate that the input data is the right shape."""
         if not _input_list:
-            return [0.0]*12
+            return [0.0] * 12
 
         if len(_input_list) != 12:
-            msg = "Error: Monthly data should be a collection of 12 numeric items.\n"\
-                  "Got a {} of length: {}?".format(type(_input_list), len(_input_list))
+            msg = (
+                "Error: Monthly data should be a collection of 12 numeric items.\n"
+                "Got a {} of length: {}?".format(type(_input_list), len(_input_list))
+            )
             raise Exception(msg)
 
         return _input_list
@@ -102,4 +104,3 @@ class GHCompo_MonthlyTemps(object):
             _sky=site.Climate_MonthlyValueSet(self.sky_temps),
             _ground=site.Climate_MonthlyValueSet(self.ground_temps),
         )
-

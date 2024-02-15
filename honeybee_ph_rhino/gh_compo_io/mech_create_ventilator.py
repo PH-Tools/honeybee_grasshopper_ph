@@ -6,12 +6,12 @@
 try:
     from honeybee_energy_ph.hvac import ventilation
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_energy_ph:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
 
 try:
     from honeybee_ph_rhino.gh_compo_io import ghio_validators
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
 
 class GHCompo_CreatePhVentilator(object):
@@ -20,8 +20,17 @@ class GHCompo_CreatePhVentilator(object):
     latent_hr = ghio_validators.FloatPercentage("latent_hr", default=0.0)
     elec_efficiency = ghio_validators.UnitWH_M3("elec_efficiency", default=0.45)
     frost_temp = ghio_validators.UnitDegreeC("frost_temp", default=-5.0)
-    
-    def __init__(self, _display_name, _sens_hr, _lat_hr, _elec_eff, _frost_protect, _frost_temp, _inside):
+
+    def __init__(
+        self,
+        _display_name,
+        _sens_hr,
+        _lat_hr,
+        _elec_eff,
+        _frost_protect,
+        _frost_temp,
+        _inside,
+    ):
         self.display_name = _display_name or "_unnamed_ventilator_"
         self.sensible_hr = _sens_hr
         self.latent_hr = _lat_hr

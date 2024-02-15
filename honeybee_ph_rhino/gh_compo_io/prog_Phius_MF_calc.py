@@ -7,7 +7,7 @@
 from collections import defaultdict
 
 try:
-    from typing import List, Optional, Tuple, Any, Union, Type
+    from typing import Any, List, Optional, Tuple, Type, Union
 except ImportError:
     pass  # IronPython 2.7
 
@@ -22,8 +22,7 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
 try:
-    from honeybee_energy_ph.load import phius_mf
-    from honeybee_energy_ph.load import ph_equipment
+    from honeybee_energy_ph.load import ph_equipment, phius_mf
     from honeybee_energy_ph.properties.load.people import PeoplePhProperties
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
@@ -159,7 +158,7 @@ class GHCompo_CalcPhiusMFLoads(object):
         _include_elevator,
         _hb_rooms,
         _include_garage=False,
-        *args, 
+        *args,
         **kwargs
     ):
         # type: (gh_io.IGH, float, float, float, bool, List[room.Room], bool, *Any, **Any) -> None

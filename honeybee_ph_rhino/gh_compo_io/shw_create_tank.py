@@ -5,9 +5,21 @@
 
 from honeybee_energy_ph.hvac import hot_water
 
+
 class GHCompo_CreateSHWTank(object):
-    def __init__(self, _tank_type, _display_name_, _quantity, _for_solar, _heat_loss_rate,
-                _volume, _standby_frac, _in_conditioned_space, _location_temp, _water_temp):
+    def __init__(
+        self,
+        _tank_type,
+        _display_name_,
+        _quantity,
+        _for_solar,
+        _heat_loss_rate,
+        _volume,
+        _standby_frac,
+        _in_conditioned_space,
+        _location_temp,
+        _water_temp,
+    ):
         self.tank_type = _tank_type
         self.display_name = _display_name_
         self.quantity = _quantity

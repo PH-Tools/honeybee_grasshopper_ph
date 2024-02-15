@@ -6,7 +6,7 @@
 import os
 
 try:
-    from typing import Optional, List, Dict, Union
+    from typing import Dict, List, Optional, Union
 except ImportError:
     pass  # IronPython 2.7
 
@@ -51,17 +51,16 @@ class GHCompo_WriteWufiXml(object):
 
         # -- Merge the model faces during export to XML?
         if _merge_faces is None or _merge_faces is False:
-            self.merge_faces = False # Default = will not merge faces
+            self.merge_faces = False  # Default = will not merge faces
         elif _merge_faces == True:
-            self.merge_faces = True # Will use default model tolerance
+            self.merge_faces = True  # Will use default model tolerance
         else:
-            self.merge_faces = float(_merge_faces) # Tolerance
-
+            self.merge_faces = float(_merge_faces)  # Tolerance
 
     def give_user_warnings(self, _stdout):
         # type: (str) -> None
         """Give user warnings if any."""
-        
+
         for line in _stdout.split("\n"):
             if "WARNING:" in line:
                 self.IGH.warning(line)

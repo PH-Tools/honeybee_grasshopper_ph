@@ -6,15 +6,15 @@
 try:
     from honeybee_energy_ph.properties import ruleset
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_energy_ph:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
 
 try:
     from honeybee_ph_rhino import gh_io
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
+
 
 class GHCompo_CreateOccPeriod(object):
-
     def __init__(self, _IGH, _name, _hrs_per_day, _op_frac):
         # type: (gh_io.IGH, str, float, float) -> None
         self.IGH = _IGH
@@ -25,7 +25,5 @@ class GHCompo_CreateOccPeriod(object):
     def run(self):
         # type: () -> ruleset.DailyOperationPeriod
         return ruleset.DailyOperationPeriod.from_operating_hours(
-            self.hours_per_day or 0.0,
-            self.operating_fraction or 0.0,
-            self.name
+            self.hours_per_day or 0.0, self.operating_fraction or 0.0, self.name
         )

@@ -4,12 +4,12 @@
 """GHCompo Interface: HBPH - Create Ventilation System."""
 
 try:
-    from typing import Union, Optional, List
+    from typing import List, Optional, Union
 except ImportError:
     pass  # IronPython 2.7
 
 try:
-    from honeybee_energy_ph.hvac import ventilation, ducting
+    from honeybee_energy_ph.hvac import ducting, ventilation
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
 

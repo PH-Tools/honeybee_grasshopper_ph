@@ -4,7 +4,7 @@
 """GHCompo Interface: HBPH - Set Model Project Data."""
 
 try:
-    from typing import Optional, List, Dict
+    from typing import Dict, List, Optional
 except ImportError:
     pass  # IronPython 2.7
 
@@ -14,7 +14,7 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
 try:
-    from honeybee_ph.team import ProjectTeamMember, ProjectTeam
+    from honeybee_ph.team import ProjectTeam, ProjectTeamMember
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph:\n\t{}".format(e))
 

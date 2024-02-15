@@ -1,5 +1,6 @@
-pytest
-coverage
 black
-Rhino-stubs
+coverage
 Grasshopper-stubs
+isort
+pytest
+Rhino-stubs

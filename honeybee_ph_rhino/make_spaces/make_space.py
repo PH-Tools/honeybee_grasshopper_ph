@@ -29,8 +29,8 @@ except ImportError as e:
 
 try:
     from honeybee_ph import space
-    from honeybee_ph.properties.space import SpacePhProperties
     from honeybee_ph.properties.room import RoomPhProperties
+    from honeybee_ph.properties.space import SpacePhProperties
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph:\n\t{}".format(e))
 
@@ -109,6 +109,7 @@ def set_absolute_ventilation(_hb_room, _new_room_airflow):
 
     return _hb_room
 
+
 def add_spaces_to_honeybee_rooms(_spaces, _hb_rooms, _inherit_names=False):
     # type: (List[space.Space], List[room.Room], bool) -> Tuple[List[room.Room], List[SpaceData], List[room.Room]]
     """Sorts a list of Spaces, checks which are 'in' which HB-Room, and adds the space to that room.
@@ -142,14 +143,17 @@ def add_spaces_to_honeybee_rooms(_spaces, _hb_rooms, _inherit_names=False):
 
         # -- Check to ensure that the room is actually solid first
         if not dup_room.geometry.is_solid:
-            print("Error: Room {} not solid. Cannot host spaces.".format(dup_room.display_name))
+            print(
+                "Error: Room {} not solid. Cannot host spaces.".format(
+                    dup_room.display_name
+                )
+            )
             open_rooms.append(dup_room)
             continue
 
         # -- See if any of the Space Reference points are inside the Room Geometry
         for space_data_id, space_data in spaces_dict.items():
             for pt in space_data.reference_points:
-                
                 if not dup_room.geometry.is_point_inside(pt):
                     continue
 

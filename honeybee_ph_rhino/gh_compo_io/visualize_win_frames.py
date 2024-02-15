@@ -6,7 +6,7 @@
 import math
 
 try:
-    from typing import List, Iterable, Tuple
+    from typing import Iterable, List, Tuple
 except ImportError:
     pass
 
@@ -16,10 +16,17 @@ except ImportError:
     izip = zip  # Python 3
 
 try:
-    from System import Object  # type: ignore
     from Grasshopper import DataTree  # type: ignore
     from Grasshopper.Kernel.Data import GH_Path  # type: ignore
-    from Rhino.Geometry import Brep, Point3d, Plane, Vector3d, LineCurve, Interval  # type: ignore
+    from Rhino.Geometry import (
+        Brep,
+        Interval,
+        LineCurve,  # type: ignore
+        Plane,
+        Point3d,
+        Vector3d,
+    )
+    from System import Object  # type: ignore
 except ImportError:
     pass  # Outside Rhino
 
@@ -32,8 +39,8 @@ try:
     from ladybug_rhino.fromgeometry import (
         from_face3d,
         from_linesegment3d,
-        from_point3d,
         from_plane,
+        from_point3d,
     )
 except ImportError as e:
     raise ImportError("\nFailed to import ladybug_rhino:\n\t{}".format(e))
@@ -44,10 +51,10 @@ try:
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
+from honeybee_energy_ph.construction.window import PhWindowFrame, PhWindowFrameElement
 from honeybee_energy_ph.properties.construction.window import (
     WindowConstructionPhProperties,
 )
-from honeybee_energy_ph.construction.window import PhWindowFrame, PhWindowFrameElement
 
 try:
     from honeybee_ph_rhino import gh_io

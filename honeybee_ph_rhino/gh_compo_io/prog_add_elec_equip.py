@@ -4,7 +4,7 @@
 """GHCompo Interface: HBPH - Add PH Equipment."""
 
 try:
-    from typing import Tuple, List
+    from typing import List, Tuple
 except ImportError:
     pass  # IronPython 2.7
 
@@ -15,9 +15,9 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
 try:
-    from honeybee_energy.schedule.ruleset import ScheduleRuleset
-    from honeybee_energy.load import equipment
     from honeybee_energy.lib.scheduletypelimits import schedule_type_limit_by_identifier
+    from honeybee_energy.load import equipment
+    from honeybee_energy.schedule.ruleset import ScheduleRuleset
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy:\n\t{}".format(e))
 

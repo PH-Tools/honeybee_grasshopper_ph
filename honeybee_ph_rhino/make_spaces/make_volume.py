@@ -4,6 +4,7 @@
 """Functions to create SpaceVolume objects from Rhino/Grasshopper inputs."""
 
 from honeybee_ph import space
+
 from honeybee_ph_rhino import gh_io
 
 
@@ -14,7 +15,7 @@ def volumes_from_floors(IGH, _floors, _heights):
     Arguments:
     ----------
         * IGH (gh_io.IGH): Honeybee-PH Grasshopper Interface Object.
-        * _floors ([list[space.SpaceFloor]): A list of SpaceFloor objects to 
+        * _floors ([list[space.SpaceFloor]): A list of SpaceFloor objects to
             build the volumes from.
         * _heights (list[float]): A list of heights to extrude the Volume to.
 

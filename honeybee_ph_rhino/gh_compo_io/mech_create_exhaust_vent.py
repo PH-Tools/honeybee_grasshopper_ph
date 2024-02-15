@@ -6,23 +6,23 @@
 try:
     from typing import Dict, Optional
 except ImportError:
-    pass # IronPython 2.7
+    pass  # IronPython 2.7
 
 try:
     from honeybee_ph_rhino import gh_io
     from honeybee_ph_rhino.gh_compo_io import ghio_validators
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
 try:
     from honeybee_ph_utils import input_tools
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_ph_utils:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee_ph_utils:\n\t{}".format(e))
 
 try:
     from honeybee_energy_ph.hvac import ventilation
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_energy_ph:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
 
 
 class GHCompo_CreateExhaustVent(object):
@@ -30,8 +30,8 @@ class GHCompo_CreateExhaustVent(object):
         1: ventilation.ExhaustVentDryer,
         2: ventilation.ExhaustVentKitchenHood,
         3: ventilation.ExhaustVentUserDefined,
-    } # type: (Dict[int, type[ventilation._ExhaustVentilatorBase]])
-    
+    }  # type: (Dict[int, type[ventilation._ExhaustVentilatorBase]])
+
     valid_device_types = [
         "1-Dryer",
         "2-Kitchen Hood",
@@ -70,7 +70,7 @@ class GHCompo_CreateExhaustVent(object):
             device_class = self.device_classes[self.system_type]
         except KeyError as e:
             raise Exception(
-                "Error: Input Device type: '{}' not supported by this GH-Component. "\
+                "Error: Input Device type: '{}' not supported by this GH-Component. "
                 "Please only input:{}".format(self.system_type, self.valid_device_types)
             )
 
@@ -82,5 +82,5 @@ class GHCompo_CreateExhaustVent(object):
             vent_device_.exhaust_flow_rate_m3s = float(self.flow_rate_m3s)
         except Exception as e:
             raise e
-       
+
         return vent_device_

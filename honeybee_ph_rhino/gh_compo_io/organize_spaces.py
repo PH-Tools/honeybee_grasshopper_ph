@@ -4,14 +4,14 @@
 """GHCompo Interface: HBPH - Organize Spaces."""
 
 try:
-    from typing import List, Any
+    from typing import Any, List
 except ImportError:
     pass  # IronPython 2.7
 
 try:
-    from System import Object  # type: ignore
     from Grasshopper import DataTree  # type: ignore
     from Grasshopper.Kernel.Data import GH_Path  # type: ignore
+    from System import Object  # type: ignore
 except:
     pass  # Outside Rhino
 

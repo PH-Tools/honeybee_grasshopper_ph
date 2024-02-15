@@ -4,25 +4,24 @@
 """GHCompo Interface: HBPH - Get FloorSegment Data."""
 
 try:
-    from System import Object # type: ignore
+    from System import Object  # type: ignore
 except ImportError:
     pass  # Outside .NET
 
 try:
-    from typing import List, Tuple, Any, Optional, Dict
+    from typing import Any, Dict, List, Optional, Tuple
 except ImportError:
     pass  # IronPython 2.7
 
-from collections import namedtuple, defaultdict
+from collections import defaultdict, namedtuple
+
 from honeybee_ph_rhino import gh_io
 from honeybee_ph_rhino.gh_compo_io.space_create_vent_rates import SpacePhVentFlowRates
-
 
 # -- Temporary dataclasses to organize input data
 
 
 class VentilationData(object):
-
     def __init__(self, _v_sup, _v_eta, _v_tran):
         self.v_sup = _v_sup
         self.v_eta = _v_eta
@@ -30,8 +29,9 @@ class VentilationData(object):
 
 
 class FloorSegmentData(object):
-
-    def __init__(self, _name, _number, _full_name, _vent_rates, _geometry, _weighting_factor):
+    def __init__(
+        self, _name, _number, _full_name, _vent_rates, _geometry, _weighting_factor
+    ):
         # type: (str, str, str, Any, Optional[SpacePhVentFlowRates], float) -> None
         self.name = _name
         self.number = _number
@@ -43,13 +43,13 @@ class FloorSegmentData(object):
 
 # -- Component Interface
 
-class GHCompo_GetFloorSegData(object):
 
+class GHCompo_GetFloorSegData(object):
     def __init__(self, _IGH, _group_by_name, _input_geom):
         # type: (gh_io.IGH, bool, List) -> None
         self.IGH = _IGH
         self.group_by_name = _group_by_name
-        self.floor_segment_data = self.handle_user_input(_input_geom, '_floor_seg_geom')
+        self.floor_segment_data = self.handle_user_input(_input_geom, "_floor_seg_geom")
 
     def handle_user_input(self, _input_geom, _input_node_name):
         # type: (List, str) -> List[FloorSegmentData]
@@ -82,21 +82,20 @@ class GHCompo_GetFloorSegData(object):
         floor_segment_input_data = []  # type: (List[FloorSegmentData])
         for data_dict, geom in zip(input_data, _input_geom):
             segment_vent_data = VentilationData(
-                float(data_dict.get('V_sup', 0.0))/3600,
-                float(data_dict.get('V_eta', 0.0))/3600,
-                float(data_dict.get('V_trans', 0.0))/3600
+                float(data_dict.get("V_sup", 0.0)) / 3600,
+                float(data_dict.get("V_eta", 0.0)) / 3600,
+                float(data_dict.get("V_trans", 0.0)) / 3600,
             )
 
             segment_data = FloorSegmentData(
-                _name=data_dict.get('Object Name', ''),
-                _number=data_dict.get('Room_Number', ''),
-                _full_name='{}-{}'.format(
-                    data_dict.get('Room_Number'),
-                    data_dict.get('Object Name')
+                _name=data_dict.get("Object Name", ""),
+                _number=data_dict.get("Room_Number", ""),
+                _full_name="{}-{}".format(
+                    data_dict.get("Room_Number"), data_dict.get("Object Name")
                 ),
                 _vent_rates=segment_vent_data,
                 _geometry=geom,
-                _weighting_factor=float(data_dict.get('TFA_Factor', 1.0)),
+                _weighting_factor=float(data_dict.get("TFA_Factor", 1.0)),
             )
 
             floor_segment_input_data.append(segment_data)
@@ -124,19 +123,19 @@ class GHCompo_GetFloorSegData(object):
         flr_seg_vent_rates_ = self.IGH.Grasshopper.DataTree[SpacePhVentFlowRates]()
         pth = self.IGH.Grasshopper.Kernel.Data.GH_Path
         NameGroupItem = namedtuple(
-            'NameGroupItem', ['breps', 'name', 'number', 'weight', 'vent_rates'])
+            "NameGroupItem", ["breps", "name", "number", "weight", "vent_rates"]
+        )
 
         # -- Break out the data into the output Trees
         if self.group_by_name:
             name_groups = defaultdict(list)  # type: (Dict[str, List[NameGroupItem]])
             for flr_seg in self.floor_segment_data:
-
                 new_entry = NameGroupItem(
                     flr_seg.geometry,
                     str(flr_seg.name).upper(),
                     str(flr_seg.number).upper(),
                     flr_seg.weighting_factor,
-                    flr_seg.vent_rates
+                    flr_seg.vent_rates,
                 )
                 name_groups[flr_seg.full_name].append(new_entry)
 
@@ -150,8 +149,9 @@ class GHCompo_GetFloorSegData(object):
                         SpacePhVentFlowRates(
                             item.vent_rates.v_sup,
                             item.vent_rates.v_eta,
-                            item.vent_rates.v_tran
-                        ), pth(i)
+                            item.vent_rates.v_tran,
+                        ),
+                        pth(i),
                     )
         else:
             for i, flr_seg in enumerate(self.floor_segment_data):
@@ -163,8 +163,15 @@ class GHCompo_GetFloorSegData(object):
                     SpacePhVentFlowRates(
                         flr_seg.vent_rates.v_sup,
                         flr_seg.vent_rates.v_eta,
-                        flr_seg.vent_rates.v_tran
-                    ), pth(i)
+                        flr_seg.vent_rates.v_tran,
+                    ),
+                    pth(i),
                 )
 
-        return flr_seg_srfcs_, flr_seg_weighting_factors_, flr_seg_names_, flr_seg_numbers_, flr_seg_vent_rates_
+        return (
+            flr_seg_srfcs_,
+            flr_seg_weighting_factors_,
+            flr_seg_names_,
+            flr_seg_numbers_,
+            flr_seg_vent_rates_,
+        )

@@ -9,31 +9,23 @@ probably would not need something like this? I suppose it does help reduce coupl
 """
 
 try:
-    from typing import Any, Sequence, Union, List, Dict, Optional
+    from typing import Any, Dict, List, Optional, Sequence, Union
 except ImportError:
     pass  # Python 3
 
 try:
-    from itertools import izip as zip # type: ignore
+    from itertools import izip as zip  # type: ignore
 except ImportError:
     pass  # Python3+
-
-from GhPython import Component # type: ignore
-import System # type: ignore
-from System import Object # type: ignore
 
 from contextlib import contextmanager
 from copy import deepcopy
 
 import honeybee.face
+import System  # type: ignore
+from GhPython import Component  # type: ignore
+from honeybee_ph_utils.input_tools import clean_get, input_to_int
 from ladybug_geometry.geometry3d.face import Face3D
-from ladybug_rhino.togeometry import (
-    to_face3d,
-    to_linesegment3d,
-    to_mesh3d,
-    to_point3d,
-    to_polyline3d,
-)
 from ladybug_rhino.fromgeometry import (
     from_face3d,
     from_linesegment3d,
@@ -41,14 +33,21 @@ from ladybug_rhino.fromgeometry import (
     from_point3d,
     from_polyline3d,
 )
-
-from honeybee_ph_utils.input_tools import input_to_int, clean_get
+from ladybug_rhino.togeometry import (
+    to_face3d,
+    to_linesegment3d,
+    to_mesh3d,
+    to_point3d,
+    to_polyline3d,
+)
+from System import Object  # type: ignore
 
 
 class LBTGeometryConversionError(Exception):
     def __init__(self, _in):
         self.message = 'Input Error: Cannot convert "{}" to LBT Geometry.'.format(
-            type(_in))
+            type(_in)
+        )
 
         super(LBTGeometryConversionError, self).__init__(self.message)
 
@@ -86,7 +85,7 @@ class IGH:
     def ghc(self):
         """Convenience Attribute Alias."""
         return self.ghpythonlib_components
-    
+
     @property
     def sc(self):
         """Convenience Attribute Alias."""
@@ -122,8 +121,7 @@ class IGH:
             if _input_name.upper() in names:
                 return i
 
-        raise Exception(
-            'Error: The input node "{}" cannot be found?'.format(_input_name))
+        raise Exception('Error: The input node "{}" cannot be found?'.format(_input_name))
 
     def gh_compo_get_input_for_node_number(self, _node_number):
         # type: (int) -> GH_Structure[IGH_Goo]
@@ -158,7 +156,9 @@ class IGH:
 
         guids = []
         try:
-            for _ in self.ghenv.Component.Params.Input[_input_index_number].VolatileData[_branch_num]:
+            for _ in self.ghenv.Component.Params.Input[_input_index_number].VolatileData[
+                _branch_num
+            ]:
                 try:
                     guids.append(_.ReferenceID)
                 except AttributeError:
@@ -316,7 +316,8 @@ class IGH:
                 rh_geom.append(from_face3d(_))
             else:
                 raise Exception(
-                    'Input Error: Cannot convert "{}" to Rhino Geometry.'.format(type(_)))
+                    'Input Error: Cannot convert "{}" to Rhino Geometry.'.format(type(_))
+                )
 
         return rh_geom
 
@@ -347,30 +348,37 @@ class IGH:
         # Get the inset Curve
         # -----------------------------------------------------------------------
         srfcCentroid = self.Rhino.Geometry.AreaMassProperties.Compute(
-            rh_floor_surface).Centroid
+            rh_floor_surface
+        ).Centroid
         plane = self.ghpythonlib_components.XYPlane(srfcCentroid)
         plane = self.ghpythonlib_components.IsPlanar(rh_floor_surface, True).plane
         srfcPerim_Inset_Pos = self.ghpythonlib_components.OffsetCurve(
-            srfcPerim, _inset_distance, plane, 1)
+            srfcPerim, _inset_distance, plane, 1
+        )
         srfcPerim_Inset_Neg = self.ghpythonlib_components.OffsetCurve(
-            srfcPerim, _inset_distance * -1, plane, 1)
+            srfcPerim, _inset_distance * -1, plane, 1
+        )
 
         # Choose the right Offset Curve. The one with the smaller area
         # Check IsPlanar first to avoid self.grasshopper_components.BoundarySurfaces error
         # -----------------------------------------------------------------------
         if srfcPerim_Inset_Pos.IsPlanar:
             srfcInset_Pos = self.ghpythonlib_components.BoundarySurfaces(
-                srfcPerim_Inset_Pos)
+                srfcPerim_Inset_Pos
+            )
         else:
             srfcInset_Pos = self.ghpythonlib_components.BoundarySurfaces(
-                srfcPerim)  # Use the normal perim
+                srfcPerim
+            )  # Use the normal perim
 
         if srfcPerim_Inset_Neg.IsPlanar():
             srfcInset_Neg = self.ghpythonlib_components.BoundarySurfaces(
-                srfcPerim_Inset_Neg)
+                srfcPerim_Inset_Neg
+            )
         else:
             srfcInset_Neg = self.ghpythonlib_components.BoundarySurfaces(
-                srfcPerim)  # Use the normal perim
+                srfcPerim
+            )  # Use the normal perim
 
         # -----------------------------------------------------------------------
         area_Pos = self.ghpythonlib_components.Area(srfcInset_Pos).area
@@ -466,7 +474,7 @@ class IGH:
     def duplicate_data_to_branches(self, _data, _branch_count=1, _shallow=True):
         # type: (List[Any], int, bool) -> DataTree[Object]
         """Duplicate a list of data into a DataTree with the specified number of branches.
-        
+
         Arguments:
         ----------
             * data: (Iterable[Any]) The data that you would like to duplicate onto the new branches.
@@ -491,7 +499,14 @@ class IGH:
 class ComponentInput:
     """GH-Component Input Node data class."""
 
-    def __init__(self, _name='-', _description='', _access=0, _type_hint=Component.NoChangeHint(), _target_unit=None):
+    def __init__(
+        self,
+        _name="-",
+        _description="",
+        _access=0,
+        _type_hint=Component.NoChangeHint(),
+        _target_unit=None,
+    ):
         # type: (str, str, int, Component.NoChangeHint, Optional[str]) -> None
         self.name = _name
         self.description = _description
@@ -500,7 +515,9 @@ class ComponentInput:
         self.target_unit = _target_unit
 
     def __str__(self):
-        return '{}(name={})'.format(self.__class__.__name__, self.name, self.access, self.type_hint)
+        return "{}(name={})".format(
+            self.__class__.__name__, self.name, self.access, self.type_hint
+        )
 
     def __repr__(self):
         return str(self)
@@ -566,7 +583,7 @@ def setup_component_inputs(IGH, _input_dict, _start_i=1, _end_i=20):
         * None
     """
     for input_num in range(_start_i, _end_i):
-        input_item = _input_dict.get(input_num, ComponentInput('-', '-'))
+        input_item = _input_dict.get(input_num, ComponentInput("-", "-"))
 
         try:
             input_node = IGH.ghenv.Component.Params.Input[input_num]
@@ -603,7 +620,7 @@ def _get_component_input_value(_input):
 
 def get_component_input_values(ghenv):
     # type: (Any) -> Dict[str, Any]
-    """ Dynamic Component Input 'get' - pulls all the component input names/values into a dictionary.
+    """Dynamic Component Input 'get' - pulls all the component input names/values into a dictionary.
 
     Arguments:
     ----------
@@ -623,11 +640,11 @@ def get_component_input_values(ghenv):
             except:
                 input_list = []
 
-            if str(input.Access) == 'list':
+            if str(input.Access) == "list":
                 val = []
                 for v in input_list:
                     val.append(_get_component_input_value([v]))
-            elif str(input.Access) == 'tree':
+            elif str(input.Access) == "tree":
                 raise NotImplementedError("Tree input not allowed yet....")
             else:
                 val = _get_component_input_value(input_list)

@@ -9,7 +9,7 @@ except ImportError as e:
     raise ImportError("Failed to import Rhino Geometry.\n{}".format(e))
 
 try:
-    from typing import Tuple, List
+    from typing import List, Tuple
 except ImportError:
     pass  # IronPython 2.7
 
@@ -29,8 +29,8 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph:\n\t{}".format(e))
 
 try:
-    from honeybee_ph_rhino.make_spaces import make_space
     from honeybee_ph_rhino import gh_io
+    from honeybee_ph_rhino.make_spaces import make_space
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
@@ -60,7 +60,11 @@ class GHCompo_AddPHSpaces(object):
             make_space.offset_space_reference_points(self.IGH, sp, offset_dist)
             for sp in self.spaces
         ]
-        hb_rooms_, un_hosted_spaces, open_rooms_ = make_space.add_spaces_to_honeybee_rooms(
+        (
+            hb_rooms_,
+            un_hosted_spaces,
+            open_rooms_,
+        ) = make_space.add_spaces_to_honeybee_rooms(
             spaces, self.hb_rooms, self.inherit_room_names
         )
 

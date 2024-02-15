@@ -3,11 +3,11 @@
 
 """GHCompo Interface: HBPH - Create Detailed Constructions."""
 
-import os
 import json
+import os
 
 try:
-    from typing import List, Optional, Dict, Any
+    from typing import Any, Dict, List, Optional
 except ImportError:
     pass  # IronPython 2.7
 
@@ -17,14 +17,14 @@ except ImportError:
     raise ImportError("Failed to import honeybee.typing")
 
 try:
-    from honeybee_energy.material.opaque import EnergyMaterial
     from honeybee_energy.construction.opaque import OpaqueConstruction
+    from honeybee_energy.material.opaque import EnergyMaterial
 except ImportError:
     raise Exception("Error importing honeybee_energy modules?")
 
 try:
-    from ph_units.parser import parse_input
     from ph_units.converter import convert
+    from ph_units.parser import parse_input
 except ImportError as e:
     raise ImportError("\nFailed to import ph_units:\n\t{}".format(e))
 

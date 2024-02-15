@@ -9,9 +9,9 @@ except ImportError:
     pass  # IronPython 2.7
 
 try:
-    from honeybee_energy.material.glazing import EnergyWindowMaterialSimpleGlazSys
     from honeybee_energy.construction.window import WindowConstruction
     from honeybee_energy.construction.windowshade import WindowConstructionShade
+    from honeybee_energy.material.glazing import EnergyWindowMaterialSimpleGlazSys
     from honeybee_energy.material.shade import EnergyWindowMaterialShade
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy:\n\t{}".format(e))
@@ -22,8 +22,8 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
 try:
-    from honeybee_ph_rhino.gh_compo_io import ghio_validators
     from honeybee_ph_rhino import gh_io
+    from honeybee_ph_rhino.gh_compo_io import ghio_validators
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 

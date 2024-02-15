@@ -6,7 +6,7 @@
 from copy import copy
 
 try:
-    from typing import List, Any
+    from typing import Any, List
 except ImportError:
     pass  # IronPython 2.7
 
@@ -22,8 +22,8 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
 try:
-    from honeybee_energy_ph.properties.hvac.idealair import IdealAirSystemPhProperties
     from honeybee_energy_ph.hvac.renewable_devices import PhRenewableEnergyDevice
+    from honeybee_energy_ph.properties.hvac.idealair import IdealAirSystemPhProperties
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
 

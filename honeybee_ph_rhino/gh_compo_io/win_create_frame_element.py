@@ -6,17 +6,17 @@
 try:
     from honeybee.typing import clean_and_id_ep_string
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
 try:
     from honeybee_energy_ph.construction import window
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_energy_ph:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
 
 try:
     from honeybee_ph_rhino.gh_compo_io import ghio_validators
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
 
 class GHCompo_CreatePhWinFrameElement(object):
@@ -29,9 +29,13 @@ class GHCompo_CreatePhWinFrameElement(object):
     psi_install = ghio_validators.UnitW_MK("psi_install", default=0.04)
     chi_value = ghio_validators.UnitW_K("chi_value", default=0.0)
 
-    def __init__(self, _display_name, _width, _u_factor, _psi_glazing, _psi_install, _chi_value):
+    def __init__(
+        self, _display_name, _width, _u_factor, _psi_glazing, _psi_install, _chi_value
+    ):
         # type: (str, float, float, float, float, float) -> None
-        self.display_name = _display_name or clean_and_id_ep_string("PhWindowFrameElement")
+        self.display_name = _display_name or clean_and_id_ep_string(
+            "PhWindowFrameElement"
+        )
         self.width = _width
         self.u_factor = _u_factor
         self.psi_glazing = _psi_glazing

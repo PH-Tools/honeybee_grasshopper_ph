@@ -4,12 +4,12 @@
 """GHCompo Interface: HBPH - Create SD Constructions."""
 
 try:
-    from typing import List, Union, Tuple
+    from typing import List, Tuple, Union
 except ImportError:
-    pass # IronPython 2.7
+    pass  # IronPython 2.7
 
 try:
-    from itertools import izip_longest # type: ignore
+    from itertools import izip_longest  # type: ignore
 except ImportError:
     # -- Python 3+
     from itertools import zip_longest as izip_longest
@@ -18,16 +18,17 @@ try:
     from ph_units.converter import convert
     from ph_units.parser import parse_input
 except ImportError as e:
-    raise ImportError('\nFailed to import ph_units:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import ph_units:\n\t{}".format(e))
 
 try:
-    from honeybee_energy.material.opaque import EnergyMaterial, EnergyMaterialNoMass
     from honeybee_energy.construction.opaque import OpaqueConstruction
+    from honeybee_energy.material.opaque import EnergyMaterial, EnergyMaterialNoMass
 except ImportError:
     raise Exception("Error importing honeybee_energy modules?")
 
+
 class GHCompo_CreateSDConstructions(object):
-    MASS_HB_MAT = EnergyMaterial('MAT_Mass', 0.01, 100, 2500, 460, 'Rough',0.9, 0.7, 0.7)
+    MASS_HB_MAT = EnergyMaterial("MAT_Mass", 0.01, 100, 2500, 460, "Rough", 0.9, 0.7, 0.7)
 
     def __init__(self, _names, _u_values):
         # type: (List[str], List[str]) -> None
@@ -37,18 +38,22 @@ class GHCompo_CreateSDConstructions(object):
     def _cleanup_input_lists(self, _name_inputs, _u_value_inputs):
         # type: (List[str], List[str]) -> Tuple[List[str], List[str]]
         """Make sure the input list lengths align."""
-        u_value_inputs_ = [] # type: List[str]
-        names_ = [] # type: List[str]
+        u_value_inputs_ = []  # type: List[str]
+        names_ = []  # type: List[str]
 
         if (not _name_inputs) or (not _u_value_inputs):
             return u_value_inputs_, names_
-        
+
         if len(_name_inputs) < len(_u_value_inputs):
-            for u_value_input, name in izip_longest(_u_value_inputs, _name_inputs, fillvalue=_name_inputs[0]):
+            for u_value_input, name in izip_longest(
+                _u_value_inputs, _name_inputs, fillvalue=_name_inputs[0]
+            ):
                 u_value_inputs_.append(u_value_input)
                 names_.append(name)
         elif len(_name_inputs) > len(_u_value_inputs):
-            for u_value_input, name in izip_longest(_u_value_inputs, _name_inputs, fillvalue=_u_value_inputs[0]):
+            for u_value_input, name in izip_longest(
+                _u_value_inputs, _name_inputs, fillvalue=_u_value_inputs[0]
+            ):
                 u_value_inputs_.append(u_value_input)
                 names_.append(name)
         else:
@@ -61,11 +66,11 @@ class GHCompo_CreateSDConstructions(object):
     def _convert_u_value_units(self, _u_value_inputs):
         # type: (List[str]) -> List[Union[int, float]]
         """Ensure all U-Values are converted to SI units."""
-        _ = [] # type: List[Union[float, int]]
-        
+        _ = []  # type: List[Union[float, int]]
+
         for u_value in _u_value_inputs:
             val, unit = parse_input(u_value)
-            
+
             val = convert(val, unit, "W/M2K")
             if val:
                 _.append(val)
@@ -82,9 +87,11 @@ class GHCompo_CreateSDConstructions(object):
                         name,
                         [
                             self.MASS_HB_MAT,
-                            EnergyMaterialNoMass("MAT_{}".format(name), 1/u_value, 'Rough', 0.9, 0.7, 0.7),
-                            self.MASS_HB_MAT
-                        ]
+                            EnergyMaterialNoMass(
+                                "MAT_{}".format(name), 1 / u_value, "Rough", 0.9, 0.7, 0.7
+                            ),
+                            self.MASS_HB_MAT,
+                        ],
                     )
                 )
 

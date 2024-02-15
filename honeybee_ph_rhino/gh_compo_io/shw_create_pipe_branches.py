@@ -4,17 +4,17 @@
 """GHCompo Interface: HBPH - Create SHW Pipe | Branches."""
 
 try:
-    from typing import Union, List, Any, Dict, Collection
+    from typing import Any, Collection, Dict, List, Union
 except ImportError:
     pass  # IronPython 2.7
 
-from ladybug_rhino.togeometry import to_polyline3d
-from ladybug_geometry.geometry3d.polyline import Polyline3D, LineSegment3D
-
 from honeybee_energy_ph.hvac import hot_water
+from honeybee_ph_utils.input_tools import clean_get, input_to_int
+from ladybug_geometry.geometry3d.polyline import LineSegment3D, Polyline3D
+from ladybug_rhino.togeometry import to_polyline3d
+
 from honeybee_ph_rhino import gh_io
 from honeybee_ph_rhino.gh_compo_io import ghio_validators
-from honeybee_ph_utils.input_tools import clean_get, input_to_int
 
 
 class _BranchPipeBuilder(object):

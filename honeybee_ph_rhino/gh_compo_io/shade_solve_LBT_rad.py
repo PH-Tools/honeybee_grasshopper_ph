@@ -11,7 +11,7 @@ except:
     pass  # Python3
 
 try:
-    from typing import Any, List, Collection, Tuple, Optional
+    from typing import Any, Collection, List, Optional, Tuple
 except ImportError:
     pass  # IronPython
 
@@ -37,28 +37,28 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
 try:
-    from ladybug.viewsphere import view_sphere
     from ladybug.graphic import GraphicContainer
+    from ladybug.viewsphere import view_sphere
 except ImportError as e:
     raise ImportError("\nFailed to import ladybug:\n\t{}".format(e))
 
 try:
-    from ladybug_rhino.togeometry import to_joined_gridded_mesh3d, to_mesh3d
-    from ladybug_rhino.fromgeometry import from_mesh3d, from_point3d, from_vector3d
     from ladybug_geometry.geometry3d import Mesh3D, Point3D
+    from ladybug_rhino.fromgeometry import from_mesh3d, from_point3d, from_vector3d
     from ladybug_rhino.fromobjects import legend_objects
-    from ladybug_rhino.text import text_objects
-    from ladybug_rhino.intersect import intersect_mesh_rays
     from ladybug_rhino.grasshopper import de_objectify_output
+    from ladybug_rhino.intersect import intersect_mesh_rays
+    from ladybug_rhino.text import text_objects
+    from ladybug_rhino.togeometry import to_joined_gridded_mesh3d, to_mesh3d
 except ImportError as e:
     raise ImportError("\nFailed to import ladybug_rhino:\n\t{}".format(e))
 
 try:
     from honeybee_ph_rhino import gh_io
-    from honeybee_ph_rhino.gh_compo_io.shade_LBT_rad_settings import HBPH_LBTRadSettings
     from honeybee_ph_rhino.gh_compo_io.shade_create_bldg_shd import (
         create_inset_aperture_surface,
     )
+    from honeybee_ph_rhino.gh_compo_io.shade_LBT_rad_settings import HBPH_LBTRadSettings
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
@@ -229,7 +229,7 @@ def build_window_meshes(
         * window_back_mesh: (Optional[ladybug_geometry.geometry3d.Mesh3D]) A copy of the window shifted 'back'
             just a little bit (0.1 units). Used when solving the 'unshaded' situation.
         * window_rh_mesh: (Rhino.Geometry.Mesh): The window as a Rhino-Mesh
-   """
+    """
 
     # Create the gridded mesh for the window surface
     # ---------------------------------------------------------------------------
@@ -472,7 +472,9 @@ class GHCompo_SolveLBTRad(object):
 
             for face in new_room.faces:
                 for aperture in face.apertures:
-                    window_surface = create_inset_aperture_surface(aperture, rh_units_name)
+                    window_surface = create_inset_aperture_surface(
+                        aperture, rh_units_name
+                    )
 
                     # Build the meshes
                     # ----------------------------------------------------------------------

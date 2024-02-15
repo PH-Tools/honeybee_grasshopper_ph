@@ -4,23 +4,23 @@
 """GHCompo Interface: HBPH - PH Climate Peak Load."""
 
 try:
-    from typing import  Optional
+    from typing import Optional
 except ImportError:
     pass  # IronPython 2.7
 
 try:
     from honeybee_ph import site
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_ph:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee_ph:\n\t{}".format(e))
 
 try:
     from honeybee_ph_rhino import gh_io
     from honeybee_ph_rhino.gh_compo_io import ghio_validators
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
+
 
 class GHCompo_CreatePeakLoad(object):
-
     display_name = ghio_validators.HBName("display_name")
     temp = ghio_validators.UnitDegreeC("temp", default=0.0)
     rad_north = ghio_validators.UnitKWH_M2("rad_north", default=0.0)
@@ -32,18 +32,20 @@ class GHCompo_CreatePeakLoad(object):
     ground_temp = ghio_validators.UnitDegreeC("ground_temp")
     sky_temp = ghio_validators.UnitDegreeC("sky_temp")
 
-    def __init__(self,
-                _IGH,
-                 _display_name,
-                 _temp,
-                 _rad_north,
-                 _rad_east,
-                 _rad_south,
-                 _rad_west,
-                 _rad_global,
-                 _dewpoint_temp,
-                 _ground_temp,
-                 _sky_temp,):
+    def __init__(
+        self,
+        _IGH,
+        _display_name,
+        _temp,
+        _rad_north,
+        _rad_east,
+        _rad_south,
+        _rad_west,
+        _rad_global,
+        _dewpoint_temp,
+        _ground_temp,
+        _sky_temp,
+    ):
         # type: (gh_io.IGH, str, float, float, float, float, float, float, Optional[float], Optional[float], Optional[float]) -> None
         self.IGH = _IGH
         self.display_name = _display_name
@@ -73,4 +75,3 @@ class GHCompo_CreatePeakLoad(object):
         hbph_obj.display_name = self.display_name
 
         return hbph_obj
-

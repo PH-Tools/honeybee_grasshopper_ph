@@ -9,17 +9,17 @@ except ImportError:
     pass  # IronPython 2.7
 
 try:
-    from honeybee_ph_standards.sourcefactors import factors 
+    from honeybee_ph_standards.sourcefactors import factors
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_ph_standards:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee_ph_standards:\n\t{}".format(e))
 
 try:
     from honeybee_ph_rhino import gh_io
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
+
 
 class GHCompo_ConversionFactor(object):
-
     def __init__(self, _IGH, _fuel_name, _factor):
         # type: (gh_io.IGH, Optional[str], Optional[float]) -> None
         self.IGH = _IGH

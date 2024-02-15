@@ -4,18 +4,18 @@
 """GHCompo Interface: HBPH - Create Spaces."""
 
 try:
-    from typing import Tuple, Union, TypeVar, Any, List, Optional
+    from typing import Any, List, Optional, Tuple, TypeVar, Union
     T = TypeVar("T")
 except ImportError:
     pass  # IronPython 2.7
 
 try:
-    from Grasshopper import DataTree # type: ignore
+    from Grasshopper import DataTree  # type: ignore
 except ImportError:
     pass  # outside Grasshopper
 
 try:
-    from System import Object, Double, String # type: ignore
+    from System import Double, Object, String  # type: ignore
 except:
     pass  # outside .NET
 
@@ -25,8 +25,8 @@ except ImportError as e:
     raise ImportError('\nFailed to import ladybug_geometry:\n\t{}'.format(e))
 
 try:
-    from ladybug_rhino.fromgeometry import from_face3d
     from ladybug_rhino.config import units_abbreviation
+    from ladybug_rhino.fromgeometry import from_face3d
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
@@ -47,7 +47,8 @@ except ImportError as e:
     raise ImportError('\nFailed to import ph_units:\n\t{}'.format(e))
 
 try:
-    from honeybee_ph_rhino.gh_compo_io.space_create_vent_rates import SpacePhVentFlowRates
+    from honeybee_ph_rhino.gh_compo_io.space_create_vent_rates import \
+        SpacePhVentFlowRates
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
 

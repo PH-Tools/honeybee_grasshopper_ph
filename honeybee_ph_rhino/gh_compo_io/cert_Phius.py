@@ -21,7 +21,6 @@ except ImportError as e:
 
 
 class GHCompo_PhiusCertification(object):
-
     PHIUS_annual_heating_demand_kWh_m2 = ghio_validators.UnitKWH_M2(
         "PHIUS_annual_heating_demand_kWh_m2"
     )

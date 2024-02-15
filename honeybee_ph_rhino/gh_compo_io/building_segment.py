@@ -4,7 +4,7 @@
 """GHCompo Interface: HBPH - Bldg Segment."""
 
 try:
-    from typing import List, Tuple, Any
+    from typing import Any, List, Tuple
 except ImportError:
     pass  # IronPython 2.7
 
@@ -15,8 +15,8 @@ except ImportError as e:
 
 try:
     from honeybee_ph import bldg_segment, phi, phius, site
-    from honeybee_ph.properties.room import RoomPhProperties
     from honeybee_ph.bldg_segment import PhVentilationSummerBypassMode
+    from honeybee_ph.properties.room import RoomPhProperties
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph:\n\t{}".format(e))
 

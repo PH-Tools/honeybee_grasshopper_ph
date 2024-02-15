@@ -4,7 +4,7 @@
 """GHCompo Interface: HBPH - Set Model Project Data."""
 
 try:
-    from typing import Optional, List, Dict
+    from typing import Dict, List, Optional
 except ImportError:
     pass  # IronPython 2.7
 
