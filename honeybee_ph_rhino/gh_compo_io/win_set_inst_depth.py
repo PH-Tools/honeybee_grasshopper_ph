@@ -53,7 +53,7 @@ class GHCompo_SetApertureInstallDepth(object):
         # -- convert the input value to Meters, always
         install_depth = convert(input_value, input_unit, "M")
 
-        if not install_depth:
+        if install_depth is None:
             raise ValueError("Failed to parse install depth input {}?".format(_install_depth))
         else:
             print("Converting: {} {} -> {:.4f} M".format(input_value, input_unit, install_depth))
