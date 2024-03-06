@@ -69,7 +69,7 @@ class GHCompo_BuildingSegment(object):
             + list(phius_CO2_factors.factors_2021.keys())
         )
     )
-    display_name = ghio_validators.HBName("display_name")
+    _display_name = ghio_validators.HBName("display_name")
     num_floor_levels = ghio_validators.IntegerNonZero("num_floor_levels", default=1)
     num_dwelling_units = ghio_validators.IntegerNonZero("num_dwelling_units", default=1)
     site = ghio_validators.NotNone("site")
@@ -99,7 +99,7 @@ class GHCompo_BuildingSegment(object):
     ):
         # type: (gh_io.IGH, str, int, int, site.Site, List, List, phius.PhiusCertification, phi.PhiCertification, str, str, str, List[room.Room], bool, str, *Any, **Any) -> None
         self.IGH = _IGH
-        self.display_name = _segment_name or "_unnamed_bldg_segment_"
+        self._display_name = _segment_name or "_unnamed_bldg_segment_"
         self.num_floor_levels = _num_floor_levels
         self.num_dwelling_units = _num_dwelling_units
         self.site = _site or site.Site()
@@ -205,11 +205,9 @@ class GHCompo_BuildingSegment(object):
         """Returns a new HBPH BldgSegment object with attribute value set."""
 
         obj = bldg_segment.BldgSegment()
-        ignore = ["IGH", "user_data", "identifier"]
+        ignore = ['_identifier', 'user_data', ]
         for attr_name in vars(obj).keys():
-            if attr_name.startswith("_"):
-                continue
-            elif attr_name in ignore:
+            if attr_name in ignore:
                 continue
             setattr(obj, attr_name, getattr(self, attr_name))
 
@@ -224,7 +222,7 @@ class GHCompo_BuildingSegment(object):
         # -------------------------------------------------------------------------------------
         # -- Create the actual HBPH Building Segment Object
         hbph_segment = self._create_bldg_segment()
-
+        
         # -------------------------------------------------------------------------------------
         # -- Set the new HBPH Building Segment on the HB rooms
         hb_rooms_ = []
