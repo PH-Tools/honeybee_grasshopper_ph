@@ -5,7 +5,7 @@
 These are called when the component is instantiated within the Grasshopper canvas.
 """
 
-RELEASE_VERSION = "Honeybee-PH v1.2.10"
+RELEASE_VERSION = "Honeybee-PH v1.2.11"
 CATEGORY = "HB-PH"
 SUB_CATEGORIES = {
     0: "00 | Utils",
@@ -414,6 +414,12 @@ COMPONENT_PARAMS = {
         "Category": CATEGORY,
         "SubCategory": 1,
     },
+    "HBPH - Set Material Color": {
+        "NickName": "Set Mat Color",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
     # -- Shading
     "HBPH - Create Building Shading": {
         "NickName": "Create Shading",
@@ -472,8 +478,8 @@ COMPONENT_PARAMS = {
         "Category": CATEGORY,
         "SubCategory": 1,
     },
-    "HBPH - Visualize Window Frames": {
-        "NickName": "Visualize Window Frames",
+    "HBPH - Visualize Aperture Frames": {
+        "NickName": "Visualize Aperture Frames",
         "Message": RELEASE_VERSION,
         "Category": CATEGORY,
         "SubCategory": 1,

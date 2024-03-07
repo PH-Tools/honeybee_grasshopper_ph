@@ -17,6 +17,9 @@ from honeybee_ph_rhino.gh_compo_io.assmbly_create_sd_const import (
 from honeybee_ph_rhino.gh_compo_io.building_create_team_member import (
     GHCompo_CreateProjectTeamMember,
 )
+from honeybee_ph_rhino.gh_compo_io.assmbly_set_mat_color import (
+    GHCompo_SetMaterialColor,
+)
 
 # -- Building Segment
 from honeybee_ph_rhino.gh_compo_io.building_segment import GHCompo_BuildingSegment
