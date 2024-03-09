@@ -4,6 +4,11 @@
 """GHCompo Interface: HBPH - Create Space PH Ventilation."""
 
 try:
+    from typing import Optional
+except ImportError:
+    pass # IronPython 2.7
+
+try:
     from Grasshopper import DataTree  # type: ignore
 except ImportError:
     pass  # outside Grasshopper
@@ -14,11 +19,20 @@ except:
     # Python 3+
     from itertools import zip_longest as izip_longest
 
-from honeybee_ph_utils import input_tools
+try:
+    from honeybee_ph_utils import input_tools
+except ImportError as e:
+    raise ImportError(
+        "Failed to import honeybee_ph_utils: {}".format(e)
+    )
 
-from honeybee_ph_rhino import gh_io
-from honeybee_ph_rhino.gh_compo_io import ghio_validators
-
+try:
+    from honeybee_ph_rhino import gh_io
+    from honeybee_ph_rhino.gh_compo_io import ghio_validators
+except ImportError as e:
+    raise ImportError(
+        "Failed to import honeybee_ph_rhino: {}".format(e)
+    )
 
 class SpacePhVentFlowRates(object):
     """Temporary dataclass to store flow-rate info"""
@@ -28,10 +42,10 @@ class SpacePhVentFlowRates(object):
     v_tran = ghio_validators.UnitM3_S("v_tran")
 
     def __init__(self, _v_sup, _v_eta, _v_tran):
-        # type: (float, float, float) -> None
-        self.v_sup = _v_sup
-        self.v_eta = _v_eta
-        self.v_tran = _v_tran
+        # type: (Optional[float], Optional[float], Optional[float]) -> None
+        self.v_sup = _v_sup or 0.0
+        self.v_eta = _v_eta or 0.0
+        self.v_tran = _v_tran or 0.0
 
     def __add__(self, other):
         # type: (SpacePhVentFlowRates, SpacePhVentFlowRates) -> SpacePhVentFlowRates
@@ -49,9 +63,14 @@ class SpacePhVentFlowRates(object):
             return self + other
 
     def __str__(self):
-        return "{}(v_sup={:.4f} m3/s, v_eta={:.4f} m3/s, v_tran={:.4f} m3/s)".format(
-            self.__class__.__name__, self.v_sup, self.v_eta, self.v_tran
-        )
+        try:
+            return "{}(v_sup={:.4f} m3/s, v_eta={:.4f} m3/s, v_tran={:.4f} m3/s)".format(
+                self.__class__.__name__, self.v_sup, self.v_eta, self.v_tran
+            )
+        except Exception as e:
+            return "{}(v_sup={} m3/s, v_eta={} m3/s, v_tran={} m3/s)".format(
+                            self.__class__.__name__, self.v_sup, self.v_eta, self.v_tran
+                        )
 
     def __repr__(self):
         return str(self)
@@ -99,7 +118,7 @@ class GHCompo_CreateSpaceVent(object):
                     ),
                     pth(branch_num),
                 )
-
+        
         return output
 
     def __str__(self):
