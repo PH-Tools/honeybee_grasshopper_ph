@@ -3,9 +3,8 @@
 
 """GHCompo Interface: HBPH - Create Space Conditioning System."""
 
-from copy import (
-    copy,
-)  # Use copy so that specific equipments can overwrite base with their own hints
+# Use copy so that specific equipments can overwrite base with their own hints
+from copy import copy
 
 try:
     from typing import Any, Dict, Iterable, List, Optional, Type, Union
@@ -239,6 +238,12 @@ class GHCompo_CreateSpaceConditioningSystem(object):
             user_input.append(val)
         return user_input
 
+    @property
+    def heating_system_percent_coverage(self):
+        # type: () -> float
+        """Get the percent coverage of the heating system."""
+        return float(self.input_dict.get("_percent_bldg_heating_covered", 1.0) or 1.0)
+
     def run(self):
         # type: () -> Optional[Union[heating.PhHeatingSystem, heat_pumps.PhHeatPumpSystem]]
         """Build the new PH Heating/Cooling System object."""
@@ -287,7 +292,7 @@ class GHCompo_CreateSpaceConditioningSystem(object):
                 setattr(new_heating_system, attr_name, user_input)
         
         # -- Set the heating percent covered
-        new_heating_system.percent_coverage = self.input_dict.get("_percent_bldg_heating_covered", 1.0)
+        new_heating_system.percent_coverage = self.heating_system_percent_coverage
 
         # -- If its not a heat-pump with cooling, just return it.
         if isinstance(new_heating_system, heating.PhHeatingSystem):

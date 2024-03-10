@@ -632,25 +632,25 @@ def get_component_input_values(ghenv):
 
     """
     inputs = {}
-    for input in ghenv.Component.Params.Input:
+    for _input in ghenv.Component.Params.Input:
         try:
             # Cast from GH_Goo to a normal PH-List
             try:
-                input_list = list(input.VolatileData[0])
+                input_list = list(_input.VolatileData[0])
             except:
                 input_list = []
 
-            if str(input.Access) == "list":
+            if str(_input.Access) == "list":
                 val = []
                 for v in input_list:
                     val.append(_get_component_input_value([v]))
-            elif str(input.Access) == "tree":
+            elif str(_input.Access) == "tree":
                 raise NotImplementedError("Tree input not allowed yet....")
             else:
                 val = _get_component_input_value(input_list)
 
-            inputs[input.Name] = val
+            inputs[_input.Name] = val
         except:
-            inputs[input.Name] = None
+            inputs[_input.Name] = None
 
     return inputs
