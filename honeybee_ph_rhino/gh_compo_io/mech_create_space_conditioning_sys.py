@@ -250,16 +250,16 @@ class GHCompo_CreateSpaceConditioningSystem(object):
 
         # --- Figure out which type of system should be built
         try:
-            system_class = self.system_classes[self.system_type]
+            heating_system_class = self.system_classes[self.system_type]
         except KeyError as e:
             raise Exception(
                 "Error: Input Heating type: '{}' not supported by this GH-Component. Please only input: "
                 "{}".format(self.system_type, self.valid_system_types)
             )
 
-        # -- Build the heat-pump system
-        new_system = system_class()
-        for attr_name in dir(new_system):
+        # -- Build the new Heating system
+        new_heating_system = heating_system_class()
+        for attr_name in dir(new_heating_system):
             if attr_name.startswith("_"):
                 continue
 
@@ -275,7 +275,7 @@ class GHCompo_CreateSpaceConditioningSystem(object):
             else:
                 target_unit = None
 
-            # -- Convert the user-input-value, if necessary
+            # -- Convert the attribute's user-input-value, if necessary
             if user_input and target_unit:
                 if isinstance(user_input, (list, tuple, set)):
                     user_input = self.convert_list_of_inputs(user_input, target_unit)
@@ -284,31 +284,50 @@ class GHCompo_CreateSpaceConditioningSystem(object):
 
             # -- Set the attribute value
             if user_input:
-                setattr(new_system, attr_name, user_input)
+                setattr(new_heating_system, attr_name, user_input)
+        
+        # -- Set the heating percent covered
+        new_heating_system.percent_coverage = self.input_dict.get("_percent_bldg_heating_covered", 1.0)
 
         # -- If its not a heat-pump with cooling, just return it.
-        if isinstance(new_system, heating.PhHeatingSystem):
-            return new_system
+        if isinstance(new_heating_system, heating.PhHeatingSystem):
+            return new_heating_system
 
         # -- Set any cooling params if its a heat-pump
         self.set_cooling_params(
             self.input_dict.get("_cooling_params_ventilation_air", None),
-            new_system.cooling_params.ventilation,
+            new_heating_system.cooling_params.ventilation,
         )
         self.set_cooling_params(
             self.input_dict.get("_cooling_params_recirculation_air", None),
-            new_system.cooling_params.recirculation,
+            new_heating_system.cooling_params.recirculation,
         )
         self.set_cooling_params(
             self.input_dict.get("_cooling_params_dehumidification", None),
-            new_system.cooling_params.dehumidification,
+            new_heating_system.cooling_params.dehumidification,
         )
         self.set_cooling_params(
             self.input_dict.get("_cooling_params_chilled_panel", None),
-            new_system.cooling_params.panel,
+            new_heating_system.cooling_params.panel,
         )
 
-        return new_system
+        self.warn_cooling_without_dehumidification(new_heating_system)
+
+        return new_heating_system
+
+    def warn_cooling_without_dehumidification(self, _system):
+        # type: (heat_pumps.PhHeatPumpSystem) -> None
+        if _system.cooling_params.recirculation.used:
+            if not _system.cooling_params.dehumidification.used:
+                msg = (
+                    "WARNING: The cooling system has recirculation-air but no dehumidification?"
+                    "For WUFI-Passive projects, you should add dehumidification parameters in "
+                    "order for the simulation results to work correctly. If you do not add "
+                    "dehumidification parameters, certain output reports such as Monthly-Site-Energy "
+                    "will have errors and will not print correctly."
+                )
+                self.IGH.warning(msg)
+                print(msg)
 
     def set_cooling_params(self, _user_input_clg_params, _system_clg_params):
         # type: (str, heat_pumps.PhHeatPumpCoolingParams_Base) -> None
