@@ -196,8 +196,9 @@ class FacadePhCoolingVentilation(object):
     min_coil_temp = ghio_validators.UnitDegreeC("min_coil_temp", default=12)
     capacity = ghio_validators.UnitKW("capacity", default=10)
 
-    def __init__(self, _input_dict):
-        # type: (Dict) -> None
+    def __init__(self, _IGH, _input_dict):
+        # type: (gh_io.IGH, Dict) -> None
+        self.IGH = _IGH
         self.display_name = _input_dict["display_name"]
         self.single_speed = _input_dict["single_speed"] or False
         self.min_coil_temp = _input_dict["min_coil_temp"]
@@ -224,8 +225,9 @@ class FacadePhCoolingRecirculation(object):
     flow_rate_m3_s = ghio_validators.UnitM3_S("flow_rate_m3_s", default=0.0278)
     capacity = ghio_validators.UnitKW("capacity", default=10)
 
-    def __init__(self, _input_dict):
-        # type: (Dict) -> None
+    def __init__(self, _IGH, _input_dict):
+        # type: (gh_io.IGH, Dict) -> None
+        self.IGH = _IGH
         self.display_name = _input_dict["display_name"]
         self.single_speed = _input_dict["single_speed"] or False
         self.min_coil_temp = _input_dict["min_coil_temp"]
@@ -233,6 +235,26 @@ class FacadePhCoolingRecirculation(object):
         self.flow_rate_variable = _input_dict["flow_rate_variable"] or True
         self.capacity = _input_dict["capacity"]
         self.annual_COP = _input_dict["annual_COP"] or 2.0
+
+        self.check_capacity()
+
+    def check_capacity(self):
+        # type: () -> None
+        """Check if the capacity is below the WUFI limit of 200 kW (682 kBTU/HR).
+        
+        This is a bug in WUFI v3.3.x which requires that the user adds a second 
+        'fake' cooling system if the capacity is above 200 kW.
+        """
+        if self.capacity >= 200.0:
+            msg = (
+                "\nWARNING: The cooling capacity of the cooling system is above 200 KW (682 KBTUH). "
+                "WUFI-Passive v3 has a bug which limits this size of any single cooling "
+                "system to < 200 KW. As a result, in WUFI-Passive, the total cooling capacity "
+                "of {} KW will be split across multiple systems. "
+                "Please contact Phius for more information or questions on this issue.\n".format(self.capacity)
+            )
+            self.IGH.warning(msg)
+            print(msg)
 
     def build(self):
         # type: () -> heat_pumps.PhHeatPumpCoolingParams_Recirculation
@@ -254,8 +276,9 @@ class FacadePhCoolingDehumidification(object):
     )
     percent_coverage = ghio_validators.FloatPercentage("percent_coverage", default=1.0)
 
-    def __init__(self, _input_dict):
-        # type: (Dict) -> None
+    def __init__(self, _IGH, _input_dict):
+        # type: (gh_io.IGH, Dict) -> None
+        self.IGH = _IGH
         self.display_name = _input_dict["display_name"]
         self.useful_heat_loss = _input_dict["useful_heat_loss"] or False
         self.annual_COP = _input_dict["annual_COP"] or 2.0
@@ -276,8 +299,9 @@ class FacadePhCoolingPanel(object):
     )
     percent_coverage = ghio_validators.FloatPercentage("percent_coverage", default=1.0)
 
-    def __init__(self, _input_dict):
-        # type: (Dict) -> None
+    def __init__(self, _IGH, _input_dict):
+        # type: (gh_io.IGH, Dict) -> None
+        self.IGH = _IGH
         self.display_name = _input_dict["display_name"]
         self.annual_COP = _input_dict["annual_COP"] or 2.0
 
@@ -345,5 +369,5 @@ class GHCompo_CreateCoolingSystem(object):
             )
 
         # --- Build the Cooling system from the user_inputs
-        cooling_param_builder = cooling_param_class(self.input_dict)
+        cooling_param_builder = cooling_param_class(self.IGH, self.input_dict)
         return cooling_param_builder.build()
