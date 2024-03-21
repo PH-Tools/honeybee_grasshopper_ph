@@ -4,7 +4,7 @@
 """GHCompo Interface: HBPH - Create Site From Phius File."""
 
 try:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
 except ImportError:
     pass  # IronPython 2.7
 
@@ -235,15 +235,44 @@ class GHCompo_CreateSiteFromPhiusFile(object):
     """Interface for the GH Component"""
 
     site_elevation = ghio_validators.UnitM("station_elevation")
+    _allowable_climate_zones = {
+        1: "Not defined",
+        11: "US 1",
+        12: "US 2",
+        13: "US 3",
+        14: "US 4",
+        141: "US 4C",
+        15: "US 5",
+        16: "US 6",
+        17: "US 7",
+        18: "US 8",
+    }
 
-    def __init__(self, _IGH, _source_file_path, _site_elevation, *args, **kwargs):
-        # type: (gh_io.IGH, str, str, List, Dict) -> None
+    def __init__(self, _IGH, _source_file_path, _site_elevation, _climate_zone, *args, **kwargs):
+        # type: (gh_io.IGH, str, str, str, List, Dict) -> None
         self.IGH = _IGH
         self.data = self._read_file(_source_file_path)
         self.monthly_data_collection = MonthlyDataInputCollection()
         self.peak_load_data_collection = PeakLoadInputCollection()
         self.site_elevation = _site_elevation
+        self.climate_zone = self.clean_climate_zone(_climate_zone or 1)
+    
+    def clean_climate_zone(self, _cz_input):
+        # type: (Union[str, int]) -> int
+        """Check the input climate zone and return the number."""
+        
+        cz_number = gh_io.input_to_int(str(_cz_input))
+        if not cz_number:
+            return 1
 
+        if cz_number not in self._allowable_climate_zones.keys():
+            msg = "Climate zone number must be one of the following:\n"
+            msg += ", ".join(["'{}-{}'".format(k,v) for k, v in  self._allowable_climate_zones.items()])
+            self.IGH.error(msg)
+            return 1
+        
+        return cz_number
+    
     def _read_file(self, _source_file_path):
         # type: (Optional[str]) -> List[str]
         """Read in the Phius Data file (TXT only) and return a list of the contents."""
@@ -308,7 +337,7 @@ class GHCompo_CreateSiteFromPhiusFile(object):
             latitude=self.monthly_data_collection.latitude,
             longitude=self.monthly_data_collection.longitude,
             site_elevation=site_elevation,
-            climate_zone=1,
+            climate_zone=self.climate_zone,
             hours_from_UTC=-5,  # TODO: make automatic somehow?
         )
 

@@ -20,14 +20,18 @@
 # @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 #
 """
-Set the geographic location data for the Passive House model. Note: if none is supplied, the default
-values for NYC, USA will be used.
+Set the geographic location data for the Passive House model. 
 -
-Note also that this component will *NOT* reset any of the Honeybee EnergyPlus climate, and you will need to set
-that separately using a normal EPW file with hourly data.
+Note: If none is supplied, the default values for NYC, USA will be used.
 -
-EM October 2, 2022
+Note: This component will -*-NOT-*- reset any of the Honeybee EnergyPlus climate values, 
+and you will need to set those separately using a normal EPW file with hourly data for any
+Honeybee-Energy / OpenStudio simulations.
+-
+EM March 21, 2024
     Args:
+        _display_name: (str) The display-name for the Location (default="New York")
+
         _latitude: (deg) default = 40.6 (NYC)
         
         _longitude: (deg) default = -73.8 (NYC)
@@ -35,8 +39,17 @@ EM October 2, 2022
         _site_elevation: (m) default = None. If None, the weather-station elevation will be 
             used as the site-elevation.
             
-        _climate_zone: (int) For WUFI-Passive.
-        
+        _climate_zone: (str) For WUFI-Passive. Input either
+1-Not defined (default)
+11-US 1
+12-US 2
+13-US 3
+14-US 4
+141-US 4C
+15-US 5
+16-US 6
+17-US 7
+18-US 8
         _hours_from_UTC: (hours) For WUFI-Passive.
 
     Returns:
@@ -67,8 +80,9 @@ reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - PH Location"
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
-    reload(gh_compo_io)
     reload(gh_io)
+    from honeybee_ph_rhino.gh_compo_io import climate_location as gh_compo_io
+    reload(gh_compo_io)
 
 
 # ------------------------------------------------------------------------------

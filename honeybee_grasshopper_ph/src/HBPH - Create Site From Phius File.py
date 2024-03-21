@@ -21,18 +21,30 @@
 #
 """
 Create a new PH-Site object with all the relevant attributes and data based on
-a Phius climate-data file. For information on Phius climate data files and to 
-download cliamte data, see:
+a Phius climate-data file (.TXT). For information on Phius climate data files and to 
+download climate data, see:
 https://www.phius.org/climate-data-sets
 -
-EM April 2, 2023
+EM March 21, 2024
     Args:
-        _source_file_path: Input the full path to the Phius climate file you would 
+        _source_file_path: (str) Input the full path to the Phius climate file you would 
             like to read in. Note: use only the 'TXT' files.
             
-        _station_elevation: The Site elevation. If none provided, the station
-            elevation will be used.
+        _site_elevation: (float) The site's elevation (m). 
+            If none provided, the station elevation will be used.
         
+        _climate_zone: (str) For WUFI-Passive. Input either
+1-Not defined (default)
+11-US 1
+12-US 2
+13-US 3
+14-US 4
+141-US 4C
+15-US 5
+16-US 6
+17-US 7
+18-US 8
+
     Returns:
         site_: A new PHX-Site object with all the relevant Phius climate and location
             data for the site specified. This PHX-Site object can be added to a 
@@ -63,6 +75,7 @@ reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create Site From Phius File"
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
+    reload(gh_io)
     from honeybee_ph_rhino.gh_compo_io import climate_site_from_phius_file as gh_compo_io
     reload(gh_compo_io)
 
@@ -77,6 +90,7 @@ gh_compo_interface = gh_compo_io.GHCompo_CreateSiteFromPhiusFile(
         IGH,
         _source_file_path,
         _site_elevation,
+        _climate_zone
     )
 
 site_ = gh_compo_interface.run()
