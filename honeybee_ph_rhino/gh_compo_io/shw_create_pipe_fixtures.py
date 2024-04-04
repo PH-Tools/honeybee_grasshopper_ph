@@ -20,9 +20,7 @@ from honeybee_ph_rhino.gh_compo_io import ghio_validators
 class _FixturePipeBuilder(object):
     """Interface for collect and clean DHW Fixture ('Twig') Piping user-inputs"""
 
-    display_name = ghio_validators.HBName(
-        "display_name", default="_unnamed_fixture_pipe_"
-    )
+    display_name = ghio_validators.HBName("display_name", default="_unnamed_fixture_pipe_")
 
     def __init__(self, IGH, display_name, pipe_material, pipe_diameter, geometry):
         # type: (gh_io.IGH, str, int, int, Union[Polyline3D, LineSegment3D]) -> None
@@ -53,9 +51,7 @@ class _FixturePipeBuilder(object):
                 self._geometry = to_polyline3d(self._convert_to_polyline(_input))
             except Exception as e:
                 raise Exception(
-                    "{}\nError: Geometry input {} cannot be converted to an LBT Polyline3D?".format(
-                        e, _input
-                    )
+                    "{}\nError: Geometry input {} cannot be converted to an LBT Polyline3D?".format(e, _input)
                 )
 
     @property
@@ -66,11 +62,7 @@ class _FixturePipeBuilder(object):
         elif isinstance(self.geometry, Polyline3D):
             return self.geometry.segments
         else:
-            raise ValueError(
-                "Geometry input '{}' is not a Polyline3D or LineSegment3D?".format(
-                    type(self.geometry)
-                )
-            )
+            raise ValueError("Geometry input '{}' is not a Polyline3D or LineSegment3D?".format(type(self.geometry)))
 
     def create_hbph_dhw_fixture_pipe(self):
         # type: () -> hot_water.PhPipeElement
@@ -128,8 +120,6 @@ class GHCompo_CreateSHWFixturePipes(object):
 
         for fixture_data in self.collect_fixture_data():
             fixture_pipe_builder = _FixturePipeBuilder(**fixture_data)
-            dhw_fixture_piping_.append(
-                fixture_pipe_builder.create_hbph_dhw_fixture_pipe()
-            )
+            dhw_fixture_piping_.append(fixture_pipe_builder.create_hbph_dhw_fixture_pipe())
 
         return dhw_fixture_piping_

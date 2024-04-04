@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 # -*- Python Version: 2.7 -*-
 
-"""GHCompo Interface: HBPH - Create Mixed HB-Material."""
+"""GHCompo Interface: HBPH - Set Mixed-Material Column/Row."""
+
+# TODO: Deprecate this component
 
 from functools import reduce
 

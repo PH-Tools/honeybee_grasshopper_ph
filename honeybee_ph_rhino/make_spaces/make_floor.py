@@ -126,12 +126,8 @@ def build_floors_from_segments(IGH, _flr_segments, _merge_segments=False):
 
     if _merge_segments:
         # -- Sort out the 'neighbor' (ie: touching) SpaceFloorSegment groups
-        neighbor_group_ids, error_surfaces_ = gather_neighbor_group_ids(
-            IGH, _flr_segments
-        )
-        neighbor_group_flr_segs = group_floor_segments_by_neighbor(
-            neighbor_group_ids, _flr_segments
-        )
+        neighbor_group_ids, error_surfaces_ = gather_neighbor_group_ids(IGH, _flr_segments)
+        neighbor_group_flr_segs = group_floor_segments_by_neighbor(neighbor_group_ids, _flr_segments)
 
         # -- Build new Floors for each of the neighbor groups
         for flr_seg_group in neighbor_group_flr_segs:
@@ -178,20 +174,12 @@ def space_floor_from_rh_geom(IGH, _flr_segment_geom, _weighting_factors):
             try:
                 weighting_factors.append(_weighting_factors[0])
             except IndexError:
-                raise Exception(
-                    "Error: Weighting Factors input {} cannot be used?".format(
-                        _weighting_factors
-                    )
-                )
+                raise Exception("Error: Weighting Factors input {} cannot be used?".format(_weighting_factors))
 
     # -- Build the new SpaceFloorSegments from the Rhino Geometry
-    flr_segments = make_floor_segment.create_floor_segment_from_rhino_geom(
-        IGH, _flr_segment_geom, weighting_factors
-    )
+    flr_segments = make_floor_segment.create_floor_segment_from_rhino_geom(IGH, _flr_segment_geom, weighting_factors)
 
     # -- Build the new SpaceFloors from the new SpaceFloorSegments
-    new_floors, error_surfaces = build_floors_from_segments(
-        IGH, flr_segments, _merge_segments=False
-    )
+    new_floors, error_surfaces = build_floors_from_segments(IGH, flr_segments, _merge_segments=False)
 
     return (new_floors, error_surfaces)

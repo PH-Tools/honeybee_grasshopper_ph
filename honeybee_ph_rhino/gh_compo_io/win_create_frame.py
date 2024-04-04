@@ -38,9 +38,7 @@ class GHCompo_CreatePhWinFrame(object):
         self._bottom = _bottom
         self._left = _left
 
-        self._default_frame = window.PhWindowFrameElement(
-            clean_and_id_ep_string("PhWindowFrameElement")
-        )
+        self._default_frame = window.PhWindowFrameElement(clean_and_id_ep_string("PhWindowFrameElement"))
 
     @property
     def top(self):

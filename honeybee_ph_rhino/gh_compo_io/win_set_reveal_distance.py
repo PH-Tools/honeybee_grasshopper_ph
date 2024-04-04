@@ -56,15 +56,9 @@ class GHCompo_SetApertureRevealDistance(object):
         install_depth = convert(input_value, input_unit, "M")
 
         if not install_depth:
-            raise ValueError(
-                "Failed to parse reveal-distance input {}?".format(_install_depth)
-            )
+            raise ValueError("Failed to parse reveal-distance input {}?".format(_install_depth))
         else:
-            print(
-                "Converting: {} {} -> {:.4f} M".format(
-                    input_value, input_unit, install_depth
-                )
-            )
+            print("Converting: {} {} -> {:.4f} M".format(input_value, input_unit, install_depth))
             return install_depth
 
     def run(self):

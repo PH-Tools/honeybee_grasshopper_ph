@@ -25,9 +25,7 @@ except ImportError as e:
 
 
 class GHCompo_SetProjectData(object):
-    def __init__(
-        self, _IGH, _customer, _building, _owner, _designer, _model, *args, **kwargs
-    ):
+    def __init__(self, _IGH, _customer, _building, _owner, _designer, _model, *args, **kwargs):
         # type: (gh_io.IGH, ProjectTeamMember, ProjectTeamMember, ProjectTeamMember, ProjectTeamMember, model.Model, List, Dict) -> None
         self.IGH = _IGH
         self.customer = _customer

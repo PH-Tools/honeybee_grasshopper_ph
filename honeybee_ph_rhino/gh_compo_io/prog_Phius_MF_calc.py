@@ -106,9 +106,7 @@ def check_inputs(_hb_rooms, _IGH):
         msg = (
             "Error: There are no PH-Spaces assigned to room: '{}'. Please be sure to assign the "
             "PH-Spaces before using this component. Use the HB-PH 'Create Spaces' and 'Add Spaces' "
-            "components in order to add Spaces to all the Honeybee-Rooms.".format(
-                rm_with_error.display_name
-            )
+            "components in order to add Spaces to all the Honeybee-Rooms.".format(rm_with_error.display_name)
         )
         print(msg)
         _IGH.error(msg)
@@ -188,9 +186,7 @@ class GHCompo_CalcPhiusMFLoads(object):
         # type: (room.Room) -> bool
         """Return True if the Honeybee-Room is a 'dwelling' (residential)?"""
         hb_room_prop_e = _hb_room.properties.energy  # type: RoomEnergyProperties
-        hb_room_prop_e_prop_ph = (
-            hb_room_prop_e.people.properties.ph
-        )  # type: PeoplePhProperties
+        hb_room_prop_e_prop_ph = hb_room_prop_e.people.properties.ph  # type: PeoplePhProperties
         return hb_room_prop_e_prop_ph.is_residential
 
     def calc_res_electric_consumption(self, _hb_res_rooms):
@@ -200,9 +196,7 @@ class GHCompo_CalcPhiusMFLoads(object):
         # -- Determine the Input Res Honeybee Room attributes by story
 
         rooms_by_story = sort_rooms_by_story(_hb_res_rooms)
-        phius_stories = [
-            phius_mf.PhiusResidentialStory(room_list) for room_list in rooms_by_story
-        ]
+        phius_stories = [phius_mf.PhiusResidentialStory(room_list) for room_list in rooms_by_story]
         phius_stories = sorted(phius_stories, reverse=True)
 
         # ---------------------------------------------------------------------------
@@ -279,14 +273,8 @@ class GHCompo_CalcPhiusMFLoads(object):
         # -- Collect the program data for preview / output
         non_res_program_data_ = prog_collection.to_phius_mf_workbook()
 
-        non_res_room_data_ = [
-            sp.to_phius_mf_workbook()
-            for sp in sorted(non_res_spaces, key=lambda x: x.name)
-        ]
-        non_res_totals_ = [
-            sp.to_phius_mf_workbook_results()
-            for sp in sorted(non_res_spaces, key=lambda x: x.name)
-        ]
+        non_res_room_data_ = [sp.to_phius_mf_workbook() for sp in sorted(non_res_spaces, key=lambda x: x.name)]
+        non_res_totals_ = [sp.to_phius_mf_workbook_results() for sp in sorted(non_res_spaces, key=lambda x: x.name)]
         non_res_totals_.insert(
             0,
             str(
@@ -352,24 +340,18 @@ class GHCompo_CalcPhiusMFLoads(object):
         total_hb_rooms = len(_hb_res_rooms) + len(_hb_nonres_rooms)
         bldg_avg_mel_dwellings = _total_res_mel / total_hb_rooms
         bldg_avg_mel_non_res = _total_nonres_mel / total_hb_rooms
-        bldg_avg_lighting_int = (
-            _total_res_int_lighting + _total_nonres_int_lighting
-        ) / total_hb_rooms
+        bldg_avg_lighting_int = (_total_res_int_lighting + _total_nonres_int_lighting) / total_hb_rooms
         bldg_avg_lighting_ext = _total_res_ext_lighting / total_hb_rooms
         bldg_avg_lighting_garage = _total_res_garage_lighting / total_hb_rooms
 
         # ---------------------------------------------------------------------------
         # -- Create the new Phius MF Elec Equip
-        mel = ph_equipment.PhCustomAnnualMEL(
-            _defaults=ph_default_equip["PhCustomAnnualMEL"]["PHIUS"]
-        )
+        mel = ph_equipment.PhCustomAnnualMEL(_defaults=ph_default_equip["PhCustomAnnualMEL"]["PHIUS"])
         mel.energy_demand = bldg_avg_mel_dwellings
         mel.comment = "MEL_Dwell - Phius MF Calculator"
         elec_equipment_.append(mel)
 
-        mel = ph_equipment.PhCustomAnnualMEL(
-            _defaults=ph_default_equip["PhCustomAnnualMEL"]["PHIUS"]
-        )
+        mel = ph_equipment.PhCustomAnnualMEL(_defaults=ph_default_equip["PhCustomAnnualMEL"]["PHIUS"])
         mel.energy_demand = bldg_avg_mel_non_res
         mel.comment = "MEL_Comm - Phius MF Calculator"
         elec_equipment_.append(mel)
@@ -413,9 +395,7 @@ class GHCompo_CalcPhiusMFLoads(object):
             # ---------------------------------------------------------------------------
             # -- Break out the Res from the non-Res HB-Rooms
             hb_res_rooms_ = [rm for rm in self.hb_rooms if self._room_is_dwelling(rm)]
-            hb_nonres_rooms_ = [
-                rm for rm in self.hb_rooms if not self._room_is_dwelling(rm)
-            ]
+            hb_nonres_rooms_ = [rm for rm in self.hb_rooms if not self._room_is_dwelling(rm)]
 
             if not hb_res_rooms_:
                 msg = "Warning: No Residential HB-Rooms found?"

@@ -4,7 +4,7 @@
 """GHCompo Interface: HBPH - Create Spaces."""
 
 try:
-    from typing import Any, List, Optional, Tuple, TypeVar, Union, Optional
+    from typing import Any, List, Optional, Tuple, TypeVar, Union
 
     T = TypeVar("T")
 except ImportError:
@@ -90,9 +90,7 @@ class GHCompo_CreatePHSpaces(object):
 
         default_height_value = self.DEFAULT_SPACE_HEIGHT
         default_height_unit = "M"
-        value = converter.convert(
-            default_height_value, default_height_unit, self.rh_doc_unit_type_abbreviation
-        )
+        value = converter.convert(default_height_value, default_height_unit, self.rh_doc_unit_type_abbreviation)
         if not value:
             msg = "Error: Failed to convert:" "'{}{}' to local unit-type: '{}'".format(
                 default_height_value,
@@ -105,7 +103,7 @@ class GHCompo_CreatePHSpaces(object):
     def _clean_input_tree(self, _input_tree, branch_count, default, _type):
         # type: (DataTree, int, Any, T) -> DataTree[T]
         """Align the input DataTrees so they are all the same length. Apply defaults.
-        
+
         Arguments:
         ----------
             * _input_tree: The input DataTree to clean.
@@ -127,9 +125,7 @@ class GHCompo_CreatePHSpaces(object):
                 new_tree.Add(default, pth(i))
         return new_tree
 
-    def _clean_volume_heights_tree(
-        self, _input_tree, _branch_count, _default_height, _type
-    ):
+    def _clean_volume_heights_tree(self, _input_tree, _branch_count, _default_height, _type):
         # type: (DataTree, int, Any, T) -> DataTree[T]
         """Return a cleaned DataTree of the volume height inputs. Allows for conversion of user input.
 
@@ -146,9 +142,7 @@ class GHCompo_CreatePHSpaces(object):
 
                 for input_item in _input_tree.Branch(i):
                     val, unit = parser.parse_input(input_item)
-                    converted_value = converter.convert(
-                        val, unit, self.rh_doc_unit_type_abbreviation
-                    )
+                    converted_value = converter.convert(val, unit, self.rh_doc_unit_type_abbreviation)
                     new_tree.Add(converted_value, pth(i))
             except ValueError:
                 new_tree.Add(_default_height, pth(i))
@@ -177,9 +171,7 @@ class GHCompo_CreatePHSpaces(object):
         # type: (List[space.SpaceFloor], List[float]) -> List[space.SpaceVolume]
         """Return a new space.SpaceVolume based on a floor and a height."""
 
-        volumes = make_volume.volumes_from_floors(
-            self.IGH, _space_floors, list(_vol_heights)
-        )
+        volumes = make_volume.volumes_from_floors(self.IGH, _space_floors, list(_vol_heights))
         return volumes
 
     def _add_flow_rates_to_space(self, _vent_rates, _new_space):
@@ -202,9 +194,7 @@ class GHCompo_CreatePHSpaces(object):
         volume_rh_breps_ = []
         for vol in _space_volumes:
             volume_rh_breps_.append(
-                self.IGH.ghpythonlib_components.BrepJoin(
-                    self.IGH.convert_to_rhino_geom(vol.geometry)
-                ).breps
+                self.IGH.ghpythonlib_components.BrepJoin(self.IGH.convert_to_rhino_geom(vol.geometry)).breps
             )
         return volume_rh_breps_
 
@@ -229,12 +219,8 @@ class GHCompo_CreatePHSpaces(object):
             new_space = space.Space()
             new_space.name = _space_names.Branch(i)[0]
             new_space.number = _space_numbers.Branch(i)[0]
-            space_floors, errors_ = self._create_space_floors(
-                floor_surface_list, _weighting_factors.Branch(i)
-            )
-            space_volumes = self._create_space_volumes(
-                space_floors, _volume_heights.Branch(i)
-            )
+            space_floors, errors_ = self._create_space_floors(floor_surface_list, _weighting_factors.Branch(i))
+            space_volumes = self._create_space_volumes(space_floors, _volume_heights.Branch(i))
             new_space.add_new_volumes(space_volumes)
             new_space = self._add_flow_rates_to_space(_vent_rates.Branch(i), new_space)
             spaces_.append(new_space)
@@ -262,14 +248,8 @@ class GHCompo_CreatePHSpaces(object):
 
         space_names = self._clean_input_tree(self.names, input_len, "_Unnamed_", String)
         space_numbers = self._clean_input_tree(self.numbers, input_len, "000", String)
-        weighting_factors = self._clean_input_tree(
-            self.weighting_factors, input_len, 1.0, Object
-        )
-        volume_heights = self._clean_volume_heights_tree(
-            self.vol_heights, input_len, default_height, Object
-        )
+        weighting_factors = self._clean_input_tree(self.weighting_factors, input_len, 1.0, Object)
+        volume_heights = self._clean_volume_heights_tree(self.vol_heights, input_len, default_height, Object)
         vent_rates = self._clean_input_tree(self.vent_rates, input_len, None, Object)
 
-        return self._create_ph_spaces(
-            space_names, space_numbers, weighting_factors, volume_heights, vent_rates
-        )
+        return self._create_ph_spaces(space_names, space_numbers, weighting_factors, volume_heights, vent_rates)

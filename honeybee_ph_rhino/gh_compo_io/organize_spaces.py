@@ -47,8 +47,6 @@ class GHCompo_OrganizeSpaces(object):
             return spaces_
 
         for i, room in enumerate(self.hb_rooms):
-            spaces_.AddRange(
-                [sp.duplicate() for sp in room.properties.ph.spaces], GH_Path(i)
-            )
+            spaces_.AddRange([sp.duplicate() for sp in room.properties.ph.spaces], GH_Path(i))
 
         return spaces_

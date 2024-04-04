@@ -9,16 +9,21 @@ except ImportError:
     pass  # IronPython 2.7
 
 try:
-    import System.Drawing.Color # type: ignore
+    import System.Drawing.Color  # type: ignore
 except ImportError:
     raise Exception("Error importing System.Drawing.Color.")
 
 try:
     from honeybee_energy.material import opaque
+
     try:
-        HBMaterial = Union[opaque.EnergyMaterial, opaque.EnergyMaterialNoMass, opaque.EnergyMaterialVegetation]
+        HBMaterial = Union[
+            opaque.EnergyMaterial,
+            opaque.EnergyMaterialNoMass,
+            opaque.EnergyMaterialVegetation,
+        ]
     except NameError:
-       pass # Union is not defined, IronPython 2.7
+        pass  # Union is not defined, IronPython 2.7
 except ImportError:
     raise Exception("Error importing honeybee_energy modules.")
 
@@ -29,7 +34,6 @@ except ImportError:
 
 
 class GHCompo_SetMaterialColor(object):
-
     def __init__(self, _IHG, _material, _color, *args, **kwargs):
         # type : gh_io.IGH, Optional[HBMaterial], Optional[System.Drawing.Color] -> None
         self.IGH = _IHG

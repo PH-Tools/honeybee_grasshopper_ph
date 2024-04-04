@@ -6,6 +6,9 @@ from honeybee_ph_rhino.gh_compo_io.assmbly_create_air_layer_mat import (
 from honeybee_ph_rhino.gh_compo_io.assmbly_create_detailed_const import (
     GHCompo_CreateDetailedConstructions,
 )
+from honeybee_ph_rhino.gh_compo_io.assmbly_create_heterogeneous_material import (
+    GHCompo_CreateHeterogeneousMaterial,
+)
 from honeybee_ph_rhino.gh_compo_io.assmbly_create_mixed_mat import (
     GHCompo_CreateMixedHBMaterial,
 )
@@ -14,11 +17,12 @@ from honeybee_ph_rhino.gh_compo_io.assmbly_create_mixed_mat import (
 from honeybee_ph_rhino.gh_compo_io.assmbly_create_sd_const import (
     GHCompo_CreateSDConstructions,
 )
+from honeybee_ph_rhino.gh_compo_io.assmbly_set_mat_color import GHCompo_SetMaterialColor
+from honeybee_ph_rhino.gh_compo_io.assmbly_set_material_column_and_row import (
+    GHCompo_SetMaterialColumnAndRow,
+)
 from honeybee_ph_rhino.gh_compo_io.building_create_team_member import (
     GHCompo_CreateProjectTeamMember,
-)
-from honeybee_ph_rhino.gh_compo_io.assmbly_set_mat_color import (
-    GHCompo_SetMaterialColor,
 )
 
 # -- Building Segment

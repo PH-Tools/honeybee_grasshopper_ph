@@ -190,9 +190,7 @@ def get_component_inputs(_param_type):
 
 
 class FacadePhCoolingVentilation(object):
-    display_name = ghio_validators.HBName(
-        "display_name", default="_unnamed_ventilation_cooling_"
-    )
+    display_name = ghio_validators.HBName("display_name", default="_unnamed_ventilation_cooling_")
     min_coil_temp = ghio_validators.UnitDegreeC("min_coil_temp", default=12)
     capacity = ghio_validators.UnitKW("capacity", default=10)
 
@@ -218,9 +216,7 @@ class FacadePhCoolingVentilation(object):
 
 
 class FacadePhCoolingRecirculation(object):
-    display_name = ghio_validators.HBName(
-        "display_name", default="_unnamed_recirculation_cooling_"
-    )
+    display_name = ghio_validators.HBName("display_name", default="_unnamed_recirculation_cooling_")
     min_coil_temp = ghio_validators.UnitDegreeC("min_coil_temp", default=12)
     flow_rate_m3_s = ghio_validators.UnitM3_S("flow_rate_m3_s", default=0.0278)
     capacity = ghio_validators.UnitKW("capacity", default=10)
@@ -241,8 +237,8 @@ class FacadePhCoolingRecirculation(object):
     def check_capacity(self):
         # type: () -> None
         """Check if the capacity is below the WUFI limit of 200 kW (682 kBTU/HR).
-        
-        This is a bug in WUFI v3.3.x which requires that the user adds a second 
+
+        This is a bug in WUFI v3.3.x which requires that the user adds a second
         'fake' cooling system if the capacity is above 200 kW.
         """
         if self.capacity >= 200.0:
@@ -271,9 +267,7 @@ class FacadePhCoolingRecirculation(object):
 
 
 class FacadePhCoolingDehumidification(object):
-    display_name = ghio_validators.HBName(
-        "display_name", default="_unnamed_dehumidification_cooling_"
-    )
+    display_name = ghio_validators.HBName("display_name", default="_unnamed_dehumidification_cooling_")
     percent_coverage = ghio_validators.FloatPercentage("percent_coverage", default=1.0)
 
     def __init__(self, _IGH, _input_dict):
@@ -294,9 +288,7 @@ class FacadePhCoolingDehumidification(object):
 
 
 class FacadePhCoolingPanel(object):
-    display_name = ghio_validators.HBName(
-        "display_name", default="_unnamed_panel_cooling_"
-    )
+    display_name = ghio_validators.HBName("display_name", default="_unnamed_panel_cooling_")
     percent_coverage = ghio_validators.FloatPercentage("percent_coverage", default=1.0)
 
     def __init__(self, _IGH, _input_dict):
@@ -363,9 +355,7 @@ class GHCompo_CreateCoolingSystem(object):
         except KeyError as e:
             raise Exception(
                 "Error: Input '_cooling_type' value of: '{}' is not supported by this GH-Component. "
-                "Please only input one of the types: {}".format(
-                    self.param_type, self.valid_cooling_param_types
-                )
+                "Please only input one of the types: {}".format(self.param_type, self.valid_cooling_param_types)
             )
 
         # --- Build the Cooling system from the user_inputs

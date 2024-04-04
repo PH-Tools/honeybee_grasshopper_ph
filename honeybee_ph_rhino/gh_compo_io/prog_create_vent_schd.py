@@ -61,27 +61,19 @@ class GHCompo_CreateVentSched(object):
 
         if self.op_period_high:
             self.op_period_high.name = "high"
-            ph_properties.daily_operating_periods.add_period_to_collection(
-                self.op_period_high
-            )
+            ph_properties.daily_operating_periods.add_period_to_collection(self.op_period_high)
 
         if self.op_period_standard:
             self.op_period_standard.name = "standard"
-            ph_properties.daily_operating_periods.add_period_to_collection(
-                self.op_period_standard
-            )
+            ph_properties.daily_operating_periods.add_period_to_collection(self.op_period_standard)
 
         if self.op_period_basic:
             self.op_period_basic.name = "basic"
-            ph_properties.daily_operating_periods.add_period_to_collection(
-                self.op_period_basic
-            )
+            ph_properties.daily_operating_periods.add_period_to_collection(self.op_period_basic)
 
         if self.op_period_minimum:
             self.op_period_minimum.name = "low"
-            ph_properties.daily_operating_periods.add_period_to_collection(
-                self.op_period_minimum
-            )
+            ph_properties.daily_operating_periods.add_period_to_collection(self.op_period_minimum)
 
         # ---------------------------------------------------------------------
         # -- User Warnings
@@ -96,15 +88,9 @@ class GHCompo_CreateVentSched(object):
         # ---------------------------------------------------------------------
         # -- Create a new constant-value honeybee-energy-ScheduleRuleset object
         # -- Set the properties.ph with the user-determined values above.
-        name = (
-            clean_and_id_ep_string("ConstantSchedule")
-            if self.name is None
-            else clean_ep_string(self.name)
-        )
+        name = clean_and_id_ep_string("ConstantSchedule") if self.name is None else clean_ep_string(self.name)
         type_limit = schedule_type_limit_by_identifier("Fractional")
-        ventilation_sch_ = hbe_ruleset.ScheduleRuleset.from_constant_value(
-            name, hb_schedule_const_value, type_limit
-        )
+        ventilation_sch_ = hbe_ruleset.ScheduleRuleset.from_constant_value(name, hb_schedule_const_value, type_limit)
         ph_properties._host = ventilation_sch_._properties
         ventilation_sch_._properties._ph = ph_properties  # type: ignore
 

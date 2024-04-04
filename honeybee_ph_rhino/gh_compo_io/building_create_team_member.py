@@ -20,9 +20,7 @@ except ImportError as e:
 
 
 class GHCompo_CreateProjectTeamMember(object):
-    def __init__(
-        self, _IGH, _name, _street, _city, _post_code, _telephone, _email, *args, **kwargs
-    ):
+    def __init__(self, _IGH, _name, _street, _city, _post_code, _telephone, _email, *args, **kwargs):
         # type: (gh_io.IGH, Optional[str], Optional[str], Optional[str], Optional[str], Optional[str], Optional[str], List, Dict) -> None
         self.IGH = _IGH
         self.name = _name

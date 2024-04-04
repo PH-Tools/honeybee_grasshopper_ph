@@ -40,8 +40,7 @@ class GHCompo_PHPPCodes(object):
         vals = _in.split("-")
         if len(vals) != 2:
             raise Exception(
-                "Error: input for '_dataset_name' format should be "
-                "'xx01234-xxxx'. Got: '{}'?".format(_in)
+                "Error: input for '_dataset_name' format should be " "'xx01234-xxxx'. Got: '{}'?".format(_in)
             )
         self._dataset_name = _in
         self.display_name = vals[1]

@@ -70,9 +70,7 @@ class _TrunkPipeBuilder(object):
                 self._geometry = to_polyline3d(self._convert_to_polyline(_input))
             except Exception as e:
                 raise Exception(
-                    "{}\nError: Geometry input {} cannot be converted to an LBT Polyline3D?".format(
-                        e, _input
-                    )
+                    "{}\nError: Geometry input {} cannot be converted to an LBT Polyline3D?".format(e, _input)
                 )
 
     @property
@@ -83,11 +81,7 @@ class _TrunkPipeBuilder(object):
         elif isinstance(self.geometry, Polyline3D):
             return self.geometry.segments
         else:
-            raise ValueError(
-                "Geometry input '{}' is not a Polyline3D or LineSegment3D?".format(
-                    type(self.geometry)
-                )
-            )
+            raise ValueError("Geometry input '{}' is not a Polyline3D or LineSegment3D?".format(type(self.geometry)))
 
     def create_hbph_dhw_trunk_pipe(self):
         # type: () -> hot_water.PhPipeTrunk
@@ -167,9 +161,7 @@ class GHCompo_CreateSHWTrunkPipes(object):
                     "dhw_branches": self.dhw_branches,
                     "multiplier": clean_get(self.multipliers, i, 1),
                     "display_name": clean_get(self.display_name, i, "_unnamed_trunk_"),
-                    "demand_recirculation": clean_get(
-                        self.demand_recirculation, i, False
-                    ),
+                    "demand_recirculation": clean_get(self.demand_recirculation, i, False),
                     "pipe_material": input_to_int(clean_get(self.pipe_material, i, "2")),
                     "pipe_diameter": input_to_int(clean_get(self.pipe_diameter, i, "2")),
                     "geometry": self.geometry[i],

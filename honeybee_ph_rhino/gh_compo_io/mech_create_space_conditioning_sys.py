@@ -66,18 +66,14 @@ inputs_direct_electric.update({})
 inputs_fossil_boiler = copy(inputs_base)
 inputs_fossil_boiler.update(
     {
-        3: ComponentInput(
-            _name="fuel", _description='Select Fuel type: "1-Natural-Gas" or "2-Oil"'
-        ),
+        3: ComponentInput(_name="fuel", _description='Select Fuel type: "1-Natural-Gas" or "2-Oil"'),
     }
 )
 
 inputs_wood_boiler = copy(inputs_base)
 inputs_wood_boiler.update(
     {
-        3: ComponentInput(
-            _name="fuel", _description='Select Fuel type: "3-Logs" or "4-Pellets"'
-        ),
+        3: ComponentInput(_name="fuel", _description='Select Fuel type: "3-Logs" or "4-Pellets"'),
     }
 )
 
@@ -154,20 +150,12 @@ def get_component_inputs(_system_type):
 
     input_type_id = gh_io.input_to_int(_system_type)
     if not input_type_id:
-        raise Exception(
-            'Error: Heating type ID: "{}" is not a valid equip type.'.format(
-                input_type_id
-            )
-        )
+        raise Exception('Error: Heating type ID: "{}" is not a valid equip type.'.format(input_type_id))
 
     try:
         return input_groups[input_type_id]
     except KeyError:
-        raise Exception(
-            'Error: Heating type ID: "{}" is not a valid equip type.'.format(
-                input_type_id
-            )
-        )
+        raise Exception('Error: Heating type ID: "{}" is not a valid equip type.'.format(input_type_id))
 
 
 def get_component_input_by_name(_input_group, _name):
@@ -272,9 +260,7 @@ class GHCompo_CreateSpaceConditioningSystem(object):
             user_input = self.input_dict.get(attr_name, None)
 
             # -- Find the GH-Component's Input Node for the attribute so we can check the unit-conversion (if any)
-            gh_compo_input = get_component_input_by_name(
-                self.gh_component_input_group, attr_name
-            )
+            gh_compo_input = get_component_input_by_name(self.gh_component_input_group, attr_name)
             if gh_compo_input:
                 target_unit = gh_compo_input.target_unit
             else:
@@ -290,7 +276,7 @@ class GHCompo_CreateSpaceConditioningSystem(object):
             # -- Set the attribute value
             if user_input:
                 setattr(new_heating_system, attr_name, user_input)
-        
+
         # -- Set the heating percent covered
         new_heating_system.percent_coverage = self.heating_system_percent_coverage
 

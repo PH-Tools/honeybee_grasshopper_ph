@@ -82,9 +82,7 @@ inputs_dishwasher.update(
             _description='Input "1-Standard" or ',
             _type_hint=Component.NewStrHint(),
         ),
-        11: ComponentInput(
-            _name="capacity", _description="(float)", _type_hint=Component.NewFloatHint()
-        ),
+        11: ComponentInput(_name="capacity", _description="(float)", _type_hint=Component.NewFloatHint()),
         12: ComponentInput(
             _name="water_connection",
             _description='Input either -\n "1-DHW Connection"\n "2-Cold Water Connection"',
@@ -96,9 +94,7 @@ inputs_dishwasher.update(
 inputs_clothes_washer = copy(inputs_base)
 inputs_clothes_washer.update(
     {
-        10: ComponentInput(
-            _name="capacity", _description="", _type_hint=Component.NewFloatHint()
-        ),
+        10: ComponentInput(_name="capacity", _description="", _type_hint=Component.NewFloatHint()),
         11: ComponentInput(
             _name="modified_energy_factor",
             _description="",
@@ -125,9 +121,7 @@ inputs_clothes_dryer.update(
             _description='Input either -\n "1-CLOTHES LINE"\n "2-DRYING CLOSET (COLD!)"\n "3-DRYING CLOSET (COLD!) IN EXTRACT AIR"\n "4-CONDENSATION DRYER"\n "5-ELECTRIC EXHAUST AIR DRYER"\n "6-GAS EXHAUST AIR DRYER"\n ',
             _type_hint=Component.NewStrHint(),
         ),
-        11: ComponentInput(
-            _name="gas_consumption", _description="", _type_hint=Component.NewFloatHint()
-        ),
+        11: ComponentInput(_name="gas_consumption", _description="", _type_hint=Component.NewFloatHint()),
         12: ComponentInput(
             _name="gas_efficiency_factor",
             _description="",
@@ -240,16 +234,12 @@ def get_component_inputs(_equipment_type):
     input_type_id = input_to_int(_equipment_type)
 
     if not input_type_id:
-        raise Exception(
-            'Error: Equip. type ID: "{}" is not a valid equip type.'.format(input_type_id)
-        )
+        raise Exception('Error: Equip. type ID: "{}" is not a valid equip type.'.format(input_type_id))
 
     try:
         return input_groups[input_type_id]
     except KeyError:
-        raise Exception(
-            'Error: Equip. type ID: "{}" is not a valid equip type.'.format(input_type_id)
-        )
+        raise Exception('Error: Equip. type ID: "{}" is not a valid equip type.'.format(input_type_id))
 
 
 # -----------------------------------------------------------------------------

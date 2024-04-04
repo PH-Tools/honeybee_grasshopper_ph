@@ -73,9 +73,7 @@ class GHCompo_ApplySHWSys(object):
         for room in self.hb_rooms:
             new_room = room.duplicate()  # type: room.Room # type: ignore
 
-            hb_energy_props = (
-                new_room.properties.energy
-            )  # type: RoomEnergyProperties # type: ignore
+            hb_energy_props = new_room.properties.energy  # type: RoomEnergyProperties # type: ignore
             if hb_energy_props.service_hot_water is None:
                 # -- Assign a Hot Water flow first
                 # -- this will add a default service_hot_water load

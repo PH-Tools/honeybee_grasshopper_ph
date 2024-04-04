@@ -45,9 +45,7 @@ from System import Object  # type: ignore
 
 class LBTGeometryConversionError(Exception):
     def __init__(self, _in):
-        self.message = 'Input Error: Cannot convert "{}" to LBT Geometry.'.format(
-            type(_in)
-        )
+        self.message = 'Input Error: Cannot convert "{}" to LBT Geometry.'.format(type(_in))
 
         super(LBTGeometryConversionError, self).__init__(self.message)
 
@@ -156,9 +154,7 @@ class IGH:
 
         guids = []
         try:
-            for _ in self.ghenv.Component.Params.Input[_input_index_number].VolatileData[
-                _branch_num
-            ]:
+            for _ in self.ghenv.Component.Params.Input[_input_index_number].VolatileData[_branch_num]:
                 try:
                     guids.append(_.ReferenceID)
                 except AttributeError:
@@ -315,9 +311,7 @@ class IGH:
             elif isinstance(_, honeybee.face.Face3D):
                 rh_geom.append(from_face3d(_))
             else:
-                raise Exception(
-                    'Input Error: Cannot convert "{}" to Rhino Geometry.'.format(type(_))
-                )
+                raise Exception('Input Error: Cannot convert "{}" to Rhino Geometry.'.format(type(_)))
 
         return rh_geom
 
@@ -347,38 +341,24 @@ class IGH:
 
         # Get the inset Curve
         # -----------------------------------------------------------------------
-        srfcCentroid = self.Rhino.Geometry.AreaMassProperties.Compute(
-            rh_floor_surface
-        ).Centroid
+        srfcCentroid = self.Rhino.Geometry.AreaMassProperties.Compute(rh_floor_surface).Centroid
         plane = self.ghpythonlib_components.XYPlane(srfcCentroid)
         plane = self.ghpythonlib_components.IsPlanar(rh_floor_surface, True).plane
-        srfcPerim_Inset_Pos = self.ghpythonlib_components.OffsetCurve(
-            srfcPerim, _inset_distance, plane, 1
-        )
-        srfcPerim_Inset_Neg = self.ghpythonlib_components.OffsetCurve(
-            srfcPerim, _inset_distance * -1, plane, 1
-        )
+        srfcPerim_Inset_Pos = self.ghpythonlib_components.OffsetCurve(srfcPerim, _inset_distance, plane, 1)
+        srfcPerim_Inset_Neg = self.ghpythonlib_components.OffsetCurve(srfcPerim, _inset_distance * -1, plane, 1)
 
         # Choose the right Offset Curve. The one with the smaller area
         # Check IsPlanar first to avoid self.grasshopper_components.BoundarySurfaces error
         # -----------------------------------------------------------------------
         if srfcPerim_Inset_Pos.IsPlanar:
-            srfcInset_Pos = self.ghpythonlib_components.BoundarySurfaces(
-                srfcPerim_Inset_Pos
-            )
+            srfcInset_Pos = self.ghpythonlib_components.BoundarySurfaces(srfcPerim_Inset_Pos)
         else:
-            srfcInset_Pos = self.ghpythonlib_components.BoundarySurfaces(
-                srfcPerim
-            )  # Use the normal perim
+            srfcInset_Pos = self.ghpythonlib_components.BoundarySurfaces(srfcPerim)  # Use the normal perim
 
         if srfcPerim_Inset_Neg.IsPlanar():
-            srfcInset_Neg = self.ghpythonlib_components.BoundarySurfaces(
-                srfcPerim_Inset_Neg
-            )
+            srfcInset_Neg = self.ghpythonlib_components.BoundarySurfaces(srfcPerim_Inset_Neg)
         else:
-            srfcInset_Neg = self.ghpythonlib_components.BoundarySurfaces(
-                srfcPerim
-            )  # Use the normal perim
+            srfcInset_Neg = self.ghpythonlib_components.BoundarySurfaces(srfcPerim)  # Use the normal perim
 
         # -----------------------------------------------------------------------
         area_Pos = self.ghpythonlib_components.Area(srfcInset_Pos).area
@@ -515,9 +495,7 @@ class ComponentInput:
         self.target_unit = _target_unit
 
     def __str__(self):
-        return "{}(name={})".format(
-            self.__class__.__name__, self.name, self.access, self.type_hint
-        )
+        return "{}(name={})".format(self.__class__.__name__, self.name, self.access, self.type_hint)
 
     def __repr__(self):
         return str(self)

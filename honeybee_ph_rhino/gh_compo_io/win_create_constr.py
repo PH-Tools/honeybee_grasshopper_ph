@@ -57,9 +57,7 @@ class GHCompo_CreatePhConstruction(object):
     ):
         # type: (gh_io.IGH, str, window.PhWindowFrame, window.PhWindowGlazing, float, float, float, Optional[EnergyWindowMaterialShade] ) -> None
         self.IGH = _IGH
-        self.display_name = _display_name or clean_and_id_ep_string(
-            "PhWindowConstruction"
-        )
+        self.display_name = _display_name or clean_and_id_ep_string("PhWindowConstruction")
         self.frame = _frame
         self.glazing = _glazing
         self.hb_shade_material = _shading
@@ -82,9 +80,7 @@ class GHCompo_CreatePhConstruction(object):
         # -- If it is a 'shade', return a WindowConstructionShade which has the normal window
         # -- construction as one of its attributes,Otherwise, just return the normal WindowConstruction
         if self.hb_shade_material:
-            return WindowConstructionShade(
-                self.display_name, hb_win_construction, self.hb_shade_material
-            )
+            return WindowConstructionShade(self.display_name, hb_win_construction, self.hb_shade_material)
         else:
             return hb_win_construction
 
@@ -100,14 +96,10 @@ class GHCompo_CreatePhConstruction(object):
 
         # ---------------------------------------------------------------------
         # -- Create a new HB Simple Window Material and set the NFRC/HBmaterial properties
-        nfrc_u_factor = self.nfrc_u_factor or iso_10077_1.calculate_window_uw(
-            self.frame, self.glazing
-        )
+        nfrc_u_factor = self.nfrc_u_factor or iso_10077_1.calculate_window_uw(self.frame, self.glazing)
         nfrc_shgc = self.nfrc_shgc or self.glazing.g_value
         t_vis = self.t_vis
-        window_mat = EnergyWindowMaterialSimpleGlazSys(
-            self.display_name, nfrc_u_factor, nfrc_shgc, t_vis
-        )
+        window_mat = EnergyWindowMaterialSimpleGlazSys(self.display_name, nfrc_u_factor, nfrc_shgc, t_vis)
         window_mat.display_name = self.display_name
 
         # -------------------------------------------------------------------------------------

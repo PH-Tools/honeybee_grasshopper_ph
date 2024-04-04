@@ -41,9 +41,7 @@ class GHCompo_CreateSupportiveDevice(object):
     ]
 
     norm_energy_demand_W = ghio_validators.UnitW("norm_energy_demand_W", default=0.0)
-    annual_period_operation_khrs = ghio_validators.FloatPositiveValue(
-        "annual_period_operation_khrs", default=8.760
-    )
+    annual_period_operation_khrs = ghio_validators.FloatPositiveValue("annual_period_operation_khrs", default=8.760)
 
     def __init__(
         self,

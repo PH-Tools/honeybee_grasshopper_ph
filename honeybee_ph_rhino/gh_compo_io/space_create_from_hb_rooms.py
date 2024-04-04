@@ -63,9 +63,7 @@ class GHCompo_CreatePHSpacesFromHBRooms(object):
 
         default_height_value = self.DEFAULT_SPACE_HEIGHT
         default_height_unit = "M"
-        value = converter.convert(
-            default_height_value, default_height_unit, self.rh_doc_unit_type_abbreviation
-        )
+        value = converter.convert(default_height_value, default_height_unit, self.rh_doc_unit_type_abbreviation)
         if not value:
             msg = "Error: Failed to convert:" "'{}{}' to local unit-type: '{}'".format(
                 default_height_value,
@@ -84,9 +82,7 @@ class GHCompo_CreatePHSpacesFromHBRooms(object):
                 floor_faces_.append(face.geometry)
 
         if not floor_faces_:
-            msg = "Error: HB-Room '{}' has no floor surfaces?".format(
-                _hb_room.display_name
-            )
+            msg = "Error: HB-Room '{}' has no floor surfaces?".format(_hb_room.display_name)
             raise Exception(msg)
 
         return floor_faces_
@@ -111,9 +107,7 @@ class GHCompo_CreatePHSpacesFromHBRooms(object):
             new_floor.geometry = new_segment.geometry
 
         # -- Build new Volume
-        new_volume = make_volume.volumes_from_floors(
-            self.IGH, [new_floor], [self._default_height_in_local_units()]
-        )
+        new_volume = make_volume.volumes_from_floors(self.IGH, [new_floor], [self._default_height_in_local_units()])
 
         # -- Build new Space
         new_space = space.Space(_host=rm_ph_prop)

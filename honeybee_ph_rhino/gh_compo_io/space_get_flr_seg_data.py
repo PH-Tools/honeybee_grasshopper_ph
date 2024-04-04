@@ -29,9 +29,7 @@ class VentilationData(object):
 
 
 class FloorSegmentData(object):
-    def __init__(
-        self, _name, _number, _full_name, _vent_rates, _geometry, _weighting_factor
-    ):
+    def __init__(self, _name, _number, _full_name, _vent_rates, _geometry, _weighting_factor):
         # type: (str, str, str, Any, Optional[SpacePhVentFlowRates], float) -> None
         self.name = _name
         self.number = _number
@@ -90,9 +88,7 @@ class GHCompo_GetFloorSegData(object):
             segment_data = FloorSegmentData(
                 _name=data_dict.get("Object Name", ""),
                 _number=data_dict.get("Room_Number", ""),
-                _full_name="{}-{}".format(
-                    data_dict.get("Room_Number"), data_dict.get("Object Name")
-                ),
+                _full_name="{}-{}".format(data_dict.get("Room_Number"), data_dict.get("Object Name")),
                 _vent_rates=segment_vent_data,
                 _geometry=geom,
                 _weighting_factor=float(data_dict.get("TFA_Factor", 1.0)),
@@ -122,9 +118,7 @@ class GHCompo_GetFloorSegData(object):
         flr_seg_numbers_ = self.IGH.Grasshopper.DataTree[str]()
         flr_seg_vent_rates_ = self.IGH.Grasshopper.DataTree[SpacePhVentFlowRates]()
         pth = self.IGH.Grasshopper.Kernel.Data.GH_Path
-        NameGroupItem = namedtuple(
-            "NameGroupItem", ["breps", "name", "number", "weight", "vent_rates"]
-        )
+        NameGroupItem = namedtuple("NameGroupItem", ["breps", "name", "number", "weight", "vent_rates"])
 
         # -- Break out the data into the output Trees
         if self.group_by_name:

@@ -27,9 +27,7 @@ except ImportError as e:
 class GHCompo_CreateVentSystem(object):
     display_name = ghio_validators.HBName("display_name")
 
-    def __init__(
-        self, _display_name, _sys_type, _vent_unit, _supply_ducts, _exhaust_ducts
-    ):
+    def __init__(self, _display_name, _sys_type, _vent_unit, _supply_ducts, _exhaust_ducts):
         # type: (str, int, ventilation.Ventilator, List[Optional[ducting.PhDuctElement]], List[Optional[ducting.PhDuctElement]]) -> None
         self.display_name = _display_name or "__unnamed_ventilator__"
         self.system_type = _sys_type
@@ -41,9 +39,7 @@ class GHCompo_CreateVentSystem(object):
     def supply_ducts(self):
         # type: () -> List[ducting.PhDuctElement]
         return self._supply_ducts or [
-            ducting.PhDuctElement.default_supply_duct(
-                _display_name="{}_supply".format(self.display_name)
-            )
+            ducting.PhDuctElement.default_supply_duct(_display_name="{}_supply".format(self.display_name))
         ]
 
     @supply_ducts.setter
@@ -55,9 +51,7 @@ class GHCompo_CreateVentSystem(object):
     def exhaust_ducts(self):
         # type: () -> List[ducting.PhDuctElement]
         return self._exhaust_ducts or [
-            ducting.PhDuctElement.default_exhaust_duct(
-                _display_name="{}_exhaust".format(self.display_name)
-            )
+            ducting.PhDuctElement.default_exhaust_duct(_display_name="{}_exhaust".format(self.display_name))
         ]
 
     @exhaust_ducts.setter

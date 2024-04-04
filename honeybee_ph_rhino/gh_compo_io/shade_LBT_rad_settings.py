@@ -88,9 +88,7 @@ class GHCompo_CreateLBTRadSettings(object):
         if _in:
             self._winter_sky_matrix = _in
         elif self.epw_file:
-            self._winter_sky_matrix = sky_matrix.gen_matrix(
-                self.epw_file, self.winter_period, self.north
-            )
+            self._winter_sky_matrix = sky_matrix.gen_matrix(self.epw_file, self.winter_period, self.north)
         else:
             self._winter_sky_matrix = None
 
@@ -103,9 +101,7 @@ class GHCompo_CreateLBTRadSettings(object):
         if _in:
             self._summer_sky_matrix = _in
         elif self.epw_file:
-            self._summer_sky_matrix = sky_matrix.gen_matrix(
-                self.epw_file, self.summer_period, self.north
-            )
+            self._summer_sky_matrix = sky_matrix.gen_matrix(self.epw_file, self.summer_period, self.north)
         else:
             self._summer_sky_matrix = None
 

@@ -44,9 +44,8 @@ class GHCompo_CreateMonthlyRadiation(object):
             return [0.0] * 12
 
         if len(_input_list) != 12:
-            msg = (
-                "Error: Monthly data should be a collection of 12 numeric items.\n"
-                "Got a {} of length: {}?".format(type(_input_list), len(_input_list))
+            msg = "Error: Monthly data should be a collection of 12 numeric items.\n" "Got a {} of length: {}?".format(
+                type(_input_list), len(_input_list)
             )
             raise Exception(msg)
 

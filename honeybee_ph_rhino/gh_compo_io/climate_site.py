@@ -20,9 +20,7 @@ except ImportError as e:
 
 
 class GHCompo_Site(object):
-    def __init__(
-        self, _IGH, _display_name, _location, _climate_data, _phpp_library_codes
-    ):
+    def __init__(self, _IGH, _display_name, _location, _climate_data, _phpp_library_codes):
         # type: (gh_io.IGH, Optional[str], Optional[site.Location], Optional[site.Climate], Optional[site.PHPPCodes]) -> None
         self.IGH = _IGH
         self.display_name = _display_name or "_unnamed_"

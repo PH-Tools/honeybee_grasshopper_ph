@@ -88,9 +88,8 @@ class GHCompo_SetResOccupancy(object):
             # -- Set the num. bedrooms according to the user input:
             return branch[_list_index]
         except ValueError as e:
-            msg = (
-                "Error: No Num. of Bedrooms provided for "
-                "Branch num. {}, item num. {}".format(_branch_number, _list_index)
+            msg = "Error: No Num. of Bedrooms provided for " "Branch num. {}, item num. {}".format(
+                _branch_number, _list_index
             )
             raise ValueError(msg)
 
@@ -107,9 +106,8 @@ class GHCompo_SetResOccupancy(object):
             # -- Set the num. dwellings according to the user input:
             return branch[_list_index]
         except ValueError as e:
-            msg = (
-                "Error: No Num. of People provided for "
-                "Branch num. {}, item num. {}".format(_branch_number, _list_index)
+            msg = "Error: No Num. of People provided for " "Branch num. {}, item num. {}".format(
+                _branch_number, _list_index
             )
             raise ValueError(msg)
 
@@ -119,11 +117,7 @@ class GHCompo_SetResOccupancy(object):
         try:
             num_dwellings = self._number_dwellings.Branch(_branch_num)[_room_number]
             hb_room = self.hb_rooms.Branch(_branch_num)[_room_number]
-            self.IGH.remark(
-                "Setting HB-Room: '{}' num_dwellings to {}".format(
-                    hb_room.display_name, num_dwellings
-                )
-            )
+            self.IGH.remark("Setting HB-Room: '{}' num_dwellings to {}".format(hb_room.display_name, num_dwellings))
             return num_dwellings
         except Exception as e:
             msg = (
@@ -136,21 +130,15 @@ class GHCompo_SetResOccupancy(object):
     def duplicate_people(self, _hb_room):
         # type: (room.Room) -> people.People
         """If the room does not already have a 'people' object, give warning."""
-        new_room_prop_e = (
-            _hb_room.properties.energy
-        )  # type: RoomEnergyProperties # type: ignore
+        new_room_prop_e = _hb_room.properties.energy  # type: RoomEnergyProperties # type: ignore
         if not new_room_prop_e.people:
             msg = (
                 "Error: The Honeybee-Room '{}' does not have an HB-Energy 'People' load. "
-                "Please apply a 'People' load to the room before proceeding.".format(
-                    _hb_room.display_name
-                )
+                "Please apply a 'People' load to the room before proceeding.".format(_hb_room.display_name)
             )
             raise Exception(msg)
 
-        new_people = (
-            new_room_prop_e.people.duplicate()
-        )  # type: people.People # type: ignore
+        new_people = new_room_prop_e.people.duplicate()  # type: people.People # type: ignore
         return new_people
 
     def branch_is_single_family(self, _branch_num):
@@ -165,11 +153,7 @@ class GHCompo_SetResOccupancy(object):
     def check_has_hb_people(self, _hb_room):
         # type: (room.Room) -> bool
         if not _hb_room.properties.energy.people:  # type: ignore
-            raise Exception(
-                "Error: room {} is missing an HB-Energy 'People' load?".format(
-                    _hb_room.display_name
-                )
-            )
+            raise Exception("Error: room {} is missing an HB-Energy 'People' load?".format(_hb_room.display_name))
         else:
             return True
 
@@ -186,9 +170,7 @@ class GHCompo_SetResOccupancy(object):
                 "Error: The input data BranchCounts do not match. You entered "
                 "{} Honeybee Rooms Branches, {} 'Num-Bedroom' Branches, {} 'Num-Dwelling' "
                 "Branches, and {} 'Num-People' Branches? Please enure all input DataTrees "
-                "are the same shape and length.".format(
-                    hb_rm_branch_len, br_branch_len, dw_branch_len, ppl_branch_len
-                )
+                "are the same shape and length.".format(hb_rm_branch_len, br_branch_len, dw_branch_len, ppl_branch_len)
             )
             print(msg)
             self.IGH.warning(msg)
@@ -238,28 +220,18 @@ class GHCompo_SetResOccupancy(object):
                     # -- If it is single-family branch, apply the same branch-level PhDwellings
                     # -- to *all* the rooms in the branch.
                     _rm_lst = list(self.hb_rooms.Branch(i))
-                    self.IGH.remark(
-                        "Creating a Single-Dwelling from rooms: '{}'".format(_rm_lst)
-                    )
+                    self.IGH.remark("Creating a Single-Dwelling from rooms: '{}'".format(_rm_lst))
                     ph_dwelling_obj = ph_single_fam_dwelling_ob
                 else:
                     # -- If it is *not* a single family branch, build a new a PhDwellings object
                     # -- for each room, and set the value according to the user-input.
-                    ph_dwelling_obj = PhDwellings(
-                        _num_dwellings=self.get_number_dwellings(i, k)
-                    )
+                    ph_dwelling_obj = PhDwellings(_num_dwellings=self.get_number_dwellings(i, k))
 
                 # -- Duplicate the Room's HB-People and assign the Occupancy Attributes
-                dup_rm_prop_e = (
-                    dup_hb_room.properties.energy
-                )  # type: RoomEnergyProperties # type: ignore
-                dup_people = (
-                    dup_rm_prop_e.people.duplicate()
-                )  # type: people.People # type: ignore
+                dup_rm_prop_e = dup_hb_room.properties.energy  # type: RoomEnergyProperties # type: ignore
+                dup_people = dup_rm_prop_e.people.duplicate()  # type: people.People # type: ignore
 
-                dup_people_prop_ph = (
-                    dup_people.properties.ph
-                )  # type: PeoplePhProperties # type: ignore
+                dup_people_prop_ph = dup_people.properties.ph  # type: PeoplePhProperties # type: ignore
                 dup_people_prop_ph.number_bedrooms = self.get_number_bedrooms(i, k)
                 dup_people_prop_ph.number_people = self.get_number_people(i, k)
                 _ppl_per_m2 = dup_people_prop_ph.number_people / hb_room.floor_area
