@@ -66,9 +66,7 @@ except ImportError as e:
 # -----------------------------------------------------------------------------
 
 
-def hbph_to_joined_gridded_mesh3d(
-    geometry, grid_size, offset_distance=0, _mesh_params=None
-):
+def hbph_to_joined_gridded_mesh3d(geometry, grid_size, offset_distance=0, _mesh_params=None):
     # type: (Any, float, float, Optional[rg.MeshingParameters]) -> Mesh3D
     """
     ------------------------------------------------------------------
@@ -90,9 +88,7 @@ def hbph_to_joined_gridded_mesh3d(
     lb_meshes = []
     for geo in geometry:
         if isinstance(geo, rg.Brep):
-            lb_meshes.append(
-                hbph_to_gridded_mesh3d(geo, grid_size, offset_distance, _mesh_params)
-            )
+            lb_meshes.append(hbph_to_gridded_mesh3d(geo, grid_size, offset_distance, _mesh_params))
         else:  # assume that it's a Mesh
             lb_meshes.append(to_mesh3d(geo))
     if len(lb_meshes) == 1:
@@ -170,9 +166,7 @@ def create_shading_mesh(_bldg_shading_breps, _mesh_params):
                 "Check that all your geometry is correct with no overlaps or voids \n"
                 "and check that the Honeybee surfaces are all being created correctly? \n"
                 "If that surface has windows hosted on it, be sure the windows are not \n"
-                "overlapping and that they are being generated correctly?".format(
-                    surface_name
-                )
+                "overlapping and that they are being generated correctly?".format(surface_name)
             )
             raise Exception(msg)
 
@@ -196,11 +190,7 @@ def deconstruct_sky_matrix(_sky_mtx):
 
     mtx = de_objectify_output(_sky_mtx)
     total_sky_rad = [dir_rad + dif_rad for dir_rad, dif_rad in zip(mtx[1], mtx[2])]
-    lb_vecs = (
-        view_sphere.tregenza_dome_vectors
-        if len(total_sky_rad) == 145
-        else view_sphere.reinhart_dome_vectors
-    )
+    lb_vecs = view_sphere.tregenza_dome_vectors if len(total_sky_rad) == 145 else view_sphere.reinhart_dome_vectors
     if mtx[0][0] != 0:  # there is a north input for sky; rotate vectors
         north_angle = math.radians(mtx[0][0])
         lb_vecs = [vec.rotate_xy(north_angle) for vec in lb_vecs]
@@ -209,9 +199,7 @@ def deconstruct_sky_matrix(_sky_mtx):
     return (sky_vecs, total_sky_rad)
 
 
-def build_window_meshes(
-    _window_surface, _grid_size, _shading_mesh_params, _window_mesh_params=None
-):
+def build_window_meshes(_window_surface, _grid_size, _shading_mesh_params, _window_mesh_params=None):
     # type: (Any, float, rg.MeshingParameters, Optional[rg.MeshingParameters]) -> Tuple[List[Point3D], List[Normal], Mesh3D, Optional[Mesh3D], rg.Mesh]
     """Create the Ladybug Mesh3D grided mesh for the window being analyzed
 
@@ -239,14 +227,10 @@ def build_window_meshes(
         # -- If no custom params are supplied, use the standard Ladybug method
     else:
         # -- otherwise, use the custom settings provided by the user
-        window_mesh = hbph_to_joined_gridded_mesh3d(
-            [_window_surface], _grid_size, offset_dist, _window_mesh_params
-        )
+        window_mesh = hbph_to_joined_gridded_mesh3d([_window_surface], _grid_size, offset_dist, _window_mesh_params)
 
     if not window_mesh:
-        raise Exception(
-            "Failed to create a mesh for the window surface {}.".format(_window_surface)
-        )
+        raise Exception("Failed to create a mesh for the window surface {}.".format(_window_surface))
     window_rh_mesh = from_mesh3d(window_mesh)
     points = [from_point3d(pt) for pt in window_mesh.face_centroids]
     normals = [from_vector3d(vec) for vec in window_mesh.face_normals]
@@ -268,9 +252,7 @@ def build_window_meshes(
     return points, normals, window_mesh, window_back_mesh, window_rh_mesh
 
 
-def generate_intersection_data(
-    _shade_mesh, _win_mesh_back, _points, _sky_vecs, _normals, _cpu_count
-):
+def generate_intersection_data(_shade_mesh, _win_mesh_back, _points, _sky_vecs, _normals, _cpu_count):
     """Creates all the Intersection Matrix data for both the Shaded and the UNShaded conditions
 
     Note that for the 'Unshaded' case you still have to pass the solver *something*, so
@@ -295,13 +277,9 @@ def generate_intersection_data(
 
     # intersect the rays with the mesh
     # ---------------------------------------------------------------------------
-    int_matrix_init_shaded, angles_s = intersect_mesh_rays(
-        _shade_mesh, _points, _sky_vecs, _normals, _cpu_count
-    )
+    int_matrix_init_shaded, angles_s = intersect_mesh_rays(_shade_mesh, _points, _sky_vecs, _normals, _cpu_count)
 
-    int_matrix_init_unshaded, angles_u = intersect_mesh_rays(
-        _win_mesh_back, _points, _sky_vecs, _normals, _cpu_count
-    )
+    int_matrix_init_unshaded, angles_u = intersect_mesh_rays(_win_mesh_back, _points, _sky_vecs, _normals, _cpu_count)
 
     return int_matrix_init_shaded, int_matrix_init_unshaded, angles_s, angles_u
 
@@ -438,21 +416,13 @@ class GHCompo_SolveLBTRad(object):
 
         # -- Create context Shade meshes
         # ---------------------------------------------------------------------
-        shade_mesh_winter = create_shading_mesh(
-            self.shading_surfaces_winter, self.settings.mesh_params
-        )
-        shade_mesh_summer = create_shading_mesh(
-            self.shading_surfaces_summer, self.settings.mesh_params
-        )
+        shade_mesh_winter = create_shading_mesh(self.shading_surfaces_winter, self.settings.mesh_params)
+        shade_mesh_summer = create_shading_mesh(self.shading_surfaces_summer, self.settings.mesh_params)
 
         # Deconstruct the sky-matrix and get the sky dome vectors. Winter (w) and Summer (s)
         # ---------------------------------------------------------------------
-        w_sky_vecs, w_total_sky_rad = deconstruct_sky_matrix(
-            self.settings.winter_sky_matrix
-        )
-        s_sky_vecs, s_total_sky_rad = deconstruct_sky_matrix(
-            self.settings.summer_sky_matrix
-        )
+        w_sky_vecs, w_total_sky_rad = deconstruct_sky_matrix(self.settings.winter_sky_matrix)
+        s_sky_vecs, s_total_sky_rad = deconstruct_sky_matrix(self.settings.summer_sky_matrix)
 
         # Calc window surface shaded and unshaded radiation
         # ---------------------------------------------------------------------
@@ -472,9 +442,7 @@ class GHCompo_SolveLBTRad(object):
 
             for face in new_room.faces:
                 for aperture in face.apertures:
-                    window_surface = create_inset_aperture_surface(
-                        aperture, rh_units_name
-                    )
+                    window_surface = create_inset_aperture_surface(aperture, rh_units_name)
 
                     # Build the meshes
                     # ----------------------------------------------------------------------
@@ -503,23 +471,15 @@ class GHCompo_SolveLBTRad(object):
                         angles_s,
                         angles_u,
                     ) = generate_intersection_data(*args_winter)
-                    w_rads_shaded, face_areas = calc_win_radiation(
-                        int_matrix_s, angles_s, w_total_sky_rad, win_msh
-                    )
-                    w_rads_unshaded, face_areas = calc_win_radiation(
-                        int_matrix_u, angles_u, w_total_sky_rad, win_msh
-                    )
+                    w_rads_shaded, face_areas = calc_win_radiation(int_matrix_s, angles_s, w_total_sky_rad, win_msh)
+                    w_rads_unshaded, face_areas = calc_win_radiation(int_matrix_u, angles_u, w_total_sky_rad, win_msh)
 
                     winter_rad_shaded = sum(w_rads_shaded) / sum(face_areas)
                     winter_rad_unshaded = sum(w_rads_unshaded) / sum(face_areas)
 
-                    winter_radiation_shaded_detailed_.AddRange(
-                        w_rads_shaded, GH_Path(win_count)
-                    )
+                    winter_radiation_shaded_detailed_.AddRange(w_rads_shaded, GH_Path(win_count))
                     winter_radiation_shaded_.Add(winter_rad_shaded, GH_Path(win_count))
-                    winter_radiation_unshaded_.Add(
-                        winter_rad_unshaded, GH_Path(win_count)
-                    )
+                    winter_radiation_unshaded_.Add(winter_rad_unshaded, GH_Path(win_count))
 
                     # Solve Summer
                     # ----------------------------------------------------------------------
@@ -538,34 +498,22 @@ class GHCompo_SolveLBTRad(object):
                         angles_s,
                         angles_u,
                     ) = generate_intersection_data(*args_summer)
-                    s_rads_shaded, face_areas = calc_win_radiation(
-                        int_matrix_s, angles_s, s_total_sky_rad, win_msh
-                    )
-                    s_rads_unshaded, face_areas = calc_win_radiation(
-                        int_matrix_u, angles_u, s_total_sky_rad, win_msh
-                    )
+                    s_rads_shaded, face_areas = calc_win_radiation(int_matrix_s, angles_s, s_total_sky_rad, win_msh)
+                    s_rads_unshaded, face_areas = calc_win_radiation(int_matrix_u, angles_u, s_total_sky_rad, win_msh)
 
                     summer_rad_shaded = sum(s_rads_shaded) / sum(face_areas)
                     summer_rad_unshaded = sum(s_rads_unshaded) / sum(face_areas)
 
-                    summer_radiation_shaded_detailed_.AddRange(
-                        s_rads_shaded, GH_Path(win_count)
-                    )
+                    summer_radiation_shaded_detailed_.AddRange(s_rads_shaded, GH_Path(win_count))
                     summer_radiation_shaded_.Add(summer_rad_shaded, GH_Path(win_count))
-                    summer_radiation_unshaded_.Add(
-                        summer_rad_unshaded, GH_Path(win_count)
-                    )
+                    summer_radiation_unshaded_.Add(summer_rad_unshaded, GH_Path(win_count))
 
                     mesh_by_window.Add(rh_msh, GH_Path(win_count))
 
                     # Set the aperture shading factors
                     # ----------------------------------------------------------------------
-                    aperture.properties.ph.winter_shading_factor = (
-                        winter_rad_shaded / winter_rad_unshaded
-                    )
-                    aperture.properties.ph.summer_shading_factor = (
-                        summer_rad_shaded / summer_rad_unshaded
-                    )
+                    aperture.properties.ph.winter_shading_factor = winter_rad_shaded / winter_rad_unshaded
+                    aperture.properties.ph.summer_shading_factor = summer_rad_shaded / summer_rad_unshaded
 
                     win_count += 1
 
@@ -576,16 +524,8 @@ class GHCompo_SolveLBTRad(object):
         # Create the mesh and legend outputs
         # --------------------------------------------------------------------------
         # Flatten the radiation data trees
-        winter_rad_vals = [
-            item
-            for branch in winter_radiation_shaded_detailed_.Branches
-            for item in branch
-        ]
-        summer_rad_vals = [
-            item
-            for branch in summer_radiation_shaded_detailed_.Branches
-            for item in branch
-        ]
+        winter_rad_vals = [item for branch in winter_radiation_shaded_detailed_.Branches for item in branch]
+        summer_rad_vals = [item for branch in summer_radiation_shaded_detailed_.Branches for item in branch]
 
         # Create the single window Mesh
         joined_window_mesh = create_window_mesh(lb_window_meshes)
@@ -593,16 +533,12 @@ class GHCompo_SolveLBTRad(object):
         winter_graphic, title = create_graphic_container(
             "Winter", winter_rad_vals, joined_window_mesh, self.settings.legend_par
         )
-        winter_radiation_shaded_mesh_, legend_ = create_rhino_mesh(
-            winter_graphic, joined_window_mesh
-        )
+        winter_radiation_shaded_mesh_, legend_ = create_rhino_mesh(winter_graphic, joined_window_mesh)
 
         summer_graphic, title = create_graphic_container(
             "Summer", summer_rad_vals, joined_window_mesh, self.settings.legend_par
         )
-        summer_radiation_shaded_mesh_, legend_ = create_rhino_mesh(
-            summer_graphic, joined_window_mesh
-        )
+        summer_radiation_shaded_mesh_, legend_ = create_rhino_mesh(summer_graphic, joined_window_mesh)
 
         # -- Pull out the shading factors
         winter_shading_factors_, summer_shading_factors_, aperture_names_ = [], [], []
@@ -610,12 +546,8 @@ class GHCompo_SolveLBTRad(object):
             for face in room.faces:
                 for aperture in face.apertures:
                     aperture_names_.append(aperture.display_name)
-                    winter_shading_factors_.append(
-                        aperture.properties.ph.winter_shading_factor
-                    )
-                    summer_shading_factors_.append(
-                        aperture.properties.ph.summer_shading_factor
-                    )
+                    winter_shading_factors_.append(aperture.properties.ph.winter_shading_factor)
+                    summer_shading_factors_.append(aperture.properties.ph.summer_shading_factor)
 
         return (
             legend_,

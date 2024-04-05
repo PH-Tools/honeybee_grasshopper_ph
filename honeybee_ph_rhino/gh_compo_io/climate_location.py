@@ -60,17 +60,17 @@ class GHCompo_Location(object):
     def clean_climate_zone(self, _cz_input):
         # type: (Union[str, int]) -> int
         """Check the input climate zone and return the number."""
-        
+
         cz_number = gh_io.input_to_int(str(_cz_input))
         if not cz_number:
             return 1
 
         if cz_number not in self._allowable_climate_zones.keys():
             msg = "Climate zone number must be one of the following:\n"
-            msg += ", ".join(["'{}-{}'".format(k,v) for k, v in  self._allowable_climate_zones.items()])
+            msg += ", ".join(["'{}-{}'".format(k, v) for k, v in self._allowable_climate_zones.items()])
             self.IGH.error(msg)
             return 1
-        
+
         return cz_number
 
     def run(self):

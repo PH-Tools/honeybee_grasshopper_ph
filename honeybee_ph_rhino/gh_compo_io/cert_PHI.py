@@ -40,14 +40,10 @@ def _build_options_string(_input_options):
 
 
 inputs_phpp_9 = {
-    1: ComponentInput(
-        _name="- " * 20, _description="", _type_hint=Component.NewStrHint()
-    ),
+    1: ComponentInput(_name="- " * 20, _description="", _type_hint=Component.NewStrHint()),
     2: ComponentInput(
         _name="_building_category_type",
-        _description=_build_options_string(
-            ["1-Residential building (default)", "2-Non-residential building"]
-        ),
+        _description=_build_options_string(["1-Residential building (default)", "2-Non-residential building"]),
         _type_hint=Component.NewStrHint(),
     ),
     3: ComponentInput(
@@ -85,9 +81,7 @@ inputs_phpp_9 = {
         ),
         _type_hint=Component.NewStrHint(),
     ),
-    6: ComponentInput(
-        _name="- " * 20, _description="", _type_hint=Component.NewStrHint()
-    ),
+    6: ComponentInput(_name="- " * 20, _description="", _type_hint=Component.NewStrHint()),
     7: ComponentInput(
         _name="_certification_type",
         _description=_build_options_string(
@@ -145,9 +139,7 @@ inputs_phpp_9 = {
 }
 
 inputs_phpp_10 = {
-    1: ComponentInput(
-        _name="- " * 20, _description="", _type_hint=Component.NewStrHint()
-    ),
+    1: ComponentInput(_name="- " * 20, _description="", _type_hint=Component.NewStrHint()),
     3: ComponentInput(
         _name="_building_use_type",
         _description=_build_options_string(
@@ -173,9 +165,7 @@ inputs_phpp_10 = {
         ),
         _type_hint=Component.NewStrHint(),
     ),
-    6: ComponentInput(
-        _name="- " * 20, _description="", _type_hint=Component.NewStrHint()
-    ),
+    6: ComponentInput(_name="- " * 20, _description="", _type_hint=Component.NewStrHint()),
     7: ComponentInput(
         _name="_certification_type",
         _description=_build_options_string(
@@ -248,9 +238,7 @@ class _CertSettingsPHPP_9(object):
         # type: (gh_io.IGH, int, Dict[str, Any]) -> None
         self.IGH = gh_io.input_to_int(_IGH)
         self.phpp_version = _phpp_version
-        self.building_category_type = gh_io.input_to_int(
-            _input_dict["_building_category_type"]
-        )
+        self.building_category_type = gh_io.input_to_int(_input_dict["_building_category_type"])
         self.building_use_type = gh_io.input_to_int(_input_dict["_building_use_type"])
         self.ihg_type = gh_io.input_to_int(_input_dict["_ihg_type"])
         self.occupancy_type = gh_io.input_to_int(_input_dict["_occupancy_type"])

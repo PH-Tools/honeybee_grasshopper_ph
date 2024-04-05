@@ -30,9 +30,7 @@ from honeybee_ph_rhino.gh_compo_io import ghio_validators
 class _TBBuilder(object):
     """Interface for collect and clean PhThermalBridge user-inputs"""
 
-    display_name = ghio_validators.HBName(
-        "display_name", default="_unnamed_bldg_segment_"
-    )
+    display_name = ghio_validators.HBName("display_name", default="_unnamed_bldg_segment_")
     psi_value = ghio_validators.UnitW_MK("psi_value", default=0.1)
     fRsi_value = ghio_validators.FloatPercentage("fRsi_value", default=0.75)
     quantity = ghio_validators.Float("quantity", default=1.0)
@@ -73,11 +71,7 @@ class _TBBuilder(object):
             try:
                 self._geometry = to_polyline3d(self._convert_to_polyline(_input))
             except Exception as e:
-                raise Exception(
-                    "{}\nError: Input {} cannot be converted to an LBT Polyline3D?".format(
-                        e, _input
-                    )
-                )
+                raise Exception("{}\nError: Input {} cannot be converted to an LBT Polyline3D?".format(e, _input))
 
     @property
     def group_type(self):
@@ -95,9 +89,7 @@ class _TBBuilder(object):
     def create_hbph_thermal_bridge(self):
         # type () -> thermal_bridge.PhThermalBridge
         if not self.geometry:
-            raise Exception(
-                "Error: Invalid or None Geometry input? Cannot build Thermal Bridge."
-            )
+            raise Exception("Error: Invalid or None Geometry input? Cannot build Thermal Bridge.")
 
         new_obj = thermal_bridge.PhThermalBridge(uuid4(), self.geometry)
         new_obj.display_name = self.display_name
@@ -110,9 +102,7 @@ class _TBBuilder(object):
 
 
 class GHCompo_CreateTB(object):
-    def __init__(
-        self, _IGH, _geometry, _names, _psi_values, _fRsi_values, _types, _quantities
-    ):
+    def __init__(self, _IGH, _geometry, _names, _psi_values, _fRsi_values, _types, _quantities):
         self.IGH = _IGH
         self.geometry = _geometry
         self.names = _names

@@ -155,9 +155,7 @@ inputs_district = {
         _name="in_conditioned_space",
         _description=r"(bool) Is the boiler installed inside the conditioned space? default=True.",
     ),
-    4: ComponentInput(
-        _name="energy_carrier", _description=r"Energy Carrier for the district heat."
-    ),
+    4: ComponentInput(_name="energy_carrier", _description=r"Energy Carrier for the district heat."),
     5: ComponentInput(
         _name="solar_fraction",
         _description=r"(float) The solar fraction for the space heating.",
@@ -308,9 +306,7 @@ class GHCompo_CreateSHWHeater(object):
     def _determine_heater_type_input(self):
         # type: () -> Optional[int]
         if not self.heater_type:
-            msg = "Set the 'heater_type' to configure the user-inputs. Options include: {}".format(
-                self.valid_types
-            )
+            msg = "Set the 'heater_type' to configure the user-inputs. Options include: {}".format(self.valid_types)
             self.IGH.warning(msg)
             return None
 

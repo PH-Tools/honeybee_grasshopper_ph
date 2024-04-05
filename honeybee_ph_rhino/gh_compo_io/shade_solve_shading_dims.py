@@ -80,12 +80,8 @@ def calc_shading_dims(_aperture, _shading_objs, _IGH, _limit=99):
 
     # ----------------------------------------------------------------------
     # Find the relevant geometry in the scene and figures out the critical dimensions from the window
-    dims.h_hori, dims.d_hori, dims.checkline_hori = find_horizon_shading(
-        _aperture, _shading_objs, _IGH, _limit
-    )
-    dims.d_over, dims.o_over, dims.checkline_over = find_overhang_shading(
-        _aperture, _shading_objs, _IGH, _limit
-    )
+    dims.h_hori, dims.d_hori, dims.checkline_hori = find_horizon_shading(_aperture, _shading_objs, _IGH, _limit)
+    dims.d_over, dims.o_over, dims.checkline_over = find_overhang_shading(_aperture, _shading_objs, _IGH, _limit)
     (
         dims.o_reveal,
         dims.d_reveal,
@@ -210,11 +206,7 @@ def _get_glazing_center(_aperture):
     This will be a point in the center, put pushed 'in' the "install_depth" amount.
     """
     ap_prop_ph = _aperture.properties.ph  # type: hbph_aperture.AperturePhProperties
-    return from_point3d(
-        _aperture.geometry.centroid.move(
-            _aperture.normal.normalize() * ap_prop_ph.install_depth * -1
-        )
-    )
+    return from_point3d(_aperture.geometry.centroid.move(_aperture.normal.normalize() * ap_prop_ph.install_depth * -1))
 
 
 def find_horizon_shading(_aperture, _shading_objs, _IGH, _limit=99):
@@ -246,35 +238,23 @@ def find_horizon_shading(_aperture, _shading_objs, _IGH, _limit=99):
 
     # -----------------------------------------------------------------------
     # Find if there are any intersection shading objects. If so, put them in a list
-    line_horizontal = _IGH.ghpythonlib_components.LineSDL(
-        shading_origin, surface_normal, _limit
-    )
+    line_horizontal = _IGH.ghpythonlib_components.LineSDL(shading_origin, surface_normal, _limit)
     horizon_shading_objs = [
         shading_obj
         for shading_obj in _shading_objs
-        if _IGH.ghpythonlib_components.BrepXCurve(shading_obj, line_horizontal).points
-        != None
+        if _IGH.ghpythonlib_components.BrepXCurve(shading_obj, line_horizontal).points != None
     ]
 
     # -----------------------------------------------------------------------
     # Find any intersection Curves with the shading objects
     line_vertical = _IGH.ghpythonlib_components.LineSDL(shading_origin, up_vector, _limit)
-    intersection_surface = _IGH.ghpythonlib_components.SumSurface(
-        line_horizontal, line_vertical
-    )
+    intersection_surface = _IGH.ghpythonlib_components.SumSurface(line_horizontal, line_vertical)
     intersection_curve = []
     intersection_points = []
 
     for shading_obj in horizon_shading_objs:
-        if (
-            _IGH.ghpythonlib_components.BrepXBrep(
-                shading_obj, intersection_surface
-            ).curves
-            != None
-        ):
-            intersection_curve.append(
-                _IGH.ghpythonlib_components.BrepXBrep(shading_obj, intersection_surface)
-            )
+        if _IGH.ghpythonlib_components.BrepXBrep(shading_obj, intersection_surface).curves != None:
+            intersection_curve.append(_IGH.ghpythonlib_components.BrepXBrep(shading_obj, intersection_surface))
     for pnt in intersection_curve:
         pts = _IGH.ghpythonlib_components.ControlPoints(pnt).points
         if pts:
@@ -290,35 +270,21 @@ def find_horizon_shading(_aperture, _shading_objs, _IGH, _limit=99):
             angles = []
             if pnt:
                 for k in range(len(pnt)):
-                    rays.append(
-                        _IGH.ghpythonlib_components.Vector2Pt(
-                            shading_origin, pnt[k], False
-                        ).vector
-                    )
-                    angles.append(
-                        _IGH.ghpythonlib_components.Angle(surface_normal, rays[k]).angle
-                    )
+                    rays.append(_IGH.ghpythonlib_components.Vector2Pt(shading_origin, pnt[k], False).vector)
+                    angles.append(_IGH.ghpythonlib_components.Angle(surface_normal, rays[k]).angle)
                 key_points.append(pnt[angles.index(max(angles))])
 
         # Find the relevant highest / closest point
         rays = []
         angles = []
         for i in range(len(key_points)):
-            rays.append(
-                _IGH.ghpythonlib_components.Vector2Pt(
-                    surface_normal, key_points[i], False
-                ).vector
-            )
-            angles.append(
-                _IGH.ghpythonlib_components.Angle(surface_normal, rays[i]).angle
-            )
+            rays.append(_IGH.ghpythonlib_components.Vector2Pt(surface_normal, key_points[i], False).vector)
+            angles.append(_IGH.ghpythonlib_components.Angle(surface_normal, rays[i]).angle)
         key_point = key_points[angles.index(max(angles))]
 
         # Use the point it finds to deliver the Height and Distance for the PHPP Shading Calculator
         h_hori = key_point.Z - shading_origin.Z  # Vertical distance
-        hypotenuse = _IGH.ghpythonlib_components.Length(
-            _IGH.ghpythonlib_components.Line(shading_origin, key_point)
-        )
+        hypotenuse = _IGH.ghpythonlib_components.Length(_IGH.ghpythonlib_components.Line(shading_origin, key_point))
         d_hori = math.sqrt(hypotenuse**2 - h_hori**2)
         check_line = _IGH.ghpythonlib_components.Line(shading_origin, key_point)
     else:
@@ -340,9 +306,7 @@ def find_overhang_shading(_aperture, _shading_objs, _IGH, _limit=99):
     # In order to also work for windows which are not vertical, find the
     # 'direction' from the glazing origin and the top/middle ege point
     glazing_center = _get_glazing_center(_aperture)
-    UpVector = _IGH.ghpythonlib_components.Vector2Pt(
-        glazing_center, origin_point, True
-    ).vector
+    UpVector = _IGH.ghpythonlib_components.Vector2Pt(glazing_center, origin_point, True).vector
 
     # -----------------------------------------------------------------------
     # First, need to filter the scene to find the objects that are 'above'
@@ -352,15 +316,11 @@ def find_overhang_shading(_aperture, _shading_objs, _IGH, _limit=99):
     ap_prop_ph = _aperture.properties.ph  # type: hbph_aperture.AperturePhProperties
     depth = float(ap_prop_ph.install_depth) + 0.5
     edge1 = _IGH.ghpythonlib_components.LineSDL(origin_point, UpVector, _limit)
-    edge2 = _IGH.ghpythonlib_components.LineSDL(
-        origin_point, from_vector3d(_aperture.geometry.normal), depth
-    )
+    edge2 = _IGH.ghpythonlib_components.LineSDL(origin_point, from_vector3d(_aperture.geometry.normal), depth)
     intersectionTestPlane = _IGH.ghpythonlib_components.SumSurface(edge1, edge2)
 
     OverhangShadingObjs = (
-        x
-        for x in _shading_objs
-        if _IGH.ghpythonlib_components.BrepXBrep(intersectionTestPlane, x).curves != None
+        x for x in _shading_objs if _IGH.ghpythonlib_components.BrepXBrep(intersectionTestPlane, x).curves != None
     )
 
     # -----------------------------------------------------------------------
@@ -368,26 +328,17 @@ def find_overhang_shading(_aperture, _shading_objs, _IGH, _limit=99):
     # geom and then decide where the maximums shading point is
     # Create a new 'test' plane coming off the origin (99m in both directions this time).
     # Test to find any intersection shading objs and all their curves/points with this plane
-    HorizontalLine = _IGH.ghpythonlib_components.LineSDL(
-        origin_point, from_vector3d(_aperture.geometry.normal), _limit
-    )
+    HorizontalLine = _IGH.ghpythonlib_components.LineSDL(origin_point, from_vector3d(_aperture.geometry.normal), _limit)
     VerticalLine = _IGH.ghpythonlib_components.LineSDL(origin_point, UpVector, _limit)
 
-    IntersectionSurface = _IGH.ghpythonlib_components.SumSurface(
-        HorizontalLine, VerticalLine
-    )
+    IntersectionSurface = _IGH.ghpythonlib_components.SumSurface(HorizontalLine, VerticalLine)
     IntersectionCurves = (
         _IGH.ghpythonlib_components.BrepXBrep(obj, IntersectionSurface).curves
         for obj in OverhangShadingObjs
         if _IGH.ghpythonlib_components.BrepXBrep(obj, IntersectionSurface).curves != None
     )
-    IntersectionPointsList = (
-        _IGH.ghpythonlib_components.ControlPoints(crv).points
-        for crv in IntersectionCurves
-    )
-    IntersectionPoints = (
-        pt for list_of_pts in IntersectionPointsList for pt in list_of_pts
-    )
+    IntersectionPointsList = (_IGH.ghpythonlib_components.ControlPoints(crv).points for crv in IntersectionCurves)
+    IntersectionPoints = (pt for list_of_pts in IntersectionPointsList for pt in list_of_pts)
 
     # -----------------------------------------------------------------------
     # If there are any intersection Points found, choose the right one to use to calc shading....
@@ -405,9 +356,7 @@ def find_overhang_shading(_aperture, _shading_objs, _IGH, _limit=99):
         if ray.Length < 0.001:
             continue
 
-        this_ray_angle = _IGH.ghpythonlib_components.Angle(
-            from_vector3d(_aperture.geometry.normal), ray
-        ).angle
+        this_ray_angle = _IGH.ghpythonlib_components.Angle(from_vector3d(_aperture.geometry.normal), ray).angle
         if this_ray_angle < 0.001:
             continue
 
@@ -423,9 +372,7 @@ def find_overhang_shading(_aperture, _shading_objs, _IGH, _limit=99):
         CheckLine = VerticalLine
     else:
         d_over = key_point.Z - origin_point.Z  # Vertical distance
-        Hypot = _IGH.ghpythonlib_components.Length(
-            _IGH.ghpythonlib_components.Line(origin_point, key_point)
-        )
+        Hypot = _IGH.ghpythonlib_components.Length(_IGH.ghpythonlib_components.Line(origin_point, key_point))
         # Horizontal distance
         o_over = math.sqrt(Hypot**2 - d_over**2)
         CheckLine = _IGH.ghpythonlib_components.Line(origin_point, key_point)
@@ -444,33 +391,17 @@ def find_reveal_shading(_aperture, _shading_objs, _IGH, _limit=99):
 
     # Create the Intersection Surface for each side
     Side1_OriginPt = _IGH.ghpythonlib_components.CurveMiddle(glazing_edge_left)
-    Side1_NormalLine = _IGH.ghpythonlib_components.LineSDL(
-        Side1_OriginPt, aperture_normal_vector, _limit
-    )
-    Side1_Direction = _IGH.ghpythonlib_components.Vector2Pt(
-        glazing_center, Side1_OriginPt, False
-    ).vector
-    Side1_HorizLine = _IGH.ghpythonlib_components.LineSDL(
-        Side1_OriginPt, Side1_Direction, _limit
-    )
-    Side1_IntersectionSurface = _IGH.ghpythonlib_components.SumSurface(
-        Side1_NormalLine, Side1_HorizLine
-    )
+    Side1_NormalLine = _IGH.ghpythonlib_components.LineSDL(Side1_OriginPt, aperture_normal_vector, _limit)
+    Side1_Direction = _IGH.ghpythonlib_components.Vector2Pt(glazing_center, Side1_OriginPt, False).vector
+    Side1_HorizLine = _IGH.ghpythonlib_components.LineSDL(Side1_OriginPt, Side1_Direction, _limit)
+    Side1_IntersectionSurface = _IGH.ghpythonlib_components.SumSurface(Side1_NormalLine, Side1_HorizLine)
 
     # Side2_OriginPt = SideMidPoints[1] #ghc.CurveMiddle(self.Edge_Left)
     Side2_OriginPt = _IGH.ghpythonlib_components.CurveMiddle(glazing_edge_right)
-    Side2_NormalLine = _IGH.ghpythonlib_components.LineSDL(
-        Side2_OriginPt, aperture_normal_vector, _limit
-    )
-    Side2_Direction = _IGH.ghpythonlib_components.Vector2Pt(
-        glazing_center, Side2_OriginPt, False
-    ).vector
-    Side2_HorizLine = _IGH.ghpythonlib_components.LineSDL(
-        Side2_OriginPt, Side2_Direction, _limit
-    )
-    Side2_IntersectionSurface = _IGH.ghpythonlib_components.SumSurface(
-        Side2_NormalLine, Side2_HorizLine
-    )
+    Side2_NormalLine = _IGH.ghpythonlib_components.LineSDL(Side2_OriginPt, aperture_normal_vector, _limit)
+    Side2_Direction = _IGH.ghpythonlib_components.Vector2Pt(glazing_center, Side2_OriginPt, False).vector
+    Side2_HorizLine = _IGH.ghpythonlib_components.LineSDL(Side2_OriginPt, Side2_Direction, _limit)
+    Side2_IntersectionSurface = _IGH.ghpythonlib_components.SumSurface(Side2_NormalLine, Side2_HorizLine)
 
     # Find any Shader Objects and put them all into a list
     Side1_RevealShaderObjs = []
@@ -478,30 +409,16 @@ def find_reveal_shading(_aperture, _shading_objs, _IGH, _limit=99):
         glazing_center, _IGH.ghpythonlib_components.Amplitude(aperture_normal_vector, 0.1)
     ).geometry  # Offsets the test line just a bit
     # extend a line off to side 1
-    Side1_TesterLine = _IGH.ghpythonlib_components.LineSDL(
-        testStartPt, Side1_Direction, _limit
-    )
+    Side1_TesterLine = _IGH.ghpythonlib_components.LineSDL(testStartPt, Side1_Direction, _limit)
     for i in range(len(_shading_objs)):
-        if (
-            _IGH.ghpythonlib_components.BrepXCurve(
-                _shading_objs[i], Side1_TesterLine
-            ).points
-            != None
-        ):
+        if _IGH.ghpythonlib_components.BrepXCurve(_shading_objs[i], Side1_TesterLine).points != None:
             Side1_RevealShaderObjs.append(_shading_objs[i])
 
     Side2_RevealShaderObjs = []
     # extend a line off to side 2
-    Side2_TesterLine = _IGH.ghpythonlib_components.LineSDL(
-        testStartPt, Side2_Direction, _limit
-    )
+    Side2_TesterLine = _IGH.ghpythonlib_components.LineSDL(testStartPt, Side2_Direction, _limit)
     for i in range(len(_shading_objs)):
-        if (
-            _IGH.ghpythonlib_components.BrepXCurve(
-                _shading_objs[i], Side2_TesterLine
-            ).points
-            != None
-        ):
+        if _IGH.ghpythonlib_components.BrepXCurve(_shading_objs[i], Side2_TesterLine).points != None:
             Side2_RevealShaderObjs.append(_shading_objs[i])
 
     # ---------------------------------------------------------------------------
@@ -588,38 +505,21 @@ def find_reveal_shading(_aperture, _shading_objs, _IGH, _limit=99):
     return o_reveal, d_reveal, Side1_CheckLine, Side2_CheckLine
 
 
-def CalcRevealDims(
-    _aperture, _shader_objs, _intersection_surface, _reference_pt, _direction_vector, _IGH
-):
+def CalcRevealDims(_aperture, _shader_objs, _intersection_surface, _reference_pt, _direction_vector, _IGH):
     # type: (aperture.Aperture, Sequence, Any, Rhino.Geometry.Point3d, Rhino.Geometry.Vector3d, gh_io.IGH) -> Tuple[float, float, Rhino.Geometry.LineCurve]
 
     # Test shading objects for their edge points
     Side_IntersectionCurve = []
     Side_IntersectionPoints = []
     for i in range(len(_shader_objs)):  # This is the list of shading objects to filter
-        if (
-            _IGH.ghpythonlib_components.BrepXBrep(
-                _shader_objs[i], _intersection_surface
-            ).curves
-            != None
-        ):
+        if _IGH.ghpythonlib_components.BrepXBrep(_shader_objs[i], _intersection_surface).curves != None:
             Side_IntersectionCurve.append(
-                _IGH.ghpythonlib_components.BrepXBrep(
-                    _shader_objs[i], _intersection_surface
-                ).curves
+                _IGH.ghpythonlib_components.BrepXBrep(_shader_objs[i], _intersection_surface).curves
             )
     for i in range(len(Side_IntersectionCurve)):
-        for k in range(
-            len(
-                _IGH.ghpythonlib_components.ControlPoints(
-                    Side_IntersectionCurve[i]
-                ).points
-            )
-        ):
+        for k in range(len(_IGH.ghpythonlib_components.ControlPoints(Side_IntersectionCurve[i]).points)):
             Side_IntersectionPoints.append(
-                _IGH.ghpythonlib_components.ControlPoints(
-                    Side_IntersectionCurve[i]
-                ).points[k]
+                _IGH.ghpythonlib_components.ControlPoints(Side_IntersectionCurve[i]).points[k]
             )
 
     # Find the top/closets point for each of the objects that could possibly shade
@@ -628,14 +528,8 @@ def CalcRevealDims(
     Side_Angles = []
     for i in range(len(Side_IntersectionPoints)):
         if _reference_pt != Side_IntersectionPoints[i]:
-            Ray = _IGH.ghpythonlib_components.Vector2Pt(
-                _reference_pt, Side_IntersectionPoints[i], False
-            ).vector
-            Angle = math.degrees(
-                _IGH.ghpythonlib_components.Angle(
-                    from_vector3d(_aperture.geometry.normal), Ray
-                ).angle
-            )
+            Ray = _IGH.ghpythonlib_components.Vector2Pt(_reference_pt, Side_IntersectionPoints[i], False).vector
+            Angle = math.degrees(_IGH.ghpythonlib_components.Angle(from_vector3d(_aperture.geometry.normal), Ray).angle)
             if Angle < 89.9:
                 Side_Rays.append(Ray)
                 Side_Angles.append(float(Angle))
@@ -644,12 +538,8 @@ def CalcRevealDims(
     Side_KeyRay = Side_Rays[Side_Angles.index(min(Side_Angles))]
 
     # use the Key point found to calculate the Distances for the PHPP Shading Calculator
-    Side_Hypot = _IGH.ghpythonlib_components.Length(
-        _IGH.ghpythonlib_components.Line(_reference_pt, Side_KeyPoint)
-    )
-    Deg = _IGH.ghpythonlib_components.Angle(
-        _direction_vector, Side_KeyRay
-    ).angle  # note this is in Radians
+    Side_Hypot = _IGH.ghpythonlib_components.Length(_IGH.ghpythonlib_components.Line(_reference_pt, Side_KeyPoint))
+    Deg = _IGH.ghpythonlib_components.Angle(_direction_vector, Side_KeyRay).angle  # note this is in Radians
     Side_o_reveal = math.sin(Deg) * Side_Hypot
     Side_d_reveal = math.sqrt(Side_Hypot**2 - Side_o_reveal**2)
     Side_CheckLine = _IGH.ghpythonlib_components.Line(_reference_pt, Side_KeyPoint)
@@ -676,9 +566,7 @@ class GHCompo_SolveShadingDims(object):
             for room in hb_rooms_:
                 for face in room.faces:
                     for hb_aperture in face.apertures:
-                        shading_dims = calc_shading_dims(
-                            hb_aperture, self.shading_surfaces, self.IGH
-                        )
+                        shading_dims = calc_shading_dims(hb_aperture, self.shading_surfaces, self.IGH)
 
                         # -- Create a new HBPH-Shading Dims and store all the info
                         hbph_shading_dims_obj = hbph_aperture.ShadingDimensions()
@@ -691,9 +579,7 @@ class GHCompo_SolveShadingDims(object):
                         hbph_shading_dims_obj.o_over = shading_dims.o_over
 
                         # -- Add the new shading into the HB-Ap properties.ph
-                        hb_aperture.properties.ph.shading_dimensions = (
-                            hbph_shading_dims_obj
-                        )
+                        hb_aperture.properties.ph.shading_dimensions = hbph_shading_dims_obj
 
                         # -- Also set the winter / summer factors None
                         hb_aperture.properties.ph.winter_shading_factor = None

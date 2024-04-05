@@ -43,9 +43,7 @@ class GHCompo_AirLayerMaterial(object):
         self.thickness = _thickness or 0.000
         self.e_1 = _e1 or 0.9
         self.e_2 = _e2 or 0.9
-        self.display_name = _name or "PH_AirLayer_({:.3f}m_{})".format(
-            self.thickness, self.orientation
-        )
+        self.display_name = _name or "PH_AirLayer_({:.3f}m_{})".format(self.thickness, self.orientation)
 
     @property
     def h_r(self):

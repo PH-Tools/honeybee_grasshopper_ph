@@ -121,8 +121,7 @@ class GHCompo_CreateVentDuct(object):
                 self._geometry = to_polyline3d(self._convert_to_polyline(_input))
             except Exception as e:
                 raise Exception(
-                    "{}\nError: Geometry input {} cannot be converted "
-                    "to an LBT Polyline3D?".format(e, _input)
+                    "{}\nError: Geometry input {} cannot be converted " "to an LBT Polyline3D?".format(e, _input)
                 )
 
     def _convert_to_polyline(self, _input):

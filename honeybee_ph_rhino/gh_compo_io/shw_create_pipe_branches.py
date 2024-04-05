@@ -60,9 +60,7 @@ class _BranchPipeBuilder(object):
                 self._geometry = to_polyline3d(self._convert_to_polyline(_input))
             except Exception as e:
                 raise Exception(
-                    "{}\nError: Geometry input {} cannot be converted to an LBT Polyline3D?".format(
-                        e, _input
-                    )
+                    "{}\nError: Geometry input {} cannot be converted to an LBT Polyline3D?".format(e, _input)
                 )
 
     @property
@@ -73,11 +71,7 @@ class _BranchPipeBuilder(object):
         elif isinstance(self.geometry, Polyline3D):
             return self.geometry.segments
         else:
-            raise ValueError(
-                "Geometry input '{}' is not a Polyline3D or LineSegment3D?".format(
-                    type(self.geometry)
-                )
-            )
+            raise ValueError("Geometry input '{}' is not a Polyline3D or LineSegment3D?".format(type(self.geometry)))
 
     def create_hbph_dhw_branch_pipe(self):
         # type: () -> hot_water.PhPipeBranch

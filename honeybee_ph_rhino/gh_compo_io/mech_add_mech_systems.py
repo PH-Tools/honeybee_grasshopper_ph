@@ -25,15 +25,7 @@ except ImportError as e:
 
 
 class GHCompo_AddMechSystems(object):
-    def __init__(
-        self,
-        _vent_sys,
-        _conditioning_systems,
-        _supportive_devices=[],
-        _hb_rooms=[],
-        *args,
-        **kwargs
-    ):
+    def __init__(self, _vent_sys, _conditioning_systems, _supportive_devices=[], _hb_rooms=[], *args, **kwargs):
         # type: (ventilation.PhVentilationSystem, List[heating.PhHeatingSystem], List[PhSupportiveDevice], List[room.Room],  *Any, **Any) -> None
 
         self.ventilation_system = _vent_sys
@@ -51,9 +43,7 @@ class GHCompo_AddMechSystems(object):
 
             # -- Aliases
             new_hvac_prop = new_hvac.properties  # type: IdealAirSystemPhProperties
-            new_hvac_prop_ph = (
-                new_hvac_prop.ph
-            )  # type: IdealAirSystemPhProperties # type: ignore
+            new_hvac_prop_ph = new_hvac_prop.ph  # type: IdealAirSystemPhProperties # type: ignore
 
             # ---------------------------------------------------------------------------
             # -- Fresh-Air Ventilation
@@ -63,12 +53,8 @@ class GHCompo_AddMechSystems(object):
 
                 # -- Set the new h-hvac's values to match the PH-Ventilator Inputs, if any
                 new_hvac_prop_ph.ventilation_system = self.ventilation_system
-                new_hvac.sensible_heat_recovery = (
-                    self.ventilation_system.ventilation_unit.sensible_heat_recovery
-                )
-                new_hvac.latent_heat_recovery = (
-                    self.ventilation_system.ventilation_unit.latent_heat_recovery
-                )
+                new_hvac.sensible_heat_recovery = self.ventilation_system.ventilation_unit.sensible_heat_recovery
+                new_hvac.latent_heat_recovery = self.ventilation_system.ventilation_unit.latent_heat_recovery
                 new_hvac.demand_controlled_ventilation = True
 
             # ---------------------------------------------------------------------------

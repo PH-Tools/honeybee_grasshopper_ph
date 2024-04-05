@@ -238,20 +238,12 @@ def get_component_inputs(_equipment_type):
     input_type_id = input_to_int(_equipment_type)
 
     if not input_type_id:
-        raise Exception(
-            'Error: Foundation type: "{}" is not a valid equip type.'.format(
-                input_type_id
-            )
-        )
+        raise Exception('Error: Foundation type: "{}" is not a valid equip type.'.format(input_type_id))
 
     try:
         return input_groups[input_type_id]
     except KeyError:
-        raise Exception(
-            'Error: Foundation type: "{}" is not a valid equip type.'.format(
-                input_type_id
-            )
-        )
+        raise Exception('Error: Foundation type: "{}" is not a valid equip type.'.format(input_type_id))
 
 
 # -----------------------------------------------------------------------------

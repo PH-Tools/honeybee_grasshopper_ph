@@ -45,15 +45,11 @@ class GHCompo_CreateSDConstructions(object):
             return u_value_inputs_, names_
 
         if len(_name_inputs) < len(_u_value_inputs):
-            for u_value_input, name in izip_longest(
-                _u_value_inputs, _name_inputs, fillvalue=_name_inputs[0]
-            ):
+            for u_value_input, name in izip_longest(_u_value_inputs, _name_inputs, fillvalue=_name_inputs[0]):
                 u_value_inputs_.append(u_value_input)
                 names_.append(name)
         elif len(_name_inputs) > len(_u_value_inputs):
-            for u_value_input, name in izip_longest(
-                _u_value_inputs, _name_inputs, fillvalue=_u_value_inputs[0]
-            ):
+            for u_value_input, name in izip_longest(_u_value_inputs, _name_inputs, fillvalue=_u_value_inputs[0]):
                 u_value_inputs_.append(u_value_input)
                 names_.append(name)
         else:
@@ -87,9 +83,7 @@ class GHCompo_CreateSDConstructions(object):
                         name,
                         [
                             self.MASS_HB_MAT,
-                            EnergyMaterialNoMass(
-                                "MAT_{}".format(name), 1 / u_value, "Rough", 0.9, 0.7, 0.7
-                            ),
+                            EnergyMaterialNoMass("MAT_{}".format(name), 1 / u_value, "Rough", 0.9, 0.7, 0.7),
                             self.MASS_HB_MAT,
                         ],
                     )

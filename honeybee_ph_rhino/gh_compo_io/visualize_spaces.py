@@ -152,10 +152,7 @@ class GHCompo_VisualizeSpaces(object):
 
         # -------------------------------------------------------------------------------
         # -- Output the visualization geometry
-        mesh = [
-            from_face3ds_to_colored_mesh([fc], col)
-            for fc, col in zip(flat_geo, graphic.value_colors)
-        ]
+        mesh = [from_face3ds_to_colored_mesh([fc], col) for fc, col in zip(flat_geo, graphic.value_colors)]
         wire_frame = []
         for face in color_obj.flat_faces:
             wire_frame.extend(from_face3d_to_wireframe(face.geometry))

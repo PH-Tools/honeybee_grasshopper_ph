@@ -83,14 +83,10 @@ class Validated(object):
             * old_value: The original value of the descriptor, sometimes useful
                 for returning if 'new_value' is None, or similar.
         """
-        raise NotImplementedError(
-            "Error: Must implement the .validated() method on subclass of Validated."
-        )
+        raise NotImplementedError("Error: Must implement the .validated() method on subclass of Validated.")
 
     def __str__(self):
-        return "Validated[{}](storage_name={})".format(
-            self.__class__.__name__, self.storage_name
-        )
+        return "Validated[{}](storage_name={})".format(self.__class__.__name__, self.storage_name)
 
 
 class NotNone(Validated):
@@ -147,9 +143,32 @@ class IntegerNonZero(Validated):
             )
 
         if new_value < 1:
+            raise ValueError("Error: input for '{}' cannot be zero or negative.".format(name))
+
+        return new_value
+
+
+class IntegerPositiveValueOrZero(Validated):
+    """A Positive Integer value (or Zero)."""
+
+    def validate(self, name, new_value, old_value):
+        if new_value is None:
+            # If the user passed a 'default' attribute, try and use that
+            try:
+                return int(self.default)
+            except:
+                return old_value
+
+        try:
+            new_value = int(new_value)
+        except:
             raise ValueError(
-                "Error: input for '{}' cannot be zero or negative.".format(name)
+                "Error: input '{}' of type: '{}' is not allowed."
+                "Supply positive integer values only.".format(new_value, type(new_value))
             )
+
+        if new_value < 0:
+            raise ValueError("Error: input for '{}' cannot be negative.".format(name))
 
         return new_value
 
@@ -169,8 +188,7 @@ class Float(Validated):
             new_value = float(new_value)
         except:
             raise ValueError(
-                "Error: input {} of type: {} is not allowed."
-                "Supply float only.".format(new_value, type(new_value))
+                "Error: input {} of type: {} is not allowed." "Supply float only.".format(new_value, type(new_value))
             )
 
         return new_value
@@ -250,9 +268,7 @@ class FloatPercentage(Validated):
             new_value = new_value / 100
 
         if not 0.0 <= new_value <= 1.0:
-            raise ValueError(
-                "Error: input for '{}' must be between 0.0 and 1.0".format(name)
-            )
+            raise ValueError("Error: input for '{}' must be between 0.0 and 1.0".format(name))
 
         return new_value
 
@@ -279,9 +295,7 @@ class FloatMax24(Validated):
             )
 
         if 24.0 - new_value < self.tolerance:
-            raise ValueError(
-                "Error: input for '{}' cannot be greater than 24.".format(name)
-            )
+            raise ValueError("Error: input for '{}' cannot be greater than 24.".format(name))
 
         return new_value
 
@@ -307,8 +321,7 @@ class UnitM(Validated):
             input_value = float(input_value)
         except:
             raise ValueError(
-                "Error: input {} of type: {} is not allowed."
-                "Supply float only.".format(new_value, type(new_value))
+                "Error: input {} of type: {} is not allowed." "Supply float only.".format(new_value, type(new_value))
             )
 
         # -- Convert to Meters
@@ -337,8 +350,7 @@ class UnitM2(Validated):
             input_value = float(input_value)
         except:
             raise ValueError(
-                "Error: input {} of type: {} is not allowed."
-                "Supply float only.".format(new_value, type(new_value))
+                "Error: input {} of type: {} is not allowed." "Supply float only.".format(new_value, type(new_value))
             )
 
         # -- Convert to Meters
@@ -367,8 +379,7 @@ class UnitMM(Validated):
             input_value = float(input_value)
         except:
             raise ValueError(
-                "Error: input {} of type: {} is not allowed."
-                "Supply float only.".format(new_value, type(new_value))
+                "Error: input {} of type: {} is not allowed." "Supply float only.".format(new_value, type(new_value))
             )
 
         # -- Convert to MilliMeters
@@ -397,8 +408,7 @@ class UnitW_MK(Validated):
             input_value = float(input_value)
         except:
             raise ValueError(
-                "Error: input {} of type: {} is not allowed."
-                "Supply float only.".format(new_value, type(new_value))
+                "Error: input {} of type: {} is not allowed." "Supply float only.".format(new_value, type(new_value))
             )
 
         # -- Convert units
@@ -427,8 +437,7 @@ class UnitW_M2K(Validated):
             input_value = float(input_value)
         except:
             raise ValueError(
-                "Error: input {} of type: {} is not allowed."
-                "Supply float only.".format(new_value, type(new_value))
+                "Error: input {} of type: {} is not allowed." "Supply float only.".format(new_value, type(new_value))
             )
 
         # -- Convert units
@@ -461,8 +470,7 @@ class UnitW_K(Validated):
             input_value = float(input_value)
         except:
             raise ValueError(
-                "Error: input {} of type: {} is not allowed."
-                "Supply float only.".format(new_value, type(new_value))
+                "Error: input {} of type: {} is not allowed." "Supply float only.".format(new_value, type(new_value))
             )
 
         # -- Convert to Meters
@@ -495,8 +503,7 @@ class UnitDeltaC(Validated):
             input_value = float(input_value)
         except:
             raise ValueError(
-                "Error: input {} of type: {} is not allowed."
-                "Supply float only.".format(new_value, type(new_value))
+                "Error: input {} of type: {} is not allowed." "Supply float only.".format(new_value, type(new_value))
             )
 
         # -- Convert to Meters
@@ -525,8 +532,7 @@ class UnitDegreeC(Validated):
             input_value = float(input_value)
         except:
             raise ValueError(
-                "Error: input {} of type: {} is not allowed."
-                "Supply float only.".format(new_value, type(new_value))
+                "Error: input {} of type: {} is not allowed." "Supply float only.".format(new_value, type(new_value))
             )
 
         # -- Convert to Meters
@@ -555,8 +561,7 @@ class UnitMeterPerSecond(Validated):
             input_value = float(input_value)
         except:
             raise ValueError(
-                "Error: input {} of type: {} is not allowed."
-                "Supply float only.".format(new_value, type(new_value))
+                "Error: input {} of type: {} is not allowed." "Supply float only.".format(new_value, type(new_value))
             )
 
         # -- Convert to Meters
@@ -585,8 +590,7 @@ class UnitWH_M3(Validated):
             input_value = float(input_value)
         except:
             raise ValueError(
-                "Error: input {} of type: {} is not allowed."
-                "Supply float only.".format(new_value, type(new_value))
+                "Error: input {} of type: {} is not allowed." "Supply float only.".format(new_value, type(new_value))
             )
 
         # -- Convert units
@@ -619,8 +623,7 @@ class UnitKWH(Validated):
             input_value = float(input_value)
         except:
             raise ValueError(
-                "Error: input {} of type: {} is not allowed."
-                "Supply float only.".format(new_value, type(new_value))
+                "Error: input {} of type: {} is not allowed." "Supply float only.".format(new_value, type(new_value))
             )
 
         # -- Convert units
@@ -653,8 +656,7 @@ class UnitKWH_M2(Validated):
             input_value = float(input_value)
         except:
             raise ValueError(
-                "Error: input {} of type: {} is not allowed."
-                "Supply float only.".format(new_value, type(new_value))
+                "Error: input {} of type: {} is not allowed." "Supply float only.".format(new_value, type(new_value))
             )
 
         # -- Convert units
@@ -687,8 +689,7 @@ class UnitW_M2(Validated):
             input_value = float(input_value)
         except:
             raise ValueError(
-                "Error: input {} of type: {} is not allowed."
-                "Supply float only.".format(new_value, type(new_value))
+                "Error: input {} of type: {} is not allowed." "Supply float only.".format(new_value, type(new_value))
             )
 
         # -- Convert units
@@ -721,8 +722,7 @@ class UnitM3_S(Validated):
             input_value = float(input_value)
         except:
             raise ValueError(
-                "Error: input {} of type: {} is not allowed."
-                "Supply float only.".format(new_value, type(new_value))
+                "Error: input {} of type: {} is not allowed." "Supply float only.".format(new_value, type(new_value))
             )
 
         # -- Convert units
@@ -755,8 +755,7 @@ class UnitKW(Validated):
             input_value = float(input_value)
         except:
             raise ValueError(
-                "Error: input {} of type: {} is not allowed."
-                "Supply float only.".format(new_value, type(new_value))
+                "Error: input {} of type: {} is not allowed." "Supply float only.".format(new_value, type(new_value))
             )
 
         # -- Convert units
@@ -789,8 +788,7 @@ class UnitW(Validated):
             input_value = float(input_value)
         except:
             raise ValueError(
-                "Error: input {} of type: {} is not allowed."
-                "Supply float only.".format(new_value, type(new_value))
+                "Error: input {} of type: {} is not allowed." "Supply float only.".format(new_value, type(new_value))
             )
 
         # -- Convert units

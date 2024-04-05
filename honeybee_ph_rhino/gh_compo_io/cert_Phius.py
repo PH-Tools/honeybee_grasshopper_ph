@@ -21,18 +21,10 @@ except ImportError as e:
 
 
 class GHCompo_PhiusCertification(object):
-    PHIUS_annual_heating_demand_kWh_m2 = ghio_validators.UnitKWH_M2(
-        "PHIUS_annual_heating_demand_kWh_m2"
-    )
-    PHIUS_annual_cooling_demand_kWh_m2 = ghio_validators.UnitKWH_M2(
-        "PHIUS_annual_cooling_demand_kWh_m2"
-    )
-    PHIUS_peak_heating_load_W_m2 = ghio_validators.UnitW_M2(
-        "PHIUS_peak_heating_load_W_m2"
-    )
-    PHIUS_peak_cooling_load_W_m2 = ghio_validators.UnitW_M2(
-        "PHIUS_peak_cooling_load_W_m2"
-    )
+    PHIUS_annual_heating_demand_kWh_m2 = ghio_validators.UnitKWH_M2("PHIUS_annual_heating_demand_kWh_m2")
+    PHIUS_annual_cooling_demand_kWh_m2 = ghio_validators.UnitKWH_M2("PHIUS_annual_cooling_demand_kWh_m2")
+    PHIUS_peak_heating_load_W_m2 = ghio_validators.UnitW_M2("PHIUS_peak_heating_load_W_m2")
+    PHIUS_peak_cooling_load_W_m2 = ghio_validators.UnitW_M2("PHIUS_peak_cooling_load_W_m2")
 
     def __init__(
         self,
@@ -54,12 +46,8 @@ class GHCompo_PhiusCertification(object):
         self.building_use_type = gh_io.input_to_int(building_use_type_)
         self.building_status = gh_io.input_to_int(building_status_)
         self.building_type = gh_io.input_to_int(building_type_)
-        self.PHIUS_annual_heating_demand_kWh_m2 = (
-            _PHIUS_annual_heating_demand_kWh_m2 or 15.0
-        )
-        self.PHIUS_annual_cooling_demand_kWh_m2 = (
-            _PHIUS_annual_cooling_demand_kWh_m2 or 15.0
-        )
+        self.PHIUS_annual_heating_demand_kWh_m2 = _PHIUS_annual_heating_demand_kWh_m2 or 15.0
+        self.PHIUS_annual_cooling_demand_kWh_m2 = _PHIUS_annual_cooling_demand_kWh_m2 or 15.0
         self.PHIUS_peak_heating_load_W_m2 = _PHIUS_peak_heating_load_W_m2 or 10.0
         self.PHIUS_peak_cooling_load_W_m2 = _PHIUS_peak_cooling_load_W_m2 or 10.0
 

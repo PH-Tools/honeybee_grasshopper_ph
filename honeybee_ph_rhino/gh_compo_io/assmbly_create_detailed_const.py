@@ -41,9 +41,7 @@ class GHCompo_CreateDetailedConstructions(object):
         self._path = str(_path)
 
         # -- Turn the materials into a dict
-        self.materials = {
-            m.display_name: m for m in _materials
-        }  # type: Dict[str, EnergyMaterial]
+        self.materials = {m.display_name: m for m in _materials}  # type: Dict[str, EnergyMaterial]
 
     @property
     def path(self):
@@ -116,6 +114,4 @@ class GHCompo_CreateDetailedConstructions(object):
             return []
 
         # -- Build the constructions with the materials (with thickness added)
-        return [
-            self.create_hb_constructions(const_data) for const_data in input_data.values()
-        ]
+        return [self.create_hb_constructions(const_data) for const_data in input_data.values()]

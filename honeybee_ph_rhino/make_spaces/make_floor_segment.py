@@ -47,9 +47,7 @@ def calc_reference_point(IGH, _face3D):
     # -- Move the point a little more ( + 0.01) in the direction of the 'pull'
     # -- to ensure the reference point is 'in' the space volume brep
     MOVE_DISTANCE = 0.01
-    pull_vector, pull_length = IGH.ghpythonlib_components.Vector2Pt(
-        face_cent_rh_pt, new_cp, False
-    )
+    pull_vector, pull_length = IGH.ghpythonlib_components.Vector2Pt(face_cent_rh_pt, new_cp, False)
 
     pull_vector = IGH.ghpythonlib_components.Amplitude(pull_vector, MOVE_DISTANCE)
     new_cp = IGH.ghpythonlib_components.Move(new_cp, pull_vector).geometry
@@ -86,8 +84,7 @@ def create_floor_segment_from_rhino_geom(IGH, _flr_segment_geom, _weighting_fact
 
     # -- Check weighting factors
     assert len(lbt_face_3ds) == len(_weighting_factors), (
-        "Error: input lists of floor"
-        "segments and weighting factor lengths do not match?"
+        "Error: input lists of floor" "segments and weighting factor lengths do not match?"
     )
 
     # -- Create new SpaceFloorSegments for each surface input

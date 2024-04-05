@@ -256,23 +256,23 @@ class GHCompo_CreateSiteFromPhiusFile(object):
         self.peak_load_data_collection = PeakLoadInputCollection()
         self.site_elevation = _site_elevation
         self.climate_zone = self.clean_climate_zone(_climate_zone or 1)
-    
+
     def clean_climate_zone(self, _cz_input):
         # type: (Union[str, int]) -> int
         """Check the input climate zone and return the number."""
-        
+
         cz_number = gh_io.input_to_int(str(_cz_input))
         if not cz_number:
             return 1
 
         if cz_number not in self._allowable_climate_zones.keys():
             msg = "Climate zone number must be one of the following:\n"
-            msg += ", ".join(["'{}-{}'".format(k,v) for k, v in  self._allowable_climate_zones.items()])
+            msg += ", ".join(["'{}-{}'".format(k, v) for k, v in self._allowable_climate_zones.items()])
             self.IGH.error(msg)
             return 1
-        
+
         return cz_number
-    
+
     def _read_file(self, _source_file_path):
         # type: (Optional[str]) -> List[str]
         """Read in the Phius Data file (TXT only) and return a list of the contents."""
@@ -284,9 +284,7 @@ class GHCompo_CreateSiteFromPhiusFile(object):
 
         extension = _source_file_path[-3:].upper()
         if extension != "TXT":
-            msg = "Error: Input Phius data '.TXT' file path. Got file of type: '{}'?".format(
-                extension
-            )
+            msg = "Error: Input Phius data '.TXT' file path. Got file of type: '{}'?".format(extension)
             self.IGH.error(msg)
             return []
 
@@ -329,9 +327,7 @@ class GHCompo_CreateSiteFromPhiusFile(object):
     def _create_location(self):
         # type: () -> site.Location
 
-        site_elevation = (
-            self.site_elevation or self.monthly_data_collection.station_elevation
-        )
+        site_elevation = self.site_elevation or self.monthly_data_collection.station_elevation
 
         return site.Location(
             latitude=self.monthly_data_collection.latitude,
@@ -346,9 +342,7 @@ class GHCompo_CreateSiteFromPhiusFile(object):
 
         return site.Climate_MonthlyTempCollection(
             _air=site.Climate_MonthlyValueSet(self.monthly_data_collection.air_temps),
-            _dewpoint=site.Climate_MonthlyValueSet(
-                self.monthly_data_collection.dewpoints
-            ),
+            _dewpoint=site.Climate_MonthlyValueSet(self.monthly_data_collection.dewpoints),
             _sky=site.Climate_MonthlyValueSet(self.monthly_data_collection.sky_temps),
         )
 
@@ -385,18 +379,10 @@ class GHCompo_CreateSiteFromPhiusFile(object):
         # type: () -> site.Climate_PeakLoadCollection
 
         climate_peak_loads_ = site.Climate_PeakLoadCollection(
-            self._create_peak_load_value_set(
-                self.peak_load_data_collection.peak_heat_load_1
-            ),
-            self._create_peak_load_value_set(
-                self.peak_load_data_collection.peak_heat_load_2
-            ),
-            self._create_peak_load_value_set(
-                self.peak_load_data_collection.peak_cooling_load_1
-            ),
-            self._create_peak_load_value_set(
-                self.peak_load_data_collection.peak_cooling_load_2
-            ),
+            self._create_peak_load_value_set(self.peak_load_data_collection.peak_heat_load_1),
+            self._create_peak_load_value_set(self.peak_load_data_collection.peak_heat_load_2),
+            self._create_peak_load_value_set(self.peak_load_data_collection.peak_cooling_load_1),
+            self._create_peak_load_value_set(self.peak_load_data_collection.peak_cooling_load_2),
         )
         return climate_peak_loads_
 

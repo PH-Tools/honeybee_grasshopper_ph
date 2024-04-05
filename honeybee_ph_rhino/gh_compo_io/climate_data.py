@@ -24,9 +24,7 @@ class GHCompo_ClimateData(object):
     display_name = ghio_validators.HBName("display_name")
     station_elevation = ghio_validators.UnitM("station_elevation", default=0.0)
     daily_temp_swing = ghio_validators.UnitDeltaC("daily_temp_swing", default=8.0)
-    average_wind_speed = ghio_validators.UnitMeterPerSecond(
-        "average_wind_speed", default=4.0
-    )
+    average_wind_speed = ghio_validators.UnitMeterPerSecond("average_wind_speed", default=4.0)
 
     def __init__(
         self,
@@ -49,9 +47,7 @@ class GHCompo_ClimateData(object):
         self.daily_temp_swing = _daily_temp_swing or 8.0
         self.average_wind_speed = _average_wind_speed or 4.0
         self.monthly_temps = _monthly_temps or site.Climate_MonthlyTempCollection()
-        self.monthly_radiation = (
-            _monthly_radiation or site.Climate_MonthlyRadiationCollection()
-        )
+        self.monthly_radiation = _monthly_radiation or site.Climate_MonthlyRadiationCollection()
         self.heat_load_1 = _peak_heat_load_1 or site.Climate_PeakLoadValueSet()
         self.heat_load_2 = _peak_heat_load_2 or site.Climate_PeakLoadValueSet()
         self.cooling_load_1 = _peak_cooling_load_1 or site.Climate_PeakLoadValueSet()

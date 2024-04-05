@@ -6,7 +6,7 @@
 import math
 
 try:
-    from typing import Iterable, List, Tuple, Sequence
+    from typing import Iterable, List, Sequence, Tuple
 except ImportError:
     pass
 
@@ -18,24 +18,14 @@ except ImportError:
 try:
     from Grasshopper import DataTree  # type: ignore
     from Grasshopper.Kernel.Data import GH_Path  # type: ignore
-    from Rhino.Geometry import ( # type: ignore
-        Brep,
-        Interval,
-        LineCurve,
-        Plane,
-        Point3d,
-        Vector3d,
-    )
+    from Rhino.Geometry import LineCurve  # type: ignore
+    from Rhino.Geometry import Brep, Interval, Plane, Point3d, Vector3d
     from System import Object  # type: ignore
 except ImportError:
     pass  # Outside Rhino
 
 try:
-    from ladybug_rhino.fromgeometry import (
-        from_face3d,
-        from_linesegment3d,
-        from_plane,
-    )
+    from ladybug_rhino.fromgeometry import from_face3d, from_linesegment3d, from_plane
 except ImportError as e:
     raise ImportError("\nFailed to import ladybug_rhino:\n\t{}".format(e))
 
@@ -97,9 +87,7 @@ class GHCompo_VisualizeWindowFrameElements(object):
         edges_sorted = sorted(
             _ap_edges,
             reverse=True,
-            key=lambda e: self.calc_edge_angle_about_origin(
-                e, _ap_center_point, _ap_local_plane
-            ),
+            key=lambda e: self.calc_edge_angle_about_origin(e, _ap_center_point, _ap_local_plane),
         )
         return edges_sorted
 
@@ -127,9 +115,7 @@ class GHCompo_VisualizeWindowFrameElements(object):
         # -- by choosing the surface with the closest point to the aperture's center point
         ct_pt_distances = []
         for test_surface in win_surfaces:
-            ct_pt_distances.append(
-                self.IGH.ghc.SurfaceClosestPoint(_ap_ctr_pt, test_surface).distance
-            )
+            ct_pt_distances.append(self.IGH.ghc.SurfaceClosestPoint(_ap_ctr_pt, test_surface).distance)
         glazing_surface = win_surfaces[ct_pt_distances.index(min(ct_pt_distances))]
 
         return glazing_surface
@@ -138,17 +124,17 @@ class GHCompo_VisualizeWindowFrameElements(object):
         # type: (Aperture) -> Tuple[List[PhWindowFrameElement], List[str]]
         """Get the Passive House PhWindowFrameElements for of the aperture;s PH-Frame."""
         ap_const = _aperture.properties.energy.construction  # type: ignore
-        
+
         # -- Find the HBPH-Properties for the Window Construction
         try:
             """
-            If it's a Honeybee Energy WindowConstructionShade the actual 
+            If it's a Honeybee Energy WindowConstructionShade the actual
             construction will be inside the 'window_construction' attribute
             """
             ap_prop_ph = ap_const.window_construction.properties.ph
         except AttributeError:
             ap_prop_ph = ap_const.properties.ph
-        
+
         # -- Try and get the PH-Frame from the Window Construction
         ap_ph_frame = ap_prop_ph.ph_frame
         if not ap_ph_frame:
@@ -164,7 +150,7 @@ class GHCompo_VisualizeWindowFrameElements(object):
     def get_aperture_geometry(self, _aperture):
         # type: (Aperture) -> tuple[Brep, Point3d, Plane, List[LineCurve]]
         """Get the geometric elements of the Honeybee-Aperture as Rhino Geometry."""
-        ap_surface = from_face3d(_aperture.geometry) # type: Brep # type: ignore
+        ap_surface = from_face3d(_aperture.geometry)  # type: Brep # type: ignore
         ap_ctr_pt = self.IGH.ghc.Area(ap_surface).centroid
         ap_local_plane = from_plane(_aperture.geometry.plane)
         ap_edges = [from_linesegment3d(s) for s in _aperture.geometry.boundary_segments]

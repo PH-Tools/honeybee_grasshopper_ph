@@ -22,21 +22,10 @@ except ImportError as e:
 
 class GHCompo_CreatePVDevice(object):
     annual_yield = ghio_validators.UnitKWH("annual_yield", default=0.0)
-    utilization_factor = ghio_validators.FloatPercentage(
-        "utilization_factor", default=1.0
-    )
+    utilization_factor = ghio_validators.FloatPercentage("utilization_factor", default=1.0)
     array_size = ghio_validators.UnitM2("array_size", default=0.0)
 
-    def __init__(
-        self,
-        _IGH,
-        _display_name,
-        _annual_yield,
-        _array_size,
-        _utilization_factor,
-        *args,
-        **kwargs
-    ):
+    def __init__(self, _IGH, _display_name, _annual_yield, _array_size, _utilization_factor, *args, **kwargs):
         # type: (gh_io.IGH, str, float, float, float, *Any, **Any) -> None
         self.IGH = _IGH
         self.display_name = _display_name or "__unnamed_pv_system__"

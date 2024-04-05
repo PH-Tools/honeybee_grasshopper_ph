@@ -9,7 +9,8 @@ except ImportError:
     pass  # IronPython 2.7
 
 try:
-    from itertools import izip_longest as zip_longest  # type: ignore # Python-2
+    from itertools import \
+        izip_longest as zip_longest  # type: ignore # Python-2
 except ImportError:
     from itertools import zip_longest
 

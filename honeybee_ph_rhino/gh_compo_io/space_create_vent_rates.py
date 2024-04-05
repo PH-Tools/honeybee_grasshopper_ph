@@ -6,7 +6,7 @@
 try:
     from typing import Optional
 except ImportError:
-    pass # IronPython 2.7
+    pass  # IronPython 2.7
 
 try:
     from Grasshopper import DataTree  # type: ignore
@@ -22,17 +22,14 @@ except:
 try:
     from honeybee_ph_utils import input_tools
 except ImportError as e:
-    raise ImportError(
-        "Failed to import honeybee_ph_utils: {}".format(e)
-    )
+    raise ImportError("Failed to import honeybee_ph_utils: {}".format(e))
 
 try:
     from honeybee_ph_rhino import gh_io
     from honeybee_ph_rhino.gh_compo_io import ghio_validators
 except ImportError as e:
-    raise ImportError(
-        "Failed to import honeybee_ph_rhino: {}".format(e)
-    )
+    raise ImportError("Failed to import honeybee_ph_rhino: {}".format(e))
+
 
 class SpacePhVentFlowRates(object):
     """Temporary dataclass to store flow-rate info"""
@@ -69,8 +66,8 @@ class SpacePhVentFlowRates(object):
             )
         except Exception as e:
             return "{}(v_sup={} m3/s, v_eta={} m3/s, v_tran={} m3/s)".format(
-                            self.__class__.__name__, self.v_sup, self.v_eta, self.v_tran
-                        )
+                self.__class__.__name__, self.v_sup, self.v_eta, self.v_tran
+            )
 
     def __repr__(self):
         return str(self)
@@ -118,7 +115,7 @@ class GHCompo_CreateSpaceVent(object):
                     ),
                     pth(branch_num),
                 )
-        
+
         return output
 
     def __str__(self):

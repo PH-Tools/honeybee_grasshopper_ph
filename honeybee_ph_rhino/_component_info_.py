@@ -5,7 +5,7 @@
 These are called when the component is instantiated within the Grasshopper canvas.
 """
 
-RELEASE_VERSION = "Honeybee-PH v1.2.15"
+RELEASE_VERSION = "Honeybee-PH v1.3.00"
 CATEGORY = "HB-PH"
 SUB_CATEGORIES = {
     0: "00 | Utils",
@@ -378,12 +378,6 @@ COMPONENT_PARAMS = {
         "Category": CATEGORY,
         "SubCategory": 1,
     },
-    "HBPH - Create Mixed HB-Material": {
-        "NickName": "Create Mixed HB-Material",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 1,
-    },
     "HBPH - Create Thermal Bridges": {
         "NickName": "Create Thermal Bridges",
         "Message": RELEASE_VERSION,
@@ -416,6 +410,24 @@ COMPONENT_PARAMS = {
     },
     "HBPH - Set Material Color": {
         "NickName": "Set Mat Color",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
+    "HBPH - Set Mixed-Material Column and Row": {
+        "NickName": "Set Mat Column/Row",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
+    "HBPH - Create Heterogeneous Material": {
+        "NickName": "Create Heterogeneous Mat",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
+    "HBPH - Create Wood Framing Material": {
+        "NickName": "Create Wood Framing Mat",
         "Message": RELEASE_VERSION,
         "Category": CATEGORY,
         "SubCategory": 1,

@@ -75,9 +75,7 @@ class HBElecEquipWithRooms:
         dup_ee = self.hb_electric_equipment.duplicate()
 
         ph_equip = dup_ee.properties.ph.equipment_collection  # type: ignore
-        total_wattage = sum(
-            ph_equip.total_collection_wattage(hb_room) for hb_room in self.hb_rooms
-        )
+        total_wattage = sum(ph_equip.total_collection_wattage(hb_room) for hb_room in self.hb_rooms)
         total_m2 = sum(rm.floor_area for rm in self.hb_rooms)
         avg_wattage_per_m2 = total_wattage / total_m2
         dup_ee.watts_per_area = avg_wattage_per_m2  # type: ignore
@@ -125,9 +123,7 @@ class HBElecEquipCollection:
         return self._collection.items()
 
     def __str__(self):
-        return "{}({} items in the collection)".format(
-            self.__class__.__name__, len(self.keys())
-        )
+        return "{}({} items in the collection)".format(self.__class__.__name__, len(self.keys()))
 
     def __repr__(self):
         return str(self)
@@ -190,63 +186,25 @@ def _add_Phius_default_equipment_to_list(_equipment, _defaults=1):
     equipment_list_ = _equipment[:]
 
     if _defaults == 1:  # Residential Single family:
+        equipment_list_.append(ph_equipment.PhDishwasher(_defaults=ph_default_equip["PhDishwasher"]["PHIUS"]))
+        equipment_list_.append(ph_equipment.PhClothesWasher(_defaults=ph_default_equip["PhClothesWasher"]["PHIUS"]))
+        equipment_list_.append(ph_equipment.PhClothesDryer(_defaults=ph_default_equip["PhClothesDryer"]["PHIUS"]))
+        equipment_list_.append(ph_equipment.PhFridgeFreezer(_defaults=ph_default_equip["PhFridgeFreezer"]["PHIUS"]))
+        equipment_list_.append(ph_equipment.PhCooktop(_defaults=ph_default_equip["PhCooktop"]["PHIUS"]))
+        equipment_list_.append(ph_equipment.PhPhiusMEL(_defaults=ph_default_equip["PhPhiusMEL"]["PHIUS"]))
         equipment_list_.append(
-            ph_equipment.PhDishwasher(_defaults=ph_default_equip["PhDishwasher"]["PHIUS"])
+            ph_equipment.PhPhiusLightingInterior(_defaults=ph_default_equip["PhPhiusLightingInterior"]["PHIUS"])
         )
         equipment_list_.append(
-            ph_equipment.PhClothesWasher(
-                _defaults=ph_default_equip["PhClothesWasher"]["PHIUS"]
-            )
-        )
-        equipment_list_.append(
-            ph_equipment.PhClothesDryer(
-                _defaults=ph_default_equip["PhClothesDryer"]["PHIUS"]
-            )
-        )
-        equipment_list_.append(
-            ph_equipment.PhFridgeFreezer(
-                _defaults=ph_default_equip["PhFridgeFreezer"]["PHIUS"]
-            )
-        )
-        equipment_list_.append(
-            ph_equipment.PhCooktop(_defaults=ph_default_equip["PhCooktop"]["PHIUS"])
-        )
-        equipment_list_.append(
-            ph_equipment.PhPhiusMEL(_defaults=ph_default_equip["PhPhiusMEL"]["PHIUS"])
-        )
-        equipment_list_.append(
-            ph_equipment.PhPhiusLightingInterior(
-                _defaults=ph_default_equip["PhPhiusLightingInterior"]["PHIUS"]
-            )
-        )
-        equipment_list_.append(
-            ph_equipment.PhPhiusLightingExterior(
-                _defaults=ph_default_equip["PhPhiusLightingExterior"]["PHIUS"]
-            )
+            ph_equipment.PhPhiusLightingExterior(_defaults=ph_default_equip["PhPhiusLightingExterior"]["PHIUS"])
         )
 
     if _defaults == 2:  # Multifamily Residential
-        equipment_list_.append(
-            ph_equipment.PhDishwasher(_defaults=ph_default_equip["PhDishwasher"]["PHIUS"])
-        )
-        equipment_list_.append(
-            ph_equipment.PhClothesWasher(
-                _defaults=ph_default_equip["PhClothesWasher"]["PHIUS"]
-            )
-        )
-        equipment_list_.append(
-            ph_equipment.PhClothesDryer(
-                _defaults=ph_default_equip["PhClothesDryer"]["PHIUS"]
-            )
-        )
-        equipment_list_.append(
-            ph_equipment.PhFridgeFreezer(
-                _defaults=ph_default_equip["PhFridgeFreezer"]["PHIUS"]
-            )
-        )
-        equipment_list_.append(
-            ph_equipment.PhCooktop(_defaults=ph_default_equip["PhCooktop"]["PHIUS"])
-        )
+        equipment_list_.append(ph_equipment.PhDishwasher(_defaults=ph_default_equip["PhDishwasher"]["PHIUS"]))
+        equipment_list_.append(ph_equipment.PhClothesWasher(_defaults=ph_default_equip["PhClothesWasher"]["PHIUS"]))
+        equipment_list_.append(ph_equipment.PhClothesDryer(_defaults=ph_default_equip["PhClothesDryer"]["PHIUS"]))
+        equipment_list_.append(ph_equipment.PhFridgeFreezer(_defaults=ph_default_equip["PhFridgeFreezer"]["PHIUS"]))
+        equipment_list_.append(ph_equipment.PhCooktop(_defaults=ph_default_equip["PhCooktop"]["PHIUS"]))
 
     if _defaults == 3:  # Multifamily NonResidential
         pass
@@ -275,27 +233,11 @@ def _add_Phi_default_equipment_to_list(_equipment, _defaults=0):
     equipment_list_ = _equipment[:]
 
     if _defaults == 1:
-        equipment_list_.append(
-            ph_equipment.PhDishwasher(_defaults=ph_default_equip["PhDishwasher"]["PHI"])
-        )
-        equipment_list_.append(
-            ph_equipment.PhClothesWasher(
-                _defaults=ph_default_equip["PhClothesWasher"]["PHI"]
-            )
-        )
-        equipment_list_.append(
-            ph_equipment.PhClothesDryer(
-                _defaults=ph_default_equip["PhClothesDryer"]["PHI"]
-            )
-        )
-        equipment_list_.append(
-            ph_equipment.PhFridgeFreezer(
-                _defaults=ph_default_equip["PhFridgeFreezer"]["PHI"]
-            )
-        )
-        equipment_list_.append(
-            ph_equipment.PhCooktop(_defaults=ph_default_equip["PhCooktop"]["PHI"])
-        )
+        equipment_list_.append(ph_equipment.PhDishwasher(_defaults=ph_default_equip["PhDishwasher"]["PHI"]))
+        equipment_list_.append(ph_equipment.PhClothesWasher(_defaults=ph_default_equip["PhClothesWasher"]["PHI"]))
+        equipment_list_.append(ph_equipment.PhClothesDryer(_defaults=ph_default_equip["PhClothesDryer"]["PHI"]))
+        equipment_list_.append(ph_equipment.PhFridgeFreezer(_defaults=ph_default_equip["PhFridgeFreezer"]["PHI"]))
+        equipment_list_.append(ph_equipment.PhCooktop(_defaults=ph_default_equip["PhCooktop"]["PHI"]))
 
     return equipment_list_
 
@@ -322,13 +264,9 @@ class GHCompo_AddElecEquip(object):
         # ----------------------------------------------------------------------
         # -- Create the HBPH-Equipment set
         if self.phius_defaults:
-            ph_equipment = _add_Phius_default_equipment_to_list(
-                self.equipment, self.phius_defaults
-            )
+            ph_equipment = _add_Phius_default_equipment_to_list(self.equipment, self.phius_defaults)
         elif self.phi_defaults:
-            ph_equipment = _add_Phi_default_equipment_to_list(
-                self.equipment, self.phi_defaults
-            )
+            ph_equipment = _add_Phi_default_equipment_to_list(self.equipment, self.phi_defaults)
         else:
             ph_equipment = self.equipment
 

@@ -58,9 +58,7 @@ class GHCompo_FindPhiusProgram(object):
             print("No protocol specified. Select either: '{}'".format(protocols))
 
         if self.protocol and not self.name and not self.description:
-            program_names = programtypes.get_all_valid_program_names_of_protocol(
-                self.protocol
-            )
+            program_names = programtypes.get_all_valid_program_names_of_protocol(self.protocol)
             print("No program name specified. Select either: '{}'".format(program_names))
 
         # -- Get the data from in the Phius data set
@@ -70,24 +68,18 @@ class GHCompo_FindPhiusProgram(object):
             return None
 
         if self.name:
-            prog_data = programtypes.load_data_from_Phius_standards(
-                self.name, "name", self.protocol
-            )
+            prog_data = programtypes.load_data_from_Phius_standards(self.name, "name", self.protocol)
             if not prog_data:
                 msg = "No Phius data found for name: '{}'".format(self.name)
                 self.IGH.warning(msg)
         elif self.description:
-            prog_data = programtypes.load_data_from_Phius_standards(
-                self.description, "description", self.protocol
-            )
+            prog_data = programtypes.load_data_from_Phius_standards(self.description, "description", self.protocol)
             if not prog_data:
                 msg = "No Phius data found for description: '{}'".format(self.description)
                 self.IGH.warning(msg)
         else:
             prog_data = []
-            msg = "No Phius data found for name: '{}' or description: '{}'".format(
-                self.name, self.description
-            )
+            msg = "No Phius data found for name: '{}' or description: '{}'".format(self.name, self.description)
             self.IGH.warning(msg)
 
         # ------------------------------------------------------------------------------

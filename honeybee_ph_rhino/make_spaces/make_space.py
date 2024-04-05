@@ -99,9 +99,7 @@ def set_absolute_ventilation(_hb_room, _new_room_airflow):
         * (room.Room): The HB-Room with the .properties.energy modified.
     """
 
-    rm_prop_energy = (
-        _hb_room.properties.energy
-    )  # type: RoomEnergyProperties # type: ignore
+    rm_prop_energy = _hb_room.properties.energy  # type: RoomEnergyProperties # type: ignore
     if hasattr(_hb_room, "abolute_ventilation"):
         rm_prop_energy.abolute_ventilation(_new_room_airflow)  # type: ignore
     else:
@@ -143,11 +141,7 @@ def add_spaces_to_honeybee_rooms(_spaces, _hb_rooms, _inherit_names=False):
 
         # -- Check to ensure that the room is actually solid first
         if not dup_room.geometry.is_solid:
-            print(
-                "Error: Room {} not solid. Cannot host spaces.".format(
-                    dup_room.display_name
-                )
-            )
+            print("Error: Room {} not solid. Cannot host spaces.".format(dup_room.display_name))
             open_rooms.append(dup_room)
             continue
 
@@ -157,11 +151,7 @@ def add_spaces_to_honeybee_rooms(_spaces, _hb_rooms, _inherit_names=False):
                 if not dup_room.geometry.is_point_inside(pt):
                     continue
 
-                print(
-                    "Hosting Space: {}  in HB-Room: {}".format(
-                        space_data.space.name, dup_room.display_name
-                    )
-                )
+                print("Hosting Space: {}  in HB-Room: {}".format(space_data.space.name, dup_room.display_name))
 
                 sp = space_data.space.duplicate()
                 sp.host = dup_room
@@ -169,9 +159,7 @@ def add_spaces_to_honeybee_rooms(_spaces, _hb_rooms, _inherit_names=False):
                 # -- If 'inherit names', simplify the spaces so that
                 # -- there is only a single space inside of the HB-Room
                 # -- and it will inherit its name from the parent HB-Room.
-                dup_rm_prop_ph = (
-                    dup_room.properties.ph
-                )  # type: RoomPhProperties # type: ignore
+                dup_rm_prop_ph = dup_room.properties.ph  # type: RoomPhProperties # type: ignore
                 if _inherit_names:
                     sp.name = dup_room.display_name
                     dup_rm_prop_ph.merge_new_space(sp)
@@ -181,16 +169,10 @@ def add_spaces_to_honeybee_rooms(_spaces, _hb_rooms, _inherit_names=False):
                 # -- Add in any detailed PH-Style vent flow rates if they exist
                 sp_prop_ph = sp.properties.ph  # type: SpacePhProperties # type:ignore
                 if sp_prop_ph.has_ventilation_flow_rates:
-                    space_flow_rate = (
-                        sp_prop_ph.honeybee_flow_rate
-                    )  # type: float # type: ignore
+                    space_flow_rate = sp_prop_ph.honeybee_flow_rate  # type: float # type: ignore
 
-                    dup_room_prop_energy = (
-                        dup_room.properties.energy
-                    )  # type: RoomEnergyProperties # type: ignore
-                    existing_room_flow = float(
-                        dup_room_prop_energy.ventilation.flow_per_zone
-                    )
+                    dup_room_prop_energy = dup_room.properties.energy  # type: RoomEnergyProperties # type: ignore
+                    existing_room_flow = float(dup_room_prop_energy.ventilation.flow_per_zone)
                     new_room_flow = space_flow_rate + existing_room_flow
                     dup_room = set_absolute_ventilation(dup_room, new_room_flow)
 

@@ -64,10 +64,7 @@ class _SetPoints(object):
 
 class GHCompo_BuildingSegment(object):
     _allowed_fuels = list(
-        set(
-            list(phius_source_energy_factors.factors_2021.keys())
-            + list(phius_CO2_factors.factors_2021.keys())
-        )
+        set(list(phius_source_energy_factors.factors_2021.keys()) + list(phius_CO2_factors.factors_2021.keys()))
     )
     _display_name = ghio_validators.HBName("display_name")
     num_floor_levels = ghio_validators.IntegerNonZero("num_floor_levels", default=1)
@@ -117,19 +114,13 @@ class GHCompo_BuildingSegment(object):
         self._source_energy_factors = factors.FactorCollection(
             "Source_Energy", self._default_phius_source_energy_factors
         )
-        self._co2e_factors = factors.FactorCollection(
-            "CO2", self._default_phius_CO2_factors
-        )
+        self._co2e_factors = factors.FactorCollection("CO2", self._default_phius_CO2_factors)
 
         for factor in (
-            factors.build_factors_from_library(phius_source_energy_factors.factors_2021)
-            + _source_energy_factors
+            factors.build_factors_from_library(phius_source_energy_factors.factors_2021) + _source_energy_factors
         ):
             self.source_energy_factors.add_factor(factor)
-        for factor in (
-            factors.build_factors_from_library(phius_CO2_factors.factors_2021)
-            + _co2_factors
-        ):
+        for factor in factors.build_factors_from_library(phius_CO2_factors.factors_2021) + _co2_factors:
             self.co2e_factors.add_factor(factor)
 
         self.co2e_factors.validate_fuel_types(self._allowed_fuels)
@@ -159,9 +150,7 @@ class GHCompo_BuildingSegment(object):
     def _default_phius_source_energy_factors(self):
         # type: () -> List[factors.Factor]
         """Return a list of default source-energy factors."""
-        return factors.build_factors_from_library(
-            phius_source_energy_factors.factors_2021
-        )
+        return factors.build_factors_from_library(phius_source_energy_factors.factors_2021)
 
     @property
     def _default_phius_CO2_factors(self):
@@ -176,9 +165,7 @@ class GHCompo_BuildingSegment(object):
     @summer_hrv_bypass_mode.setter
     def summer_hrv_bypass_mode(self, _input):
         # type: (str) -> None
-        self._summer_hrv_bypass_mode = PhVentilationSummerBypassMode(
-            input_to_int(_input) or 4
-        )
+        self._summer_hrv_bypass_mode = PhVentilationSummerBypassMode(input_to_int(_input) or 4)
 
     def _create_hbph_set_points(self):
         # type: () -> bldg_segment.SetPoints
@@ -205,7 +192,10 @@ class GHCompo_BuildingSegment(object):
         """Returns a new HBPH BldgSegment object with attribute value set."""
 
         obj = bldg_segment.BldgSegment()
-        ignore = ['_identifier', 'user_data', ]
+        ignore = [
+            "_identifier",
+            "user_data",
+        ]
         for attr_name in vars(obj).keys():
             if attr_name in ignore:
                 continue
@@ -222,7 +212,7 @@ class GHCompo_BuildingSegment(object):
         # -------------------------------------------------------------------------------------
         # -- Create the actual HBPH Building Segment Object
         hbph_segment = self._create_bldg_segment()
-        
+
         # -------------------------------------------------------------------------------------
         # -- Set the new HBPH Building Segment on the HB rooms
         hb_rooms_ = []

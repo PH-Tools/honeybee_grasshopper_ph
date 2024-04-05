@@ -56,17 +56,12 @@ class GHCompo_AddPHSpaces(object):
         # ---------------------------------------------------------------------
         # -- Clean up the input spaces, host in the HB-Rooms
         offset_dist = self.offset_dist or 0.1
-        spaces = [
-            make_space.offset_space_reference_points(self.IGH, sp, offset_dist)
-            for sp in self.spaces
-        ]
+        spaces = [make_space.offset_space_reference_points(self.IGH, sp, offset_dist) for sp in self.spaces]
         (
             hb_rooms_,
             un_hosted_spaces,
             open_rooms_,
-        ) = make_space.add_spaces_to_honeybee_rooms(
-            spaces, self.hb_rooms, self.inherit_room_names
-        )
+        ) = make_space.add_spaces_to_honeybee_rooms(spaces, self.hb_rooms, self.inherit_room_names)
 
         # ---------------------------------------------------------------------
         # -- Warn if any open rooms
@@ -77,11 +72,7 @@ class GHCompo_AddPHSpaces(object):
         # ---------------------------------------------------------------------
         # -- If any un_hosted_spaces, pull out their center points for troubleshooting
         # -- and raise a user-warning
-        check_pts_ = [
-            from_point3d(lbt_pt)
-            for space_data in un_hosted_spaces
-            for lbt_pt in space_data.reference_points
-        ]
+        check_pts_ = [from_point3d(lbt_pt) for space_data in un_hosted_spaces for lbt_pt in space_data.reference_points]
         if un_hosted_spaces:
             msg = "Error: Host Honeybee-Rooms not found for the Spaces: {}".format(
                 "\n".join([spd.space.full_name for spd in un_hosted_spaces])
