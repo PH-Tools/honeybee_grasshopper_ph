@@ -20,11 +20,22 @@
 # @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 #
 """
-Create a new Hot-Water Heater with detailed Passive-House style inputs which 
-can then be added to the HB-Energy SHW.
+Set the column and row position for a material in a Mixed Material layer. Pass the output to a 
+'HBPH - Create Heterogeneous Material' component in order to create mixed materials. Note that the 
+columns and rows are specified from the upper-left to the lower-right, and both the row and column
+counts start at '0', not '1'.
 -
-EM October 13, 2022
+EM April 5, 2024
 
+    Args:
+        _column_position: (int) The column location. Note that columns start counting from '0', not '1'
+
+        _row_position: (int) The row location. Note that columns start counting from '0', not '1'
+
+        _hb_material: (EnergyMaterial) The Honeybee-Energy Material to use for the specified cell.
+        
+    Returns:
+        hb_material_: The Honeybee-Energy Material with the column/row location specified.
 """
 
 import scriptcontext as sc
@@ -32,6 +43,7 @@ import Rhino as rh
 import rhinoscriptsyntax as rs
 import ghpythonlib.components as ghc
 import Grasshopper as gh
+
 
 try:
     from honeybee_ph_utils import preview
@@ -43,15 +55,19 @@ try:
 except ImportError as e:
     raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
 
-
 #-------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
-ghenv.Component.Name = "HBPH - Create SHW Heater"
+ghenv.Component.Name = "HBPH - Set Mixed-Material Column and Row"
+DEV = True
+honeybee_ph_rhino._component_info_.set_component_params(ghenv)
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
-    reload(gh_compo_io)
+    from honeybee_energy_ph.properties.materials import opaque
+    reload(opaque)
     reload(gh_io)
+    from honeybee_ph_rhino.gh_compo_io import assmbly_set_material_column_and_row as gh_compo_io
+    reload(gh_compo_io)
 
 
 # ------------------------------------------------------------------------------
@@ -59,23 +75,7 @@ if DEV:
 IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 
 
-#-------------------------------------------------------------------------------
-# -- Setup the input nodes, get all the user input values
-input_dict = gh_compo_io.shw_create_heater.get_component_inputs(heater_type)
-gh_io.setup_component_inputs(IGH, input_dict)
-input_values_dict = gh_io.get_component_input_values(ghenv)
-
-
-#-------------------------------------------------------------------------------
-# -- Build the new heater
-gh_compo_interface = gh_compo_io.GHCompo_CreateSHWHeater(
-        IGH,
-        heater_type,
-        input_values_dict,
-    )
-heater_ = gh_compo_interface.run()
-
-
-#-------------------------------------------------------------------------------
-# -- Preview
-preview.object_preview(heater_)
+# ------------------------------------------------------------------------------
+gh_compo_interface = gh_compo_io.GHCompo_SetMaterialColumnAndRow(
+    IGH, _column_position, _row_position, _hb_material)
+hb_material_ = gh_compo_interface.run()

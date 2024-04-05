@@ -378,12 +378,6 @@ COMPONENT_PARAMS = {
         "Category": CATEGORY,
         "SubCategory": 1,
     },
-    "HBPH - Create Mixed HB-Material": {
-        "NickName": "Create Mixed HB-Material",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 1,
-    },
     "HBPH - Create Thermal Bridges": {
         "NickName": "Create Thermal Bridges",
         "Message": RELEASE_VERSION,
@@ -420,7 +414,7 @@ COMPONENT_PARAMS = {
         "Category": CATEGORY,
         "SubCategory": 1,
     },
-    "HBPH - Set Mixed-Material Column/Row": {
+    "HBPH - Set Mixed-Material Column and Row": {
         "NickName": "Set Mat Column/Row",
         "Message": RELEASE_VERSION,
         "Category": CATEGORY,
@@ -428,6 +422,12 @@ COMPONENT_PARAMS = {
     },
     "HBPH - Create Heterogeneous Material": {
         "NickName": "Create Heterogeneous Mat",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
+    "HBPH - Create Wood Framing Material": {
+        "NickName": "Create Wood Framing Mat",
         "Message": RELEASE_VERSION,
         "Category": CATEGORY,
         "SubCategory": 1,
