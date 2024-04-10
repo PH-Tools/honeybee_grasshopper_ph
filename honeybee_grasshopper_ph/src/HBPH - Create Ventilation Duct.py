@@ -22,13 +22,12 @@
 """
 Create new HBPH Ventilation Duct which can be added to a PH Ventilation System.
 -
-EM March 14, 2022
+EM April 10, 2024
 
     Args:
-        _geometry: (Curve) The Rhino Curve Geometry that describes the duct path.
+        _geometry: (List[Polyline Curves]) The Rhino Curves that describe the duct path.
             
         _display_name: (str) An optional name for the duct.
-        
         
         _duct_type: Input either - 
 "-Supply / outdoor air duct"
@@ -66,11 +65,11 @@ reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create Ventilation Duct"
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
+    reload(gh_io)
     from honeybee_energy_ph.hvac import ducting
     reload(ducting)
     from honeybee_ph_rhino.gh_compo_io import mech_create_vent_duct as gh_compo_io
     reload(gh_compo_io)
-    reload(gh_io)
 
 # ------------------------------------------------------------------------------
 # -- GH Interface

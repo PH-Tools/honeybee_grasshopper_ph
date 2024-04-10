@@ -9,6 +9,11 @@ except ImportError:
     pass  # IronPython 2.7
 
 try:
+    from Rhino.Geometry import LineCurve, NurbsCurve, PolylineCurve  # type: ignore
+except ImportError as e:
+    raise ImportError("\nFailed to import Rhino:\n\t{}".format(e))
+
+try:
     from ladybug_rhino.togeometry import to_polyline3d
 except ImportError as e:
     raise ImportError("\nFailed to import ladybug_rhino:\n\t{}".format(e))
@@ -59,9 +64,9 @@ class GHCompo_CreateVentDuct(object):
         _height,
         _width,
     ):
-        # type: (gh_io.IGH, Union[Polyline3D, LineSegment3D], str, int, float, float, bool, float, Optional[float], Optional[float]) -> None
+        # type: (gh_io.IGH, List[Union[LineCurve, NurbsCurve, PolylineCurve]], str, int, float, float, bool, float, Optional[float], Optional[float]) -> None
         self.IGH = _IGH
-        self.geometry = _geometry
+        self.geometry_segments = self.to_LbtLineSegments3D(_geometry)
         self.display_name = _display_name or "__unnamed_vent_duct__"
         self.duct_type = _duct_type
         self.insul_thickness = _insul_thickness or 25.4
@@ -85,64 +90,64 @@ class GHCompo_CreateVentDuct(object):
         input_int = input_tools.input_to_int(_in)
         self._duct_type = input_int or 1
 
-    @property
-    def geometry(self):
-        # type: () -> Union[Polyline3D, LineSegment3D]
-        return self._geometry
+    def to_LbtLineSegments3D(self, _input):
+        # type: (List[Union[LineCurve, NurbsCurve, PolylineCurve]]) -> List[LineSegment3D]
+        """Convert Rhino geometry Inputs to Ladybug LineSegment3D."""
+        lbt_line_segments = []  # type: List[LineSegment3D]
+
+        if not _input:
+            return lbt_line_segments
+
+        if not isinstance(_input, list):
+            _input = [_input]
+
+        for rh_crv in [self._clean_rh_curves(rh_crv) for rh_crv in _input]:
+            lbt_crv = to_polyline3d(rh_crv)
+
+            if hasattr(lbt_crv, "segments"):
+                # -- It is a Polyline3D
+                lbt_line_segments.extend(lbt_crv.segments)
+            else:
+                # -- It is a LineSegment3D
+                lbt_line_segments.append(lbt_crv)
+
+        return lbt_line_segments
+
+    def _clean_rh_curves(self, _input):
+        # type: (Union[LineCurve, NurbsCurve, PolylineCurve]) -> Union[LineCurve, PolylineCurve]
+        """Try to convert input Rhino geometry to a Rhino Polyline object."""
+        try:
+            cps = self.IGH.ghpythonlib_components.ControlPoints(_input).points
+        except:
+            raise Exception("Error: Geometry input '{}' cannot be converted to a Rhino PolylineCurve.".format(_input))
+        return self.IGH.ghpythonlib_components.PolyLine(cps, False)
 
     @property
     def _default_geometry(self):
         # type: () -> LineSegment3D
+        """Return a default geometry for the component (A line 1 unit long)."""
         pt1 = Point3D(0, 0, 0)
         pt2 = Point3D(1, 0, 0)
         return LineSegment3D.from_end_points(pt1, pt2)
 
-    @property
-    def geometry_segments(self):
-        # type: () -> List[LineSegment3D]
-        if hasattr(self.geometry, "segments"):
-            # If its a Polyline3D
-            return self.geometry.segments
-        else:
-            # If its a single LineSegment3D
-            return [self.geometry]
-
-    @geometry.setter
-    def geometry(self, _input):
-        # type: (Union[Polyline3D, LineSegment3D]) -> None
-        if not _input:
-            self._geometry = self._default_geometry
-            return None
-
-        try:
-            self._geometry = to_polyline3d(_input)
-        except:
-            try:
-                self._geometry = to_polyline3d(self._convert_to_polyline(_input))
-            except Exception as e:
-                raise Exception(
-                    "{}\nError: Geometry input {} cannot be converted " "to an LBT Polyline3D?".format(e, _input)
-                )
-
-    def _convert_to_polyline(self, _input):
-        # type: (Union[Polyline3D, LineSegment3D]) -> Polyline3D
-        """Try to convert input geometry to a Rhino Polyline object."""
-        cps = self.IGH.ghpythonlib_components.ControlPoints(_input).points
-        return self.IGH.ghpythonlib_components.PolyLine(cps, False)
+    def ready(self):
+        # type: () -> bool
+        """Return True if the component is ready to run."""
+        return len(self.geometry_segments) > 0
 
     def run(self):
         # type: () -> Optional[ducting.PhDuctElement]
-        if not self.geometry:
+        if not self.ready():
             return None
 
         hbph_obj = ducting.PhDuctElement()
         hbph_obj.display_name = self.display_name
         hbph_obj.duct_type = self.duct_type
 
-        for geometry in self.geometry_segments:
+        for segment in self.geometry_segments:
             hbph_obj.add_segment(
                 ducting.PhDuctSegment(
-                    geometry,
+                    segment,
                     self.insul_thickness,
                     self.insul_conductivity,
                     self.insul_reflective,
