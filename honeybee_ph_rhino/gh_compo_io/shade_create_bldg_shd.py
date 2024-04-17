@@ -91,21 +91,27 @@ def create_window_reveal(_hb_aperture, _rh_units_name):
     # type: (aperture.Aperture, str) -> List[rg.Brep]
     """Return a list of the Aperture 'reveal' surfaces."""
 
-    # -- Convert the Aperture's install depth to Rhino units
+    # -- Convert the Aperture's install depth (m) to Rhino units
     try:
-        ap_prop_ph = _hb_aperture.properties.ph  # type: AperturePhProperties
+        ap_prop_ph = _hb_aperture.properties.ph  # type: AperturePhProperties # type: ignore
         ap_install_depth_in_m = ap_prop_ph.install_depth
         ap_install_depth_in_r_units = convert(ap_install_depth_in_m, "M", _rh_units_name)
     except Exception as e:
         msg = "Error converting Aperture's install depth to Rhino units: {}?\t{}".format(_rh_units_name, e)
         raise Exception(msg)
 
+    # -- Extrude the aperture's edges to create the reveals
+    rhino_faces_ = []
     extrusion_vector = _hb_aperture.normal.reverse() * ap_install_depth_in_r_units
-    return [
-        from_face3d(Face3D.from_extrusion(seg, extrusion_vector))
-        for seg in _hb_aperture.geometry.boundary_segments
-        if extrusion_vector.magnitude != 0
-    ]
+    if extrusion_vector.magnitude == 0:
+        return []
+
+    for seg in _hb_aperture.geometry.boundary_segments:
+        rhino_face = from_face3d(Face3D.from_extrusion(seg, extrusion_vector))
+        if rhino_face:
+            rhino_faces_.append(rhino_face)
+
+    return rhino_faces_
 
 
 def create_window_reveals(_hb_rooms, _rh_units_name):

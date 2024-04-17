@@ -23,6 +23,11 @@ try:
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
+try:
+    from ph_units.converter import convert
+except ImportError as e:
+    raise ImportError("\nFailed to import ph_units:\n\t{}".format(e))
+
 
 class HBPH_LBTRadSettings:
     """LBT Radiation Solver Settings."""
@@ -105,10 +110,31 @@ class GHCompo_CreateLBTRadSettings(object):
         else:
             self._summer_sky_matrix = None
 
+    def check_grid_size(self):
+        """Check the grid size and issue a warning if it seems too small."""
+        rh_units_name = self.IGH.get_rhino_unit_system_name()
+        grid_size_in_mm = convert(self.grid_size, rh_units_name, "MM") or 0.0
+        if grid_size_in_mm < 101.6:
+            msg = (
+                "WARNING: the analysis grid size is set to {}-{} x {}-{}. "
+                "This is very small and will result in long calculation times. "
+                "Are you really sure you need an analysis grid with segments "
+                "this small?".format(self.grid_size, rh_units_name, self.grid_size, rh_units_name)
+            )
+            print(msg)
+            self.IGH.warning(msg)
+        else:
+            msg = "Analysis grid size is set to {}-{} x {}-{}. ".format(
+                self.grid_size, rh_units_name, self.grid_size, rh_units_name
+            )
+            print(msg)
+
     def run(self):
         # type: () -> Optional[HBPH_LBTRadSettings]
         if not self.winter_sky_matrix or not self.summer_sky_matrix:
             return None
+
+        self.check_grid_size()
 
         hbph_obj = HBPH_LBTRadSettings(
             self.winter_sky_matrix,
