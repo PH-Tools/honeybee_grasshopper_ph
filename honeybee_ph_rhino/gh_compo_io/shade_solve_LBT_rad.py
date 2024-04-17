@@ -32,7 +32,7 @@ except ImportError as e:
     raise ImportError("\nFailed to import Grasshopper:\n\t{}".format(e))
 
 try:
-    from honeybee import room
+    from honeybee import room, aperture
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
@@ -405,6 +405,30 @@ class GHCompo_SolveLBTRad(object):
             msg = "Please set _run to True in order to calculate Radiation results."
             self.IGH.warning(msg)
 
+    def check_shading_factors(self, aperture, winter_factor, summer_factor, _tolerance=0.0001):
+        # type: (aperture.Aperture, float, float, float) -> None
+        """Check the shading factors are not 1.0 or 0.0, display warning if they are."""
+        TOL = _tolerance
+        if (1.0 - winter_factor < TOL) or (0.0 + winter_factor < TOL):
+            msg = (
+                "The Winter shading factor for the aperture '{}' is {:.2f}? "
+                "This may be an error. Please double check the shade geometry.".format(
+                    aperture.display_name, winter_factor
+                )
+            )
+            print(msg)
+            self.IGH.warning(msg)
+
+        if (1.0 - summer_factor < TOL) or (0.0 + summer_factor < TOL):
+            msg = (
+                "The Summer shading factor for the aperture '{}' is {:.2f}? "
+                "This may be an error. Please double check the shade geometry.".format(
+                    aperture.display_name, summer_factor
+                )
+            )
+            print(msg)
+            self.IGH.warning(msg)
+
     def run(self):
         # type: () -> Tuple[Any, Any, List[float], Any, List[float],  List[room.Room], List[str]]
 
@@ -512,8 +536,11 @@ class GHCompo_SolveLBTRad(object):
 
                     # Set the aperture shading factors
                     # ----------------------------------------------------------------------
-                    aperture.properties.ph.winter_shading_factor = winter_rad_shaded / winter_rad_unshaded
-                    aperture.properties.ph.summer_shading_factor = summer_rad_shaded / summer_rad_unshaded
+                    winter_factor = winter_rad_shaded / winter_rad_unshaded
+                    summer_factor = summer_rad_shaded / summer_rad_unshaded
+                    self.check_shading_factors(aperture, winter_factor, summer_factor)
+                    aperture.properties.ph.winter_shading_factor = winter_factor
+                    aperture.properties.ph.summer_shading_factor = summer_factor
 
                     win_count += 1
 
