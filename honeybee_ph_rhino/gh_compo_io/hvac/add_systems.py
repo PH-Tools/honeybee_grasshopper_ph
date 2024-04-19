@@ -49,9 +49,6 @@ class GHCompo_AddMechSystems(object):
 
                 # -- Set the new h-hvac's values to match the PH-Ventilator Inputs, if any
                 new_hvac.ventilation_system = self.ventilation_system
-                # new_hvac.sensible_heat_recovery = self.ventilation_system.ventilation_unit.sensible_heat_recovery
-                # new_hvac.latent_heat_recovery = self.ventilation_system.ventilation_unit.latent_heat_recovery
-                # new_hvac.demand_controlled_ventilation = True
 
             # ---------------------------------------------------------------------------
             # -- Space Heating / Cooling
