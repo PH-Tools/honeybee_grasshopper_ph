@@ -4,12 +4,12 @@
 """GHCompo Interface: HBPH - Create Heterogeneous Material."""
 
 try:
-    from typing import Any, Optional, Sequence, Tuple, List
+    from typing import Any, List, Optional, Sequence, Tuple
 except ImportError:
     pass  # IronPython 2.7
 
 try:
-    from Rhino.Geometry import Brep # type: ignore
+    from Rhino.Geometry import Brep  # type: ignore
 except ImportError as e:
     raise ImportError("\nFailed to import Rhino:\n\t{}".format(e))
 
@@ -24,7 +24,7 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
 try:
-    from honeybee_energy_ph.properties.materials.opaque import EnergyMaterialPhProperties, CellPositionError
+    from honeybee_energy_ph.properties.materials.opaque import CellPositionError, EnergyMaterialPhProperties
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
 
@@ -45,7 +45,7 @@ def generate_preview(_IGH, _column_widths, _row_heights):
     total_height = sum(_row_heights)
 
     # -- Create the Vertical Edges
-    left_edge = _IGH.ghc.LineSDL( _IGH.ghc.ConstructPoint(0,0,0), _IGH.ghc.UnitY(1), total_height)
+    left_edge = _IGH.ghc.LineSDL(_IGH.ghc.ConstructPoint(0, 0, 0), _IGH.ghc.UnitY(1), total_height)
     vertical_edges = [left_edge]
     vertical_move_dist = 0.0
     for width in _column_widths:
@@ -53,11 +53,11 @@ def generate_preview(_IGH, _column_widths, _row_heights):
         vertical_edges.append(_IGH.ghc.Move(left_edge, _IGH.ghc.UnitX(vertical_move_dist)).geometry)
 
     # --- Crete the Horizontal Edges
-    bottom_edge = _IGH.ghc.LineSDL(_IGH.ghc.ConstructPoint(0,0,0), _IGH.ghc.UnitX(1), total_width)
+    bottom_edge = _IGH.ghc.LineSDL(_IGH.ghc.ConstructPoint(0, 0, 0), _IGH.ghc.UnitX(1), total_width)
 
     horizontal_edges = [bottom_edge]
     horizontal_move_dist = 0.0
-    for height in _row_heights[::-1]: # Reverse since we're now building 'up', not 'down'
+    for height in _row_heights[::-1]:  # Reverse since we're now building 'up', not 'down'
         horizontal_move_dist += height
         horizontal_edges.append(_IGH.ghc.Move(bottom_edge, _IGH.ghc.UnitY(horizontal_move_dist)).geometry)
 
@@ -65,12 +65,12 @@ def generate_preview(_IGH, _column_widths, _row_heights):
     boundary = _IGH.ghc.BoundarySurfaces(
         _IGH.ghc.Rectangle2Pt(
             plane=_IGH.ghc.ConstructPlane(
-                _IGH.ghc.ConstructPoint(0,0,0),
+                _IGH.ghc.ConstructPoint(0, 0, 0),
                 _IGH.ghc.UnitX(1),
                 _IGH.ghc.UnitY(1),
             ),
-            point_a=_IGH.ghc.ConstructPoint(0,0,0),
-            point_b=_IGH.ghc.ConstructPoint(total_width,total_height,0),
+            point_a=_IGH.ghc.ConstructPoint(0, 0, 0),
+            point_b=_IGH.ghc.ConstructPoint(total_width, total_height, 0),
             radius=0,
         ).rectangle
     )
@@ -92,10 +92,10 @@ class GHCompo_CreateHeterogeneousMaterial(object):
     def ready(self):
         # type: () -> bool
         """Check if all the inputs are ready, perform some cleanup on the inputs."""
-        
+
         if not self.base_material:
             return False
-        
+
         if not self.additional_materials:
             return False
 
@@ -104,10 +104,10 @@ class GHCompo_CreateHeterogeneousMaterial(object):
 
         if (not self.column_widths) and self.row_heights:
             self.column_widths = [1.0]
-        
+
         if (not self.row_heights) and self.column_widths:
             self.row_heights = [1.0]
-        
+
         self.check_materials_for_user_data()
         self.column_widths = self.convert_column_widths(self.column_widths, "M")
         self.row_heights = self.convert_row_heights(self.row_heights, "M")
@@ -119,7 +119,7 @@ class GHCompo_CreateHeterogeneousMaterial(object):
         for mat in self.additional_materials:
             if not hasattr(mat.properties, "ph"):
                 raise ValueError("Error: Material '{}' does not have a PH properties?".format(mat.display_name))
-            if not hasattr(mat.properties.ph, "user_data"): # type: ignore
+            if not hasattr(mat.properties.ph, "user_data"):  # type: ignore
                 raise ValueError("Error: Material '{}' does not have user_data?".format(mat.display_name))
 
     def convert_column_widths(self, _column_widths, _unit="M"):
@@ -150,9 +150,12 @@ class GHCompo_CreateHeterogeneousMaterial(object):
         base_thickness = material.thickness
         for addnl_material in self.additional_materials:
             if abs(addnl_material.thickness - base_thickness) > _tol:
-                msg = "WARNING: Material '{}' has a different thickness from the base material '{}'. "\
+                msg = (
+                    "WARNING: Material '{}' has a different thickness from the base material '{}'. "
                     "The base-material thickness of {:.2f} will be used when creating the heterogeneous-material.".format(
-                        material.display_name, addnl_material.display_name, material.thickness)
+                        material.display_name, addnl_material.display_name, material.thickness
+                    )
+                )
                 print(msg)
                 self.IGH.warning(msg)
                 break
@@ -161,10 +164,13 @@ class GHCompo_CreateHeterogeneousMaterial(object):
         # type: (opaque.EnergyMaterial) -> None
         for addnl_mat in self.additional_materials:
             if addnl_mat.conductivity > 10.0:
-                msg = "WARNING: Material '{}' has a very high conductivity value of {:.2f} W/m-K. "\
-                    "Note that metal elements like steel studs and metal fasteners may NOT be "\
+                msg = (
+                    "WARNING: Material '{}' has a very high conductivity value of {:.2f} W/m-K. "
+                    "Note that metal elements like steel studs and metal fasteners may NOT be "
                     "used as part of heterogeneous assemblies (as per ISO 6946).".format(
-                        addnl_mat.display_name, addnl_mat.conductivity)
+                        addnl_mat.display_name, addnl_mat.conductivity
+                    )
+                )
                 print(msg)
                 self.IGH.error(msg)
                 break
@@ -182,13 +188,17 @@ class GHCompo_CreateHeterogeneousMaterial(object):
         ph_prop.divisions.set_row_heights(self.row_heights)
 
         for material in self.additional_materials:
-            col = material.properties.ph.user_data.get("column_position", 0) # type: ignore
-            row = material.properties.ph.user_data.get("row_position", 0) # type: ignore
-            print("Setting Material at: Column-{} | Row-{} to '{}' [id={}]".format(col, row, material.display_name, id(material)))
+            col = material.properties.ph.user_data.get("column_position", 0)  # type: ignore
+            row = material.properties.ph.user_data.get("row_position", 0)  # type: ignore
+            print(
+                "Setting Material at: Column-{} | Row-{} to '{}' [id={}]".format(
+                    col, row, material.display_name, id(material)
+                )
+            )
             try:
                 ph_prop.divisions.set_cell_material(col, row, material)
             except CellPositionError as e:
-                print("- " *25)
+                print("- " * 25)
                 print("WARNING: Check the '_column_widths' and '_row_heights' inputs.\n")
                 raise e
 
@@ -198,7 +208,7 @@ class GHCompo_CreateHeterogeneousMaterial(object):
         preview_ = generate_preview(
             self.IGH,
             self.convert_column_widths(self.column_widths, self.IGH.get_rhino_unit_system_name()),
-            self.convert_row_heights(self.row_heights, self.IGH.get_rhino_unit_system_name())
+            self.convert_row_heights(self.row_heights, self.IGH.get_rhino_unit_system_name()),
         )
 
         return new_material_, preview_

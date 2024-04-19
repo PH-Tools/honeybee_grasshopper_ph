@@ -9,8 +9,7 @@ except ImportError:
     pass  # IronPython 2.7
 
 try:
-    from itertools import \
-        izip_longest as zip_longest  # type: ignore # Python-2
+    from itertools import izip_longest as zip_longest  # type: ignore # Python-2
 except ImportError:
     from itertools import zip_longest
 
@@ -33,9 +32,7 @@ except ImportError as e:
 
 
 class GHCompo_SetWindowSeasonalShadingFactors(object):
-    def __init__(
-        self, _IGH, _hb_apertures, _winter_factors, _summer_factors, *args, **kwargs
-    ):
+    def __init__(self, _IGH, _hb_apertures, _winter_factors, _summer_factors, *args, **kwargs):
         # type: (gh_io.IGH, List[Aperture], List[float], List[float], List, Dict) -> None
         self.IGH = _IGH
         self.hb_apertures = _hb_apertures
@@ -50,11 +47,7 @@ class GHCompo_SetWindowSeasonalShadingFactors(object):
             return 0.0
         elif factor > 1.0:
             new_factor = factor / 100
-            print(
-                "Factor {} is greater than 1.0. Setting to: {:.2f}".format(
-                    factor, new_factor
-                )
-            )
+            print("Factor {} is greater than 1.0. Setting to: {:.2f}".format(factor, new_factor))
             return self.clean_factor(new_factor)
         else:
             return factor
@@ -62,29 +55,19 @@ class GHCompo_SetWindowSeasonalShadingFactors(object):
     def run(self):
         # type: () -> List[Aperture]
         apertures_ = []
-        for ap, w_factor, s_factor in zip_longest(
-            self.hb_apertures, self.winter_factors, self.summer_factors
-        ):
+        for ap, w_factor, s_factor in zip_longest(self.hb_apertures, self.winter_factors, self.summer_factors):
             new_ap = ap.duplicate()
             new_ap_ph_prop = (
-                new_ap.properties.ph # type: ignore
-            )  # type: AperturePhProperties 
+                new_ap.properties.ph  # type: ignore
+            )  # type: AperturePhProperties
 
             if w_factor is not None:
                 new_ap_ph_prop.winter_shading_factor = self.clean_factor(w_factor)
-                print(
-                    "Setting aperture {} winter factor to: {:.2f}".format(
-                        new_ap.display_name, w_factor
-                    )
-                )
+                print("Setting aperture {} winter factor to: {:.2f}".format(new_ap.display_name, w_factor))
 
             if s_factor is not None:
                 new_ap_ph_prop.summer_shading_factor = self.clean_factor(s_factor)
-                print(
-                    "Setting aperture {} summer factor to: {:.2f}".format(
-                        new_ap.display_name, s_factor
-                    )
-                )
+                print("Setting aperture {} summer factor to: {:.2f}".format(new_ap.display_name, s_factor))
 
             apertures_.append(new_ap)
         return apertures_

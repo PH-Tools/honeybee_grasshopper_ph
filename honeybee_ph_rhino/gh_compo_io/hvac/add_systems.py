@@ -16,8 +16,8 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
 try:
-    from honeybee_phhvac.properties.room import RoomPhHvacEquipmentProperties
     from honeybee_phhvac import heat_pumps, heating, ventilation
+    from honeybee_phhvac.properties.room import RoomPhHvacEquipmentProperties
     from honeybee_phhvac.supportive_device import PhSupportiveDevice
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_phhvac:\n\t{}".format(e))

@@ -1,22 +1,22 @@
 #
 # Honeybee-PH: A Plugin for adding Passive-House data to LadybugTools Honeybee-Energy Models
-# 
+#
 # This component is part of the PH-Tools toolkit <https://github.com/PH-Tools>.
-# 
-# Copyright (c) 2022, PH-Tools and bldgtyp, llc <phtools@bldgtyp.com> 
-# Honeybee-PH is free software; you can redistribute it and/or modify 
-# it under the terms of the GNU General Public License as published 
-# by the Free Software Foundation; either version 3 of the License, 
-# or (at your option) any later version. 
-# 
+#
+# Copyright (c) 2022, PH-Tools and bldgtyp, llc <phtools@bldgtyp.com>
+# Honeybee-PH is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published
+# by the Free Software Foundation; either version 3 of the License,
+# or (at your option) any later version.
+#
 # Honeybee-PH is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of 
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-# 
+#
 # For a copy of the GNU General Public License
 # see <https://github.com/PH-Tools/honeybee_ph/blob/main/LICENSE>.
-# 
+#
 # @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 #
 """
@@ -48,11 +48,12 @@ EM October 2, 2022
         storage_tank_: A new HW Tank Object. You can add this tank to a Service Hot Water system.
 """
 
-from honeybee_ph_rhino import gh_compo_io
 from honeybee_ph_utils import preview
 
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
+from honeybee_ph_rhino import gh_compo_io
+
 reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create SHW Tank"
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
@@ -61,19 +62,19 @@ if DEV:
     reload(gh_io)
 
 
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 gh_compo_interface = gh_compo_io.GHCompo_CreateSHWTank(
-        _tank_type,
-        _display_name_,
-        quantity_,
-        for_solar_,
-        heat_loss_rate_,
-        volume_,
-        standby_frac_,
-        in_conditioned_space_,
-        location_temp_,
-        water_temp_,
-    )
+    _tank_type,
+    _display_name_,
+    quantity_,
+    for_solar_,
+    heat_loss_rate_,
+    volume_,
+    standby_frac_,
+    in_conditioned_space_,
+    location_temp_,
+    water_temp_,
+)
 storage_tank_ = gh_compo_interface.run()
 
 

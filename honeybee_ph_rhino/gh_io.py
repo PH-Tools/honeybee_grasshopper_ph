@@ -49,20 +49,8 @@ except ImportError:
 
 try:
     from ladybug_geometry.geometry3d.face import Face3D
-    from ladybug_rhino.fromgeometry import (
-        from_face3d,
-        from_linesegment3d,
-        from_mesh3d,
-        from_point3d,
-        from_polyline3d,
-    )
-    from ladybug_rhino.togeometry import (
-        to_face3d,
-        to_linesegment3d,
-        to_mesh3d,
-        to_point3d,
-        to_polyline3d,
-    )
+    from ladybug_rhino.fromgeometry import from_face3d, from_linesegment3d, from_mesh3d, from_point3d, from_polyline3d
+    from ladybug_rhino.togeometry import to_face3d, to_linesegment3d, to_mesh3d, to_point3d, to_polyline3d
 except ImportError:
     raise ImportError("Failed to import ladybug_geometry")
 

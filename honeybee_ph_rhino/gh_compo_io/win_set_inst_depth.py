@@ -6,28 +6,28 @@
 try:
     from typing import List, Optional
 except ImportError:
-    pass # IronPython 2.7
+    pass  # IronPython 2.7
 
 try:
     from honeybee.aperture import Aperture
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
 try:
     from honeybee_ph.properties.aperture import AperturePhProperties
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_energy_ph:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
 
 try:
     from honeybee_ph_rhino import gh_io
 except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
 try:
     from ph_units.converter import convert
     from ph_units.parser import parse_input
 except ImportError as e:
-    raise ImportError('\nFailed to import ph_units:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import ph_units:\n\t{}".format(e))
 
 
 class GHCompo_SetApertureInstallDepth(object):
@@ -40,7 +40,7 @@ class GHCompo_SetApertureInstallDepth(object):
         self._install_depth = self.calc_install_depth(_install_depth or "4 in.")
 
     def calc_install_depth(self, _install_depth):
-        # type: (str) -> int | float      
+        # type: (str) -> int | float
         """Calculate the install depth of the window glazing, considering Rhino unit-types."""
 
         # -- If the user supplied an input unit, just use that
@@ -49,7 +49,7 @@ class GHCompo_SetApertureInstallDepth(object):
         # -- otherwise use the Rhino document unit system as the input unit
         if not input_unit:
             input_unit = self.IGH.get_rhino_unit_system_name()
-        
+
         # -- convert the input value to Meters, always
         install_depth = convert(input_value, input_unit, "M")
 
@@ -64,6 +64,6 @@ class GHCompo_SetApertureInstallDepth(object):
         apertures_ = []
         for aperture in self._apertures:
             dup_ap = aperture.duplicate()
-            dup_ap.properties.ph.install_depth = self._install_depth # type: ignore
+            dup_ap.properties.ph.install_depth = self._install_depth  # type: ignore
             apertures_.append(dup_ap)
         return apertures_

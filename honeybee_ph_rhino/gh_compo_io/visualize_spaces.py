@@ -20,11 +20,7 @@ except ImportError as e:
 
 try:
     from ladybug_rhino.color import color_to_color
-    from ladybug_rhino.fromgeometry import (
-        from_face3d,
-        from_face3d_to_wireframe,
-        from_face3ds_to_colored_mesh,
-    )
+    from ladybug_rhino.fromgeometry import from_face3d, from_face3d_to_wireframe, from_face3ds_to_colored_mesh
     from ladybug_rhino.fromobjects import legend_objects
 except ImportError as e:
     raise ImportError("\nFailed to import ladybug_rhino:\n\t{}".format(e))
@@ -52,7 +48,6 @@ except ImportError as e:
 
 
 class TempFace(Face):
-
     """A temporary subclass of Honeybee.face.Face so that we can add custom attributes
 
     This is required since the base Face class using __slots__

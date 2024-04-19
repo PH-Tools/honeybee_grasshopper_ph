@@ -3,9 +3,7 @@
 
 """GHCompo Interface: HBPH - Create PH Equipment."""
 
-from copy import (
-    copy,
-)  # Use copy so that specific equipments can overwrite base with their own hints
+from copy import copy  # Use copy so that specific equipments can overwrite base with their own hints
 
 try:
     from typing import Dict, Optional
