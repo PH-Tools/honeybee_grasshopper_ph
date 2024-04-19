@@ -25,7 +25,7 @@ except ImportError as e:
 class GHCompo_AddMechSupportiveDevices(object):
     def __init__(self, _supportive_devices, _hb_rooms, *args, **kwargs):
         # type: (List[PhSupportiveDevice], List[room.Room], *Any, **Any) -> None
-        self.supportive_devices = _supportive_devices
+        self.supportive_devices = [d for d in _supportive_devices if d]
         self.hb_rooms = _hb_rooms
 
     def run(self):
@@ -33,6 +33,7 @@ class GHCompo_AddMechSupportiveDevices(object):
 
         hb_rooms_ = []
         for hb_room in self.hb_rooms:
+            new_room = hb_room.duplicate()
             ph_hvac = getattr(hb_room.properties, "ph_hvac")  # type: RoomPhHvacEquipmentProperties
             new_hvac = copy(ph_hvac.duplicate())
 
@@ -46,7 +47,6 @@ class GHCompo_AddMechSupportiveDevices(object):
                 )
 
             # -- Output
-            new_room = hb_room.duplicate()
             setattr(new_room.properties, "ph_hvac", new_hvac)
             hb_rooms_.append(new_room)
 

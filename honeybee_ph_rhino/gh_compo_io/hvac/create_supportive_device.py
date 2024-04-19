@@ -20,9 +20,9 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_utils:\n\t{}".format(e))
 
 try:
-    from honeybee_energy_ph.hvac import supportive_device
+    from honeybee_phhvac import supportive_device
 except ImportError as e:
-    raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
+    raise ImportError("\nFailed to import honeybee_phhvac:\n\t{}".format(e))
 
 
 class GHCompo_CreateSupportiveDevice(object):

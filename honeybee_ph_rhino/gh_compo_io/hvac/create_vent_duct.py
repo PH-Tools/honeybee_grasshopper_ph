@@ -20,14 +20,14 @@ except ImportError as e:
 
 try:
     from ladybug_geometry.geometry3d.pointvector import Point3D
-    from ladybug_geometry.geometry3d.polyline import LineSegment3D, Polyline3D
+    from ladybug_geometry.geometry3d.polyline import LineSegment3D
 except ImportError as e:
     raise ImportError("\nFailed to import ladybug_geometry:\n\t{}".format(e))
 
 try:
-    from honeybee_energy_ph.hvac import ducting
+    from honeybee_phhvac import ducting
 except ImportError as e:
-    raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
+    raise ImportError("\nFailed to import honeybee_phhvac:\n\t{}".format(e))
 
 try:
     from honeybee_ph_rhino import gh_io
@@ -105,10 +105,10 @@ class GHCompo_CreateVentDuct(object):
             lbt_crv = to_polyline3d(rh_crv)
 
             if hasattr(lbt_crv, "segments"):
-                # -- It is a Polyline3D
+                # -- It is a PolylineCurve
                 lbt_line_segments.extend(lbt_crv.segments)
             else:
-                # -- It is a LineSegment3D
+                # -- It is a LineCurve
                 lbt_line_segments.append(lbt_crv)
 
         return lbt_line_segments

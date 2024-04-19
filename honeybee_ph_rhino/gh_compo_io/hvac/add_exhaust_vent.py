@@ -31,7 +31,7 @@ class GHCompo_AddExhaustVent(object):
     def __init__(self, IGH, _exhaust_vent_devices, _hb_rooms):
         # type: (gh_io.IGH, List[_ExhaustVentilatorBase], List[room.Room]) -> None
         self.IGH = IGH
-        self.exhaust_vent_devices = _exhaust_vent_devices
+        self.exhaust_vent_devices = [d for d in _exhaust_vent_devices if d]
         self.hb_rooms = _hb_rooms
 
     def run(self):
@@ -39,6 +39,7 @@ class GHCompo_AddExhaustVent(object):
 
         hb_rooms_ = []
         for hb_room in self.hb_rooms:
+            new_room = hb_room.duplicate()
             ph_hvac = getattr(hb_room.properties, "ph_hvac")  # type: RoomPhHvacEquipmentProperties
             new_hvac = copy(ph_hvac.duplicate())
 
@@ -52,7 +53,6 @@ class GHCompo_AddExhaustVent(object):
                 )
 
             # -- Output
-            new_room = hb_room.duplicate()
             setattr(new_room.properties, "ph_hvac", new_hvac)
             hb_rooms_.append(new_room)
 

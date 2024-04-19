@@ -31,7 +31,7 @@ class GHCompo_AddRenewableEnergyDevices(object):
     def __init__(self, _IGH, _renewable_devices=[], _hb_rooms=[], *args, **kwargs):
         # type: (gh_io.IGH, List[PhRenewableEnergyDevice], List[room.Room], *Any, **Any) -> None
         self.IGH = _IGH
-        self.renewable_devices = _renewable_devices
+        self.renewable_devices = [d for d in _renewable_devices if d]
         self.hb_rooms = _hb_rooms
 
     def run(self):
@@ -39,6 +39,7 @@ class GHCompo_AddRenewableEnergyDevices(object):
 
         hb_rooms_ = []
         for hb_room in self.hb_rooms:
+            new_room = hb_room.duplicate()
             ph_hvac = getattr(hb_room.properties, "ph_hvac")  # type: RoomPhHvacEquipmentProperties
             new_hvac = copy(ph_hvac.duplicate())
 
@@ -52,7 +53,6 @@ class GHCompo_AddRenewableEnergyDevices(object):
                 )
 
             # -- Output
-            new_room = hb_room.duplicate()
             setattr(new_room.properties, "ph_hvac", new_hvac)
             hb_rooms_.append(new_room)
 

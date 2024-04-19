@@ -23,9 +23,9 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
 try:
-    from honeybee_energy_ph.hvac import heat_pumps, heating
+    from honeybee_phhvac import heat_pumps, heating
 except ImportError as e:
-    raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
+    raise ImportError("\nFailed to import honeybee_phhvac:\n\t{}".format(e))
 
 try:
     from honeybee_ph_utils import input_tools
