@@ -8,6 +8,9 @@ could figure out how to get Rhino dependencies to be recognized by testing frame
 probably would not need something like this? I suppose it does help reduce coupling?
 """
 
+from contextlib import contextmanager
+from copy import deepcopy
+
 try:
     from typing import Any, Dict, List, Optional, Sequence, Union
 except ImportError:
@@ -18,29 +21,55 @@ try:
 except ImportError:
     pass  # Python3+
 
-from contextlib import contextmanager
-from copy import deepcopy
+try:
+    import System  # type: ignore
+    from System import Object  # type: ignore
+except ImportError:
+    raise ImportError("Failed to import System")
 
-import honeybee.face
-import System  # type: ignore
-from GhPython import Component  # type: ignore
-from honeybee_ph_utils.input_tools import clean_get, input_to_int
-from ladybug_geometry.geometry3d.face import Face3D
-from ladybug_rhino.fromgeometry import (
-    from_face3d,
-    from_linesegment3d,
-    from_mesh3d,
-    from_point3d,
-    from_polyline3d,
-)
-from ladybug_rhino.togeometry import (
-    to_face3d,
-    to_linesegment3d,
-    to_mesh3d,
-    to_point3d,
-    to_polyline3d,
-)
-from System import Object  # type: ignore
+try:
+    from GhPython import Component
+except ImportError:
+    raise ImportError("Failed to import GhPython")
+
+try:
+    import Grasshopper
+except ImportError:
+    raise ImportError("Failed to import Grasshopper")
+
+try:
+    import Rhino
+except ImportError:
+    raise ImportError("Failed to import Rhino")
+
+try:
+    import honeybee.face
+except ImportError:
+    raise ImportError("Failed to import honeybee")
+
+try:
+    from ladybug_geometry.geometry3d.face import Face3D
+    from ladybug_rhino.fromgeometry import (
+        from_face3d,
+        from_linesegment3d,
+        from_mesh3d,
+        from_point3d,
+        from_polyline3d,
+    )
+    from ladybug_rhino.togeometry import (
+        to_face3d,
+        to_linesegment3d,
+        to_mesh3d,
+        to_point3d,
+        to_polyline3d,
+    )
+except ImportError:
+    raise ImportError("Failed to import ladybug_geometry")
+
+try:
+    from honeybee_ph_utils.input_tools import clean_get, input_to_int
+except ImportError:
+    raise ImportError("Failed to import honeybee_ph_utils")
 
 
 class LBTGeometryConversionError(Exception):
@@ -66,6 +95,7 @@ class IGH:
     """
 
     def __init__(self, _ghdoc, _ghenv, _sc, _rh, _rs, _ghc, _gh):
+        # type: (Any, Any, Any, Rhino, Any, Any, Grasshopper) -> None
         self.ghdoc = _ghdoc
         self.ghenv = _ghenv
         self.scriptcontext = _sc
