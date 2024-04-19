@@ -29,6 +29,7 @@ from honeybee_ph_rhino.gh_compo_io.cert_PHI import GHCompo_PhiCertification
 from honeybee_ph_rhino.gh_compo_io.building_create_team_member import (
     GHCompo_CreateProjectTeamMember,
 )
+
 # -- Certification
 from honeybee_ph_rhino.gh_compo_io.cert_Phius import GHCompo_PhiusCertification
 from honeybee_ph_rhino.gh_compo_io.climate_conver_fact import GHCompo_ConversionFactor
@@ -50,32 +51,32 @@ from honeybee_ph_rhino.gh_compo_io.climate_site_from_phius_file import (
 # -- Foundations
 from honeybee_ph_rhino.gh_compo_io.foundations_add import GHCompo_AddFoundations
 from honeybee_ph_rhino.gh_compo_io.foundations_create import GHCompo_CreateFoundations
-from honeybee_ph_rhino.gh_compo_io.mech_add_exhaust_vent import GHCompo_AddExhaustVent
-from honeybee_ph_rhino.gh_compo_io.mech_add_mech_systems import GHCompo_AddMechSystems
-from honeybee_ph_rhino.gh_compo_io.mech_add_renewable_system import (
+from honeybee_ph_rhino.gh_compo_io.hvac.add_exhaust_vent import GHCompo_AddExhaustVent
+from honeybee_ph_rhino.gh_compo_io.hvac.add_systems import GHCompo_AddMechSystems
+from honeybee_ph_rhino.gh_compo_io.hvac.add_renewable_system import (
     GHCompo_AddRenewableEnergyDevices,
 )
-from honeybee_ph_rhino.gh_compo_io.mech_add_supportive_devices import (
+from honeybee_ph_rhino.gh_compo_io.hvac.add_supportive_devices import (
     GHCompo_AddMechSupportiveDevices,
 )
-from honeybee_ph_rhino.gh_compo_io.mech_create_cooling_params import (
+from honeybee_ph_rhino.gh_compo_io.hvac.create_cooling_params import (
     GHCompo_CreateCoolingSystem,
 )
-from honeybee_ph_rhino.gh_compo_io.mech_create_exhaust_vent import (
+from honeybee_ph_rhino.gh_compo_io.hvac.create_exhaust_vent import (
     GHCompo_CreateExhaustVent,
 )
-from honeybee_ph_rhino.gh_compo_io.mech_create_pv_system import GHCompo_CreatePVDevice
-from honeybee_ph_rhino.gh_compo_io.mech_create_space_conditioning_sys import (
+from honeybee_ph_rhino.gh_compo_io.hvac.create_pv_system import GHCompo_CreatePVDevice
+from honeybee_ph_rhino.gh_compo_io.hvac.create_space_conditioning_sys import (
     GHCompo_CreateSpaceConditioningSystem,
 )
-from honeybee_ph_rhino.gh_compo_io.mech_create_supportive_device import (
+from honeybee_ph_rhino.gh_compo_io.hvac.create_supportive_device import (
     GHCompo_CreateSupportiveDevice,
 )
-from honeybee_ph_rhino.gh_compo_io.mech_create_vent_duct import GHCompo_CreateVentDuct
+from honeybee_ph_rhino.gh_compo_io.hvac.create_vent_duct import GHCompo_CreateVentDuct
 
 # -- Mech
-from honeybee_ph_rhino.gh_compo_io.mech_create_vent_sys import GHCompo_CreateVentSystem
-from honeybee_ph_rhino.gh_compo_io.mech_create_ventilator import (
+from honeybee_ph_rhino.gh_compo_io.hvac.create_vent_sys import GHCompo_CreateVentSystem
+from honeybee_ph_rhino.gh_compo_io.hvac.create_ventilator import (
     GHCompo_CreatePhVentilator,
 )
 
