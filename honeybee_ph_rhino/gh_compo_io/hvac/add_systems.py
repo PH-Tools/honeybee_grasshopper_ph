@@ -48,20 +48,20 @@ class GHCompo_AddMechSystems(object):
                     continue
 
                 # -- Set the new h-hvac's values to match the PH-Ventilator Inputs, if any
-                new_hvac.ventilation_system = self.ventilation_system
+                new_hvac.set_ventilation_system(self.ventilation_system)
 
             # ---------------------------------------------------------------------------
             # -- Space Heating / Cooling
             for ph_conditioning_system in self.conditioning_systems:
                 if isinstance(ph_conditioning_system, heat_pumps.PhHeatPumpSystem):
-                    new_hvac.heat_pump_systems.add(ph_conditioning_system)
+                    new_hvac.add_heat_pump_system(ph_conditioning_system)
                 else:
-                    new_hvac.heating_systems.add(ph_conditioning_system)
+                    new_hvac.add_heating_system(ph_conditioning_system)
 
             # ---------------------------------------------------------------------------
             # -- Supportive Devices
             for supportive_device in self.supportive_devices:
-                new_hvac.supportive_devices.add(supportive_device)
+                new_hvac.add_supportive_device(supportive_device)
 
             new_room = hb_room.duplicate()
             setattr(new_room.properties, "ph_hvac", new_hvac)

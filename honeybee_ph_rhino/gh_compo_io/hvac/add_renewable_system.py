@@ -45,7 +45,7 @@ class GHCompo_AddRenewableEnergyDevices(object):
 
             # -- Add the new Renewable Devices to the room's hvac system
             for renewable_device in self.renewable_devices:
-                new_hvac.renewable_devices.add(renewable_device)
+                new_hvac.add_renewable_device(renewable_device)
                 print(
                     "Adding Renewable-Device '{}' to HB-Room: '{}'".format(
                         renewable_device.display_name, new_room.display_name

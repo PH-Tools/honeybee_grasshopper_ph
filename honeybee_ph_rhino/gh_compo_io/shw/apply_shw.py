@@ -1,7 +1,7 @@
 # -*- Python Version: 2.7 -*-
 # -*- coding: utf-8 -*-
 
-"""GHCompo Interface: HBPH - Apply SHW System."""
+"""GHCompo Interface: HBPH - Apply PH-HVAC Hot-Water System."""
 
 try:
     from typing import List, Optional
@@ -19,13 +19,15 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
 try:
-    from honeybee_energy import shw
     from honeybee_energy.properties.room import RoomEnergyProperties
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy:\n\t{}".format(e))
 
-from honeybee_phhvac.properties.room import RoomPhHvacProperties
-from honeybee_phhvac.hot_water_system import HotWaterSystem
+try:
+    from honeybee_phhvac.properties.room import RoomPhHvacProperties
+    from honeybee_phhvac.hot_water_system import HotWaterSystem
+except ImportError as e:
+    raise ImportError("\nFailed to import honeybee_phhvac:\n\t{}".format(e))
 
 
 class GHCompo_ApplySHWSys(object):

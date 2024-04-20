@@ -40,11 +40,7 @@ class GHCompo_CreateSHWSystem(object):
     def __init__(
         self,
         _IGH,
-        sys_type,
         display_name,
-        efficiency,
-        condition,
-        loss_coeff,
         tank_1,
         tank_2,
         buffer_tank,
@@ -54,13 +50,9 @@ class GHCompo_CreateSHWSystem(object):
         _num_tap_points,
         recirc_piping,
     ):
-        # type: (gh_io.IGH, str, str, Optional[float], Union[None, Room, int], Union[None, float, str], Optional[hot_water.PhSHWTank], Optional[hot_water.PhSHWTank], Optional[hot_water.PhSHWTank], Optional[hot_water.PhSHWTank], List, List, Optional[int], List) -> None
+        # type: (gh_io.IGH, str, Optional[hot_water_devices.PhHvacHotWaterTank], Optional[hot_water_devices.PhHvacHotWaterTank], Optional[hot_water_devices.PhHvacHotWaterTank], Optional[hot_water_devices.PhHvacHotWaterTank], List, List, Optional[int], List) -> None
         self.IGH = _IGH
-        self.sys_type = sys_type
         self.display_name = display_name
-        self.efficiency = efficiency
-        self.condition = condition
-        self.loss_coeff = loss_coeff or 6  # W/K
         self.tank_1 = tank_1
         self.tank_2 = tank_2
         self.buffer_tank = buffer_tank
@@ -70,65 +62,33 @@ class GHCompo_CreateSHWSystem(object):
         self.number_tap_points = _num_tap_points
         self.recirc_piping = recirc_piping
 
-    @property
-    def condition(self):
-        return self._condition
-
-    @condition.setter
-    def condition(self, _in):
-        # -- Copied from HB-Energy SHW System component
-        if _in is None:
-            self._condition = 22
-        elif isinstance(_in, Room):
-            self._condition = _in.identifier
-        else:
-            try:
-                self._condition = float(_in)
-            except Exception:
-                raise ValueError(
-                    "Input _condition_ must be a Room in which the system is located "
-                    "or a number\nfor the ambient temperature in which the hot water "
-                    "tank is located [C].\nGot {}.".format(type(_in))
-                )
-
     def run(self):
-        # type: () -> Optional[shw.SHWSystem]
-        """Create a new HB-Energy SHW System object."""
-        if not self.sys_type:
-            msg = "Please supply an 'HB SHW System Templates' type to '_system_type' to create the system."
-            self.IGH.warning(msg)
-            return None
+        # type: () -> hot_water_system.HotWaterSystem
+        """Create a new PH-HVAC Hot Water System object."""
+        ph_hvac_hw_sys = hot_water_system.HotWaterSystem()
 
-        # -- Create the basic HB-Energy object
-        shw_sys = shw.SHWSystem(
-            self.display_name,
-            self.sys_type,
-            self.efficiency,
-            self.condition,
-            self.loss_coeff,
-        )
-        shw_sys.display_name = self.display_name
-        shw_sys_prop_ph = shw_sys.properties.ph
-        shw_sys_prop_ph.number_tap_points = self.number_tap_points
+        # -- Basic Attributes
+        ph_hvac_hw_sys.display_name = self.display_name
+        ph_hvac_hw_sys.number_tap_points = self.number_tap_points
 
-        # -- Add any HB-PH Tanks
+        # -- Add any Tanks
         if self.tank_1:
-            shw_sys_prop_ph.tank_1 = self.tank_1
+            ph_hvac_hw_sys.tank_1 = self.tank_1
         if self.tank_2:
-            shw_sys_prop_ph.tank_2 = self.tank_2
+            ph_hvac_hw_sys.tank_2 = self.tank_2
         if self.buffer_tank:
-            shw_sys_prop_ph.tank_buffer = self.buffer_tank
+            ph_hvac_hw_sys.tank_buffer = self.buffer_tank
         if self.solar_tank:
-            shw_sys_prop_ph.tank_solar = self.solar_tank
+            ph_hvac_hw_sys.tank_solar = self.solar_tank
 
-        # -- Add any HB-PH Heaters
+        # -- Add any Heaters
         for heater in self.heaters:
-            shw_sys_prop_ph.add_heater(heater)
+            ph_hvac_hw_sys.add_heater(heater)
 
-        # -- Add any HB-PH Piping
+        # -- Add any Piping
         for distribution_piping in self.distribution_piping:
-            shw_sys_prop_ph.add_distribution_piping(distribution_piping)
+            ph_hvac_hw_sys.add_distribution_piping(distribution_piping)
         for recirc_piping in self.recirc_piping:
-            shw_sys_prop_ph.add_recirc_piping(recirc_piping)
+            ph_hvac_hw_sys.add_recirc_piping(recirc_piping)
 
-        return shw_sys
+        return ph_hvac_hw_sys

@@ -39,7 +39,7 @@ class GHCompo_AddMechSupportiveDevices(object):
 
             # -- Supportive Devices
             for supportive_device in self.supportive_devices:
-                new_hvac.supportive_devices.add(supportive_device)
+                new_hvac.add_supportive_device(supportive_device)
                 print(
                     "Adding Supportive-Device '{}' to HB-Room: '{}'".format(
                         supportive_device.display_name, new_room.display_name
