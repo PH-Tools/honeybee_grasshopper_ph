@@ -21,7 +21,7 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
 try:
-    from honeybee_phhvac.properties.room import RoomPhHvacEquipmentProperties
+    from honeybee_phhvac.properties.room import RoomPhHvacProperties
     from honeybee_phhvac.renewable_devices import PhRenewableEnergyDevice
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
@@ -40,7 +40,7 @@ class GHCompo_AddRenewableEnergyDevices(object):
         hb_rooms_ = []
         for hb_room in self.hb_rooms:
             new_room = hb_room.duplicate()
-            ph_hvac = getattr(hb_room.properties, "ph_hvac")  # type: RoomPhHvacEquipmentProperties
+            ph_hvac = getattr(hb_room.properties, "ph_hvac")  # type: RoomPhHvacProperties
             new_hvac = copy(ph_hvac.duplicate())
 
             # -- Add the new Renewable Devices to the room's hvac system

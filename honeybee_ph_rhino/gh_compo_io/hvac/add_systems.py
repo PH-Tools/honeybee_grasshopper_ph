@@ -17,7 +17,7 @@ except ImportError as e:
 
 try:
     from honeybee_phhvac import heat_pumps, heating, ventilation
-    from honeybee_phhvac.properties.room import RoomPhHvacEquipmentProperties
+    from honeybee_phhvac.properties.room import RoomPhHvacProperties
     from honeybee_phhvac.supportive_device import PhSupportiveDevice
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_phhvac:\n\t{}".format(e))
@@ -38,7 +38,7 @@ class GHCompo_AddMechSystems(object):
         hb_rooms_ = []
         for hb_room in self.hb_rooms:
             # -- Build up the new HB-HVAC
-            ph_hvac = getattr(hb_room.properties, "ph_hvac")  # type: RoomPhHvacEquipmentProperties
+            ph_hvac = getattr(hb_room.properties, "ph_hvac")  # type: RoomPhHvacProperties
             new_hvac = copy(ph_hvac.duplicate())
 
             # ---------------------------------------------------------------------------
