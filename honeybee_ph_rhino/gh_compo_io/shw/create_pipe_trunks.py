@@ -8,16 +8,31 @@ try:
 except ImportError:
     pass  # IronPython 2.7
 
-from honeybee_energy_ph.hvac import hot_water
-from honeybee_ph_utils.input_tools import clean_get, input_to_int
-from ladybug_geometry.geometry2d.pointvector import Point2D
-from ladybug_geometry.geometry2d.polyline import Polyline2D
-from ladybug_geometry.geometry3d.pointvector import Point3D, Vector3D
-from ladybug_geometry.geometry3d.polyline import LineSegment3D, Polyline3D
-from ladybug_rhino.togeometry import to_polyline3d
+try:
+    from ladybug_geometry.geometry3d.polyline import LineSegment3D, Polyline3D
+except ImportError as e:
+    raise ImportError("\nFailed to import ladybug_geometry:\n\t{}".format(e))
 
-from honeybee_ph_rhino import gh_io
-from honeybee_ph_rhino.gh_compo_io import ghio_validators
+try:
+    from ladybug_rhino.togeometry import to_polyline3d
+except ImportError as e:
+    raise ImportError("\nFailed to import ladybug_rhino:\n\t{}".format(e))
+
+try:
+    from honeybee_phhvac import hot_water_piping
+except ImportError as e:
+    raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
+
+try:
+    from honeybee_ph_utils.input_tools import clean_get, input_to_int
+except ImportError as e:
+    raise ImportError("\nFailed to import honeybee_ph_utils:\n\t{}".format(e))
+
+try:
+    from honeybee_ph_rhino import gh_io
+    from honeybee_ph_rhino.gh_compo_io import ghio_validators
+except ImportError as e:
+    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
 
 class _TrunkPipeBuilder(object):
@@ -84,17 +99,17 @@ class _TrunkPipeBuilder(object):
             raise ValueError("Geometry input '{}' is not a Polyline3D or LineSegment3D?".format(type(self.geometry)))
 
     def create_hbph_dhw_trunk_pipe(self):
-        # type: () -> hot_water.PhPipeTrunk
+        # type: () -> hot_water_piping.PhHvacPipeTrunk
         """Create a Honeybee 'PhPipeTrunk' object for a DHW Trunk Pipe."""
 
         # -- Build the new PH-Trunk
-        hbph_obj = hot_water.PhPipeTrunk()
+        hbph_obj = hot_water_piping.PhHvacPipeTrunk()
         hbph_obj.display_name = self.display_name
         hbph_obj.multiplier = self.multiplier
 
         for geom_segment in self.geometry_segments:
             hbph_obj.pipe_element.add_segment(
-                hot_water.PhPipeSegment(
+                hot_water_piping.PhHvacPipeSegment(
                     _geom=geom_segment,
                     _diameter=self.pipe_diameter,
                     _insul_thickness_m=0.0,
@@ -115,7 +130,7 @@ class _TrunkPipeBuilder(object):
                 hbph_fixture = hbph_branch
                 if len(hbph_obj.branches) == 0:
                     # -- Create a new branch, and add the input as a fixture
-                    new_branch = hot_water.PhPipeBranch()
+                    new_branch = hot_water_piping.PhHvacPipeBranch()
                     new_branch.display_name = self.display_name
                     new_branch.add_fixture(hbph_fixture)
                     hbph_obj.add_branch(new_branch)
@@ -140,7 +155,7 @@ class GHCompo_CreateSHWTrunkPipes(object):
         _pipe_diameter,
         _geometry,
     ):
-        # type: (gh_io.IGH, List[hot_water.PhPipeElement], List[int], List[str], List[bool], List[str], List[str], List[Union[Polyline3D, LineSegment3D]]) -> None
+        # type: (gh_io.IGH, List[hot_water_piping.PhHvacPipeElement], List[int], List[str], List[bool], List[str], List[str], List[Union[Polyline3D, LineSegment3D]]) -> None
         self.IGH = _IGH
         self.dhw_branches = _dhw_branches
         self.multipliers = _multipliers
@@ -171,7 +186,7 @@ class GHCompo_CreateSHWTrunkPipes(object):
         return trunk_data
 
     def run(self):
-        # type: () -> List[hot_water.PhPipeElement]
+        # type: () -> List[hot_water_piping.PhHvacPipeElement]
         dhw_trunk_piping_ = []
 
         for trunk_data in self.collect_trunk_data():

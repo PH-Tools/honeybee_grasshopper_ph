@@ -57,7 +57,7 @@ class GHCompo_ApplySHWSys(object):
         return _hb_e_prop
 
     def run(self):
-        # type: () -> Optional[List[room.Room]]
+        # type: () -> List[room.Room]
         """Assign the new HB-Energy SHW System to each HB-Room.
 
         Returns:
@@ -71,15 +71,14 @@ class GHCompo_ApplySHWSys(object):
 
         hb_rooms_ = []  # type: List[room.Room]
         for room in self.hb_rooms:
-            new_room = room.duplicate()  # type: room.Room # type: ignore
+            new_room = room.duplicate()  # type: room.Room
 
-            hb_energy_props = new_room.properties.energy  # type: RoomEnergyProperties # type: ignore
+            # -- Set a default Hot Water Program, if it doesn't already exist
+            hb_energy_props = getattr(new_room.properties, "energy")  # type: RoomEnergyProperties
             if hb_energy_props.service_hot_water is None:
-                # -- Assign a Hot Water flow first
-                # -- this will add a default service_hot_water load
-                # -- if it doesn't already exist
                 hb_energy_props = self.set_absolute_service_hot_water(hb_energy_props)
 
+            # -- Set the Hot Water System (equipment)
             hb_energy_props.shw = self.hb_shw
             hb_rooms_.append(new_room)
 

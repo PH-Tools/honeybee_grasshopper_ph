@@ -19,8 +19,7 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy:\n\t{}".format(e))
 
 try:
-    from honeybee_energy_ph.hvac import hot_water
-    from honeybee_energy_ph.properties.hot_water.hw_system import SHWSystemPhProperties
+    from honeybee_phhvac import hot_water_system, hot_water_devices, hot_water_piping
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
 
@@ -109,7 +108,7 @@ class GHCompo_CreateSHWSystem(object):
             self.loss_coeff,
         )
         shw_sys.display_name = self.display_name
-        shw_sys_prop_ph = shw_sys.properties.ph  # type: SHWSystemPhProperties
+        shw_sys_prop_ph = shw_sys.properties.ph
         shw_sys_prop_ph.number_tap_points = self.number_tap_points
 
         # -- Add any HB-PH Tanks

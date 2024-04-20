@@ -8,13 +8,31 @@ try:
 except ImportError:
     pass  # IronPython 2.7
 
-from honeybee_energy_ph.hvac import hot_water
-from honeybee_ph_utils.input_tools import clean_get, input_to_int
-from ladybug_geometry.geometry3d.polyline import LineSegment3D, Polyline3D
-from ladybug_rhino.togeometry import to_polyline3d
+try:
+    from ladybug_geometry.geometry3d.polyline import LineSegment3D, Polyline3D
+except ImportError as e:
+    raise ImportError("\nFailed to import ladybug_geometry:\n\t{}".format(e))
 
-from honeybee_ph_rhino import gh_io
-from honeybee_ph_rhino.gh_compo_io import ghio_validators
+try:
+    from ladybug_rhino.togeometry import to_polyline3d
+except ImportError as e:
+    raise ImportError("\nFailed to import ladybug_rhino:\n\t{}".format(e))
+
+try:
+    from honeybee_phhvac import hot_water_piping
+except ImportError as e:
+    raise ImportError("\nFailed to import honeybee_phhvac:\n\t{}".format(e))
+
+try:
+    from honeybee_ph_utils.input_tools import clean_get, input_to_int
+except ImportError as e:
+    raise ImportError("\nFailed to import honeybee_ph_utils:\n\t{}".format(e))
+
+try:
+    from honeybee_ph_rhino import gh_io
+    from honeybee_ph_rhino.gh_compo_io import ghio_validators
+except ImportError as e:
+    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
 
 class _FixturePipeBuilder(object):
@@ -65,13 +83,13 @@ class _FixturePipeBuilder(object):
             raise ValueError("Geometry input '{}' is not a Polyline3D or LineSegment3D?".format(type(self.geometry)))
 
     def create_hbph_dhw_fixture_pipe(self):
-        # type: () -> hot_water.PhPipeElement
-        hbph_obj = hot_water.PhPipeElement()
+        # type: () -> hot_water_piping.PhHvacPipeElement
+        hbph_obj = hot_water_piping.PhHvacPipeElement()
         hbph_obj.display_name = self.display_name
 
         for segment in self.geometry_segments:
             hbph_obj.add_segment(
-                hot_water.PhPipeSegment(
+                hot_water_piping.PhHvacPipeSegment(
                     _geom=segment,
                     _diameter=self.pipe_diameter,
                     _insul_thickness_m=0.0,
@@ -115,7 +133,7 @@ class GHCompo_CreateSHWFixturePipes(object):
         return fixture_data
 
     def run(self):
-        # type: () -> List[hot_water.PhPipeElement]
+        # type: () -> List[hot_water_piping.PhHvacPipeElement]
         dhw_fixture_piping_ = []
 
         for fixture_data in self.collect_fixture_data():
