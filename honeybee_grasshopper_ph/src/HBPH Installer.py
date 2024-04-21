@@ -80,10 +80,10 @@ except AttributeError:
 MIN_VER_RHINO = (7, 18)
 MIN_VER_LBT_GH = (1, 7, 26)
 
-import json
 import os
-import subprocess
 import sys
+import json
+import subprocess
 
 try:
     import ctypes
@@ -96,17 +96,17 @@ except ImportError:
     pass # IronPython 2.7
 
 try:
-    from exceptions import IOError  # type: ignore
+    from exceptions import IOError # type: ignore
 except ImportError:
     pass # IronPython 2.7
 
 try:
-    import Rhino  # type: ignore
+    import Rhino # type: ignore
 except ImportError:
     pass # Outside Rhino/Grasshopper
 
 try:
-    from Grasshopper.Folders import UserObjectFolders  # type: ignore
+    from Grasshopper.Folders import UserObjectFolders # type: ignore
 except ImportError:
     pass # Outside Rhino/Grasshopper
 
