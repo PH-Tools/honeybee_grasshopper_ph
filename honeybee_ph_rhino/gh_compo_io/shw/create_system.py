@@ -19,7 +19,7 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy:\n\t{}".format(e))
 
 try:
-    from honeybee_phhvac import hot_water_system, hot_water_devices, hot_water_piping
+    from honeybee_phhvac import hot_water_devices, hot_water_piping, hot_water_system
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
 

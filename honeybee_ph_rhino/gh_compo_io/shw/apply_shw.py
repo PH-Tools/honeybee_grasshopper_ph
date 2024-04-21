@@ -24,8 +24,8 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy:\n\t{}".format(e))
 
 try:
-    from honeybee_phhvac.properties.room import RoomPhHvacProperties
     from honeybee_phhvac.hot_water_system import PhHotWaterSystem
+    from honeybee_phhvac.properties.room import RoomPhHvacProperties
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_phhvac:\n\t{}".format(e))
 
