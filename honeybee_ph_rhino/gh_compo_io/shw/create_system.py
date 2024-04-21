@@ -63,9 +63,9 @@ class GHCompo_CreateSHWSystem(object):
         self.recirc_piping = recirc_piping
 
     def run(self):
-        # type: () -> hot_water_system.HotWaterSystem
+        # type: () -> hot_water_system.PhHotWaterSystem
         """Create a new PH-HVAC Hot Water System object."""
-        ph_hvac_hw_sys = hot_water_system.HotWaterSystem()
+        ph_hvac_hw_sys = hot_water_system.PhHotWaterSystem()
 
         # -- Basic Attributes
         ph_hvac_hw_sys.display_name = self.display_name
