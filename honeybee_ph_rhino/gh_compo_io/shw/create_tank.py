@@ -3,7 +3,10 @@
 
 """GHCompo Interface: HBPH - Create SHW Tank."""
 
-from honeybee_energy_ph.hvac import hot_water
+try:
+    from honeybee_phhvac import hot_water_devices
+except ImportError as e:
+    raise ImportError("\nFailed to import honeybee_phhvac:\n\t{}".format(e))
 
 
 class GHCompo_CreateSHWTank(object):
@@ -33,7 +36,7 @@ class GHCompo_CreateSHWTank(object):
 
     def run(self):
         # Create Storage Tank
-        storage_tank = hot_water.PhSHWTank()
+        storage_tank = hot_water_devices.PhHvacHotWaterTank()
 
         storage_tank.tank_type = self.tank_type or storage_tank.tank_type
         storage_tank.display_name = self.display_name or storage_tank.display_name

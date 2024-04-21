@@ -1,7 +1,7 @@
 # -*- Python Version: 2.7 -*-
 # -*- coding: utf-8 -*-
 
-"""GHCompo Interface: HBPH - Apply SHW System."""
+"""GHCompo Interface: HBPH - Apply PH-HVAC Hot-Water System."""
 
 try:
     from typing import List, Optional
@@ -19,18 +19,23 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
 try:
-    from honeybee_energy import shw
     from honeybee_energy.properties.room import RoomEnergyProperties
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy:\n\t{}".format(e))
+
+try:
+    from honeybee_phhvac.hot_water_system import PhHotWaterSystem
+    from honeybee_phhvac.properties.room import RoomPhHvacProperties
+except ImportError as e:
+    raise ImportError("\nFailed to import honeybee_phhvac:\n\t{}".format(e))
 
 
 class GHCompo_ApplySHWSys(object):
     """Interface for the GH Component"""
 
-    def __init__(self, _hb_shw, _hb_rooms):
-        # type: (shw.SHWSystem, List[room.Room]) -> None
-        self.hb_shw = _hb_shw
+    def __init__(self, _ph_hvac_hw_system, _hb_rooms):
+        # type: (PhHotWaterSystem, List[room.Room]) -> None
+        self.ph_hvac_hot_water_system = _ph_hvac_hw_system
         self.hb_rooms = _hb_rooms
 
     def set_absolute_service_hot_water(self, _hb_e_prop, _flow_rate=0.001):
@@ -47,8 +52,9 @@ class GHCompo_ApplySHWSys(object):
 
         Returns:
         --------
-            *
+            * RoomEnergyProperties
         """
+        # Handle older versions of Honeybee-Energy
         if hasattr(_hb_e_prop, "abolute_service_hot_water"):
             _hb_e_prop.abolute_service_hot_water(_flow_rate, conversion_to_meters())  # type: ignore
         else:
@@ -57,7 +63,7 @@ class GHCompo_ApplySHWSys(object):
         return _hb_e_prop
 
     def run(self):
-        # type: () -> Optional[List[room.Room]]
+        # type: () -> List[room.Room]
         """Assign the new HB-Energy SHW System to each HB-Room.
 
         Returns:
@@ -66,21 +72,21 @@ class GHCompo_ApplySHWSys(object):
                 SHW System modified.
         """
 
-        if self.hb_shw is None:
+        if self.ph_hvac_hot_water_system is None:
             return self.hb_rooms
 
         hb_rooms_ = []  # type: List[room.Room]
         for room in self.hb_rooms:
-            new_room = room.duplicate()  # type: room.Room # type: ignore
+            new_room = room.duplicate()  # type: room.Room
 
-            hb_energy_props = new_room.properties.energy  # type: RoomEnergyProperties # type: ignore
+            # -- Set a default Honeybee-Energy Hot Water Program, if it doesn't already exist.
+            hb_energy_props = getattr(new_room.properties, "energy")  # type: RoomEnergyProperties
             if hb_energy_props.service_hot_water is None:
-                # -- Assign a Hot Water flow first
-                # -- this will add a default service_hot_water load
-                # -- if it doesn't already exist
                 hb_energy_props = self.set_absolute_service_hot_water(hb_energy_props)
 
-            hb_energy_props.shw = self.hb_shw
+            # -- Set the new PH-HVAC Hot Water System (equipment)
+            ph_hvac_props = getattr(new_room.properties, "ph_hvac")  # type: RoomPhHvacProperties
+            ph_hvac_props.set_hot_water_system(self.ph_hvac_hot_water_system)
             hb_rooms_.append(new_room)
 
         return hb_rooms_

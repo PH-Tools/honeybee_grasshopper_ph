@@ -32,7 +32,7 @@ except ImportError as e:
     raise ImportError("\nFailed to import Grasshopper:\n\t{}".format(e))
 
 try:
-    from honeybee import room, aperture
+    from honeybee import aperture, room
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
@@ -55,9 +55,7 @@ except ImportError as e:
 
 try:
     from honeybee_ph_rhino import gh_io
-    from honeybee_ph_rhino.gh_compo_io.shade_create_bldg_shd import (
-        create_inset_aperture_surface,
-    )
+    from honeybee_ph_rhino.gh_compo_io.shade_create_bldg_shd import create_inset_aperture_surface
     from honeybee_ph_rhino.gh_compo_io.shade_LBT_rad_settings import HBPH_LBTRadSettings
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))

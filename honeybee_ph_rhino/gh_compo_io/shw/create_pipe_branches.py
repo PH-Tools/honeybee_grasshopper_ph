@@ -8,13 +8,31 @@ try:
 except ImportError:
     pass  # IronPython 2.7
 
-from honeybee_energy_ph.hvac import hot_water
-from honeybee_ph_utils.input_tools import clean_get, input_to_int
-from ladybug_geometry.geometry3d.polyline import LineSegment3D, Polyline3D
-from ladybug_rhino.togeometry import to_polyline3d
+try:
+    from ladybug_geometry.geometry3d.polyline import LineSegment3D, Polyline3D
+except ImportError as e:
+    raise ImportError("\nFailed to import ladybug_geometry:\n\t{}".format(e))
 
-from honeybee_ph_rhino import gh_io
-from honeybee_ph_rhino.gh_compo_io import ghio_validators
+try:
+    from ladybug_rhino.togeometry import to_polyline3d
+except ImportError as e:
+    raise ImportError("\nFailed to import ladybug_rhino:\n\t{}".format(e))
+
+try:
+    from honeybee_phhvac import hot_water_piping
+except ImportError as e:
+    raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
+
+try:
+    from honeybee_ph_utils.input_tools import clean_get, input_to_int
+except ImportError as e:
+    raise ImportError("\nFailed to import honeybee_ph_utils:\n\t{}".format(e))
+
+try:
+    from honeybee_ph_rhino import gh_io
+    from honeybee_ph_rhino.gh_compo_io import ghio_validators
+except ImportError as e:
+    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
 
 class _BranchPipeBuilder(object):
@@ -74,16 +92,16 @@ class _BranchPipeBuilder(object):
             raise ValueError("Geometry input '{}' is not a Polyline3D or LineSegment3D?".format(type(self.geometry)))
 
     def create_hbph_dhw_branch_pipe(self):
-        # type: () -> hot_water.PhPipeBranch
+        # type: () -> hot_water_piping.PhHvacPipeBranch
         """Create a Honeybee 'PhPipeBranch' object for a DHW Branch Pipe."""
 
         # -- Build the new PH-Branch
-        hbph_obj = hot_water.PhPipeBranch()
+        hbph_obj = hot_water_piping.PhHvacPipeBranch()
         hbph_obj.display_name = self.display_name
 
         for segment in self.geometry_segments:
             hbph_obj.pipe_element.add_segment(
-                hot_water.PhPipeSegment(
+                hot_water_piping.PhHvacPipeSegment(
                     _geom=segment,
                     _diameter=self.pipe_diameter,
                     _insul_thickness_m=0.0,
@@ -114,7 +132,7 @@ class GHCompo_CreateSHWBranchPipes(object):
         _pipe_diameter,
         _geometry,
     ):
-        # type: (gh_io.IGH, List[hot_water.PhPipeElement], List[str],  List[str], List[str], List[Union[Polyline3D, LineSegment3D]]) -> None
+        # type: (gh_io.IGH, List[hot_water_piping.PhHvacPipeElement], List[str],  List[str], List[str], List[Union[Polyline3D, LineSegment3D]]) -> None
         self.IGH = _IGH
         self.dhw_fixtures = _dhw_fixtures
         self.display_name = _display_name
@@ -141,7 +159,7 @@ class GHCompo_CreateSHWBranchPipes(object):
         return branch_data
 
     def run(self):
-        # type: () -> List[hot_water.PhPipeElement]
+        # type: () -> List[hot_water_piping.PhHvacPipeElement]
         dhw_branch_piping_ = []
 
         for branch_data in self.collect_branch_data():

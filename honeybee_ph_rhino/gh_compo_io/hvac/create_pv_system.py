@@ -15,9 +15,9 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
 try:
-    from honeybee_energy_ph.hvac.renewable_devices import PhPhotovoltaicDevice
+    from honeybee_phhvac.renewable_devices import PhPhotovoltaicDevice
 except ImportError as e:
-    raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
+    raise ImportError("\nFailed to import honeybee_phhvac:\n\t{}".format(e))
 
 
 class GHCompo_CreatePVDevice(object):

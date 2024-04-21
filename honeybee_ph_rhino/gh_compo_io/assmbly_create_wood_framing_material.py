@@ -4,7 +4,7 @@
 """GHCompo Interface: HBPH - Create Wood Framing Material."""
 
 try:
-    from typing import Any, Optional, Sequence, Tuple, List, Union
+    from typing import Any, List, Optional, Sequence, Tuple, Union
 except ImportError:
     pass  # IronPython 2.7
 
@@ -93,7 +93,7 @@ class GHCompo_CreateWoodFramingMaterial(object):
             thickness=0.1,
         )
 
-        mat_.properties.ph.ph_color = PhColor.from_argb(255,255,128,0)  
+        mat_.properties.ph.ph_color = PhColor.from_argb(255, 255, 128, 0)
         return mat_
 
     def _convert(self, value, to_unit="M"):
@@ -103,18 +103,21 @@ class GHCompo_CreateWoodFramingMaterial(object):
     def check_material_conductivity(self, _material):
         # type: (opaque.EnergyMaterial) -> None
         if _material.conductivity > 10.0:
-            msg = "WARNING: Material '{}' has a very high conductivity value of {:.2f} W/m-K. "\
-                "Note that metal elements like steel studs and metal fasteners may NOT be "\
+            msg = (
+                "WARNING: Material '{}' has a very high conductivity value of {:.2f} W/m-K. "
+                "Note that metal elements like steel studs and metal fasteners may NOT be "
                 "used as part of heterogeneous assemblies (as per ISO 6946).".format(
-                    _material.display_name, _material.conductivity)
+                    _material.display_name, _material.conductivity
+                )
+            )
             print(msg)
             self.IGH.error(msg)
-        
+
     def run(self):
         # type: () -> Tuple[Optional[opaque.EnergyMaterial], Optional[List[Brep]]]
         if self.insulation_material is None or self.wood_framing_material is None:
             return (None, None)
-        
+
         # -- Check
         self.check_material_conductivity(self.wood_framing_material)
         self.check_material_conductivity(self.insulation_material)
@@ -148,9 +151,8 @@ class GHCompo_CreateWoodFramingMaterial(object):
             ph_prop.divisions.set_cell_material(2, 0, self.wood_framing_material)
 
         if self.bottom_plate_width != 0:
-            ph_prop.divisions.set_cell_material(0, ph_prop.divisions.row_count-1, self.wood_framing_material)
-            ph_prop.divisions.set_cell_material(2, ph_prop.divisions.row_count-1, self.wood_framing_material)
-
+            ph_prop.divisions.set_cell_material(0, ph_prop.divisions.row_count - 1, self.wood_framing_material)
+            ph_prop.divisions.set_cell_material(2, ph_prop.divisions.row_count - 1, self.wood_framing_material)
 
         # -- Generate the Preview
         preview_ = generate_preview(

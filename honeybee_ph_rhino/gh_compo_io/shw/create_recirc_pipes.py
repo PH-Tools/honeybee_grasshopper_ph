@@ -8,13 +8,31 @@ try:
 except ImportError:
     pass  # IronPython 2.7
 
-from honeybee_energy_ph.hvac import hot_water
-from honeybee_ph_utils import input_tools
-from ladybug_geometry.geometry3d.polyline import LineSegment3D, Polyline3D
-from ladybug_rhino.togeometry import to_polyline3d
+try:
+    from ladybug_geometry.geometry3d.polyline import LineSegment3D, Polyline3D
+except ImportError as e:
+    raise ImportError("\nFailed to import ladybug_geometry:\n\t{}".format(e))
 
-from honeybee_ph_rhino import gh_io
-from honeybee_ph_rhino.gh_compo_io import ghio_validators
+try:
+    from ladybug_rhino.togeometry import to_polyline3d
+except ImportError as e:
+    raise ImportError("\nFailed to import ladybug_rhino:\n\t{}".format(e))
+
+try:
+    from honeybee_phhvac import hot_water_piping
+except ImportError as e:
+    raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
+
+try:
+    from honeybee_ph_utils import input_tools
+except ImportError as e:
+    raise ImportError("\nFailed to import honeybee_ph_utils:\n\t{}".format(e))
+
+try:
+    from honeybee_ph_rhino import gh_io
+    from honeybee_ph_rhino.gh_compo_io import ghio_validators
+except ImportError as e:
+    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
 
 class _RecircPipeBuilder(object):
@@ -75,8 +93,8 @@ class _RecircPipeBuilder(object):
                 )
 
     def create_hbph_dhw_recirc_pipe(self):
-        # type: () -> hot_water.PhPipeElement
-        hbph_obj = hot_water.PhPipeElement()
+        # type: () -> hot_water_piping.PhHvacPipeElement
+        hbph_obj = hot_water_piping.PhHvacPipeElement()
         hbph_obj.display_name = self.display_name
 
         try:
@@ -88,7 +106,7 @@ class _RecircPipeBuilder(object):
 
         for segment in segments:
             hbph_obj.add_segment(
-                hot_water.PhPipeSegment(
+                hot_water_piping.PhHvacPipeSegment(
                     segment,
                     self.diameter_m,
                     self.insul_thickness_m,
@@ -134,7 +152,7 @@ class GHCompo_CreateSHWRecircPipes(object):
         self.water_temp = _water_temp
 
     def run(self):
-        # type: () -> List[hot_water.PhPipeElement]
+        # type: () -> List[hot_water_piping.PhHvacPipeElement]
         dhw_recirc_piping_ = []
         for i in range(len(self.geometry)):
             recirc_pipe_builder = _RecircPipeBuilder(

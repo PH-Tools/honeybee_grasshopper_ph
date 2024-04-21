@@ -21,11 +21,7 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph:\n\t{}".format(e))
 
 try:
-    from honeybee_ph_standards.sourcefactors import (
-        factors,
-        phius_CO2_factors,
-        phius_source_energy_factors,
-    )
+    from honeybee_ph_standards.sourcefactors import factors, phius_CO2_factors, phius_source_energy_factors
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_standards:\n\t{}".format(e))
 

@@ -21,7 +21,7 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
 try:
-    from honeybee_energy_ph.hvac import hot_water
+    from honeybee_phhvac import hot_water_devices
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
 
@@ -287,12 +287,12 @@ class GHCompo_CreateSHWHeater(object):
     """Component Interface."""
 
     heater_classes = {
-        1: {"cls": hot_water.PhSHWHeaterElectric, "name": "1-Electric"},
-        2: {"cls": hot_water.PhSHWHeaterBoiler, "name": "2-Boiler (gas/oil)"},
-        3: {"cls": hot_water.PhSHWHeaterBoilerWood, "name": "3-Boiler (wood)"},
-        4: {"cls": hot_water.PhSHWHeaterDistrict, "name": "4-District"},
-        5: {"cls": hot_water.PhSHWHeaterHeatPump, "name": "5-HeatPump (annual COP)"},
-        6: {"cls": hot_water.PhSHWHeaterHeatPump, "name": "6-HeatPump (monthly COP)"},
+        1: {"cls": hot_water_devices.PhHvacHotWaterHeaterElectric, "name": "1-Electric"},
+        2: {"cls": hot_water_devices.PhHvacHotWaterHeaterBoiler, "name": "2-Boiler (gas/oil)"},
+        3: {"cls": hot_water_devices.PhHvacHotWaterHeaterBoilerWood, "name": "3-Boiler (wood)"},
+        4: {"cls": hot_water_devices.PhHvacHotWaterHeaterDistrict, "name": "4-District"},
+        5: {"cls": hot_water_devices.PhHvacHotWaterHeaterHeatPump, "name": "5-HeatPump (annual COP)"},
+        6: {"cls": hot_water_devices.PhHvacHotWaterHeaterHeatPump, "name": "6-HeatPump (monthly COP)"},
     }
 
     valid_types = [heater_class["name"] for heater_class in heater_classes.values()]
@@ -313,7 +313,7 @@ class GHCompo_CreateSHWHeater(object):
         return gh_io.input_to_int(self.heater_type)
 
     def _determine_heater_class(self, _type_number):
-        # type: (int) -> Type[hot_water.PhHotWaterHeater]
+        # type: (int) -> Type[hot_water_devices.PhHvacHotWaterHeater]
         try:
             return self.heater_classes[_type_number]["cls"]
         except KeyError:
@@ -323,14 +323,14 @@ class GHCompo_CreateSHWHeater(object):
             raise Exception(msg)
 
     def run(self):
-        # type: () -> Optional[hot_water.PhHotWaterHeater]
+        # type: () -> Optional[hot_water_devices.PhHvacHotWaterHeater]
 
         heater_type_number = self._determine_heater_type_input()
         if heater_type_number is None:
             return None
 
         heater_class = self._determine_heater_class(heater_type_number)
-        heater_ = heater_class()  # type: hot_water.PhHotWaterHeater
+        heater_ = heater_class()  # type: hot_water_devices.PhHvacHotWaterHeater
 
         # -- Set all the attributes.
         for attr_name in dir(heater_):
