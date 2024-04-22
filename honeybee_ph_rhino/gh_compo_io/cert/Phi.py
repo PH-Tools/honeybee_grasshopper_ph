@@ -21,14 +21,14 @@ except ImportError as e:
 
 try:
     from honeybee_ph_rhino import gh_io
-    from honeybee_ph_rhino.gh_io import ComponentInput
     from honeybee_ph_rhino.gh_compo_io.ghio_validators import UnitM2
+    from honeybee_ph_rhino.gh_io import ComponentInput
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
 try:
-    from ph_units.parser import parse_input
     from ph_units.converter import convert
+    from ph_units.parser import parse_input
 except ImportError as e:
     raise ImportError("\nFailed to import ph_units:\n\t{}".format(e))
 

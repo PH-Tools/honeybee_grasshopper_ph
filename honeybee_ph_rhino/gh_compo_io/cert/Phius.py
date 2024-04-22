@@ -20,8 +20,8 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
 try:
-    from ph_units.parser import parse_input
     from ph_units.converter import convert
+    from ph_units.parser import parse_input
 except ImportError as e:
     raise ImportError("\nFailed to import ph_units:\n\t{}".format(e))
 

@@ -1,6 +1,6 @@
 honeybee-core>=1.58.2
 honeybee-energy>=1.105.43
 ladybug-rhino>=1.42.12
-honeybee-ph>=1.25.1
-PHX>=1.41.0
+honeybee-ph>=1.25.2
+PHX>=1.41.1
 PH-units>=1.5.7
