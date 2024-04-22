@@ -97,7 +97,7 @@ if DEV:
     from honeybee_ph import phius
 
     reload(phius)
-    from honeybee_ph_rhino.gh_compo_io import cert_Phius as gh_compo_io
+    from honeybee_ph_rhino.gh_compo_io.cert import Phius as gh_compo_io
 
     reload(gh_compo_io)
     reload(gh_io)

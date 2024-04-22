@@ -4,7 +4,7 @@
 """GHCompo Interface: HBPH - PH Climate Monthly Radiation."""
 
 try:
-    from typing import Any, Dict, List, Optional
+    from typing import Any, Dict, List, Optional, Union
 except ImportError:
     pass  # IronPython 2.7
 
@@ -22,9 +22,15 @@ except ImportError as e:
 try:
     from honeybee_ph_rhino import gh_io
     from honeybee_ph_rhino.gh_io import ComponentInput
+    from honeybee_ph_rhino.gh_compo_io.ghio_validators import UnitM2
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
+try:
+    from ph_units.parser import parse_input
+    from ph_units.converter import convert
+except ImportError as e:
+    raise ImportError("\nFailed to import ph_units:\n\t{}".format(e))
 
 # -----------------------------------------------------------------------------
 # -- Functions for configuring the GH Component input nodes.
@@ -136,6 +142,10 @@ inputs_phpp_9 = {
         ),
         _type_hint=Component.NewStrHint(),
     ),
+    12: ComponentInput(_name="- " * 20, _description="", _type_hint=Component.NewStrHint()),
+    13: ComponentInput(
+        _name="_tfa_override", _description="Optional user-override of TFA input.", _type_hint=Component.NewStrHint()
+    ),
 }
 
 inputs_phpp_10 = {
@@ -212,6 +222,10 @@ inputs_phpp_10 = {
         ),
         _type_hint=Component.NewStrHint(),
     ),
+    12: ComponentInput(_name="- " * 20, _description="", _type_hint=Component.NewStrHint()),
+    13: ComponentInput(
+        _name="_tfa_override", _description="Optional user-override of TFA input.", _type_hint=Component.NewStrHint()
+    ),
 }
 
 
@@ -247,6 +261,22 @@ class _CertSettingsPHPP_9(object):
         self.primary_energy_type = gh_io.input_to_int(_input_dict["_primary_energy_type"])
         self.enerphit_type = gh_io.input_to_int(_input_dict["_enerphit_type"])
         self.retrofit = gh_io.input_to_int(_input_dict["_retrofit"])
+        self.tfa_override = _input_dict["_tfa_override"]
+
+    @property
+    def tfa_override(self):
+        # type: () -> Optional[float]
+        return self._tfa_override
+
+    @tfa_override.setter
+    def tfa_override(self, value):
+        # type: (Optional[Union[float, str]]) -> None
+        if (value is None) or (value == "") or (value == "NONE"):
+            self._tfa_override = None
+        else:
+            input_value, input_units = parse_input(str(value))
+            result = convert(input_value, input_units or "M2", "M2")
+            self._tfa_override = result
 
     def run(self):
         # type: () -> phi.PhiCertification
@@ -261,6 +291,7 @@ class _CertSettingsPHPP_9(object):
         attrs.primary_energy_type = self.primary_energy_type
         attrs.enerphit_type = self.enerphit_type
         attrs.retrofit_type = self.retrofit
+        attrs.tfa_override = self.tfa_override
         return phi_certification_
 
 
@@ -277,6 +308,22 @@ class _CertSettingsPHPP_10(object):
         self.certification_class = gh_io.input_to_int(_input_dict["_certification_class"])
         self.primary_energy_type = gh_io.input_to_int(_input_dict["_primary_energy_type"])
         self.retrofit = gh_io.input_to_int(_input_dict["_retrofit"])
+        self.tfa_override = _input_dict["_tfa_override"]
+
+    @property
+    def tfa_override(self):
+        # type: () -> Optional[float]
+        return self._tfa_override
+
+    @tfa_override.setter
+    def tfa_override(self, value):
+        # type: (Optional[Union[float, str]]) -> None
+        if (value is None) or (value == "") or (value == "NONE"):
+            self._tfa_override = None
+        else:
+            input_value, input_units = parse_input(str(value))
+            result = convert(input_value, input_units or "M2", "M2")
+            self._tfa_override = result
 
     def run(self):
         # type: () -> phi.PhiCertification
@@ -288,6 +335,7 @@ class _CertSettingsPHPP_10(object):
         attrs.certification_class = self.certification_class
         attrs.primary_energy_type = self.primary_energy_type
         attrs.retrofit_type = self.retrofit
+        attrs.tfa_override = self.tfa_override
         return phi_certification_
 
 

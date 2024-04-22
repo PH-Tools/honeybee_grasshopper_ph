@@ -4,7 +4,7 @@
 """GHCompo Interface: HBPH - Phius Certification."""
 
 try:
-    from typing import Optional
+    from typing import Optional, Union
 except ImportError:
     pass  # IronPython 2.7
 
@@ -18,6 +18,12 @@ try:
     from honeybee_ph_rhino.gh_compo_io import ghio_validators
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
+
+try:
+    from ph_units.parser import parse_input
+    from ph_units.converter import convert
+except ImportError as e:
+    raise ImportError("\nFailed to import ph_units:\n\t{}".format(e))
 
 
 class GHCompo_PhiusCertification(object):
@@ -38,8 +44,9 @@ class GHCompo_PhiusCertification(object):
         _PHIUS_annual_cooling_demand_kWh_m2,
         _PHIUS_peak_heating_load_W_m2,
         _PHIUS_peak_cooling_load_W_m2,
+        _icfa_override,
     ):
-        # type: (gh_io.IGH, Optional[int], Optional[int], Optional[int], Optional[int], Optional[int], float, float, float, float) -> None
+        # type: (gh_io.IGH, Optional[int], Optional[int], Optional[int], Optional[int], Optional[int], float, float, float, float, Optional[str]) -> None
         self.IGH = _IGH
         self.certification_program = gh_io.input_to_int(certification_program_)
         self.building_category_type = gh_io.input_to_int(building_category_type_)
@@ -50,6 +57,22 @@ class GHCompo_PhiusCertification(object):
         self.PHIUS_annual_cooling_demand_kWh_m2 = _PHIUS_annual_cooling_demand_kWh_m2 or 15.0
         self.PHIUS_peak_heating_load_W_m2 = _PHIUS_peak_heating_load_W_m2 or 10.0
         self.PHIUS_peak_cooling_load_W_m2 = _PHIUS_peak_cooling_load_W_m2 or 10.0
+        self.icfa_override = _icfa_override
+
+    @property
+    def icfa_override(self):
+        # type: () -> Optional[float]
+        return self._icfa_override
+
+    @icfa_override.setter
+    def icfa_override(self, value):
+        # type: (Optional[Union[float, str]]) -> None
+        if (value is None) or (value == "") or (value == "NONE"):
+            self._icfa_override = None
+        else:
+            input_value, input_units = parse_input(str(value))
+            result = convert(input_value, input_units or "M2", "M2")
+            self._icfa_override = result
 
     def run(self):
         # type: () -> phius.PhiusCertification
@@ -65,5 +88,7 @@ class GHCompo_PhiusCertification(object):
         certification_.PHIUS2021_cooling_demand = self.PHIUS_annual_cooling_demand_kWh_m2
         certification_.PHIUS2021_heating_load = self.PHIUS_peak_heating_load_W_m2
         certification_.PHIUS2021_cooling_load = self.PHIUS_peak_cooling_load_W_m2
+
+        certification_.icfa_override = self.icfa_override
 
         return certification_

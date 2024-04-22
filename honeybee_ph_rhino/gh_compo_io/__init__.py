@@ -14,17 +14,17 @@ from honeybee_ph_rhino.gh_compo_io.building_create_team_member import GHCompo_Cr
 # -- Building Segment
 from honeybee_ph_rhino.gh_compo_io.building_segment import GHCompo_BuildingSegment
 from honeybee_ph_rhino.gh_compo_io.building_set_project_data import GHCompo_SetProjectData
-from honeybee_ph_rhino.gh_compo_io.cert_PHI import GHCompo_PhiCertification
 
 # -- Certification
-from honeybee_ph_rhino.gh_compo_io.cert_Phius import GHCompo_PhiusCertification
+from honeybee_ph_rhino.gh_compo_io.cert.Phi import GHCompo_PhiCertification
+from honeybee_ph_rhino.gh_compo_io.cert.Phius import GHCompo_PhiusCertification
+
+# -- Climate
 from honeybee_ph_rhino.gh_compo_io.climate_conver_fact import GHCompo_ConversionFactor
 from honeybee_ph_rhino.gh_compo_io.climate_data import GHCompo_ClimateData
 from honeybee_ph_rhino.gh_compo_io.climate_location import GHCompo_Location
 from honeybee_ph_rhino.gh_compo_io.climate_monthly_radiation import GHCompo_CreateMonthlyRadiation
 from honeybee_ph_rhino.gh_compo_io.climate_monthly_temps import GHCompo_MonthlyTemps
-
-# -- Climate
 from honeybee_ph_rhino.gh_compo_io.climate_peak_load import GHCompo_CreatePeakLoad
 from honeybee_ph_rhino.gh_compo_io.climate_PHPP_code import GHCompo_PHPPCodes
 from honeybee_ph_rhino.gh_compo_io.climate_site import GHCompo_Site

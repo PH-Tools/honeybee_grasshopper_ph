@@ -54,9 +54,9 @@ if DEV:
     reload(phi)
     reload(gh_compo_io)
     reload(gh_io)
-    from honeybee_ph_rhino.gh_compo_io import cert_PHI
+    from honeybee_ph_rhino.gh_compo_io.cert import PHI
 
-    reload(cert_PHI)
+    reload(PHI)
 
 
 # ------------------------------------------------------------------------------
@@ -71,7 +71,7 @@ gh_io.setup_component_inputs(IGH, input_dict)
 input_values_dict = gh_io.get_component_input_values(ghenv)
 
 if DEV:
-    from honeybee_ph_rhino.gh_compo_io import cert_PHI as gh_compo_io
+    from honeybee_ph_rhino.gh_compo_io.cert import PHI as gh_compo_io
 
     reload(gh_compo_io)
 
