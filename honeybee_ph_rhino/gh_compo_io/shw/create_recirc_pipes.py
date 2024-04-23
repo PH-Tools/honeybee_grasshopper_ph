@@ -50,8 +50,8 @@ class _RecircPipeBuilder(object):
         IGH,
         _geometry,
         _name="_unnamed_",
-        _diameter_m=0.0254,
-        _insul_thickness_m=0.0254,
+        _diameter=0.0254,
+        _insul_thickness=0.0254,
         _insul_conductivity=0.04,
         _insul_reflective=True,
         _insul_quality=None,
@@ -62,8 +62,8 @@ class _RecircPipeBuilder(object):
         self.IGH = IGH
         self.geometry = _geometry
         self.display_name = _name
-        self.diameter_m = _diameter_m
-        self.insul_thickness_m = _insul_thickness_m
+        self.diameter = _diameter
+        self.insul_thickness = _insul_thickness
         self.insul_conductivity = _insul_conductivity
         self.insul_reflective = _insul_reflective
         self.insul_quality = _insul_quality
@@ -108,8 +108,8 @@ class _RecircPipeBuilder(object):
             hbph_obj.add_segment(
                 hot_water_piping.PhHvacPipeSegment(
                     segment,
-                    self.diameter_m,
-                    self.insul_thickness_m,
+                    self.diameter,
+                    self.insul_thickness,
                     self.insul_conductivity,
                     self.insul_reflective,
                     self.insul_quality,
@@ -129,8 +129,8 @@ class GHCompo_CreateSHWRecircPipes(object):
         _IGH,
         _geometry,
         _name,
-        _diameter_m,
-        _insul_thickness_m,
+        _diameter,
+        _insul_thickness,
         _insul_conductivity,
         _insul_reflective,
         _insul_quality,
@@ -143,8 +143,8 @@ class GHCompo_CreateSHWRecircPipes(object):
         self.IGH = _IGH
         self.geometry = _geometry
         self.name = _name
-        self.diameter_m = _diameter_m
-        self.insul_thickness_m = _insul_thickness_m
+        self.diameter = _diameter
+        self.insul_thickness = _insul_thickness
         self.insul_conductivity = _insul_conductivity
         self.insul_reflective = _insul_reflective
         self.insul_quality = _insul_quality
@@ -159,8 +159,8 @@ class GHCompo_CreateSHWRecircPipes(object):
                 self.IGH,
                 input_tools.clean_get(self.geometry, i),
                 input_tools.clean_get(self.name, i, "_unnamed_"),
-                input_tools.clean_get(self.diameter_m, i, 0.0254),
-                input_tools.clean_get(self.insul_thickness_m, i, 0.0254),
+                input_tools.clean_get(self.diameter, i, 0.0254),
+                input_tools.clean_get(self.insul_thickness, i, 0.0254),
                 input_tools.clean_get(self.insul_conductivity, i, 0.04),
                 input_tools.clean_get(self.insul_reflective, i, True),
                 input_tools.clean_get(self.insul_quality, i, None),

@@ -92,7 +92,7 @@ class _FixturePipeBuilder(object):
                 hot_water_piping.PhHvacPipeSegment(
                     _geom=segment,
                     _diameter=self.pipe_diameter,
-                    _insul_thickness_m=0.0,
+                    _insul_thickness=0.0,
                     _insul_conductivity=0.04,
                     _insul_refl=False,
                     _insul_quality=None,
