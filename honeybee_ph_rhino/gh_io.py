@@ -467,7 +467,7 @@ class IGH:
     def get_rhino_unit_system_name(self):
         # type: () -> str
         """Returns the Rhino Unit System Name as a string."""
-        return self.sc.doc.ModelUnitSystem
+        return str(self.sc.doc.ModelUnitSystem)
 
     def duplicate_data_to_branches(self, _data, _branch_count=1, _shallow=True):
         # type: (List[Any], int, bool) -> DataTree[Object]

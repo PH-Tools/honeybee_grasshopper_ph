@@ -21,10 +21,16 @@ class MyClassWithValidation(object):
 >>> ValueError: Input for 'example' may not be 0!
 """
 
+try:
+    from typing import Any
+except ImportError:
+    pass  # IronPython 2.7
+
 try:  # import the core honeybee dependencies
     from honeybee.typing import clean_and_id_ep_string, clean_ep_string
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
+
 try:
     from ph_units import converter, parser
 except ImportError as e:
@@ -40,6 +46,7 @@ class Validated(object):
     """
 
     def __init__(self, storage_name, default=None, **kwargs):
+        # type: (str, Any, dict[str, Any]) -> None
         self.storage_name = storage_name  # normally the same as the Class Attribute
         self.default = default
 

@@ -40,16 +40,18 @@ try:
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_utils:\n\t{}".format(e))
 
+try:
+    from ph_units.parser import parse_input
+    from ph_units.converter import convert
+except ImportError as e:
+    raise ImportError("\nFailed to import ph_units:\n\t{}".format(e))
+
 
 class GHCompo_CreateVentDuct(object):
     """Component Interface"""
 
     display_name = ghio_validators.HBName("display_name")
-    insul_thickness = ghio_validators.UnitMM("insul_thickness")
     insul_conductivity = ghio_validators.UnitW_MK("insul_conductivity")
-    diameter = ghio_validators.UnitMM("diameter")
-    height = ghio_validators.UnitMM("height")
-    width = ghio_validators.UnitMM("width")
 
     def __init__(
         self,
@@ -64,21 +66,80 @@ class GHCompo_CreateVentDuct(object):
         _height,
         _width,
     ):
-        # type: (gh_io.IGH, List[Union[LineCurve, NurbsCurve, PolylineCurve]], str, int, float, float, bool, float, Optional[float], Optional[float]) -> None
+        # type: (gh_io.IGH, List[Union[LineCurve, NurbsCurve, PolylineCurve]], Optional[str], Optional[str], Optional[str], Optional[str], Optional[bool], Optional[str], Optional[str], Optional[str]) -> None
         self.IGH = _IGH
-        self.geometry_segments = self.to_LbtLineSegments3D(_geometry)
+        self.geometry_segments = self._to_LbtLineSegments3D(_geometry)
         self.display_name = _display_name or "__unnamed_vent_duct__"
         self.duct_type = _duct_type
-        self.insul_thickness = _insul_thickness or 25.4
         self.insul_conductivity = _insul_conductivity or 0.04
-        self.diameter = _diameter or 160
+        self.insul_reflective = _insul_reflective
+
+        # -- These values will all be in the Rhino-Document's Unit-Type (MM, M, inch, etc.)
+        self.insul_thickness = _insul_thickness or "25.4 MM"
+        self.diameter = _diameter or "160 MM"
         self.height = _height
         self.width = _width
 
-        if _insul_reflective is None:
-            self.insul_reflective = True
-        else:
-            self.insul_reflective = _insul_reflective
+    def _convert_input_value_to_rhino_units(self, _value, _attr_name):
+        # type: (Union[str, int, float], str) -> float
+        rh_unit = self.IGH.get_rhino_unit_system_name()
+        input_value, input_unit = parse_input(_value)
+        input_unit = input_unit or rh_unit
+        value_in_rh_units = convert(input_value, input_unit, _target_unit=rh_unit)
+        if not value_in_rh_units:
+            raise ValueError("Failed to convert {} input '{}' to to Rhino units.".format(_attr_name, _value))
+        print("Converting: {}-{} > {}-{}".format(input_value, input_unit, value_in_rh_units, rh_unit))
+        return float(value_in_rh_units)
+
+    @property
+    def insul_thickness(self):
+        # type: () -> float
+        """The insul_thickness of the duct in Rhino-Document units."""
+        return self._insul_thickness
+
+    @insul_thickness.setter
+    def insul_thickness(self, _value):
+        # type: (Union[int, float, str]) -> None
+        self._insul_thickness = self._convert_input_value_to_rhino_units(_value, "insul_thickness")
+
+    @property
+    def diameter(self):
+        # type: () -> float
+        """The diameter of the duct in Rhino-Document units."""
+        return self._diameter
+
+    @diameter.setter
+    def diameter(self, _value):
+        # type: (Union[int, float, str]) -> None
+        self._diameter = self._convert_input_value_to_rhino_units(_value, "diameter")
+
+    @property
+    def height(self):
+        # type: () -> Optional[float]
+        """The height of the duct in Rhino-Document units."""
+        return self._height
+
+    @height.setter
+    def height(self, _value):
+        # type: (Optional[Union[int, float, str]]) -> None
+        if not _value:
+            self._height = None
+            return
+        self._height = self._convert_input_value_to_rhino_units(_value, "height")
+
+    @property
+    def width(self):
+        # type: () -> Optional[float]
+        """The width of the duct in Rhino-Document units."""
+        return self._width
+
+    @width.setter
+    def width(self, _value):
+        # type: (Optional[Union[int, float, str]]) -> None
+        if not _value:
+            self._width = None
+            return
+        self._width = self._convert_input_value_to_rhino_units(_value, "width")
 
     @property
     def duct_type(self):
@@ -87,10 +148,24 @@ class GHCompo_CreateVentDuct(object):
 
     @duct_type.setter
     def duct_type(self, _in):
+        # type: (Optional[str]) -> None
         input_int = input_tools.input_to_int(_in)
         self._duct_type = input_int or 1
 
-    def to_LbtLineSegments3D(self, _input):
+    @property
+    def insul_reflective(self):
+        # type: () -> bool
+        return self._insul_reflective
+
+    @insul_reflective.setter
+    def insul_reflective(self, _in):
+        # type: (Optional[bool]) -> None
+        if _in is None:
+            self._insul_reflective = True
+        else:
+            self._insul_reflective = _in
+
+    def _to_LbtLineSegments3D(self, _input):
         # type: (List[Union[LineCurve, NurbsCurve, PolylineCurve]]) -> List[LineSegment3D]
         """Convert Rhino geometry Inputs to Ladybug LineSegment3D."""
         lbt_line_segments = []  # type: List[LineSegment3D]
