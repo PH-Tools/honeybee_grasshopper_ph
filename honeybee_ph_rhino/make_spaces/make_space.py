@@ -3,8 +3,6 @@
 
 """Functions to Add Spaces onto Honeybee Rooms."""
 
-from collections import namedtuple
-
 try:
     from typing import Dict, List, Tuple
 except ImportError:
@@ -34,8 +32,25 @@ try:
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph:\n\t{}".format(e))
 
+try:
+    from honeybee_ph_rhino import gh_io
+except ImportError as e:
+    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
-# SpaceData = namedtuple("SpaceData", ["space", "reference_points"])
+
+class MissingVentilationProgramError(Exception):
+    def __init__(self, room):
+        self.room = room
+        self.message = (
+            "HB-Room '{}' with an HB-Program of: '{}' does not have an HB-Energy-Ventilation-Program? "
+            "Cannot add HBPH-Space with ventilation flow rates to an HB-Room without an HB-Energy-Ventilation-Program. "
+            "You should either use an HB-Energy-Program type for the Room which already has an HB-Energy-Ventilation-Program, "
+            "or add one to the Room's HB-Program before proceeding.".format(
+                room.display_name, room.properties.energy.program_type
+            )
+        )
+        # type: (room.Room) -> None
+        super(MissingVentilationProgramError, self).__init__(self.message)
 
 
 class SpaceData(object):
@@ -48,8 +63,8 @@ class SpaceData(object):
 
 
 def offset_space_reference_points(IGH, _space, _dist=0.0):
-    # type (gh_io.IGH, space.Space, float) -> space.Space
-    """Move the Space's floor segments 'up' in the world-Z some distance. This is
+    # type: (gh_io.IGH, space.Space, float) -> space.Space
+    """Move the Space's floor-segment's reference point 'up' in the world-Z some distance. This is
         useful since if the reference point is directly 'on' the honeybee-Room's floor
         surface, sometimes it will not test as 'inside' correctly. Tolerance issue?
 
@@ -72,8 +87,10 @@ def offset_space_reference_points(IGH, _space, _dist=0.0):
     new_space = _space.duplicate()
     for volume in new_space.volumes:
         for seg in volume.floor._floor_segments:
+            if not seg.reference_point:
+                continue
             seg.reference_point = to_point3d(
-                IGH.ghpythonlib_components.Move(
+                IGH.ghc.Move(
                     from_point3d(seg.reference_point),
                     IGH.ghpythonlib_components.UnitZ(_dist),
                 ).geometry
@@ -159,7 +176,7 @@ def add_spaces_to_honeybee_rooms(_spaces, _hb_rooms, _inherit_names=False):
                 # -- If 'inherit names', simplify the spaces so that
                 # -- there is only a single space inside of the HB-Room
                 # -- and it will inherit its name from the parent HB-Room.
-                dup_rm_prop_ph = dup_room.properties.ph  # type: RoomPhProperties # type: ignore
+                dup_rm_prop_ph = getattr(dup_room.properties, "ph")  # type: RoomPhProperties
                 if _inherit_names:
                     sp.name = dup_room.display_name
                     dup_rm_prop_ph.merge_new_space(sp)
@@ -167,13 +184,20 @@ def add_spaces_to_honeybee_rooms(_spaces, _hb_rooms, _inherit_names=False):
                     dup_rm_prop_ph.add_new_space(sp)
 
                 # -- Add in any detailed PH-Style vent flow rates if they exist
-                sp_prop_ph = sp.properties.ph  # type: SpacePhProperties # type:ignore
-                if sp_prop_ph.has_ventilation_flow_rates:
-                    space_flow_rate = sp_prop_ph.honeybee_flow_rate  # type: float # type: ignore
+                space_prop_ph = getattr(sp.properties, "ph")  # type: SpacePhProperties
+                if space_prop_ph.has_ventilation_flow_rates:
+                    # -- Ensure that the Room has a Ventilation Program
+                    # -- Some in HB-Energy don't have any Vent program at all. Which is weird.
+                    dup_room_prop_energy = getattr(dup_room.properties, "energy")  # type: RoomEnergyProperties
+                    if not dup_room_prop_energy.ventilation:
+                        raise MissingVentilationProgramError(dup_room)
 
-                    dup_room_prop_energy = dup_room.properties.energy  # type: RoomEnergyProperties # type: ignore
+                    # -- Get any Sup/Eta/Trans PH-Style flow-rate overrides / supplements
+                    space_flow_rate_override = space_prop_ph.honeybee_flow_rate or 0.0
+
+                    # -- Set the Honeybee-Energy Ventilation Flow Rates
                     existing_room_flow = float(dup_room_prop_energy.ventilation.flow_per_zone)
-                    new_room_flow = space_flow_rate + existing_room_flow
+                    new_room_flow = space_flow_rate_override + existing_room_flow
                     dup_room = set_absolute_ventilation(dup_room, new_room_flow)
 
                 # -- to speed up further checks

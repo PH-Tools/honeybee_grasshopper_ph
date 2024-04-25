@@ -4,14 +4,14 @@
 """GHCompo Interface: HBPH - Add Spaces."""
 
 try:
-    import Rhino.Geometry as rg  # type: ignore
-except ImportError as e:
-    raise ImportError("Failed to import Rhino Geometry.\n{}".format(e))
-
-try:
-    from typing import List, Tuple
+    from typing import List, Tuple, Optional
 except ImportError:
     pass  # IronPython 2.7
+
+try:
+    from Rhino.Geometry import Point3d  # type: ignore
+except ImportError as e:
+    raise ImportError("Failed to import Rhino.Geometry.\n{}".format(e))
 
 try:
     from ladybug_rhino.fromgeometry import from_point3d
@@ -37,11 +37,11 @@ except ImportError as e:
 
 class GHCompo_AddPHSpaces(object):
     def __init__(self, _IGH, _spaces, _offset_dist, _inh_rm_nms, _hb_rooms):
-        # type: (gh_io.IGH, List[space.Space], float, bool, List[room.Room]) -> None
+        # type: (gh_io.IGH, List[space.Space], Optional[float], bool, List[room.Room]) -> None
 
         self.IGH = _IGH
         self.spaces = _spaces
-        self.offset_dist = _offset_dist
+        self.offset_dist = _offset_dist or 0.1
         self.inherit_room_names = _inh_rm_nms
         self.hb_rooms = _hb_rooms
 
@@ -49,13 +49,13 @@ class GHCompo_AddPHSpaces(object):
         return all([len(self.spaces) != 0 and len(self.hb_rooms) != 0])
 
     def run(self):
-        # type: () -> Tuple[List[room.Room], List[rg.Point3D], List[room.Room]]
+        # type: () -> Tuple[List[room.Room], List[Point3D], List[room.Room]]
         if not self.ready():
             return self.hb_rooms, [], []
 
         # ---------------------------------------------------------------------
         # -- Clean up the input spaces, host in the HB-Rooms
-        offset_dist = self.offset_dist or 0.1
+        offset_dist = self.offset_dist
         spaces = [make_space.offset_space_reference_points(self.IGH, sp, offset_dist) for sp in self.spaces]
         (
             hb_rooms_,
@@ -74,9 +74,10 @@ class GHCompo_AddPHSpaces(object):
         # -- and raise a user-warning
         check_pts_ = [from_point3d(lbt_pt) for space_data in un_hosted_spaces for lbt_pt in space_data.reference_points]
         if un_hosted_spaces:
-            msg = "Error: Host Honeybee-Rooms not found for the Spaces: {}".format(
+            msg = "Error: No host Honeybee-Rooms were found for the Spaces: '{}'".format(
                 "\n".join([spd.space.full_name for spd in un_hosted_spaces])
             )
+            print(msg)
             self.IGH.error(msg)
 
         # ---------------------------------------------------------------------
