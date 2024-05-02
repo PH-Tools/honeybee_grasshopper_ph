@@ -27,7 +27,7 @@ any components to the HB-Energy model. If you need to model mechancial equipment
 / OpenStudio simulation then you must also use the Honeybee-Energy / IronBug components to setup
 those devices separate from the inputs defined on the component here.
 -
-EM April 21, 2024
+EM May 2, 2024
     Args:
         _ventilation_system: (PhVentilationSystem) The Ventilation System serving the HB-Rooms.
         

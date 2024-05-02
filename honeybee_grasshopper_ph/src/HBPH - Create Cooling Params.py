@@ -29,7 +29,7 @@ any components to the HB-Energy model. If you need to model mechancial equipment
 / OpenStudio simulation then you must also use the Honeybee-Energy / IronBug components to setup
 those devices separate from the inputs defined on the component here.
 -
-EM April 21, 2024
+EM May 2, 2024
     Args:
         _cooling_type: (int) Enter the type of cooling parameters to define. Input either - 
 "1-Ventilation Air"
@@ -55,7 +55,7 @@ except ImportError as e:
 
 try:
     from honeybee_ph_rhino import gh_compo_io, gh_io
-    from honeybee_ph_rhino.gh_compo_io import mech_create_cooling_params
+    from honeybee_ph_rhino.gh_compo_io.hvac import create_cooling_params
 except ImportError as e:
     raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
 
@@ -79,7 +79,7 @@ IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 
 #-------------------------------------------------------------------------------
 # -- Setup the input nodes, get all the user input values
-input_dict = mech_create_cooling_params.get_component_inputs(_cooling_type)
+input_dict = create_cooling_params.get_component_inputs(_cooling_type)
 gh_io.setup_component_inputs(IGH, input_dict, _start_i=1)
 input_values_dict = gh_io.get_component_input_values(ghenv)
 
