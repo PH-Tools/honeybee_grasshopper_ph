@@ -47,7 +47,7 @@ class GHCompo_AddMechSystems(object):
                 if not self.ventilation_system.ventilation_unit:
                     continue
 
-                # -- Set the new h-hvac's values to match the PH-Ventilator Inputs, if any
+                # -- Set the new ph-hvac's values to match the PH-Ventilator Inputs, if any
                 new_hvac.set_ventilation_system(self.ventilation_system)
 
             # ---------------------------------------------------------------------------
