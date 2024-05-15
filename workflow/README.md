@@ -73,17 +73,17 @@ unit_ = gh_compo_interface.run()
 
 
 ## | Component Development Cycle:
+All code libraries area kept in a dedicated git-repository outside of Rhino / Grasshopper. When using the 'facade' approach outlined above, most work is done outside Rhino in an IDE within these repositories. This means that any updates made within these repos must be deployed to Rhino's working directory in order to test out the code during development. In order to simplify and speedup this process, we use a VSCode extension named [FSDeploy](https://marketplace.visualstudio.com/items?itemName=mightycoco.fsdeploy). This extension automatically copies all modifications made to your source code into Rhino's working directories every time you save the source code file. The specific development cycle follows the pattern:
 
 ```mermaid
 graph LR;
-    A[Edit code] --> B[FSDeploy to Rhino's working dir];
-    B --> C[Reload in GH];
-    C --> A;
-    C --> D[Build .ghuser]
+    A[dev mode on] --> B[Edit Code];
+    B --> C[FSDeploy to Rhino's working dir];
+    C --> D[Reload in GH];
+    D --> B;
+    D --> E[dev mode off]
+    E --> F[Build .ghuser]
 ```
-
-All code libraries area kept in a dedicated git-repository outside of Rhino / Grasshopper. When using the 'facade' approach outlined above, most work is done outside Rhino in an IDE in these repositories. This means that any updates made within these repos must be deployed to Rhino's working directory in order to test out the code during development. In order to simplify and speedup this process, we use a VSCode extension named [FSDeploy](https://marketplace.visualstudio.com/items?itemName=mightycoco.fsdeploy). This extension automatically copies all modifications to your source code into Rhino's working directories. The specific development cycle follows the pattern:
-
 
 1. Add the component to the canvas and turn on 'dev' mode to reload libraries as you work.
 1. Make the required edits or updates the source code in VSCode or your preferred IDE.
