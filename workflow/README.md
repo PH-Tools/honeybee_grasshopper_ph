@@ -15,15 +15,15 @@ automatically (FSDeploy), and package the final elements together easily.
 ## | The Facade Approach:
 Why?
 1. Allows us to work in our preferred IDE instead of in the component editor
-1. Allows us to swap out and update the libraries without changing the components in our older Grasshopper definitions.
+1. Allows us to easily update the meaningful libraries without having to go through and change the actual component objects in older Grasshopper files.
 
-All Honeybee-PH components follow a 'facade' pattern. In order to improve overall maintainability and ease updates, all Grasshopper components are **only** responsible for the collection and organization of inputs and outputs. All actual work is done behind the facade by an associated class. This approach means that the meaningful code in the honeybee-ph or honeybee-ph-grasshopper libraries can be updated without requiring users to swap out or update any components within their specific Grasshopper definitions. 
+All Honeybee-PH components follow a 'facade' pattern. In order to improve overall maintainability and ease updates, all Grasshopper components are **only** responsible for the collection and organization of inputs and outputs. In this approach, all the actual work is done behind scenes by an associated class. This approach means that the meaningful code in the [`honeybee-ph`](https://github.com/PH-Tools/honeybee_ph) or [`honeybee-ph-rhino`](https://github.com/PH-Tools/honeybee_grasshopper_ph/tree/main/honeybee_ph_rhino) libraries can be updated without requiring users to swap out or update any components within their specific Grasshopper definitions. 
 
 
 To take an example case, consider a simple component such as the [`HBPH-Ventilator`](https://github.com/PH-Tools/honeybee_grasshopper_ph/blob/main/honeybee_grasshopper_ph/src/HBPH%20-%20Ventilator.py) component which is used to create HRV/ERV equipment. 
 
 - - - 
-First, since keep all of the 'worker' classes within the [`gh_comp_io`](https://github.com/PH-Tools/honeybee_grasshopper_ph/tree/main/honeybee_ph_rhino/gh_compo_io) package these classes get imported by the Grasshopper component, along with some utility classes:
+First, since we keep all of the 'worker' classes within the [`gh_comp_io`](https://github.com/PH-Tools/honeybee_grasshopper_ph/tree/main/honeybee_ph_rhino/gh_compo_io) package these classes get imported by the Grasshopper component, along with some utility classes:
 ```python
 from honeybee_ph_rhino import gh_compo_io, gh_io
 from honeybee_ph_utils import preview
@@ -73,7 +73,17 @@ unit_ = gh_compo_interface.run()
 
 
 ## | Component Development Cycle:
+
+```mermaid
+graph LR;
+    A[Edit Code] --> B[FSDeploy];
+    B --> C[Reload in and \t test in Grasshopper];
+    C --> A;
+    C --> D[Build .ghuser]
+```
+
 All code libraries area kept in a dedicated git-repository outside of Rhino / Grasshopper. When using the 'facade' approach outlined above, most work is done outside Rhino in an IDE in these repositories. This means that these updates made within these repos must be deployed to Rhino's working directory in order to test out the code during development. In order to simplify this, we use a VSCode extension named [FSDeploy](https://marketplace.visualstudio.com/items?itemName=mightycoco.fsdeploy). This extension automatically copies all modifications to your source code into Rhino's working directories. The specific development cycle follows the pattern:
+
 
 1. Add the component to the canvas and turn on 'dev' mode to reload libraries as you work.
 1. Make the required edits or updates the source code in VSCode or your preferred IDE.
