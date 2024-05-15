@@ -1,4 +1,4 @@
-# WORKFLOW
+# DEVELOPMENT WORKFLOW
 
 This guide summarizes the current workflow with regard to Grasshopper-Component development and packaging. Note that *nothing* here is set in stone, but represents only our best effort so far to get control over our GH Python Components and make packaging as simple as we can for our specific use-cases. Your specific situation may not be the same as ours, and there are many other ways to organize python components and libraries. For a good summary of some of the different methods, check out the discussion on the [McNeel forum here.](https://discourse.mcneel.com/t/python-component-in-multiple-gh-files-how-to-keep-updated/174263/5)
 
@@ -78,7 +78,7 @@ All code libraries area kept in a dedicated git-repository outside of Rhino / Gr
 ```mermaid
 graph LR;
     A[dev mode on] --> B[Edit Code];
-    B --> C[FSDeploy to Rhino's working dir];
+    B --> C[FSDeploy to GH];
     C --> D[Reload in GH];
     D --> B;
     D --> E[dev mode off]
@@ -87,15 +87,15 @@ graph LR;
 
 1. Add the component to the canvas and turn on 'dev' mode to reload libraries as you work.
 1. Make the required edits or updates the source code in VSCode or your preferred IDE.
-1. FSDeploy copies the changes to the Rhino working directory.
+1. FSDeploy copies the changes to your local Rhino/GH working directory.
 1. The next time you run the component in Grasshopper, it will reload the (now updated) libraries and re-run itself.
-1. Continue until your edits are complete
+1. Continue until your edits are complete.
 1. Turn off 'dev' mode (set to False). 
 2. Re-Build the `.ghuser` file in Grasshopper ('File / Create User Object...')
 
 
 ## | Component Packaging:
-Once the new or updated `.ghuser` component is created, we use a small utility element to collect all of the Honeybee-PH components and their source code, and copy them to the git-repository for packaging and distribution. This component is very rudimentary, and not designed to work on anyone else's computer. Users would need to build their own version to work on their systems if they wish to follow this pattern. This primarily means setting their own paths and 'find' flags. The relevant example code for this component can be found [here](https://github.com/PH-Tools/honeybee_grasshopper_ph/blob/main/workflow/__HBPH__Util_Update_GHCompos.py)
+Once the new or updated `.ghuser` component is created, we use a small utility element to collect all of the Honeybee-PH components (`ghuser`) and their source code, then make a copy of them in the `honeybee_grasshopper_ph` git-repository for packaging and distribution. This component is very rudimentary, and not designed to work on anyone else's computer. Users would need to build their own version to work on their own systems if they wish to follow this pattern. This primarily means just setting their own paths and 'find' flags within the component. The relevant example code for this component can be found [here](https://github.com/PH-Tools/honeybee_grasshopper_ph/blob/main/workflow/__HBPH__Util_Update_GHCompos.py)
 ![Screenshot 2024-05-15 at 9 49 58 AM](https://github.com/PH-Tools/honeybee_grasshopper_ph/assets/69652712/3328847b-5560-4f6e-8b34-22bc6d34a8f2)
 
 
