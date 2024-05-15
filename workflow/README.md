@@ -22,6 +22,9 @@ All Honeybee-PH components follow a 'facade' pattern. In order to improve overal
 
 To take an example case, consider a simple component such as the [`HBPH-Ventilator`](https://github.com/PH-Tools/honeybee_grasshopper_ph/blob/main/honeybee_grasshopper_ph/src/HBPH%20-%20Ventilator.py) component which is used to create HRV/ERV equipment. 
 
+![Screenshot 2024-05-15 at 9 53 09 AM](https://github.com/PH-Tools/honeybee_grasshopper_ph/assets/69652712/3133afe7-6a09-4323-8ae8-ae8e4a1ce19a)
+
+
 - - - 
 First, since we keep all of the 'worker' classes within the [`gh_comp_io`](https://github.com/PH-Tools/honeybee_grasshopper_ph/tree/main/honeybee_ph_rhino/gh_compo_io) package these classes get imported by the Grasshopper component, along with some utility classes:
 ```python
