@@ -86,10 +86,12 @@ All code libraries area kept in a dedicated git-repository outside of Rhino / Gr
 
 ## | Component Packaging:
 Once the new or updated `.ghuser` component is created, we use a small utility element to collect all of the Honeybee-PH components and their source code, and copy them to the git-repository for packaging and distribution. This component is very rudimentary, and not designed to work on anyone else's computer. Users would need to build their own version to work on their systems if they wish to follow this pattern. This primarily means setting their own paths and 'find' flags. The relevant example code for this component can be found [here]()
+![Screenshot 2024-05-15 at 9 49 58 AM](https://github.com/PH-Tools/honeybee_grasshopper_ph/assets/69652712/3328847b-5560-4f6e-8b34-22bc6d34a8f2)
 
 
 ## | GitHub Releases:
 Releases are executed on GitHub. Follow [sematic-versioning](https://semver.org/) for all version numbering.
+![Screenshot 2024-05-15 at 9 48 21 AM](https://github.com/PH-Tools/honeybee_grasshopper_ph/assets/69652712/8eb29638-8569-44f6-9e01-bdf073b0fbb4)
 
 
 ## | Type Hints:
