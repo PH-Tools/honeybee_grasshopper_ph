@@ -4,6 +4,8 @@ This guide summarizes the current workflow with regard to Grasshopper-Component 
 
 
 ## | Python Components in Grasshopper:
+![Screenshot 2024-05-15 at 10 08 01 AM](https://github.com/PH-Tools/honeybee_grasshopper_ph/assets/69652712/7056bf7f-225f-4d17-b581-c6f5fa3b8043)
+
 Honeybee-PH includes more than 120 Grasshopper Python components. With this many 
 individual elements it is critical to have some automatic method of organization and 
 packaging. Over time we have landed on a patten which works well for our use case 
