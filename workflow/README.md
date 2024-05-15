@@ -1,6 +1,6 @@
 # DEVELOPMENT WORKFLOW
 
-This guide summarizes the current workflow with regard to Grasshopper-Component development and packaging. Note that *nothing* here is set in stone, but represents only our best effort so far to get control over our GH Python Components and make packaging as simple as we can for our specific use-cases. Your specific situation may not be the same as ours, and there are many other ways to organize python components and libraries. For a good summary of some of the different methods, check out the discussion on the [McNeel forum here.](https://discourse.mcneel.com/t/python-component-in-multiple-gh-files-how-to-keep-updated/174263/5)
+This guide summarizes the current workflow with regard to our Grasshopper Python-Component development and packaging. Note that *nothing* here is set in stone, but represents only our best effort so far to get control over our GH Python Components and make packaging as simple as we can for our specific use-cases. Your specific situation may not be the same as ours, and there are many other ways to organize python components and libraries. For a good summary of some of the different methods, check out the discussion on the [McNeel forum here.](https://discourse.mcneel.com/t/python-component-in-multiple-gh-files-how-to-keep-updated/174263/5)
 
 
 ## | Python Components in Grasshopper:
