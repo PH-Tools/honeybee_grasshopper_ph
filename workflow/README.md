@@ -86,7 +86,7 @@ graph LR;
 ```
 
 1. Add the component to the canvas and turn on 'dev' mode to reload libraries as you work.
-1. Make the required edits or updates the source code in VSCode or your preferred IDE.
+1. Make the required edits or updates to the source code in VSCode or your preferred IDE.
 1. FSDeploy copies the changes to your local Rhino/GH working directory.
 1. The next time you run the component in Grasshopper, it will reload the (now updated) libraries and re-run itself.
 1. Continue until your edits are complete.
