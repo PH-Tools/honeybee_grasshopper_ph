@@ -1,41 +1,36 @@
 # WORKFLOW
 
-This guide summarizes the current workflow with regard to Grasshopper-Component development and packaging. Note that *nothing* here is set in stone, but represents only our best effort to date to get control over our Python Components and make packaging as simple as we can for our specific use-cases. 
+This guide summarizes the current workflow with regard to Grasshopper-Component development and packaging. Note that *nothing* here is set in stone, but represents only our best effort so far to get control over our GH Python Components and make packaging as simple as we can for our specific use-cases. Your specific situation may not be the same as ours, and there are many other ways to organize python components and libraries. For a good summary of some of the different methods, check out the discussion on the [McNeel forum here.](https://discourse.mcneel.com/t/python-component-in-multiple-gh-files-how-to-keep-updated/174263/5)
 
 
 ## | Python Components in Grasshopper:
 ![Screenshot 2024-05-15 at 10 08 01 AM](https://github.com/PH-Tools/honeybee_grasshopper_ph/assets/69652712/7056bf7f-225f-4d17-b581-c6f5fa3b8043)
 
-Honeybee-PH includes more than 120 Grasshopper Python components. With this many 
-individual elements it is critical to have some automatic method of organization and 
-packaging. Over time we have landed on a patten which works well for our use case 
-which allows us to develop locally within our preferred IDE (VSCode), deploy changes
-automatically (FSDeploy), and package the final elements together easily.
+Honeybee-PH includes more than 120 Grasshopper Python components. With this many individual elements it is critical to have some automatic method of organization and packaging. Over time we have landed on a pattern which works well for our use case which allows us to develop locally within our preferred IDE (VSCode), deploy changes automatically (FSDeploy), and package the final elements together easily.
 
 
 
-## | The Facade Approach:
-Why?
-1. Allows us to work in our preferred IDE instead of in the component editor
-1. Allows us to easily update the meaningful libraries without having to go through and change the actual component objects in older Grasshopper files.
+## | The Facade-Component Approach:
+In order to improve overall maintainability and ease updates, all Honeybee-PH components follow a 'facade-component' pattern. This:
+1. Allows us to work in our preferred IDE instead of in the GHPython component editor
+1. Allows us to easily update the meaningful libraries without having to change the actual component objects in older Grasshopper files.
 
-All Honeybee-PH components follow a 'facade' pattern. In order to improve overall maintainability and ease updates, all Grasshopper components are **only** responsible for the collection and organization of inputs and outputs. In this approach, all the actual work is done behind scenes by an associated class. This approach means that the meaningful code in the [`honeybee-ph`](https://github.com/PH-Tools/honeybee_ph) or [`honeybee-ph-rhino`](https://github.com/PH-Tools/honeybee_grasshopper_ph/tree/main/honeybee_ph_rhino) libraries can be updated without requiring users to swap out or update any components within their specific Grasshopper definitions. 
+What is a facade-component in this case? All of our Grasshopper components are **only** responsible for the collection and organization of user-inputs and the passing along outputs. In this approach, all the **actual** work is done behind scenes by an associated worker-class. This approach means that the meaningful code in the [`honeybee-ph`](https://github.com/PH-Tools/honeybee_ph) or [`honeybee-ph-rhino`](https://github.com/PH-Tools/honeybee_grasshopper_ph/tree/main/honeybee_ph_rhino) libraries can be easily updated without requiring users to swap out or update any GHPython components within their actual Grasshopper definition files.
 
-
-To take an example case, consider a simple component such as the [`HBPH-Ventilator`](https://github.com/PH-Tools/honeybee_grasshopper_ph/blob/main/honeybee_grasshopper_ph/src/HBPH%20-%20Ventilator.py) component which is used to create HRV/ERV equipment. 
+To take an example case, consider a simple component such as the [`HBPH-Ventilator`](https://github.com/PH-Tools/honeybee_grasshopper_ph/blob/main/honeybee_grasshopper_ph/src/HBPH%20-%20Ventilator.py) component which is used to create HRV/ERV equipment. The GHPython component code doesn't include much, and only looks like:
 
 ![Screenshot 2024-05-15 at 9 53 09 AM](https://github.com/PH-Tools/honeybee_grasshopper_ph/assets/69652712/3133afe7-6a09-4323-8ae8-ae8e4a1ce19a)
 
-
+Stepping through what is happening in the component:
 - - - 
-First, since we keep all of the 'worker' classes within the [`gh_comp_io`](https://github.com/PH-Tools/honeybee_grasshopper_ph/tree/main/honeybee_ph_rhino/gh_compo_io) package these classes get imported by the Grasshopper component, along with some utility classes:
+First, since we keep all of the real 'worker' classes within the [`gh_comp_io`](https://github.com/PH-Tools/honeybee_grasshopper_ph/tree/main/honeybee_ph_rhino/gh_compo_io) package these classes get imported by the Grasshopper component, along with some utility classes:
 ```python
 from honeybee_ph_rhino import gh_compo_io, gh_io
 from honeybee_ph_utils import preview
 ```
 
 - - - 
-Next, the component is configured. The component name and version information is set from the [`honeybee_ph_rhino._component_info_`](https://github.com/PH-Tools/honeybee_grasshopper_ph/blob/main/honeybee_ph_rhino/_component_info_.py) file to ensure that all components have consistent information in a consistent format. Notice that we also include a 'dev' flag which is used during testing and development to allow for reloading the libraries without restarting Rhino. This allows for much more rapid development. This reloading can have some surprising side-effects however, and so for deployment this flag is turned 'off'
+Next, the component is configured. The component nick-name and version information is set (`set_component_params()`) from the [`honeybee_ph_rhino._component_info_`](https://github.com/PH-Tools/honeybee_grasshopper_ph/blob/main/honeybee_ph_rhino/_component_info_.py) file to ensure that all components have consistent information in a consistent format. Notice that we also include a `dev` flag which is used during testing and development to allow for reloading the libraries without restarting Rhino. This allows for much more rapid development. This reloading can have some surprising side-effects however, and so for deployment this flag is turned 'off'
 ```python
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
