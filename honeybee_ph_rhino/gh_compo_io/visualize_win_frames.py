@@ -158,8 +158,9 @@ class GHCompo_VisualizeWindowFrameElements(object):
         return ap_surface, ap_ctr_pt, ap_local_plane, ap_edges_sorted
 
     def run(self):
-        # type: () -> tuple[DataTree[Object], DataTree[Object], DataTree[str], DataTree[str], DataTree[str]]
+        # type: () -> tuple[DataTree[Object], DataTree[Object], DataTree[Object], DataTree[str], DataTree[str], DataTree[str]]
         """Run the component."""
+        aperture_surfaces_ = DataTree[Object]()
         frame_surfaces_ = DataTree[Object]()
         glazing_surfaces_ = DataTree[Object]()
         frame_element_type_names_ = DataTree[str]()
@@ -175,6 +176,10 @@ class GHCompo_VisualizeWindowFrameElements(object):
 
             if not hbph_frame_elements:
                 continue
+
+            # -----------------------------------------------------------------------
+            # -- Collect the Aperture Geometry for Export
+            aperture_surfaces_.Add(surface, GH_Path(i))
 
             # -----------------------------------------------------------------------
             # -- Create all the Frame-Element Geometry
@@ -193,6 +198,7 @@ class GHCompo_VisualizeWindowFrameElements(object):
             planes_.Add(local_plane, GH_Path(i))
 
         return (
+            aperture_surfaces_,
             frame_surfaces_,
             glazing_surfaces_,
             frame_element_type_names_,

@@ -29,12 +29,14 @@ that at already hosted in a Honeybee-Room. This is due to the modifications that
 makes to the geometry planes and surface normals during the Aperture hosting operations. If you
 use this on Apertures before they are hosted in a Room, the edge order will return incorrectly.
 -
-EM June 15, 2023
+EM May 20, 2024
     Args:
         _aperture: (List[Aperture]) The list of HB-Aperatures to get the frame and 
             glass geometry for.
             
     Returns:
+        aperture_surfaces_: The aperture surface.
+
         frame_surfaces_: The aperture frame element surfaces.
             
         glazing_surfaces_: The aperture glazing surfaces.
@@ -77,8 +79,11 @@ gh_compo_interface = gh_compo_io.GHCompo_VisualizeWindowFrameElements(
     _apertures,
     )
     
-(frame_surfaces_,
-glazing_surfaces_,
-frame_typenames_,
-aperture_edges_, 
-aperture_planes_) = gh_compo_interface.run()
+(
+    aperture_surfaces_,
+    frame_surfaces_,
+    glazing_surfaces_,
+    frame_typenames_,
+    aperture_edges_, 
+    aperture_planes_,
+) = gh_compo_interface.run()
