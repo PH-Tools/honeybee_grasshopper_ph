@@ -27,7 +27,7 @@ any components to the HB-Energy model. If you need to model mechancial equipment
 / OpenStudio simulation then you must also use the Honeybee-Energy / IronBug components to setup
 those devices separate from the inputs defined on the component here.
 -
-EM April 21, 2024
+EM May 21, 2024
 
     Args:
         _geometry: (List[Curve]) A list of curves representing the SHW Recirculation
@@ -35,19 +35,19 @@ EM April 21, 2024
         
         _name: (List[str]) A list of names (Optional).
             
-        _diameter: (List[float]) Default=0.0254m (1") A list of diameters (m) of 
+        _diameter: (List[float]) Default=25.4mm (1") A list of diameters (mm) of 
             each DHW Recirculation Piping element input. If the length of this list matches 
             the _geometry input list, the diameter values will be used in order. 
             Otherwise the first element in this list will be used as the 
             default diameter for all pipe elements created.
             
-        _insul_thickness: (List[float]) Default=0.0254m (1"). A list of thickness values
+        _insul_thickness: (List[float]) Default=25.4mm (1"). A list of thicknesses (mm)
             for the pipe insulation. If the length of this list matches 
             the _geometry input list, the thickness values will be used in order. 
             Otherwise the first element in this list will be used as the 
             default thickness for all pipe elements created.
         
-        _insul_conductivity: (List[float]) Default=0.04 W/mk (~R4/in). A list of conductivity values
+        _insul_conductivity: (List[float]) Default=0.04 W/mk (~R-3.6/in). A list of conductivity values
             for the pipe insulation. If the length of this list matches 
             the _geometry input list, the conductivity values will be used in order. 
             Otherwise the first element in this list will be used as the 
@@ -68,7 +68,7 @@ EM April 21, 2024
         
         _daily_period: (List[float]) The daily operating period in hours.
         
-        _water_temp: (List[float]) The temp [C] of the water in the recirculation piping.
+        _water_temp: (List[float]) default=60C | The temp (deg-C) of the water in the recirculation piping.
         
     Returns:
         dhw_recirc_piping_: (List[PhPipeElement]) A list of the new HBPH Piping

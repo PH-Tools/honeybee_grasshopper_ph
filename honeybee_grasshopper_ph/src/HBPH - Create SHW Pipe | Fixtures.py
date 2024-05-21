@@ -29,7 +29,7 @@ any components to the HB-Energy model. If you need to model mechancial equipment
 / OpenStudio simulation then you must also use the Honeybee-Energy / IronBug components to setup
 those devices separate from the inputs defined on the component here.
 -
-EM April 21, 2024
+EM May 21, 2024
 
     Args:
         _display_name: (Optional[str]) An optional name for the fixture line.
@@ -44,15 +44,9 @@ EM April 21, 2024
 7-PE
 8-PEX_CTS_SDR
  
-        _diameter: (str) Input either - 
-3/8"
-1/2"
-5/8"
-3/4"
-1"
-1-1/4"
-1-1/2
-2"
+        _diameter: (List[float]) default=12.7mm (1/2in) | The pipe diameter (m)
+
+        _water_temp: (List[float]) default=60.0C | The temperature of the water.
 
         _geometry: (List[Curve]): A list of curves representing the Hot-Water Fixture
             Piping elements.
@@ -92,6 +86,7 @@ gh_compo_interface = gh_compo_io.GHCompo_CreateSHWFixturePipes(
         _material,
         _diameter,
         _geometry,
+        _water_temp,
     )
 dhw_fixture_piping_ = gh_compo_interface.run()
     

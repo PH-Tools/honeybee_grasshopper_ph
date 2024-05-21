@@ -30,7 +30,7 @@ any components to the HB-Energy model. If you need to model mechancial equipment
 / OpenStudio simulation then you must also use the Honeybee-Energy / IronBug components to setup
 those devices separate from the inputs defined on the component here.
 -
-EM April 21, 2024
+EM May 21, 2024
 
     Args:
         _dhw_branches: (List[PhPipeBranch]) A list of the 'Branch' pipes that should 
@@ -54,17 +54,11 @@ EM April 21, 2024
 5-CPVC_SCH_40
 6-PEX
 7-PE
-8-PEX_CTS_SDR
+8-PEX_CTS_SDR=
  
-        _diameter: (str) Input either - 
-3/8"
-1/2"
-5/8"
-3/4"
-1"
-1-1/4"
-1-1/2
-2"
+        _diameter: (List[float]) default=12.7mm (1/2in) | The pipe diameter (m)
+
+        _water_temp: (List[float]) default=60.0C | The temperature of the water.
 
         _geometry: (List[Curve]): A list of curves representing the Hot-Water Trunk
             Piping elements. Note that one new trunk will be created from EACH curve input
@@ -111,6 +105,7 @@ gh_compo_interface = gh_compo_io.GHCompo_CreateSHWTrunkPipes(
         _material,
         _diameter,
         _geometry,
+        _water_temp,
     )
 dhw_trunk_piping_ = gh_compo_interface.run()
     

@@ -36,9 +36,15 @@ except ImportError as e:
 
 
 class _BranchPipeBuilder(object):
-    """Interface for collect and clean DHW 'Branch' Piping user-inputs"""
+    """Interface for collect and clean DHW 'Branch' Piping user-inputs
+
+    Note: Following the LBT convention, the line-geometry may be stored in any units (m, mm, inch, etc).
+    All non-line-geometry data like thickness, conductivity, temp. etc. must always be in SI units.
+    """
 
     display_name = ghio_validators.HBName("display_name", default="_unnamed_branch_pipe_")
+    pipe_diameter_mm = ghio_validators.UnitMM("pipe_diameter_mm", default="12.7 MM")
+    water_temp_c = ghio_validators.UnitDegreeC("water_temp_c", default="60.0 C")
 
     def __init__(
         self,
@@ -46,16 +52,18 @@ class _BranchPipeBuilder(object):
         dhw_fixtures,
         display_name,
         pipe_material,
-        pipe_diameter,
+        pipe_diameter_mm,
         geometry,
+        water_temp_c,
     ):
-        # type: (gh_io.IGH, List, str, int, int, Union[Polyline3D, LineSegment3D]) -> None
+        # type: (gh_io.IGH, List, str, int, float, Union[Polyline3D, LineSegment3D], float) -> None
         self.IGH = IGH
         self.dhw_fixtures = dhw_fixtures
         self.display_name = display_name
         self.pipe_material = pipe_material
-        self.pipe_diameter = pipe_diameter
+        self.pipe_diameter_mm = pipe_diameter_mm
         self.geometry = geometry
+        self.water_temp_c = water_temp_c
 
     def _convert_to_polyline(self, _input):
         # type: (Any) -> Polyline3D
@@ -103,12 +111,13 @@ class _BranchPipeBuilder(object):
             hbph_obj.pipe_element.add_segment(
                 hot_water_piping.PhHvacPipeSegment(
                     _geom=segment,
-                    _diameter=self.pipe_diameter,
-                    _insul_thickness=0.0,
+                    _diameter_mm=self.pipe_diameter_mm,
+                    _insul_thickness_mm=0.0,
                     _insul_conductivity=0.04,
                     _insul_refl=False,
                     _insul_quality=None,
                     _daily_period=24,
+                    _water_temp_c=self.water_temp_c,
                     _material=self.pipe_material,
                 )
             )
@@ -131,14 +140,16 @@ class GHCompo_CreateSHWBranchPipes(object):
         _pipe_material,
         _pipe_diameter,
         _geometry,
+        _water_temp,
     ):
-        # type: (gh_io.IGH, List[hot_water_piping.PhHvacPipeElement], List[str],  List[str], List[str], List[Union[Polyline3D, LineSegment3D]]) -> None
+        # type: (gh_io.IGH, List[hot_water_piping.PhHvacPipeElement], List[str],  List[str], List[str], List[Union[Polyline3D, LineSegment3D]], List[str]) -> None
         self.IGH = _IGH
         self.dhw_fixtures = _dhw_fixtures
         self.display_name = _display_name
         self.pipe_material = _pipe_material
         self.pipe_diameter = _pipe_diameter
         self.geometry = _geometry
+        self.water_temp = _water_temp
 
     def collect_branch_data(self):
         # type: () -> List[Dict]
@@ -151,8 +162,9 @@ class GHCompo_CreateSHWBranchPipes(object):
                     "dhw_fixtures": self.dhw_fixtures,
                     "display_name": clean_get(self.display_name, i, "_unnamed_Branch_"),
                     "pipe_material": input_to_int(clean_get(self.pipe_material, i, "2")),
-                    "pipe_diameter": input_to_int(clean_get(self.pipe_diameter, i, "2")),
+                    "pipe_diameter_mm": clean_get(self.pipe_diameter, i, "12.7 MM"),
                     "geometry": self.geometry[i],
+                    "water_temp_c": clean_get(self.water_temp, i, "60.0 C"),
                 }
             )
 
