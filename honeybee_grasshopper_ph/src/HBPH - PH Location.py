@@ -28,7 +28,7 @@ Note: This component will -*-NOT-*- reset any of the Honeybee EnergyPlus climate
 and you will need to set those separately using a normal EPW file with hourly data for any
 Honeybee-Energy / OpenStudio simulations.
 -
-EM March 21, 2024
+EM May 22, 2024
     Args:
         _display_name: (str) The display-name for the Location (default="New York")
 
