@@ -24,12 +24,14 @@ Pull out all the frame and glazing surfaces from a given list of HB-Apertures. T
 will create Rhino geometry for each of the elements which can be visualized in the
 scene and used to check the model construction.
 - -
-Note: This will only return the edges in the proper order when it is used on Honeybee-Apertures
-that at already hosted in a Honeybee-Room. This is due to the modifications that Honeybee
-makes to the geometry planes and surface normals during the Aperture hosting operations. If you
-use this on Apertures before they are hosted in a Room, the edge order will return incorrectly.
+Note: The UV of your window surfaces is CRITICAL for this component to work properly. Your 
+window's UV in Rhino MUST be the standard orientation with U (green)='up' and V (red)='to the right'
+and the surface's normal pointing 'out' from the HB-Zone. Use the Rhino 'Show Object Direction' tool in 
+the 'Surfaces' toolbar to view and modify your window-surfaces until they are all consistently oriented.
+If you do not do this, the edges cannot be ordered properly and you will get unpredictable 
+results from this component. 
 -
-EM May 20, 2024
+EM May 24, 2024
     Args:
         _aperture: (List[Aperture]) The list of HB-Aperatures to get the frame and 
             glass geometry for.
