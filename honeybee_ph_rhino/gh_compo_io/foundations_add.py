@@ -19,6 +19,11 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
 try:
+    from honeybee_ph.properties.room import RoomPhProperties
+except ImportError as e:
+    raise ImportError("\nFailed to import honeybee_ph:\n\t{}".format(e))
+
+try:
     from honeybee_ph.foundations import PhFoundation
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph:\n\t{}".format(e))
@@ -38,7 +43,8 @@ class GHCompo_AddFoundations(object):
             new_hb_room = hb_room.duplicate()
 
             for ph_foundation in self.foundations:
-                new_hb_room.properties.ph.add_foundation(ph_foundation)
+                room_ph_prop = getattr(new_hb_room.properties, "ph")  # type: RoomPhProperties
+                room_ph_prop.add_foundation(ph_foundation)
 
             hb_rooms_.append(new_hb_room)
 

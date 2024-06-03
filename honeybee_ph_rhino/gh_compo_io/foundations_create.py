@@ -6,7 +6,7 @@
 from copy import copy
 
 try:
-    from typing import Any, Dict, List, Type, Union
+    from typing import Any, Dict, Optional, Type, Union, Iterable, List
 except ImportError:
     pass  # IronPython 2.7
 
@@ -32,6 +32,12 @@ try:
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_utils:\n\t{}".format(e))
 
+try:
+    from ph_units import converter, parser
+except ImportError as e:
+    raise ImportError("\nFailed to import ph-units:\n\t{}".format(e))
+
+
 # -----------------------------------------------------------------------------
 # -- Setup the component input node groups
 
@@ -40,6 +46,7 @@ inputs_base = {
         _name="_display_name",
         _description="(str) Optional display-name for the Foundation.",
         _type_hint=Component.NewStrHint(),
+        _target_unit="None",
     ),
 }
 
@@ -49,27 +56,32 @@ inputs_heated_basement.update(
         2: ComponentInput(
             _name="floor_slab_area_m2",
             _description="(float) M2 area of the floor slab.",
-            _type_hint=Component.NewFloatHint(),
+            _type_hint=Component.NewStrHint(),
+            _target_unit="M2",
         ),
         3: ComponentInput(
             _name="floor_slab_u_value",
             _description="(float) U-Value (W/m2k) of the floor slab.",
-            _type_hint=Component.NewFloatHint(),
+            _type_hint=Component.NewStrHint(),
+            _target_unit="W/M2K",
         ),
         4: ComponentInput(
             _name="floor_slab_exposed_perimeter_m",
             _description="(float) Input the total length (m) of the exposed perimeter edges.",
-            _type_hint=Component.NewFloatHint(),
+            _type_hint=Component.NewStrHint(),
+            _target_unit="M",
         ),
         5: ComponentInput(
             _name="slab_depth_below_grade_m",
             _description="(float) The average depth (m) of the top of the floor slab below grade.",
-            _type_hint=Component.NewFloatHint(),
+            _type_hint=Component.NewStrHint(),
+            _target_unit="M",
         ),
         6: ComponentInput(
             _name="basement_wall_u_value",
             _description="(float) The U-Value (W/m2k) of the basement wall below grade.",
-            _type_hint=Component.NewFloatHint(),
+            _type_hint=Component.NewStrHint(),
+            _target_unit="W/M2K",
         ),
     }
 )
@@ -80,47 +92,56 @@ inputs_unheated_basement.update(
         2: ComponentInput(
             _name="floor_ceiling_area_m2",
             _description="(float) M2 area of the floor / ceiling.",
-            _type_hint=Component.NewFloatHint(),
+            _type_hint=Component.NewStrHint(),
+            _target_unit="M2",
         ),
         3: ComponentInput(
             _name="ceiling_u_value",
             _description="(float) U-Value (W/m2k) of the ceiling above the cellar.",
-            _type_hint=Component.NewFloatHint(),
+            _type_hint=Component.NewStrHint(),
+            _target_unit="W/M2K",
         ),
         4: ComponentInput(
             _name="floor_slab_exposed_perimeter_m",
             _description="(float) Input the total length (m) of the exposed perimeter edges.",
-            _type_hint=Component.NewFloatHint(),
+            _type_hint=Component.NewStrHint(),
+            _target_unit="M",
         ),
         5: ComponentInput(
             _name="slab_depth_below_grade_m",
             _description="(float) The average depth (m) of the top of the floor slab below grade.",
-            _type_hint=Component.NewFloatHint(),
+            _type_hint=Component.NewStrHint(),
+            _target_unit="M",
         ),
         6: ComponentInput(
             _name="basement_wall_height_above_grade_m",
             _description="(float) The average height (m) of the basement wall above grade.",
-            _type_hint=Component.NewFloatHint(),
+            _type_hint=Component.NewStrHint(),
+            _target_unit="M",
         ),
         7: ComponentInput(
             _name="basement_wall_uValue_below_grade",
             _description="(float) The U-Value (W/m2k) of the basement wall below grade.",
-            _type_hint=Component.NewFloatHint(),
+            _type_hint=Component.NewStrHint(),
+            _target_unit="W/M2K",
         ),
         8: ComponentInput(
             _name="basement_wall_uValue_above_grade",
             _description="(float) The U-Value (W/m2k) of the basement wall above grade.",
-            _type_hint=Component.NewFloatHint(),
+            _type_hint=Component.NewStrHint(),
+            _target_unit="W/M2K",
         ),
         9: ComponentInput(
             _name="floor_slab_u_value",
             _description="(float) U-Value (W/m2k) of the floor slab.",
-            _type_hint=Component.NewFloatHint(),
+            _type_hint=Component.NewStrHint(),
+            _target_unit="W/M2K",
         ),
         10: ComponentInput(
             _name="basement_volume_m3",
             _description="(float) The Volume (m3) of the basement space.",
-            _type_hint=Component.NewFloatHint(),
+            _type_hint=Component.NewStrHint(),
+            _target_unit="M3",
         ),
         11: ComponentInput(
             _name="basement_ventilation_ach",
@@ -136,17 +157,20 @@ inputs_slab_on_grade.update(
         2: ComponentInput(
             _name="floor_slab_area_m2",
             _description="(float) M2 area of the floor slab.",
-            _type_hint=Component.NewFloatHint(),
+            _type_hint=Component.NewStrHint(),
+            _target_unit="M2",
         ),
         3: ComponentInput(
             _name="floor_slab_u_value",
             _description="(float) U-Value (W/m2k) of the floor slab.",
-            _type_hint=Component.NewFloatHint(),
+            _type_hint=Component.NewStrHint(),
+            _target_unit="W/M2K",
         ),
         4: ComponentInput(
             _name="floor_slab_exposed_perimeter_m",
             _description="(float) Input the total length (m) of the exposed perimeter edges.",
-            _type_hint=Component.NewFloatHint(),
+            _type_hint=Component.NewStrHint(),
+            _target_unit="M",
         ),
         5: ComponentInput(
             _name="perim_insulation_position",
@@ -156,17 +180,20 @@ inputs_slab_on_grade.update(
         6: ComponentInput(
             _name="perim_insulation_width_or_depth_m",
             _description="(float) The width (m) (if horizontal) or depth (if vertical) of the perimeter insulation.",
-            _type_hint=Component.NewFloatHint(),
+            _type_hint=Component.NewStrHint(),
+            _target_unit="M",
         ),
         7: ComponentInput(
             _name="perim_insulation_thickness_m",
             _description="(float) The thickness (m) of the perimeter insulation.",
-            _type_hint=Component.NewFloatHint(),
+            _type_hint=Component.NewStrHint(),
+            _target_unit="M",
         ),
         8: ComponentInput(
             _name="perim_insulation_conductivity",
             _description="(float) The thermal conductivity (W/mk) of the perimeter insulation.",
-            _type_hint=Component.NewFloatHint(),
+            _type_hint=Component.NewStrHint(),
+            _target_unit="W/MK",
         ),
     }
 )
@@ -177,37 +204,44 @@ inputs_vented_crawlspace.update(
         2: ComponentInput(
             _name="crawlspace_floor_slab_area_m2",
             _description="(float) M2 area of the crawlspace floor.",
-            _type_hint=Component.NewFloatHint(),
+            _type_hint=Component.NewStrHint(),
+            _target_unit="M2",
         ),
         3: ComponentInput(
             _name="ceiling_above_crawlspace_u_value",
             _description="(float) U-Value (W/m2k) of the ceiling above the crawlspace.",
-            _type_hint=Component.NewFloatHint(),
+            _type_hint=Component.NewStrHint(),
+            _target_unit="W/M2K",
         ),
         4: ComponentInput(
             _name="crawlspace_floor_exposed_perimeter_m",
             _description="(float) Input the total length (m) of the exposed perimeter edges of the crawlspace floor.",
-            _type_hint=Component.NewFloatHint(),
+            _type_hint=Component.NewStrHint(),
+            _target_unit="M",
         ),
         5: ComponentInput(
             _name="crawlspace_wall_height_above_grade_m",
             _description="(float) The average height (m) of the crawlspace wall above grade.",
-            _type_hint=Component.NewFloatHint(),
+            _type_hint=Component.NewStrHint(),
+            _target_unit="M",
         ),
         6: ComponentInput(
             _name="crawlspace_floor_u_value",
             _description="(float) The U-Value (W/m2k) of the crawlspace floor.",
-            _type_hint=Component.NewFloatHint(),
+            _type_hint=Component.NewStrHint(),
+            _target_unit="W/M2K",
         ),
         7: ComponentInput(
             _name="crawlspace_vent_opening_are_m2",
             _description="(float) The total area (m2) of the crawlspace ventilation openings.",
-            _type_hint=Component.NewFloatHint(),
+            _type_hint=Component.NewStrHint(),
+            _target_unit="M2",
         ),
         8: ComponentInput(
             _name="crawlspace_wall_u_value",
             _description="(float) The U-Value (W/m2k) of the crawlspace wall.",
-            _type_hint=Component.NewFloatHint(),
+            _type_hint=Component.NewStrHint(),
+            _target_unit="W/M2K",
         ),
     }
 )
@@ -228,22 +262,54 @@ input_groups = {
 # -----------------------------------------------------------------------------
 
 
-def get_component_inputs(_equipment_type):
+def get_component_inputs(_foundation_type):
     # type: (str) -> Dict[int, ComponentInput]
     """Select the component input-node group based on the 'type' specified"""
 
-    if not _equipment_type:
+    if not _foundation_type:
         return {}
 
-    input_type_id = input_to_int(_equipment_type)
+    input_type_id = input_to_int(_foundation_type)
 
     if not input_type_id:
-        raise Exception('Error: Foundation type: "{}" is not a valid equip type.'.format(input_type_id))
+        raise Exception('Error: Foundation type: "{}" is not a valid type.'.format(input_type_id))
 
     try:
         return input_groups[input_type_id]
     except KeyError:
-        raise Exception('Error: Foundation type: "{}" is not a valid equip type.'.format(input_type_id))
+        raise Exception('Error: Foundation type: "{}" is not a valid type.'.format(input_type_id))
+
+
+def get_component_input_by_name(_input_group, _name):
+    # type: (Dict[int, ComponentInput], str) -> Optional[ComponentInput]
+    """Get the component input from the input group by name."""
+    for value in _input_group.values():
+        if value.name == _name:
+            return value
+
+
+def convert_input(_input, _target_unit):
+    # type: (str, str) -> Optional[Union[float, int]]
+    """Convert a single input to the target unit."""
+    user_input_value, user_input_unit = parser.parse_input(_input)
+    converted_input = converter.convert(user_input_value, user_input_unit, _target_unit)
+    print(
+        "Converting: {:.3f}-{} --> {:.3f}-{}".format(
+            float(user_input_value), user_input_unit, converted_input, _target_unit
+        )
+    )
+    return converted_input
+
+
+def convert_list_of_inputs(_input_list, _target_unit):
+    # type: (Iterable[Any], str) -> List[Optional[Union[float, int]]]
+    """Convert a list of inputs to the target unit."""
+    user_input = []
+    for val in _input_list:
+        val, input_unit = parser.parse_input(val)
+        val = converter.convert(val, input_unit, _target_unit)
+        user_input.append(val)
+    return user_input
 
 
 # -----------------------------------------------------------------------------
@@ -257,15 +323,7 @@ class GHCompo_CreateFoundations(object):
         3: foundations.PhSlabOnGrade,
         4: foundations.PhVentedCrawlspace,
         5: foundations.PhFoundation,
-    }
-
-    valid_foundation_types = [
-        "1-HEATED_BASEMENT",
-        "2-UNHEATED_BASEMENT",
-        "3-SLAB_ON_GRADE",
-        "4-VENTED_CRAWLSPACE",
-        "5-NONE",
-    ]
+    }  # type: Dict[int, Type[foundations.PhFoundation]]
 
     def __init__(self, _IGH, _type, _input_dict):
         # type: (gh_io.IGH, int, Dict[str, Any]) -> None
@@ -274,8 +332,9 @@ class GHCompo_CreateFoundations(object):
         self.input_dict = _input_dict
 
     @property
-    def foundation_type(self):
+    def foundation_type_number(self):
         # type: () -> int
+        """Get the foundation type number."""
         if not self._foundation_type:
             msg = "Set the '_type' to configure the user-inputs."
             self.IGH.warning(msg)
@@ -283,28 +342,45 @@ class GHCompo_CreateFoundations(object):
 
         return int(self._foundation_type)
 
-    @foundation_type.setter
-    def foundation_type(self, _in):
+    @foundation_type_number.setter
+    def foundation_type_number(self, _in):
         # type: (Union[str, int]) -> None
+        """Set the foundation type number."""
         self._foundation_type = input_to_int(_in)
 
     @property
-    def foundation_class(self):
-        # type: () -> Type[foundations.PhFoundation]
+    def valid_foundation_type_names(self):
+        # type: () -> List[str]
+        """Get the list of valid foundation types."""
+        return sorted(foundations.PhFoundationType.allowed)
+
+    def create_new_foundation(self):
+        # type: () -> foundations.PhFoundation
+        """Create a new PhFoundation object based on the user-inputs."""
         try:
-            return self.foundation_classes[self.foundation_type]
+            foundation_class = self.foundation_classes[self.foundation_type_number]
+            return foundation_class()
         except KeyError as e:
             raise Exception(
                 "Error: Input foundation type: '{}' not supported. Please only input: "
-                "{}".format(self.foundation_type, self.valid_foundation_types)
+                "{}".format(self.foundation_type_number, self.valid_foundation_type_names)
             )
+
+    @property
+    def gh_component_input_group(self):
+        # type: () -> Dict[int, ComponentInput]
+        """Get the GH-Component input group dict for this system type."""
+        if self.foundation_type_number:
+            return get_component_inputs(str(self.foundation_type_number))
+        else:
+            return {}
 
     def run(self):
         # type: () -> foundations.PhFoundation
         """Return a new PhFoundation object with attributes based on the user-inputs."""
 
         # -- Create the new PhFoundation Object
-        hbph_foundation_obj_ = self.foundation_class()
+        hbph_foundation_obj_ = self.create_new_foundation()
         hbph_foundation_obj_.display_name = self.input_dict["_display_name"]
 
         # -- Set all the new PhFoundation Object's attributes from user-inputs
@@ -312,8 +388,24 @@ class GHCompo_CreateFoundations(object):
             if attr_name.startswith("_"):
                 continue
 
-            input_val = self.input_dict.get(attr_name)
-            if input_val:
-                setattr(hbph_foundation_obj_, attr_name, input_val)
+            # -- Pull out the user-input-value for this attribute
+            user_input = self.input_dict.get(attr_name, None)
+
+            # -- Find the GH-Component's Input Node for the attribute so we can check the unit-conversion (if any)
+            target_unit = None
+            gh_compo_input = get_component_input_by_name(self.gh_component_input_group, attr_name)
+            if gh_compo_input:
+                target_unit = gh_compo_input.target_unit
+
+            # -- Convert the attribute's user-input-value, if necessary
+            if user_input and target_unit:
+                if isinstance(user_input, (list, tuple, set)):
+                    user_input = convert_list_of_inputs(user_input, target_unit)
+                else:
+                    user_input = convert_input(user_input, target_unit)
+
+            # -- Set the attribute value
+            if user_input:
+                setattr(hbph_foundation_obj_, attr_name, user_input)
 
         return hbph_foundation_obj_
