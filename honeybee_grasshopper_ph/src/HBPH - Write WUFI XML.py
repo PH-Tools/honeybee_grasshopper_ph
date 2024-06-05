@@ -24,7 +24,7 @@ Convert an HBJSON file into a new WUFI-XML file which can then be opened using
 WUFI-Passive. This will read in the HBJSON, rebuild the HB-Model before converting the 
 Model into a WUFI-Passive file.
 -
-EM January 21, 2024
+EM June 5, 2024
     Args:
         _filename: (str) The filename for the WUFI XML file.
         
@@ -32,27 +32,9 @@ EM January 21, 2024
         
         _hb_json_file: (str) The path to the HBJSON file to convert into WUFI XML.
         
-        _group_components: (bool) Default=True. Set False to keep each component
-            (face) in the WUFI Model separate.
-        
-        _merge_faces: (bool | float [tolerance]) Default=False. Set True to try and merge together 
-            touching faces in order to simplify the model. This operation can 
-            somethimes have unexpected results with some geometry, so only use 
-            it if you really need to reduce the complexity of the WUFI model and 
-            be sure to careufully check the resulting model faces for errors. If you
-            have errors when merging, try passing in a smaller tolerance value here (0.0001, etc) 
-            and see if that helps.
+        _settings: The WUFI Settings object. Connect the "HBPH - Write WUFI XML Settings"
+            'settings_' output.
 
-        _generate_log_files: (int) Default=0 Input a log-level here if you would like PHX to generate log-files
-            which record the operations and progress of the HBJSON->XML process. Input either:
-
-50 = CRITICAL
-40 = ERROR
-30 = WARNING
-20 = INFO
-10 = DEBUG
-0 = NO LOGS (DEFAULT)
-        
         _write_xml: (bool) Set True to run. 
             
     Returns:
@@ -65,11 +47,6 @@ import rhinoscriptsyntax as rs
 import ghpythonlib.components as ghc
 import Grasshopper as gh
 
-
-try:
-    from honeybee_ph_utils import preview
-except ImportError as e:
-    raise ImportError('Failed to import honeybee_ph_utils:\t{}'.format(e))
 
 try:
     from honeybee_ph_rhino import gh_compo_io, gh_io
@@ -100,9 +77,7 @@ gh_compo_interface = gh_compo_io.GHCompo_WriteWufiXml(
         _filename,
         _save_folder,
         _hb_json_file,
+        _settings,
         _write_xml,
-        _group_components,
-        _merge_faces,
-        _generate_log_files,
 )
 xml_file_ = gh_compo_interface.run()
