@@ -6,7 +6,7 @@
 import os
 
 try:
-    from typing import Dict, List, Optional, Union
+    from typing import Optional, Any
 except ImportError:
     pass  # IronPython 2.7
 
@@ -16,46 +16,27 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
 try:
-    import PHX.run  # type: ignore
+    import PHX.run
 except ImportError as e:
     raise ImportError("\nFailed to import PHX:\n\t{}".format(e))
 
+try:
+    from honeybee_ph_rhino.gh_compo_io.write_wufi_xml_settings import WufiWriteSettings
+except ImportError as e:
+    raise ImportError("\nFailed to import WufiWriteSettings:\n\t{}".format(e))
+
 
 class GHCompo_WriteWufiXml(object):
-    def __init__(
-        self,
-        _IGH,
-        _filename,
-        _save_folder,
-        _hb_json_file,
-        _write_xml,
-        _group_components,
-        _merge_faces,
-        _generate_log_files,
-        *args,
-        **kwargs
-    ):
-        # type: (gh_io.IGH, str, str, str, bool, bool, Union[bool, float], int, List, Dict) -> None
+    """GHCompo Interface: HBPH - Write WUFI XML."""
+
+    def __init__(self, _IGH, _filename, _save_folder, _hb_json_file, _settings, _write_xml, *args, **kwargs):
+        # type: (gh_io.IGH, str, str, str, Optional[WufiWriteSettings], bool, *Any, **Any) -> None
         self.IGH = _IGH
         self.filename = _filename
         self.save_folder = _save_folder
         self.hb_json_file = _hb_json_file
+        self.settings = _settings or WufiWriteSettings()
         self.write_xml = _write_xml
-        self.generate_log_files = _generate_log_files or 0
-
-        # -- Group the model components during export to XML?
-        if _group_components is None or _group_components == True:
-            self.group_components = True  # default == True
-        else:
-            self.group_components = False
-
-        # -- Merge the model faces during export to XML?
-        if _merge_faces is None or _merge_faces is False:
-            self.merge_faces = False  # Default = will not merge faces
-        elif _merge_faces == True:
-            self.merge_faces = True  # Will use default model tolerance
-        else:
-            self.merge_faces = float(_merge_faces)  # Tolerance
 
     def give_user_warnings(self, _stdout):
         # type: (str) -> None
@@ -67,15 +48,16 @@ class GHCompo_WriteWufiXml(object):
 
     def run(self):
         # type: () -> Optional[str]
-        if self.write_xml and self.hb_json_file:
-            print("Logging with log-level: {}".format(self.generate_log_files))
+        if self.write_xml and self.hb_json_file and self.settings:
+            print("Logging with log-level: {}".format(self.settings.generate_log_files))
             save_dir, save_filename, stdout, stderr = PHX.run.convert_hbjson_to_WUFI_XML(
                 self.hb_json_file,
                 self.filename,
                 self.save_folder,
-                self.group_components,
-                self.merge_faces,
-                self.generate_log_files,
+                self.settings.group_components,
+                self.settings.merge_faces,
+                self.settings.merge_spaces_by_erv,
+                self.settings.generate_log_files,
             )
             self.give_user_warnings(stdout)
             save_filename += ".xml"

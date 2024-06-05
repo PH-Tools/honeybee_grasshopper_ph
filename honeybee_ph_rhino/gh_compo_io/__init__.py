@@ -104,3 +104,4 @@ from honeybee_ph_rhino.gh_compo_io.write_PHPP import GHCompo_WriteToPHPP
 
 # -- Export
 from honeybee_ph_rhino.gh_compo_io.write_wuif_xml import GHCompo_WriteWufiXml
+from honeybee_ph_rhino.gh_compo_io.write_wufi_xml_settings import GHCompo_WriteWufiXmlSettings

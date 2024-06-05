@@ -470,6 +470,12 @@ COMPONENT_PARAMS = {
         "Category": CATEGORY,
         "SubCategory": 3,
     },
+    "HBPH - Write WUFI XML Settings": {
+        "NickName": " WUFI Settings",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 3,
+    },
     # -- Foundations
     "HBPH - Add Foundations": {
         "NickName": "Add Foundations",
