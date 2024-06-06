@@ -4,7 +4,7 @@
 """GHCompo Interface: HBPH - Write WUFI XML Settings."""
 
 try:
-    from typing import Union, Any
+    from typing import Any, Union
 except ImportError:
     pass  # IronPython 2.7
 

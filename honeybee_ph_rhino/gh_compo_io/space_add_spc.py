@@ -4,7 +4,7 @@
 """GHCompo Interface: HBPH - Add Spaces."""
 
 try:
-    from typing import List, Tuple, Optional
+    from typing import List, Optional, Tuple
 except ImportError:
     pass  # IronPython 2.7
 

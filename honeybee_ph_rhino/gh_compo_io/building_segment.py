@@ -15,7 +15,7 @@ except ImportError as e:
 
 try:
     from honeybee_ph import bldg_segment, phi, phius, site
-    from honeybee_ph.bldg_segment import PhVentilationSummerBypassMode
+    from honeybee_ph.bldg_segment import PhVentilationSummerBypassMode, PhWindExposureType
     from honeybee_ph.properties.room import RoomPhProperties
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph:\n\t{}".format(e))
@@ -87,10 +87,11 @@ class GHCompo_BuildingSegment(object):
         _hb_rooms,
         _non_combustible_materials=False,
         _hvr_summer_bypass_mode="4",
+        _wind_exposure_type="1",
         *args,
         **kwargs
     ):
-        # type: (gh_io.IGH, str, int, int, site.Site, List, List, phius.PhiusCertification, phi.PhiCertification, str, str, str, List[room.Room], bool, str, *Any, **Any) -> None
+        # type: (gh_io.IGH, str, int, int, site.Site, List, List, phius.PhiusCertification, phi.PhiCertification, str, str, str, List[room.Room], bool, str, str, *Any, **Any) -> None
         self.IGH = _IGH
         self._display_name = _segment_name or "_unnamed_bldg_segment_"
         self.num_floor_levels = _num_floor_levels
@@ -121,6 +122,7 @@ class GHCompo_BuildingSegment(object):
 
         self.co2e_factors.validate_fuel_types(self._allowed_fuels)
         self.summer_hrv_bypass_mode = _hvr_summer_bypass_mode or "4"
+        self.wind_exposure_type = _wind_exposure_type or "1"
 
     @property
     def source_energy_factors(self):
@@ -163,6 +165,16 @@ class GHCompo_BuildingSegment(object):
         # type: (str) -> None
         self._summer_hrv_bypass_mode = PhVentilationSummerBypassMode(input_to_int(_input) or 4)
 
+    @property
+    def wind_exposure_type(self):
+        # type: () -> PhWindExposureType
+        return self._wind_exposure_type
+
+    @wind_exposure_type.setter
+    def wind_exposure_type(self, _input):
+        # type: (str) -> None
+        self._wind_exposure_type = PhWindExposureType(input_to_int(_input) or 1)
+
     def _create_hbph_set_points(self):
         # type: () -> bldg_segment.SetPoints
         """Return a new HBPH SetPoints object with attributes from user input."""
@@ -179,7 +191,7 @@ class GHCompo_BuildingSegment(object):
         for room in self.hb_rooms:
             if not room:
                 continue
-            room_prop_ph = room.properties.ph  # type: RoomPhProperties
+            room_prop_ph = getattr(room.properties, "ph")  # type: RoomPhProperties
             tb_dict.update(room_prop_ph.ph_bldg_segment.thermal_bridges)
         self.thermal_bridges = tb_dict
 
@@ -217,7 +229,8 @@ class GHCompo_BuildingSegment(object):
                 continue
 
             new_room = hb_room.duplicate()
-            new_room.properties.ph.ph_bldg_segment = hbph_segment  # type: ignore
+            new_room_prop_ph = getattr(new_room.properties, "ph")  # type: RoomPhProperties
+            new_room_prop_ph.ph_bldg_segment = hbph_segment
             hb_rooms_.append(new_room)
 
         return hb_rooms_, hbph_segment

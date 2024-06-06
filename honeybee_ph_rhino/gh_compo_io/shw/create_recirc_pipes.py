@@ -4,7 +4,7 @@
 """GHCompo Interface: HBPH - Create SHW Recirculation Pipes."""
 
 try:
-    from typing import Any, List, Union, Dict
+    from typing import Any, Dict, List, Union
 except ImportError:
     pass  # IronPython 2.7
 

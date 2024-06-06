@@ -33,7 +33,7 @@ model. Only Honeybee Faces with boundary conditions of "Outdoors", "Ground" and
 -
 Use this before passing the honeybee-rooms on to the 'HB Model' component.
 -
-EM June 14, 2023
+EM June 6, 2024
     Args:
         segment_name_: Name for the building-segment
                
@@ -75,7 +75,7 @@ EM June 14, 2023
             heated outdoor space such as a garage or breezeway. For Phius Certification, 
             use the 'ERV_HRV_Outside Calculator' tool which can be downloaded from the 
             Phius website www.phius.org
-            
+
         non_combustible_materials_: (bool) Default=False. Set True if the building is made 
             of non-combustible materials which allows for a higher air-leakage rate.
             
@@ -85,6 +85,15 @@ EM June 14, 2023
 "3-Enthalpy Controlled"
 "4-Always" (Default)
     
+        wind_exposure_type_: (str) Input either - 
+"1-Several Sides Exposed | No Screening" (Default)
+"2-Several Sides Exposed | Moderate Screening"
+"3-Several Sides Exposed | High Screening"
+"4-One Side Exposed | No Screening"
+"5-One Side Exposed | Moderate Screening"
+"6-User Determined"
+"7-One Side Exposed | High Screening"
+
     Returns:
         hb_rooms_: The honeyee-Rooms with building-segment information added.
 """
@@ -144,6 +153,7 @@ gh_compo_interface = gh_compo_io.GHCompo_BuildingSegment(
         _hb_rooms,
         non_combustible_materials_,
         hrv_summer_bypass_mode_,
+        wind_exposure_type_,
 )
 hb_rooms_, hbph_segment = gh_compo_interface.run()
 

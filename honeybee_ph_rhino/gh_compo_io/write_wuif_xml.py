@@ -6,7 +6,7 @@
 import os
 
 try:
-    from typing import Optional, Any
+    from typing import Any, Optional
 except ImportError:
     pass  # IronPython 2.7
 

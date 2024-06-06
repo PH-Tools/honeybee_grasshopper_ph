@@ -101,7 +101,7 @@ from honeybee_ph_rhino.gh_compo_io.win_set_monthly_shd_fac import GHCompo_SetWin
 from honeybee_ph_rhino.gh_compo_io.win_set_reveal_distance import GHCompo_SetApertureRevealDistance
 from honeybee_ph_rhino.gh_compo_io.win_set_seasonal_shading_factors import GHCompo_SetWindowSeasonalShadingFactors
 from honeybee_ph_rhino.gh_compo_io.write_PHPP import GHCompo_WriteToPHPP
+from honeybee_ph_rhino.gh_compo_io.write_wufi_xml_settings import GHCompo_WriteWufiXmlSettings
 
 # -- Export
 from honeybee_ph_rhino.gh_compo_io.write_wuif_xml import GHCompo_WriteWufiXml
-from honeybee_ph_rhino.gh_compo_io.write_wufi_xml_settings import GHCompo_WriteWufiXmlSettings
