@@ -493,6 +493,11 @@ class IGH:
 
         return output_tree_
 
+    @property
+    def tolerance(self):
+        # type: () -> float
+        return self.scriptcontext.doc.ModelAbsoluteTolerance
+
 
 class ComponentInput:
     """GH-Component Input Node data class."""
