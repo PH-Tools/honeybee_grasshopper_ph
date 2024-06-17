@@ -181,7 +181,7 @@ inputs_heat_pump_annual = {
     ),
     3: ComponentInput(
         _name="in_conditioned_space",
-        _description=r"(bool) Is the boiler installed inside the conditioned space? default=True.",
+        _description=r"(bool) Is the heater installed inside the conditioned space? default=True.",
         _type_hint=Hints.GH_BooleanHint_CS(),
     ),
     4: ComponentInput(
@@ -190,13 +190,8 @@ inputs_heat_pump_annual = {
         _type_hint=Component.NewFloatHint(),
     ),
     5: ComponentInput(
-        _name="annual_system_perf_ratio",
-        _description=r"(float) Annual system performance ratio of heat generator.",
-        _type_hint=Component.NewFloatHint(),
-    ),
-    6: ComponentInput(
-        _name="annual_energy_factor",
-        _description=r"(float) OPTIONAL - Annual energy-factor (EF) of the heat pump.",
+        _name="total_system_perf_ratio",
+        _description=r"(float) Total annual system performance ratio of heat generator.",
         _type_hint=Component.NewFloatHint(),
     ),
 }
@@ -214,31 +209,63 @@ inputs_heat_pump_monthly = {
     ),
     3: ComponentInput(
         _name="in_conditioned_space",
-        _description=r"(bool) Is the boiler installed inside the conditioned space? default=True.",
+        _description=r"(bool) Is the heater installed inside the conditioned space? default=True.",
         _type_hint=Hints.GH_BooleanHint_CS(),
     ),
     4: ComponentInput(
-        _name="rated_COP_at_T1",
-        _description=r"(float) The rated Coefficient of Performance (COP) at temperature T1",
+        _name="COP_1",
+        _description=r"(float) The rated Coefficient of Performance (COP) at T='ambient_temp_1'",
         _type_hint=Component.NewFloatHint(),
     ),
     5: ComponentInput(
-        _name="rated_COP_at_T2",
-        _description=r"(float) The rated Coefficient of Performance (COP) at temperature T2",
+        _name="COP_2",
+        _description=r"(float) The rated Coefficient of Performance (COP) T='ambient_temp_2'",
         _type_hint=Component.NewFloatHint(),
     ),
     6: ComponentInput(
-        _name="temp_T1",
+        _name="ambient_temp_1",
         _description=r"(float) Temperature T1 (deg C)",
         _type_hint=Component.NewFloatHint(),
     ),
     7: ComponentInput(
-        _name="temp_T2",
+        _name="ambient_temp_2",
         _description=r"(float) Temperature T2 (deg C)",
         _type_hint=Component.NewFloatHint(),
     ),
 }
 
+inputs_heat_pump_inside = {
+    1: ComponentInput(
+        _name="display_name",
+        _description=r"(str) An optional name for the HW-Heater.",
+        _type_hint=Component.NewStrHint(),
+    ),
+    2: ComponentInput(
+        _name="percent_coverage",
+        _description=r"(float) The % of total HW energy covered by this device.",
+        _type_hint=Component.NewFloatHint(),
+    ),
+    3: ComponentInput(
+        _name="in_conditioned_space",
+        _description=r"(bool) Is the heater installed inside the conditioned space? default=True.",
+        _type_hint=Hints.GH_BooleanHint_CS(),
+    ),
+    4: ComponentInput(
+        _name="annual_COP",
+        _description=r"(float) Annual Coefficient of Performance (COP). Defined as: energy-out/energy-in.",
+        _type_hint=Component.NewFloatHint(),
+    ),
+    5: ComponentInput(
+        _name="total_system_perf_ratio",
+        _description=r"(float) Total annual system performance ratio of heat generator. Inverse of the COP. Defined as: energy-in/energy-out",
+        _type_hint=Component.NewFloatHint(),
+    ),
+    6: ComponentInput(
+        _name="annual_energy_factor",
+        _description=r"(float) Annual energy-factor (EF) of the heat pump.",
+        _type_hint=Component.NewFloatHint(),
+    ),
+}
 
 input_groups = {
     1: inputs_electric,
@@ -247,6 +274,7 @@ input_groups = {
     4: inputs_district,
     5: inputs_heat_pump_annual,
     6: inputs_heat_pump_monthly,
+    7: inputs_heat_pump_inside,
 }
 
 valid_heater_types = [
@@ -256,6 +284,7 @@ valid_heater_types = [
     "4-District",
     "5-HeatPump",
     "6-HeatPump",
+    "7-HeatPump",
 ]
 
 
@@ -275,6 +304,8 @@ def get_component_inputs(_heater_type):
         return input_groups[5]
     elif "6" in str(_heater_type):
         return input_groups[6]
+    elif "7" in str(_heater_type):
+        return input_groups[7]
     else:
         return input_groups[1]
 
@@ -291,8 +322,9 @@ class GHCompo_CreateSHWHeater(object):
         2: {"cls": hot_water_devices.PhHvacHotWaterHeaterBoiler, "name": "2-Boiler (gas/oil)"},
         3: {"cls": hot_water_devices.PhHvacHotWaterHeaterBoilerWood, "name": "3-Boiler (wood)"},
         4: {"cls": hot_water_devices.PhHvacHotWaterHeaterDistrict, "name": "4-District"},
-        5: {"cls": hot_water_devices.PhHvacHotWaterHeaterHeatPump, "name": "5-HeatPump (annual COP)"},
-        6: {"cls": hot_water_devices.PhHvacHotWaterHeaterHeatPump, "name": "6-HeatPump (monthly COP)"},
+        5: {"cls": hot_water_devices.PhHvacHotWaterHeaterHeatPump_Annual, "name": "5-HeatPump (annual COP)"},
+        6: {"cls": hot_water_devices.PhHvacHotWaterHeaterHeatPump_Monthly, "name": "6-HeatPump (monthly COP)"},
+        7: {"cls": hot_water_devices.PhHvacHotWaterHeaterHeatPump_Inside, "name": "7-HeatPump (inside)"},
     }
 
     valid_types = [heater_class["name"] for heater_class in heater_classes.values()]

@@ -229,8 +229,20 @@ class GHCompo_CreateSpaceConditioningSystem(object):
     @property
     def heating_system_percent_coverage(self):
         # type: () -> float
-        """Get the percent coverage of the heating system."""
+        """Get the percent coverage of the heating system.
+
+        Because I used a "_xx" prefix in the name for some reason, I need to pull this out separately.
+        """
         return float(self.input_dict.get("_percent_bldg_heating_covered", 1.0) or 1.0)
+
+    @property
+    def display_name(self):
+        # type: () -> str
+        """Get the percent coverage of the heating system.
+
+        Because I used a "_xx" prefix in the name for some reason, I need to pull this out separately.
+        """
+        return self.input_dict.get("_display_name", "__unnamed_system__")
 
     def run(self):
         # type: () -> Optional[Union[heating.PhHeatingSystem, heat_pumps.PhHeatPumpSystem]]
@@ -277,8 +289,11 @@ class GHCompo_CreateSpaceConditioningSystem(object):
             if user_input:
                 setattr(new_heating_system, attr_name, user_input)
 
-        # -- Set the heating percent covered
+        # -- Set "_xx" attributes
+        # -- This is needed because I chose to use a "_xx" prefix in the name for some reason
+        # -- and so it would otherwise get excluded...
         new_heating_system.percent_coverage = self.heating_system_percent_coverage
+        new_heating_system.display_name = self.display_name
 
         # -- If its not a heat-pump with cooling, just return it.
         if isinstance(new_heating_system, heating.PhHeatingSystem):
