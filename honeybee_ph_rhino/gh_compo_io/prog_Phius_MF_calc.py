@@ -22,6 +22,11 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
 try:
+    from honeybee_ph.properties.room import RoomPhProperties
+except ImportError as e:
+    raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
+
+try:
     from honeybee_energy_ph.load import ph_equipment, phius_mf
     from honeybee_energy_ph.properties.load.people import PeoplePhProperties
 except ImportError as e:
@@ -259,7 +264,8 @@ class GHCompo_CalcPhiusMFLoads(object):
         # -- Build a new Phius Non-Res-Space for each PH-Space found
         non_res_spaces = []  # type: List[phius_mf.PhiusNonResRoom]
         for hb_room in _hb_nonres_rooms:
-            for space in hb_room.properties.ph.spaces:  # type: ignore
+            room_prop_ph = getattr(hb_room.properties, "ph")  # type: RoomPhProperties
+            for space in room_prop_ph.spaces:
                 new_nonres_space = phius_mf.PhiusNonResRoom.from_ph_space(space)
                 prog_collection.add_program(new_nonres_space.program_type)
                 non_res_spaces.append(new_nonres_space)

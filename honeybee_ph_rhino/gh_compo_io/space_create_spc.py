@@ -12,6 +12,7 @@ except ImportError:
 
 try:
     from Grasshopper import DataTree  # type: ignore
+    from Grasshopper.Kernel.Data import GH_Path  # type: ignore
 except ImportError:
     pass  # outside Grasshopper
 
@@ -66,8 +67,11 @@ class GHCompo_CreatePHSpaces(object):
         _space_names,
         _space_numbers,
         _space_ph_vent_rates,
+        _flr_seg_net_areas,
+        *args,
+        **kwargs
     ):
-        # type: (gh_io.IGH, DataTree, DataTree, DataTree, DataTree, DataTree, DataTree, DataTree) -> None
+        # type: (gh_io.IGH, DataTree, DataTree, DataTree, DataTree, DataTree, DataTree, DataTree, DataTree[float], *Any, **Any) -> None
         self.IGH = _IGH
         self.flr_geom = _flr_seg_geom
         self.weighting_factors = _weighting_factors
@@ -76,6 +80,7 @@ class GHCompo_CreatePHSpaces(object):
         self.names = _space_names
         self.numbers = _space_numbers
         self.vent_rates = _space_ph_vent_rates
+        self.net_areas = _flr_seg_net_areas
 
     @property
     def rh_doc_unit_type_abbreviation(self):
@@ -84,7 +89,21 @@ class GHCompo_CreatePHSpaces(object):
 
         return units_abbreviation().upper()
 
-    def _default_height_in_local_units(self):
+    @property
+    def rh_doc_local_length_unit(self):
+        # type: () -> str
+        """Return the Rhino document unit-type for area as a string abbreviation. ie: "Meter" -> "M", etc.."""
+
+        return "{}".format(self.rh_doc_unit_type_abbreviation)
+
+    @property
+    def rh_doc_local_area_unit(self):
+        # type: () -> str
+        """Return the Rhino document unit-type for area as a string abbreviation. ie: "Meter" -> "M2", etc.."""
+
+        return "{}2".format(self.rh_doc_unit_type_abbreviation)
+
+    def get_default_height_in_local_units(self):
         # type: () -> Union[float, int]
         """Return the default SpaceVolume height in the Rhino document unit-type."""
 
@@ -99,6 +118,38 @@ class GHCompo_CreatePHSpaces(object):
             )
             raise Exception(msg)
         return value
+
+    def tree_to_local_area_units(self, _input_tree):
+        # type: (DataTree[float | str | None]) -> DataTree[float | None]
+        """Convert the input DataTree to the Rhino document unit-type."""
+
+        new_tree = DataTree[Object]()
+        for i in range(_input_tree.BranchCount):
+            for _input in _input_tree.Branch(i):
+                if _input is None:
+                    converted_input = None
+                else:
+                    converted_input = converter.convert(
+                        *parser.parse_input(_input), _target_unit=self.rh_doc_local_area_unit
+                    )
+                new_tree.Add(converted_input, GH_Path(i))
+        return new_tree
+
+    def tree_to_local_length_units(self, _input_tree):
+        # type: (DataTree[float | str | None]) -> DataTree[float | None]
+        """Convert the input DataTree to the Rhino document unit-type."""
+
+        new_tree = DataTree[Object]()
+        for i in range(_input_tree.BranchCount):
+            for _input in _input_tree.Branch(i):
+                if _input is None:
+                    converted_input = None
+                else:
+                    converted_input = converter.convert(
+                        *parser.parse_input(_input), _target_unit=self.rh_doc_local_length_unit
+                    )
+                new_tree.Add(converted_input, GH_Path(i))
+        return new_tree
 
     def _clean_input_tree(self, _input_tree, branch_count, default, _type):
         # type: (DataTree, int, Any, T) -> DataTree[T]
@@ -116,13 +167,12 @@ class GHCompo_CreatePHSpaces(object):
             DataTree[T]: A new DataTree with the same structure as the input tree, but with
                 all branches the same length.
         """
-        new_tree = self.IGH.Grasshopper.DataTree[_type]()  # type: DataTree[T]
-        pth = self.IGH.Grasshopper.Kernel.Data.GH_Path
+        new_tree = DataTree[_type]()  # type: DataTree[T]
         for i in range(branch_count):
             try:
-                new_tree.AddRange(_input_tree.Branch(i), pth(i))
+                new_tree.AddRange(_input_tree.Branch(i), GH_Path(i))
             except ValueError:
-                new_tree.Add(default, pth(i))
+                new_tree.Add(default, GH_Path(i))
         return new_tree
 
     def _clean_volume_heights_tree(self, _input_tree, _branch_count, _default_height, _type):
@@ -132,28 +182,26 @@ class GHCompo_CreatePHSpaces(object):
         ie: if the user inputs "15 m" will convert to the Rhino document unit-type.
         """
 
-        new_tree = self.IGH.Grasshopper.DataTree[_type]()  # type: DataTree[T]
-        pth = self.IGH.Grasshopper.Kernel.Data.GH_Path
-
+        new_tree = DataTree[_type]()  # type: DataTree[T]
         for i in range(_branch_count):
             try:
                 if not _input_tree.Branch(i):
-                    new_tree.Add(_default_height, pth(i))
+                    new_tree.Add(_default_height, GH_Path(i))
 
                 for input_item in _input_tree.Branch(i):
                     val, unit = parser.parse_input(input_item)
                     converted_value = converter.convert(val, unit, self.rh_doc_unit_type_abbreviation)
-                    new_tree.Add(converted_value, pth(i))
+                    new_tree.Add(converted_value, GH_Path(i))
             except ValueError:
-                new_tree.Add(_default_height, pth(i))
+                new_tree.Add(_default_height, GH_Path(i))
         return new_tree
 
-    def _create_space_floors(self, _flr_srfc_list, _weighting_factor_branch):
-        # type: (List, DataTree[Double]) -> Tuple[List[space.SpaceFloor], List[Optional[face.Face3D]]]
+    def _create_space_floors(self, _flr_srfc_list, _weighting_factor_branch, _net_areas_branch):
+        # type: (List, DataTree[Double], DataTree[Double | None]) -> Tuple[List[space.SpaceFloor], List[Optional[face.Face3D]]]
         """Return a list of space.SpaceFloor objects based on Rhino Geometry and TFA weighting factors."""
 
         space_floors, e = make_floor.space_floor_from_rh_geom(
-            self.IGH, list(_flr_srfc_list), list(_weighting_factor_branch)
+            self.IGH, list(_flr_srfc_list), list(_weighting_factor_branch), list(_net_areas_branch)
         )
 
         error_faces = [from_face3d(s) for s in e]  # type: List[Optional[face.Face3D]]
@@ -205,8 +253,9 @@ class GHCompo_CreatePHSpaces(object):
         _weighting_factors,
         _volume_heights,
         _vent_rates,
+        _net_areas,
     ):
-        # type: (DataTree[str], DataTree[str], DataTree[Double], DataTree[Double], DataTree) -> Tuple[List[Optional[face.Face3D]], List, List, List[space.Space]]
+        # type: (DataTree[str], DataTree[str], DataTree[Double], DataTree[Double], DataTree, DataTree) -> Tuple[List[Optional[face.Face3D]], List, List, List[space.Space]]
         """Create all the PH space.Spaces based on the user input."""
 
         spaces_ = []
@@ -219,19 +268,20 @@ class GHCompo_CreatePHSpaces(object):
             new_space = space.Space()
             new_space.name = _space_names.Branch(i)[0]
             new_space.number = _space_numbers.Branch(i)[0]
-            space_floors, errors_ = self._create_space_floors(floor_surface_list, _weighting_factors.Branch(i))
+            space_floors, errors_ = self._create_space_floors(
+                floor_surface_list, _weighting_factors.Branch(i), _net_areas.Branch(i)
+            )
             space_volumes = self._create_space_volumes(space_floors, _volume_heights.Branch(i))
             new_space.add_new_volumes(space_volumes)
             new_space = self._add_flow_rates_to_space(_vent_rates.Branch(i), new_space)
             spaces_.append(new_space)
 
             # -- Output Preview: Floor Surfaces
-            pth = self.IGH.Grasshopper.Kernel.Data.GH_Path
             flr_rh_geom = [from_face3d(flr.geometry) for flr in space_floors]
-            floor_breps_.AddRange(flr_rh_geom, pth(i))
+            floor_breps_.AddRange(flr_rh_geom, GH_Path(i))
 
             # -- Output Preview: Volume Breps
-            volume_breps_.AddRange(self._space_volumes_as_rh_geom(space_volumes), pth(i))
+            volume_breps_.AddRange(self._space_volumes_as_rh_geom(space_volumes), GH_Path(i))
 
         spaces_ = sorted(spaces_, key=lambda sp: sp.full_name)
 
@@ -243,13 +293,18 @@ class GHCompo_CreatePHSpaces(object):
 
         # -------------------------------------------------------------------------------
         # -- Organize the input trees, lists, lengths, defaults
-        default_height = self._default_height_in_local_units()
+        default_height = self.get_default_height_in_local_units()
         input_len = len(self.flr_geom.Branches)
 
         space_names = self._clean_input_tree(self.names, input_len, "_Unnamed_", String)
         space_numbers = self._clean_input_tree(self.numbers, input_len, "000", String)
         weighting_factors = self._clean_input_tree(self.weighting_factors, input_len, 1.0, Object)
-        volume_heights = self._clean_volume_heights_tree(self.vol_heights, input_len, default_height, Object)
+        volume_heights = self.tree_to_local_length_units(
+            self._clean_volume_heights_tree(self.vol_heights, input_len, default_height, Object)
+        )
         vent_rates = self._clean_input_tree(self.vent_rates, input_len, None, Object)
+        net_areas = self.tree_to_local_area_units(self._clean_input_tree(self.net_areas, input_len, None, Object))
 
-        return self._create_ph_spaces(space_names, space_numbers, weighting_factors, volume_heights, vent_rates)
+        return self._create_ph_spaces(
+            space_names, space_numbers, weighting_factors, volume_heights, vent_rates, net_areas
+        )

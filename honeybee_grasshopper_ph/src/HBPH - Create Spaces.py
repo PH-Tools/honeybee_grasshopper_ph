@@ -34,7 +34,7 @@ a wall.
 Each Volume is made of one or more floor-segments. Each floor-segment can have a
 'weighting factor' applied for calculating the TFA/iCFA for Passive House certification.
 -
-EM October 14, 2022
+EM June 25, 2024
     Args:
         _flr_seg_geom: (Tree[Geometry]) The Rhino geometry that you would like to use 
             to create the Floor-Segments of the various Spaces. Each branch should be a list 
@@ -43,29 +43,37 @@ EM October 14, 2022
         _weighting_factors: (Tree[float]) An optional input Tree of TFA/iCFA weighting
             factors to apply to the input floor-segment geometry.
         
-        _volume_geometry: (Tree[Geometry]) An optional input Tree of Rhino Geometry
-            describing the space-shape of the individual volumes. 
-        
         _volume_heights: (Tree[float]) Default=2.5m An optional input Tree of heights
             to use when building the volume geometry.
+        
+        _volume_geometry: (Tree[Geometry]) An optional input Tree of Rhino Geometry
+            describing the space-shape of the individual volumes. 
         
         _space_names: (Tree[float]) Default="_Unnamed_" An optional input Tree of names
             to use when building the spaces
         
         _space_numbers: Default="000" An optional input Tree of space numbers
             to use when building the spaces
-            
+
         _space_ph_vent_rates: (Tree[SpacePhVentFlowRates]) An optional tree of detailed
             PH-Style space-level fresh air ventilaton flow rate objets. These can be created
             using the "HBPH - Create Space PH Ventilation" component or gotten directly 
             from the Rhino scene using the "HBPH - Get FloorSegment Data" component.
+
+        _flr_seg_net_area: (Tree[float]) Optional input for 'net' (interior) floor area
+            for the floor-segments. This 'net' area is used for the Phius Multifamily calculator
+            since they insist on using net-area instead for that calculator, but gross area
+            for their iCFA, but only for the non-residential zones like hallways. The
+            input data here (branches, items, ...) should ideally match the structure of the
+            the '_flr_seg_geometry' input. In none is input, the area of the '_flr_seg_geometry'
+            will be used for both the gross and net floor areas.
     
     Returns:
         floor_breps_: Preview of the Space Floor geometry created. Useful for debugging.
         
         volume_breps_: Preview of the Space Volume geometry created. Useful for debugging.
         
-        spaces_: The new PH-Spaces created
+        spaces_: The new PH-Spaces created. These can be added to Honeybee-Rooms.
 """
 
 import scriptcontext as sc
@@ -83,10 +91,11 @@ ghenv.Component.Name = "HBPH - Create Spaces"
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
     from honeybee_ph_rhino.gh_compo_io import space_create_spc as gh_compo_io
-    from honeybee_ph_rhino.make_spaces import make_floor
+    from honeybee_ph_rhino.make_spaces import make_floor, make_floor_segment
     from honeybee_ph import space
     reload(space)
-    reload(make_floor)    
+    reload(make_floor_segment)
+    reload(make_floor)
     reload(gh_compo_io)
     reload(gh_io)
 
@@ -112,5 +121,6 @@ gh_compo_interface = gh_compo_io.GHCompo_CreatePHSpaces(
     _space_names,
     _space_numbers,
     _space_ph_vent_rates,
+    _flr_seg_net_areas,
     )
 error_, floor_breps_, volume_breps_, spaces_ = gh_compo_interface.run()

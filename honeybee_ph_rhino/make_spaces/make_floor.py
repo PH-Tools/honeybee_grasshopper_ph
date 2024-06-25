@@ -146,8 +146,8 @@ def build_floors_from_segments(IGH, _flr_segments, _merge_segments=False):
     return (new_floors_, error_surfaces_)
 
 
-def space_floor_from_rh_geom(IGH, _flr_segment_geom, _weighting_factors):
-    # type: (gh_io.IGH, List[Any], List[float]) -> tuple[list[space.SpaceFloor], List[space.SpaceFloorSegment]]
+def space_floor_from_rh_geom(IGH, _flr_segment_geom, _weighting_factors, _net_areas):
+    # type: (gh_io.IGH, List[Any], List[float], List[float | None]) -> tuple[list[space.SpaceFloor], List[space.SpaceFloorSegment]]
     """Return a list of new SpaceFloors built from a list of Rhino floor-segment Geometry.
 
     Arguments:
@@ -157,6 +157,8 @@ def space_floor_from_rh_geom(IGH, _flr_segment_geom, _weighting_factors):
         * _weighting_factors (List[float]): A List of the weighting-factors (0.0-1.0)
             to apply to the floor segments. Note: the length of this list should match the
             _flr_segment_geom length.
+        * _net_areas (List[float | None]): A list of the net-areas for each of the floor
+            segments. If no net-area is provided, this should be set to None.
 
     Returns:
     --------
@@ -165,7 +167,7 @@ def space_floor_from_rh_geom(IGH, _flr_segment_geom, _weighting_factors):
             during Merge. If no errors, this list will be empty.
     """
 
-    # -- Check inputs
+    # -- Check weighting factor inputs
     weighting_factors = []
     for i in range(len(_flr_segment_geom)):
         try:
@@ -176,8 +178,21 @@ def space_floor_from_rh_geom(IGH, _flr_segment_geom, _weighting_factors):
             except IndexError:
                 raise Exception("Error: Weighting Factors input {} cannot be used?".format(_weighting_factors))
 
+    # -- Check net_area factor inputs
+    net_areas = []
+    for i in range(len(_flr_segment_geom)):
+        try:
+            net_areas.append(_net_areas[i])
+        except IndexError:
+            try:
+                net_areas.append(_net_areas[0])
+            except IndexError:
+                raise Exception("Error: Net Area input {} cannot be used?".format(_weighting_factors))
+
     # -- Build the new SpaceFloorSegments from the Rhino Geometry
-    flr_segments = make_floor_segment.create_floor_segment_from_rhino_geom(IGH, _flr_segment_geom, weighting_factors)
+    flr_segments = make_floor_segment.create_floor_segment_from_rhino_geom(
+        IGH, _flr_segment_geom, weighting_factors, net_areas
+    )
 
     # -- Build the new SpaceFloors from the new SpaceFloorSegments
     new_floors, error_surfaces = build_floors_from_segments(IGH, flr_segments, _merge_segments=False)

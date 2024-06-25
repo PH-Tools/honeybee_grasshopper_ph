@@ -55,8 +55,8 @@ def calc_reference_point(IGH, _face3D):
     return pointvector.Point3D(new_cp.X, new_cp.Y, new_cp.Z)
 
 
-def create_floor_segment_from_rhino_geom(IGH, _flr_segment_geom, _weighting_factors):
-    # type: (gh_io.IGH, List[Any], List[float]) -> List[space.SpaceFloorSegment]
+def create_floor_segment_from_rhino_geom(IGH, _flr_segment_geom, _weighting_factors, _net_areas):
+    # type: (gh_io.IGH, List[Any], List[float], List[float | None]) -> List[space.SpaceFloorSegment]
     """Return a list of SpaceFloorSegments created from Rhino geometry.
 
     Arguments:
@@ -67,6 +67,8 @@ def create_floor_segment_from_rhino_geom(IGH, _flr_segment_geom, _weighting_fact
         * _weighting_factors (List[float]): A List of the weighting-factors (0.0-1.0)
             to apply to the floor segments. Note: the length of this list should match the
             _flr_segment_geom length.
+        * _net_areas (List[float | None]): A list of the net-areas for each of the floor
+            segments. If no net-area is provided, this should be set to None.
 
     Returns:
     --------
@@ -77,15 +79,20 @@ def create_floor_segment_from_rhino_geom(IGH, _flr_segment_geom, _weighting_fact
     # -- Convert the input surfaces to LBT Geom
     # -- Note: convert_to_LBT_geom() returns a list of lists since the
     # -- to_face3d might return a list of triangulated srfcs sometimes.
-    lbt_face_3ds = IGH.convert_to_LBT_geom(_flr_segment_geom)
+    lbt_face_3ds = IGH.convert_to_LBT_geom(_flr_segment_geom)  # type: List[List[face.Face3D]]
 
     # TODO: probably need to type check of validate that they are all
     # Face3Ds here before moving on? Give useful warnings.
 
     # -- Check weighting factors
-    assert len(lbt_face_3ds) == len(_weighting_factors), (
-        "Error: input lists of floor" "segments and weighting factor lengths do not match?"
-    )
+    assert len(lbt_face_3ds) == len(
+        _weighting_factors
+    ), "Error: input lists of floor-segments and weighting-factors do not have matching length?"
+
+    # -- Check net-area factors
+    assert len(lbt_face_3ds) == len(
+        _net_areas
+    ), "Error: input lists of floor-segments and net-areas do not have matching length?"
 
     # -- Create new SpaceFloorSegments for each surface input
     flr_segments = []
@@ -95,6 +102,15 @@ def create_floor_segment_from_rhino_geom(IGH, _flr_segment_geom, _weighting_fact
             new_segment.geometry = face_3d
             new_segment.reference_point = calc_reference_point(IGH, face_3d)
             new_segment.weighting_factor = _weighting_factors[i]
+
+            _net_area = _net_areas[i]
+            if _net_area is not None:
+                try:
+                    net_area_factor = _net_area / face_3d.area
+                except ZeroDivisionError:
+                    net_area_factor = 1.0
+                new_segment.net_area_factor = net_area_factor
+
             flr_segments.append(new_segment)
 
     return flr_segments

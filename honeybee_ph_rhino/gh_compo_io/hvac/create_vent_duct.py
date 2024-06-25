@@ -9,7 +9,12 @@ except ImportError:
     pass  # IronPython 2.7
 
 try:
-    from Rhino.Geometry import LineCurve, NurbsCurve, PolylineCurve  # type: ignore
+    from Grasshopper import DataTree  # type: ignore
+except ImportError as e:
+    raise ImportError("\nFailed to import Grasshopper:\n\t{}".format(e))
+
+try:
+    from Rhino import Geometry as rg  # type: ignore
 except ImportError as e:
     raise ImportError("\nFailed to import Rhino:\n\t{}".format(e))
 
@@ -51,7 +56,7 @@ class GHCompo_CreateVentDuct(object):
     """Component Interface"""
 
     display_name = ghio_validators.HBName("display_name")
-    insul_conductivity = ghio_validators.UnitW_MK("insul_conductivity")
+    insul_conductivity = ghio_validators.UnitW_MK("insul_conductivity", default="0.04 W/MK")
 
     def __init__(
         self,
@@ -66,12 +71,12 @@ class GHCompo_CreateVentDuct(object):
         _height,
         _width,
     ):
-        # type: (gh_io.IGH, List[Union[LineCurve, NurbsCurve, PolylineCurve]], Optional[str], Optional[str], Optional[str], Optional[str], Optional[bool], Optional[str], Optional[str], Optional[str]) -> None
+        # type: (gh_io.IGH, List[Union[rg.LineCurve, rg.NurbsCurve, rg.PolylineCurve]], Optional[str], Optional[str], Optional[str], Optional[str], Optional[bool], Optional[str], Optional[str], Optional[str]) -> None
         self.IGH = _IGH
         self.geometry_segments = self._to_LbtLineSegments3D(_geometry)
         self.display_name = _display_name or "__unnamed_vent_duct__"
         self.duct_type = _duct_type
-        self.insul_conductivity = _insul_conductivity or 0.04
+        self.insul_conductivity = _insul_conductivity
         self.insul_reflective = _insul_reflective
 
         # -- These values will all be in the Rhino-Document's Unit-Type (MM, M, inch, etc.)
@@ -166,7 +171,7 @@ class GHCompo_CreateVentDuct(object):
             self._insul_reflective = _in
 
     def _to_LbtLineSegments3D(self, _input):
-        # type: (List[Union[LineCurve, NurbsCurve, PolylineCurve]]) -> List[LineSegment3D]
+        # type: (List[Union[rg.LineCurve, rg.NurbsCurve, rg.PolylineCurve]]) -> List[LineSegment3D]
         """Convert Rhino geometry Inputs to Ladybug LineSegment3D."""
         lbt_line_segments = []  # type: List[LineSegment3D]
 
@@ -180,16 +185,16 @@ class GHCompo_CreateVentDuct(object):
             lbt_crv = to_polyline3d(rh_crv)
 
             if hasattr(lbt_crv, "segments"):
-                # -- It is a PolylineCurve
+                # -- It is a rg.PolylineCurve
                 lbt_line_segments.extend(lbt_crv.segments)
             else:
-                # -- It is a LineCurve
+                # -- It is a rg.LineCurve
                 lbt_line_segments.append(lbt_crv)
 
         return lbt_line_segments
 
     def _clean_rh_curves(self, _input):
-        # type: (Union[LineCurve, NurbsCurve, PolylineCurve]) -> Union[LineCurve, PolylineCurve]
+        # type: (Union[rg.LineCurve, rg.NurbsCurve, rg.PolylineCurve]) -> Union[rg.LineCurve, rg.PolylineCurve]
         """Try to convert input Rhino geometry to a Rhino Polyline object."""
         try:
             cps = self.IGH.ghpythonlib_components.ControlPoints(_input).points
@@ -224,7 +229,7 @@ class GHCompo_CreateVentDuct(object):
                 ducting.PhDuctSegment(
                     segment,
                     self.insul_thickness,
-                    self.insul_conductivity,
+                    float(self.insul_conductivity or 0.04),
                     self.insul_reflective,
                     self.diameter,
                     self.height,
