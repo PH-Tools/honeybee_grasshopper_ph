@@ -1,7 +1,7 @@
 """
 Updates all the GH-Components in the Source dir (Github)
 -
-EM January 25, 2024
+EM June 27, 2024
 """
 
 ghenv.Component.Name = "__HBPH__Util_Update_GHCompos"
@@ -73,10 +73,7 @@ def copy_py_code(_save_address):
             
             print 'Writing {} code to: --> {}'.format(obj.Name, address)
             with open(address, 'wb') as f:
-                code_text = obj.Code.replace("\", "\").encode('utf-8')
-                for line in code_text.split("\"):
-                    f.write(line)
-
+                f.write(obj.Code.encode('utf-8'))
 
 def copy_ghuser(_source_address, _save_address):
     """Copy the HBPH ghuser component on the Canvas over to another folder"""
@@ -87,6 +84,9 @@ def copy_ghuser(_source_address, _save_address):
     
     for obj in objs:
         if obj.Category not in ['Honeybee-PH', 'HB-PH', 'HB-PH+']:
+            continue
+
+        if obj.Name == "__HBPH__Util_Update_GHCompos":
             continue
         
         if 'HBPH' in str(obj.Name)[:10]:
@@ -109,8 +109,7 @@ def make_dir(_dir_address):
 
 
 
-if _runIt:
-
+if _run:
     # - - - - - - HBPH Components
     hbph_source_dir = str(r"/Users/em/Library/Application Support/McNeel/Rhinoceros/8.0/Plug-ins/Grasshopper (b45a29b1-4343-4035-989e-044e8580d9cf)/UserObjects/honeybee_grasshopper_ph/")
     hbph_save_dir_ghuser    = str(r"/Users/em/Dropbox/bldgtyp-00/00_PH_Tools/honeybee_grasshopper_ph/honeybee_grasshopper_ph/user_objects/")

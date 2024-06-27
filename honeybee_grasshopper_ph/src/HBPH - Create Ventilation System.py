@@ -50,12 +50,12 @@ EM April 21, 2024
 try:
     from honeybee_ph_utils import preview
 except ImportError as e:
-    raise ImportError('Failed to import honeybee_ph_utils:\t{}'.format(e))
+    raise ImportError('\nFailed to import honeybee_ph_utils:\n\t{}'.format(e))
 
 try:
     from honeybee_ph_rhino import gh_compo_io
 except ImportError as e:
-    raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
+    raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
 
 
 # --- 
