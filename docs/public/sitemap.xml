@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>http://localhost:1313/honeybee_grasshopper_ph/install/</loc>
+  </url><url>
+    <loc>http://localhost:1313/honeybee_grasshopper_ph/quick_start/</loc>
+  </url><url>
+    <loc>http://localhost:1313/honeybee_grasshopper_ph/learn_more/</loc>
+  </url><url>
+    <loc>http://localhost:1313/honeybee_grasshopper_ph/contact/</loc>
+  </url><url>
+    <loc>http://localhost:1313/honeybee_grasshopper_ph/categories/</loc>
+  </url><url>
+    <loc>http://localhost:1313/honeybee_grasshopper_ph/</loc>
+  </url><url>
+    <loc>http://localhost:1313/honeybee_grasshopper_ph/tags/</loc>
+  </url>
+</urlset>

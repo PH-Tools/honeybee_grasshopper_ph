@@ -1,0 +1,66 @@
+html {
+    font-family: var(--html-font-family);
+    line-height: var(--html-font-line-height);
+    scroll-behavior: smooth;
+}
+
+body {
+    position: relative;
+    /*
+        always show the vertical scrollbar otherwise page width changes
+        from page to page and is annoying
+     */
+    overflow: scroll;
+    margin: 0px;
+}
+
+.content {
+    /*
+    set the minimum height to the footer does not get
+    too close to header or sidebar when page is empty
+    */
+    min-height: 50em;
+}
+
+.row-fluid {
+    /* width: fit-content; */
+    width: 100%;
+    justify-content: space-between;
+}
+
+@media only screen and (max-width: 1000px) {
+    .row-fluid {
+        display: block;
+    }
+}
+
+@media only screen and (min-width: 1000px) {
+    .row-fluid {
+        display: flex;
+    }
+}
+
+.container {
+    max-width: 1170px;
+    padding-right: 25px;
+    padding-left: 25px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.container-fluid {
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.container-full {
+    width: 100%;
+}
+
+.footer {
+    margin-top: 100px;
+    margin-bottom: 25px;
+}

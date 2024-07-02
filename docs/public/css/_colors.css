@@ -1,0 +1,15 @@
+:root {
+    --color-base-font: #212529;
+    --color-background: #fcfcfc;
+    --color-brand: #2c7be2;
+    --color-grey: #828282;
+    --color-grey-light: #bdbdbd;
+    --color-grey-very-light: #e8e8e8;
+    --color-grey-dark: #4d4d4d;
+    --color-important-font: rgb(236, 0, 140);
+    --color-important-background: rgb(251, 230, 239);
+    --color-ph-tools: rgb(142, 141, 190);
+    --color-ph-tools-dark: rgb(103, 102, 148);
+    --color-ph-tools-light: rgb(212, 212, 235);
+    --color-ph-tools-very-light: rgb(237, 237, 248);
+}

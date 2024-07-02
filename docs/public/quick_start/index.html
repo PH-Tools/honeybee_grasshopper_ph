@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head><script src="/honeybee_grasshopper_ph/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=honeybee_grasshopper_ph/livereload" data-no-instant defer></script>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Quick Start | PH-Tools.honeybee-grasshopper-ph</title>
+    <link rel="stylesheet" href="/honeybee_grasshopper_ph/css/style.css" type="text/css" media="all" />
+
+    </head>
+
+<body>
+	<div class="container">
+		<header class="header">
+			<div class="header-block">
+  
+
+  
+  <a id="cat_homelogo" class="site-logo" href="http://www.passivehousetools.com/">
+    <img src="/honeybee_grasshopper_ph/img/PHT_Logo_28x28_circle.svg">
+  </a>
+  <a id="cat_homelink" class="site-title" href="http://www.passivehousetools.com/">PH-Tools.</a>
+  <a id="cat_homelink" class="site-title" href="/honeybee_grasshopper_ph/" style="margin-left:0px;">honeybee_grasshopper_ph</a>
+
+  <nav class="site-nav">
+
+    <img class="menu-icon" src="/honeybee_grasshopper_ph/img/burger.svg" />
+
+    <div class="trigger">
+      
+      
+      
+      
+      <a id="cat_quick_start" class="page-link" href="/honeybee_grasshopper_ph/install/">Install</a>
+      
+      
+      
+      <a id="cat_quick_start" class="page-link-active" href="/honeybee_grasshopper_ph/quick_start/">Quick Start</a>
+      
+      
+      
+      <a id="cat_quick_start" class="page-link" href="/honeybee_grasshopper_ph/learn_more/">Learn More</a>
+      
+      
+      
+      <a id="cat_quick_start" class="page-link" href="/honeybee_grasshopper_ph/contact/">Contact</a>
+      
+      
+
+      <a class="extern-link" href="https://www.youtube.com/channel/UCADxgnNCFNZ3uhaSvezReQA/playlists" target="_blank" title="YouTube Channel">
+        <span class="img-button-title">YouTube</span>
+        <img class="img-extern-link" id="youtube-link" width="28" height="28"
+             src="/honeybee_grasshopper_ph/img/youtube.svg" />
+      </a>
+
+      <a class="extern-link" href="https://github.com/PH-Tools/honeybee_grasshopper_ph" target="_blank"
+         title="Source Code Repository on Github">
+        <span class="img-button-title">Github</span>
+        <img class="img-extern-link" id="github-link" width="28" height="28"
+             src="/honeybee_grasshopper_ph/img/github.svg" />
+      </a>
+
+    </div>
+
+  </nav>
+</div>
+		</header>
+	</div>
+
+<div class="container">
+    <main class="content">
+        <div class="container-fluid">
+            <div class="row-fluid">
+                
+                <nav class="sidebar">
+                    
+
+<ul class="nav scrollbar">
+    <a class="sidebar-section-head" href="http://localhost:1313/honeybee_grasshopper_ph/quick_start/">Quick Start</a>
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-create-the-hb-model">1. Create the HB-Model</a></li>
+    <li><a href="#2-hb-model--hbjson">2. HB-Model &gt; HBJSON</a></li>
+    <li><a href="#3a-hbjson--wufi-passive">3a. HBJSON &gt; WUFI-Passive</a></li>
+    <li><a href="#3b-hbjson--phpp">3b. HBJSON &gt; PHPP</a></li>
+    <li><a href="#next-steps">Next Steps</a></li>
+  </ul>
+</nav>
+</ul>
+                </nav>
+
+                
+                <div class="side-content">
+                    <h1 id="quick-start">Quick Start</h1>
+<p>This guide will help you get up and running quickly with the Honeybee-PH toolkit for <a href="https://www.rhino3d.com/">Rhino / Grasshopper</a>. The Honeybee-PH toolkit is designed to allow users to add Passive House style data to their Honeybee models, and then export those models out to the Passive House modeling platforms WUFI-Passive and PHPP.</p>
+<p><img src="/honeybee_grasshopper_ph/img/quick_start/quick_start_diagram.svg" alt="Basic Usage Diagram"></p>
+<p>The simplest usage of the Honeybee-PH toolkit is demonstrated below. For detailed tutorials on full Passive House modeling and the use of all the new Honeybee-PH tools, check out <a href="/learn_more/">Learn More</a>.</p>
+<h2 id="1-create-the-hb-model">1. Create the HB-Model</h2>
+<p>To get started, we&rsquo;ll need a valid Honeybee model to work with. You can use any model you like, but in order to keep things simple for this first example we&rsquo;ll start with just a very basic box. We will create this simple model using normal Grasshopper geometry tools and standard Honeybee components. We are not using any of the new Honeybee-PH tools yet.
+<img src="/honeybee_grasshopper_ph/img/quick_start/basic_honeybee_model.png" alt="Basic honeybee-model grasshopper"></p>
+<p>If we preview the Honeybee model at this point, we should see nothing more than a simple box with 4 sides, a roof and a floor:
+<img src="/honeybee_grasshopper_ph/img/quick_start/basic_honeybee_vis.png" alt="Basic honeybee-model preview"></p>
+<h2 id="2-hb-model--hbjson">2. HB-Model &gt; HBJSON</h2>
+<p>At this point, we have a valid Honeybee-Model. Our next step is to write out the Honeybee Model to an HBJSON file. Here we can also use just the standard &ldquo;HB Dump Objects&rdquo; Honeybee Component. As before, we are not using any of our new Honeybee-PH tools yet. This is all still basic Honeybee.
+<img src="/honeybee_grasshopper_ph/img/quick_start/basic_honeybee_to_HBJSON.png" alt="Basic honeybee-model write to HBJSON"></p>
+<h2 id="3a-hbjson--wufi-passive">3a. HBJSON &gt; WUFI-Passive</h2>
+<p>Now it is finally time to use some of the new Honeybee-PH tools. If we would like to pass our Honeybee Model off to WUFI-Passive, we can use the new &ldquo;HBPH - Write WUFI XML&rdquo; Honeybee-PH Grasshopper component. This component will read in the HBJSON model file, rebuild the Honeybee model, and then convert it over to a new WUFI-XML document. This new WUFI-XML document is being saved to the Desktop in the example shown here, but you can save this file anyplace you like.
+<img src="/honeybee_grasshopper_ph/img/quick_start/basic_honeybee_to_WUFI.png" alt="Export data to WUFI-XML"></p>
+<p>This newly created WUFI-XML document can now be opened by just using the WUFI-Passive software. Fist, open WUFI-Passive on your system and go to &ldquo;File / Open&hellip;&rdquo;
+<img src="/honeybee_grasshopper_ph/img/quick_start/WUFI_open.png" alt="Open new WUFI-Passive XML File"></p>
+<p>Navigate to the folder where you saved the new WUF-XML file we just created in Grasshopper, and select it. If you don&rsquo;t see your new file in the list, make sure you are looking for *.xml files.
+<img src="/honeybee_grasshopper_ph/img/quick_start/WUFI_XML.png" alt="Navigate to new XML-File"></p>
+<p>Select the right file, click &ldquo;Open&rdquo;, and if everything worked you should now see your Honeybee model geometry appear in the WUFI preview panel.
+<img src="/honeybee_grasshopper_ph/img/quick_start/WUFI_success.png" alt="Write data out to WUFI-Passive"></p>
+<h2 id="3b-hbjson--phpp">3b. HBJSON &gt; PHPP</h2>
+<p>If we want to export our Honeybee Model to the Passive House Planning Package (PHPP) the process is similar, but since the PHPP is a Microsoft Excel workbook, we will use a slightly different Honeybee-PH tool. The most important difference between the PHPP export and the WUFI-Passive export is that when writing out the Honeybee-Model data to PHPP, the &rsquo;target&rsquo; PHPP file must be open at the same time as our Grasshopper file. To get started using our example Grasshopper file above, simply open up a valid blank PHPP document alongside the Rhino / Grasshopper window.</p>
+<p><img src="/honeybee_grasshopper_ph/img/quick_start/PHPP_open.png" alt="Open PHPP alongside the Grasshopper Model"></p>
+<p>With both the Grasshopper file, and the PHPP Excel file open at the same time, we can now use the new Honeybee-PH &ldquo;HBPH - Write to PHPP&rdquo; component to write out the data to the Excel file. Note that this component will automatically write to the &lsquo;Active&rsquo; excel document, so if you are having trouble, try closing any excel documents other than the one you are trying to write to. If everything worked, you should see your model data show up in the PHPP.</p>
+<p><img src="/honeybee_grasshopper_ph/img/quick_start/PHPP_success.png" alt="Write data out to PHPP"></p>
+<h2 id="next-steps">Next Steps</h2>
+<p>The example above is the most basic model possible, with the absolute minimum amount of additional geometry and additional attribute assignments. At this point, you can certainly just use the normal Passive House modeling tools to finish off your model and add additional detail.</p>
+<p>However, in order to create a full Passive House model using the Honeybee-PH toolkit you&rsquo;ll want to add in all the additional data about your building directly to our Grasshopper definition. The Honeybee-PH toolkit has lots of new tools to help you model everything from windows to mechanical systems to thermal-bridges, all directly in your Grasshopper scene. Lots more information on the usage of these detailed components can be found in the <a href="/honeybee_grasshopper_ph/learn_more/">Learn More</a> section.</p>
+
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<div class="container">
+	<footer class="footer">
+		<p>&copy;2021-2024 bldgtyp, llc</p>
+		<p>PH-Tools and PHX are a projects of bldgtyp, llc
+			If you'd like to contribute or talk more about any of the PH-Tools projects,
+			contact: phtools@bldgtyp.com, or check out the <a target="_blank"
+			   href="https://github.com/PH-Tools/honeybee_grasshopper_ph">github repository.</a>
+			PH-Tools are free; you can redistribute them and/or modify them under
+			the terms of the
+			<a target="_blank" href="https://www.gnu.org/licenses/">GNU General Public License</a>
+			as published by the Free Software Foundation.
+		</p>
+	</footer>
+</div>
+
+</body>
+
+</html>

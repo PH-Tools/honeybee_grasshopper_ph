@@ -7,6 +7,9 @@ weight: 30
 
 Several 'Introduction to HBPH' sessions have been recorded and are available trough YouTube:
 
+- [July 2024 | NYPH Webinar: Introduction to HBPH (1 hour)]()
+	- {{< download_btn_NYPH_PDF_240715 >}}
+
 - [Jan. 2024 | Phius Webinar: Introduction to HBPH (1 hour)](https://www.phius.org/honeybee-ph-ed-may)
 	- {{< download_btn_Phius_PDF_240109 >}}
 

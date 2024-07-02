@@ -15,6 +15,7 @@ installer_download_url = "https://github.com/PH-Tools/honeybee_grasshopper_ph/ra
 youtube_SF_source_files = "https://github.com/PH-Tools/honeybee_grasshopper_ph/raw/main/docs/static/downloads/Single_Family_Home_Source_Files.zip"
 download_wrkshp_parsons_220923 = "https://github.com/PH-Tools/honeybee_grasshopper_ph/raw/main/docs/static/downloads/example_wufi_model.zip"
 download_Phius_PDF_240109 = "https://github.com/PH-Tools/honeybee_grasshopper_ph/raw/main/docs/static/downloads/240109_Intro_to_HBPH.pdf"
+download_NYPH_PDF_240715 = "https://github.com/PH-Tools/honeybee_grasshopper_ph/raw/main/docs/static/downloads/240715_Intro_to_HBPH.pdf"
 
 [menu]
 [[menu.main]]

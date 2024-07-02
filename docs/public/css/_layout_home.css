@@ -1,0 +1,110 @@
+/* -- Full width home-screen images -- */
+.home-cover {
+    position: relative;
+    height: 70vh;
+    min-height: 300px;
+}
+
+.home-gallery {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.home-gallery img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: opacity(0.8);
+}
+
+/* -- Text Box over the image -- */
+.home-contents-box {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    font-size: 36px;
+    display: flex;
+    align-items: flex-end;
+    box-sizing: border-box;
+    -webkit-box-align: center;
+}
+
+.home-contents-textmask {
+    /* make semi-transparent scrim over the image */
+    width: 100%;
+    background: rgb(255, 255, 255);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(232, 232, 232, 1) 90%);
+}
+
+.home-contents {
+    display: block;
+    max-width: 1170px;
+    padding: 0 30px 0 30px;
+    margin: 90px auto 30px auto;
+    color: white;
+}
+
+/* -- Home Dependencies Section -- */
+.home-dependencies {
+    margin: 30px 10px 30px 10px;
+    text-align: center;
+}
+
+/* -- Home Features Section -- */
+.home-features {
+    display: grid;
+    grid-gap: 10px;
+    margin: 0px;
+    background-color: var(--color-ph-tools-very-light);
+}
+
+
+@media only screen and (max-width: 1000px) {
+    .home-features {
+        grid-template-columns: 1fr;
+        padding: 10px 10px;
+    }
+
+    .home-features .feature-text {
+        display: none;
+    }
+}
+
+@media only screen and (min-width: 1000px) {
+    .home-features {
+        grid-template-columns: 1fr 1fr;
+        padding: 80px 80px;
+    }
+}
+
+.home-features h2 {
+    border-bottom: none;
+    margin: 0px;
+}
+
+.home-features .feature {
+    border-radius: 10px;
+    border: 0.5px solid var(--color-ph-tools-dark);
+    color: var(--color-ph-tools-dark);
+    background-color: var(--color-ph-tools-light);
+    margin: 10px 10px;
+    padding: 15px 15px;
+}
+
+.home-features .feature-text {
+    color: var(--color-ph-tools-dark);
+}
+
+/* -- Home Learn More Section -- */
+.home-more {
+    margin: 30px auto 30px auto;
+    padding-left: 80px;
+    padding-right: 80px;
+    text-align: center;
+}

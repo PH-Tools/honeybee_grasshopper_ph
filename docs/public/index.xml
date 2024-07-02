@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Home on PH-Tools.honeybee-grasshopper-ph</title>
+    <link>http://localhost:1313/honeybee_grasshopper_ph/</link>
+    <description>Recent content in Home on PH-Tools.honeybee-grasshopper-ph</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <atom:link href="http://localhost:1313/honeybee_grasshopper_ph/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Install</title>
+      <link>http://localhost:1313/honeybee_grasshopper_ph/install/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/honeybee_grasshopper_ph/install/</guid>
+      <description>Honeybee-PH and its Grasshopper toolkit are free and open-source. Feel free download and give it a try.&#xA;YouTube Walk Through Watch a detailed step-by-step walk through showing both the LadybugTools installation and the Honeybee-PH installation here: Installation Walk Through&#xA;Requirements In order to successfully install Honeybee-PH, please make sure that your system already has all of the required software installed and working:&#xA;Rhino-3D v7+ Ladybug-Tools v1.7+ WUFI-Passive PHPP v9 or v10 Windows v10+ or MacOS v13+ Please Note: The installation file for Honeybee-PH does NOT include either WUFI-Passive or PHPP.</description>
+    </item>
+    <item>
+      <title>Quick Start</title>
+      <link>http://localhost:1313/honeybee_grasshopper_ph/quick_start/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/honeybee_grasshopper_ph/quick_start/</guid>
+      <description>Quick Start This guide will help you get up and running quickly with the Honeybee-PH toolkit for Rhino / Grasshopper. The Honeybee-PH toolkit is designed to allow users to add Passive House style data to their Honeybee models, and then export those models out to the Passive House modeling platforms WUFI-Passive and PHPP.&#xA;The simplest usage of the Honeybee-PH toolkit is demonstrated below. For detailed tutorials on full Passive House modeling and the use of all the new Honeybee-PH tools, check out Learn More.</description>
+    </item>
+    <item>
+      <title>Learn More</title>
+      <link>http://localhost:1313/honeybee_grasshopper_ph/learn_more/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/honeybee_grasshopper_ph/learn_more/</guid>
+      <description>[Video] Introduction to Honeybee-PH Several &amp;lsquo;Introduction to HBPH&amp;rsquo; sessions have been recorded and are available trough YouTube:&#xA;July 2024 | NYPH Webinar: Introduction to HBPH (1 hour)&#xA;Download Presentation PDF &amp;DownArrowBar; Jan. 2024 | Phius Webinar: Introduction to HBPH (1 hour)&#xA;Download Presentation PDF &amp;DownArrowBar; Nov. 2023 | New York Passive House: Regenerative Metropolis Workshop (2 hours)&#xA;Download Workshop Source Files &amp;DownArrowBar; Oct. 2022 | Passive House Network: An Introduction to HBPH (1 hour)</description>
+    </item>
+    <item>
+      <title>Contact</title>
+      <link>http://localhost:1313/honeybee_grasshopper_ph/contact/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/honeybee_grasshopper_ph/contact/</guid>
+      <description>PH-Tools? PH-Tools is the umbrella project encompassing all of the various software tools we&amp;rsquo;ve been building to make Passive House energy modeling faster, easier and more fun. In the past we&amp;rsquo;ve made plugins for DesignPH, and standalone tools like LBT2PH. The Honeybee-PH plugin is our newest plugin, written for Honeybee from the ground up to work seamlessly with Ladybug-Tools using their plugin-architecture. If you have questions on Honeybee-PH, or any of the other PH-Tools, check out the links and references below.</description>
+    </item>
+  </channel>
+</rss>
