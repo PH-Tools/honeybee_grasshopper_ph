@@ -6,7 +6,7 @@ EM June 27, 2024
 
 ghenv.Component.Name = "__HBPH__Util_Update_GHCompos"
 ghenv.Component.NickName = "HBPH_Update_Source"
-ghenv.Component.Message = 'JAN_25_2024'
+ghenv.Component.Message = 'JUN_27_2024'
 ghenv.Component.IconDisplayMode = ghenv.Component.IconDisplayMode.application
 ghenv.Component.Category = "Honeybee-PH"
 ghenv.Component.SubCategory = "00 | Utils"

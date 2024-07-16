@@ -23,12 +23,14 @@
 Create a new HBPH Window Frame Element. A full HBPH Window Frame is made of 4 of 
 these elements (top, right, bottom, left).
 -
-EM October 2, 2022
+EM July 16, 2024
     Args:
-        _name_: (str)
+        _name_: (str) The display_name of the Frame-Element.
         
-        _width: (float) Face width of the frame (m)
-            default = 0.1m (~4")
+        _width: (float) Face width of the frame (rhino-model-units)
+            default = 0.1m (4-inch). Input either a value, ie": "4" which will be in the 
+            rhino-model's units, or input an explicit unit to have this component
+            convert the units automatically, ie: "4 INCH"
             
         _u_factor: (float) Frame U-f (W/m2k) as per ISO-10077-2. Note that this value 
             is not the same as the NFRC value.
@@ -58,6 +60,11 @@ try:
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
 
+import scriptcontext as sc
+import Rhino as rh
+import rhinoscriptsyntax as rs
+import ghpythonlib.components as ghc
+import Grasshopper as gh
 
 # -------------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
@@ -65,12 +72,19 @@ reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Create PH Window Frame Element"
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
-    reload(gh_compo_io)
     reload(gh_io)
+    from honeybee_ph_rhino.gh_compo_io import win_create_frame_element as gh_compo_io
+    reload(gh_compo_io)
+
+
+# ------------------------------------------------------------------------------
+# -- GH Interface
+IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 
 
 # -------------------------------------------------------------------------------------
 gh_compo_interface = gh_compo_io.GHCompo_CreatePhWinFrameElement(
+        IGH,
         _name_,
         _width,
         _u_factor,

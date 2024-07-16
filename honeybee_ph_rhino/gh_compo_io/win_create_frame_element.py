@@ -15,8 +15,15 @@ except ImportError as e:
 
 try:
     from honeybee_ph_rhino.gh_compo_io import ghio_validators
+    from honeybee_ph_rhino import gh_io
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
+
+try:
+    from ph_units.converter import convert
+    from ph_units.parser import parse_input
+except ImportError as e:
+    raise ImportError("\nFailed to import ph_units:\n\t{}".format(e))
 
 
 class GHCompo_CreatePhWinFrameElement(object):
@@ -29,14 +36,34 @@ class GHCompo_CreatePhWinFrameElement(object):
     psi_install = ghio_validators.UnitW_MK("psi_install", default=0.04)
     chi_value = ghio_validators.UnitW_K("chi_value", default=0.0)
 
-    def __init__(self, _display_name, _width, _u_factor, _psi_glazing, _psi_install, _chi_value):
-        # type: (str, float, float, float, float, float) -> None
+    def __init__(self, _IGH, _display_name, _width, _u_factor, _psi_glazing, _psi_install, _chi_value):
+        # type: (gh_io.IGH, str, float, float, float, float, float) -> None
+        self.IGH = _IGH
         self.display_name = _display_name or clean_and_id_ep_string("PhWindowFrameElement")
-        self.width = _width
+        self.width = self.value_with_unit(_width)
         self.u_factor = _u_factor
         self.psi_glazing = _psi_glazing
         self.psi_install = _psi_install
         self.chi_value = _chi_value
+
+    def value_with_unit(self, _value):
+        # type: (str | float | None) -> str | None
+        """ "Return a string of a value and a unit. If none is supplied, with use the Rhino-doc's unit type."""
+
+        if _value is None:
+            return None
+
+        # -- If the user supplied an input unit, just use that
+        input_value, input_unit = parse_input(_value)
+
+        # -- otherwise use the Rhino document unit system as the input unit
+        if not input_unit:
+            input_unit = self.IGH.get_rhino_unit_system_name()
+
+        if input_value is None:
+            raise ValueError("Failed to parse reveal-distance input {}?".format(_value))
+
+        return "{} {}".format(input_value, input_unit)
 
     def run(self):
         # type: () -> window.PhWindowFrameElement
