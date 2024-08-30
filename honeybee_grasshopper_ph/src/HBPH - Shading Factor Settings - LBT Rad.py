@@ -23,7 +23,7 @@
 Settings and parameter values used when calculating the Window Shading Factors
 using the Passive House LBT-Radiation solver.
 -
-EM October 2, 2022
+EM August 30, 2024
     Args:
         _epw_file: The EPW file to use to generate the sky-matrix objects.
         
@@ -36,7 +36,7 @@ EM October 2, 2022
             if None is supplied is June 1 - September 30
             
         _window_mesh_settings_: Optional Rhino Mesh Settings for the window 
-            surface geometry. Use this if you want to controlexactly how the 
+            surface geometry. Use this if you want to control exactly how the 
             window surfaces are gridded for analysis. For instance, if you supply a 
             Grasshopper Mesh Settings Custom, and set the "Min" and "Max" to "16", 
             you will always get exactly 16 segments for your analysis, which can 
@@ -45,7 +45,12 @@ EM October 2, 2022
         _shading_mesh_setings: Optional Rhino Mesh settings for the shading geometry. 
             default = Rhino.Geometry.MeshingParameters.Default
             
-        _grid_size: default=1.0
+        _grid_size_: (default=6-INCH) If no unit is specified, this input will use the 
+            Rhino-document's unit-type. For instance, if the Rhino-Doc is set to "INCH"
+            and the user inputs "8", this will be understood as a grid-spacing of 8"x8".
+            Best practice is to specify the units explicitely. So instead of inputing 
+            just "8", input "8-INCH" to ensure that you will always get the same grid-size
+            no matter which unit type the Rhino-doc is set to.
             
         _legend_par_: Optional Ladybug legend parameter object to control the 
             output visualizations.

@@ -3,15 +3,16 @@
 
 """GHCompo Interface: HBPH - Shading Factor Settings - LBT Rad."""
 
-try:
-    import Rhino.Geometry as rg  # type: ignore
-except ImportError:
-    pass  # Outside Grasshopper
 
 try:
     from typing import Any, Optional
 except ImportError:
     pass  # IronPython
+
+try:
+    import Rhino.Geometry as rg  # type: ignore
+except ImportError:
+    pass  # Outside Grasshopper
 
 try:
     from honeybee_ph_utils import sky_matrix
@@ -24,7 +25,9 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
 try:
+    from ph_units.parser import parse_input
     from ph_units.converter import convert
+    from ph_units.unit_type import Unit
 except ImportError as e:
     raise ImportError("\nFailed to import ph_units:\n\t{}".format(e))
 
@@ -72,14 +75,14 @@ class GHCompo_CreateLBTRadSettings(object):
         _cpus,
         _window_mesh_params=None,
     ):
-        # type: (gh_io.IGH, str, float, Any, Any, rg.MeshingParameters, float, Any, Optional[int], Optional[rg.MeshingParameters]) -> None
+        # type: (gh_io.IGH, str, float, Any, Any, rg.MeshingParameters, Optional[str], Any, Optional[int], Optional[rg.MeshingParameters]) -> None
         self.IGH = _IGH
         self.epw_file = _epw_file
         self.north = _north
         self.winter_sky_matrix = _winter_sky_matrix
         self.summer_sky_matrix = _summer_sky_matrix
         self.mesh_params = _mesh_params or rg.MeshingParameters.Default
-        self.grid_size = _grid_size or 1.0
+        self.grid_size_in_rhino_doc_units = _grid_size
         self.legend_par = _legend_par or None
         self.cpus = _cpus or None
         self.window_mesh_params = _window_mesh_params
@@ -110,22 +113,58 @@ class GHCompo_CreateLBTRadSettings(object):
         else:
             self._summer_sky_matrix = None
 
+    @property
+    def grid_size_in_rhino_doc_units(self):
+        # type: () -> Unit
+        return self._grid_size_in_rhino_doc_units
+
+    @grid_size_in_rhino_doc_units.setter
+    def grid_size_in_rhino_doc_units(self, _input):
+        # type: (Optional[str]) -> None
+        """Set the grid-size to use for the radiation analysis mesh, considering Rhino unit-types."""
+
+        if _input is None:
+            input_value, input_unit = "152.4", "MM"  # default = 6-INCH
+        else:
+            input_value, input_unit = parse_input(_input)
+
+        # -- Be sure to convert the input to the active Rhino-doc's unit-type
+        target_unit = self.IGH.get_rhino_unit_system_name()
+        grid_size = convert(input_value, input_unit or target_unit, target_unit)
+
+        if not grid_size:
+            raise ValueError("Failed to understand the grid-size input of: '{}'?".format(_input))
+        else:
+            print("Converting: {} {} -> {:.4f} {}".format(input_value, input_unit, grid_size, target_unit))
+            self._grid_size_in_rhino_doc_units = Unit(value=grid_size, unit=target_unit)
+
     def check_grid_size(self):
-        """Check the grid size and issue a warning if it seems too small."""
-        rh_units_name = self.IGH.get_rhino_unit_system_name()
-        grid_size_in_mm = convert(self.grid_size, rh_units_name, "MM") or 0.0
-        if grid_size_in_mm < 101.6:
+        # type: () -> None
+        """Check the grid size and issue a warning if it seems too small (less than 4-inch)."""
+
+        THRESHOLD_IN_INCHES = Unit("4", "INCH")
+        THRESHOLD_IN_RH_DOC_UNITS = THRESHOLD_IN_INCHES.as_a(self.IGH.get_rhino_unit_system_name())
+
+        if self._grid_size_in_rhino_doc_units < THRESHOLD_IN_RH_DOC_UNITS:
             msg = (
-                "WARNING: the analysis grid size is set to {}-{} x {}-{}. "
-                "This is very small and will result in long calculation times. "
+                "WARNING: The analysis grid size is set to {:.3f}-{} x {:.3f}-{}. "
+                "This is very small and will likely result in long calculation times. "
                 "Are you really sure you need an analysis grid with segments "
-                "this small?".format(self.grid_size, rh_units_name, self.grid_size, rh_units_name)
+                "this small? If so, you can proceed, but expect slow execution.".format(
+                    self._grid_size_in_rhino_doc_units.value,
+                    self._grid_size_in_rhino_doc_units.unit,
+                    self._grid_size_in_rhino_doc_units.value,
+                    self._grid_size_in_rhino_doc_units.unit,
+                )
             )
             print(msg)
             self.IGH.warning(msg)
         else:
-            msg = "Analysis grid size is set to {}-{} x {}-{}. ".format(
-                self.grid_size, rh_units_name, self.grid_size, rh_units_name
+            msg = "Analysis grid size is set to {:.3f}-{} x {:.3f}-{}. ".format(
+                self._grid_size_in_rhino_doc_units.value,
+                self._grid_size_in_rhino_doc_units.unit,
+                self._grid_size_in_rhino_doc_units.value,
+                self._grid_size_in_rhino_doc_units.unit,
             )
             print(msg)
 
@@ -140,7 +179,7 @@ class GHCompo_CreateLBTRadSettings(object):
             self.winter_sky_matrix,
             self.summer_sky_matrix,
             self.mesh_params,
-            self.grid_size,
+            self.grid_size_in_rhino_doc_units.value,
             self.legend_par,
             self.cpus,
             self.window_mesh_params,
