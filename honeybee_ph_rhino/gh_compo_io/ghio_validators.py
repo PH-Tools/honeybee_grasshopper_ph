@@ -808,3 +808,61 @@ class UnitW(Validated):
             raise ValueError("Error: input for '{}' cannot be negative.".format(name))
 
         return result
+
+
+class UnitKG_M2(Validated):
+    """A KG/M2 concentration value."""
+
+    def validate(self, name, new_value, old_value):
+        if new_value is None:
+            # If the user passed a 'default' attribute, try and use that
+            try:
+                return float(self.default)
+            except:
+                return old_value
+
+        input_value, input_units = parser.parse_input(str(new_value))
+
+        # -- Make sure the value is a float
+        try:
+            input_value = float(input_value)
+        except:
+            raise ValueError(
+                "Error: input {} of type: {} is not allowed." "Supply float only.".format(new_value, type(new_value))
+            )
+
+        # -- Convert units
+        result = converter.convert(input_value, input_units or "KG/M2", "KG/M2")
+
+        print("Converting: {} -> {:.4f} KG/M2".format(new_value, result))
+
+        return result
+
+
+class UnitCost_M2(Validated):
+    """A Cost/M2 concentration value."""
+
+    def validate(self, name, new_value, old_value):
+        if new_value is None:
+            # If the user passed a 'default' attribute, try and use that
+            try:
+                return float(self.default)
+            except:
+                return old_value
+
+        input_value, input_units = parser.parse_input(str(new_value))
+
+        # -- Make sure the value is a float
+        try:
+            input_value = float(input_value)
+        except:
+            raise ValueError(
+                "Error: input {} of type: {} is not allowed." "Supply float only.".format(new_value, type(new_value))
+            )
+
+        # -- Convert units
+        result = converter.convert(input_value, input_units or "COST/M2", "COST/M2")
+
+        print("Converting: {} -> {:.4f} COST/M2".format(new_value, result))
+
+        return result
