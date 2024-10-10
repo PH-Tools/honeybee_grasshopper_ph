@@ -7,8 +7,14 @@ weight: 30
 
 Several 'Introduction to HBPH' sessions have been recorded and are available trough YouTube:
 
-- [July 2024 | NYPH Webinar: Introduction to HBPH (1 hour)]()
+- [Sept. 2024 | PH-Accelerator: Improving our Passive House Modeling Tools (1 hour)](https://www.youtube.com/watch?v=l0T2UfkgsM8)
+
+- [Sept. 2024 | PH-Accelerator: Maximize the Value of your Passive House Models (1 hour)](https://www.youtube.com/watch?v=IxbhDM39_yY)
+
+- [July 2024 | New York Passive House Webinar: Introduction to HBPH (1 hour)](https://www.youtube.com/watch?v=SICvuysnhQc)
 	- {{< download_btn_NYPH_PDF_240715 >}}
+
+- [May 2024 | Passive House Seattle Webinar: Introduction to HBPH (1 hour)](https://www.youtube.com/watch?v=NVJpyTQVkVI)
 
 - [Jan. 2024 | Phius Webinar: Introduction to HBPH (1 hour)](https://www.phius.org/honeybee-ph-ed-may)
 	- {{< download_btn_Phius_PDF_240109 >}}
