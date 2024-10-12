@@ -26,7 +26,7 @@ for the '_num_dwellings'. Otherwise, input the number of dwellings for EACH HB-R
 -
 For Phius projects, a dwelling's '_num_people' should be the dwelling's number-of-bedrooms + 1
 -
-EM March 8, 2023
+EM October 12, 2024
     Args:
         _num_bedrooms: (list[int]) A list of number of bedrooms for EACH Honeybee-Room input.
             This should ideally be the same length as the '_hb_rooms' input, and in the same 
@@ -73,9 +73,14 @@ except ImportError as e:
     raise ImportError('\nFailed to import honeybee_ph_utils:\n\t{}'.format(e))
 
 try:
-    from honeybee_ph_rhino import gh_compo_io, gh_io
+    from honeybee_ph_rhino import gh_compo_io
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
+
+try:
+    from ph_gh_component_io import gh_io
+except ImportError as e:
+    raise ImportError('\nFailed to import ph_gh_component_io:\n\t{}'.format(e))
 
 
 #-------------------------------------------------------------------------------

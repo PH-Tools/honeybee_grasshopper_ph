@@ -32,9 +32,14 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
 
 try:
-    from honeybee_ph_rhino import gh_io
+    from ph_gh_component_io import gh_io
+except ImportError:
+    raise ImportError("\nFailed to import ph_gh_component_io")
+
+try:
+    from ph_units.converter import convert
 except ImportError as e:
-    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
+    raise ImportError("\nFailed to import ph_units:\n\t{}".format(e))
 
 
 class GHCompo_SetResOccupancy(object):
@@ -214,6 +219,9 @@ class GHCompo_SetResOccupancy(object):
             for k, hb_room in enumerate(branch):
                 self.check_has_hb_people(hb_room)
                 dup_hb_room = hb_room.duplicate()  # type: room.Room
+                room_floor_area_m2 = convert(hb_room.floor_area, self.IGH.get_rhino_areas_unit_name(), "M2") or 0.0
+                if not room_floor_area_m2:
+                    self.IGH.warning("Error: Room: '{}' has no floor surfaces?".format(hb_room.display_name))
 
                 # -- Determine the PhDwellings object to use
                 if self.branch_is_single_family(i):
@@ -234,7 +242,7 @@ class GHCompo_SetResOccupancy(object):
                 dup_people_prop_ph = dup_people.properties.ph  # type: PeoplePhProperties # type: ignore
                 dup_people_prop_ph.number_bedrooms = self.get_number_bedrooms(i, k)
                 dup_people_prop_ph.number_people = self.get_number_people(i, k)
-                _ppl_per_m2 = dup_people_prop_ph.number_people / hb_room.floor_area
+                _ppl_per_m2 = dup_people_prop_ph.number_people / room_floor_area_m2
                 dup_people_prop_ph.dwellings = ph_dwelling_obj
                 dup_people.people_per_area = _ppl_per_m2
 

@@ -51,6 +51,11 @@ try:
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
+try:
+    from ph_units.converter import convert
+except ImportError as e:
+    raise ImportError("\nFailed to import ph_units:\n\t{}".format(e))
+
 
 class GHCompo_VisualizeWindowFrameElements(object):
     def __init__(self, _IGH, _apertures):
@@ -114,9 +119,15 @@ class GHCompo_VisualizeWindowFrameElements(object):
         """Create the frame surfaces for the aperture."""
         frame_surfaces = []
         for edge, frame in izip(_ap_edges, _ap_frame_elements):
+
+            # -- Get the width in the Rhino-document's units
+            # -- From AirTable, and in Honeybee, width will ALWAYS be in meters.
+            doc_unit_type = self.IGH.get_rhino_unit_system_name()
+            width_in_doc_units = convert(frame.width, "M", doc_unit_type)
+
             crv_mid_pt = self.get_edge_midpoint(edge)
             extrusion_vector = self.IGH.ghc.Vector2Pt(crv_mid_pt, ap_ctr_pt, True).vector
-            extrusion_vector = self.IGH.ghc.Amplitude(extrusion_vector, frame.width)
+            extrusion_vector = self.IGH.ghc.Amplitude(extrusion_vector, width_in_doc_units)
             ext = self.IGH.ghc.Extrude(base=edge, direction=extrusion_vector)
             frame_surfaces.append(ext)
 

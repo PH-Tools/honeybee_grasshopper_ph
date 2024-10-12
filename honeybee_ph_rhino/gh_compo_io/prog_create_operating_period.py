@@ -13,8 +13,17 @@ try:
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
+try:
+    from honeybee_ph_rhino.gh_compo_io import ghio_validators
+except ImportError as e:
+    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
+
 
 class GHCompo_CreateOccPeriod(object):
+
+    hours_per_day = ghio_validators.FloatMax24("hours_per_day")
+    operating_fraction = ghio_validators.FloatPercentage("operating_fraction")
+
     def __init__(self, _IGH, _name, _hrs_per_day, _op_frac):
         # type: (gh_io.IGH, str, float, float) -> None
         self.IGH = _IGH
