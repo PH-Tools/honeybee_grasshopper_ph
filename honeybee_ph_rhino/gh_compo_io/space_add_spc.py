@@ -34,6 +34,12 @@ try:
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
+try:
+    from ph_units.converter import convert
+    from ph_units.parser import parse_input
+except ImportError as e:
+    raise ImportError("\nFailed to import ph_units:\n\t{}".format(e))
+
 
 class GHCompo_AddPHSpaces(object):
     def __init__(self, _IGH, _spaces, _offset_dist, _inh_rm_nms, _hb_rooms):
@@ -41,7 +47,7 @@ class GHCompo_AddPHSpaces(object):
 
         self.IGH = _IGH
         self.spaces = _spaces
-        self.offset_dist = _offset_dist or 0.1
+        self.offset_dist = _offset_dist or "0.1 M"
         self.inherit_room_names = _inh_rm_nms
         self.hb_rooms = _hb_rooms
 
@@ -54,8 +60,13 @@ class GHCompo_AddPHSpaces(object):
             return self.hb_rooms, [], []
 
         # ---------------------------------------------------------------------
+        # -- Get the offset distance in Rhino document units
+        val, unit = parse_input(self.offset_dist)
+        doc_unit_name = self.IGH.get_rhino_unit_system_name()
+        offset_dist = convert(val, unit or doc_unit_name, doc_unit_name)
+
+        # ---------------------------------------------------------------------
         # -- Clean up the input spaces, host in the HB-Rooms
-        offset_dist = self.offset_dist
         spaces = [make_space.offset_space_reference_points(self.IGH, sp, offset_dist) for sp in self.spaces]
         (
             hb_rooms_,
