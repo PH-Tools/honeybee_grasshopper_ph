@@ -28,9 +28,9 @@ class GHCompo_CalcPhiusShadeTransmittance(object):
         """Calculate the effective reduction factor according to Phius Guidebook v3.1, Appendix N-8"""
 
         if self.inside is False:
-            transmittance_eff = 1 - (1 - self.transmittance) * (1 - 0.6)
-        else:
             transmittance_eff = 0.3 + (0.7 * self.transmittance)
+        else:
+            transmittance_eff = 1 - (1 - self.transmittance) * (1 - 0.6)
 
         reflectance = 1.0 - transmittance_eff
 
