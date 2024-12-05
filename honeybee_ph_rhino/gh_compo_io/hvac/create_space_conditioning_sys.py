@@ -233,7 +233,11 @@ class GHCompo_CreateSpaceConditioningSystem(object):
 
         Because I used a "_xx" prefix in the name for some reason, I need to pull this out separately.
         """
-        return float(self.input_dict.get("_percent_bldg_heating_covered", 1.0) or 1.0)
+        input_value = self.input_dict.get("_percent_bldg_heating_covered", 1.0)  # type:  float | None
+        if input_value is None:
+            return 1.0
+        else:
+            return float(input_value)
 
     @property
     def display_name(self):
