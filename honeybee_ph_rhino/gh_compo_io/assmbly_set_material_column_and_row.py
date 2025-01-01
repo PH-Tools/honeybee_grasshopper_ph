@@ -51,7 +51,7 @@ class GHCompo_SetMaterialColumnAndRow(object):
         row_position = gh_io.input_to_int(str(self.row_position))
 
         hbe_material_ = self.hbe_material.duplicate()
-        ph_prop = hbe_material_.properties.ph  # type: EnergyMaterialPhProperties
+        ph_prop = getattr(hbe_material_.properties, "ph")  # type: EnergyMaterialPhProperties
 
         if not hasattr(ph_prop, "user_data"):
             ph_prop.user_data = {}

@@ -24,7 +24,11 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
 try:
-    from honeybee_energy_ph.properties.materials.opaque import CellPositionError, EnergyMaterialPhProperties
+    from honeybee_energy_ph.properties.materials.opaque import (
+        CellPositionError,
+        EnergyMaterialPhProperties,
+        PhDivisionGrid,
+    )
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
 
@@ -88,6 +92,18 @@ class GHCompo_CreateHeterogeneousMaterial(object):
         self.additional_materials = _additional_materials
         self.column_widths = _column_widths
         self.row_heights = _row_heights
+
+    @property
+    def all_materials(self):
+        # type: () -> List[opaque.EnergyMaterial]
+        """Get all the materials including the base and additional materials."""
+        mats = []
+        for mat in self.additional_materials:
+            if mat is not None:
+                mats.append(mat)
+        if self.base_material is not None:
+            mats.insert(0, self.base_material)
+        return mats
 
     def ready(self):
         # type: () -> bool
@@ -175,33 +191,55 @@ class GHCompo_CreateHeterogeneousMaterial(object):
                 self.IGH.error(msg)
                 break
 
+    def set_cell_material(self, _division_grid, _column, _row, _material):
+        # type: (PhDivisionGrid, int, int, opaque.EnergyMaterial) -> None
+        print(
+            "Setting Material at: Column-{} | Row-{} to '{}' [id={}]".format(
+                _column, _row, _material.display_name, id(_material)
+            )
+        )
+        try:
+            _division_grid.set_cell_material(_column, _row, _material)
+        except CellPositionError as e:
+            print("- " * 25)
+            print("WARNING: Check the '_column_widths' and '_row_heights' inputs.\n")
+            raise e
+
     def run(self):
         # type: () -> Tuple[Optional[opaque.EnergyMaterial], Optional[Any]]
         if not self.ready() or not self.base_material:
             return (self.base_material, None)
 
-        # -- Setup the Base Material Division Grid
-        new_material_ = self.base_material.duplicate()
-        ph_prop = new_material_.properties.ph  # type: EnergyMaterialPhProperties # type: ignore
+        # --------------------------------------------------------------------------------------------------------------
+        # -- Setup the Division Grid
+        division_grid = PhDivisionGrid()
+        division_grid.set_column_widths(self.column_widths)
+        division_grid.set_row_heights(self.row_heights)
 
-        ph_prop.divisions.set_column_widths(self.column_widths)
-        ph_prop.divisions.set_row_heights(self.row_heights)
+        for row in range(division_grid.row_count):
+            for col in range(division_grid.column_count):
+                division_grid.set_cell_material(col, row, self.base_material)
 
         for material in self.additional_materials:
-            col = material.properties.ph.user_data.get("column_position", 0)  # type: ignore
-            row = material.properties.ph.user_data.get("row_position", 0)  # type: ignore
-            print(
-                "Setting Material at: Column-{} | Row-{} to '{}' [id={}]".format(
-                    col, row, material.display_name, id(material)
-                )
-            )
-            try:
-                ph_prop.divisions.set_cell_material(col, row, material)
-            except CellPositionError as e:
-                print("- " * 25)
-                print("WARNING: Check the '_column_widths' and '_row_heights' inputs.\n")
-                raise e
+            hbph_mat_props = getattr(material.properties, "ph")  # type: EnergyMaterialPhProperties
+            col = hbph_mat_props.user_data.get("column_position", 0)
+            row = hbph_mat_props.user_data.get("row_position", 0)
+            self.set_cell_material(division_grid, col, row, material)
 
+        # --------------------------------------------------------------------------------------------------------------
+        # -- Create a new Hybrid Material
+        base_material = division_grid.get_base_material()
+        if not base_material:
+            return (None, None)
+        new_material_ = base_material.duplicate()
+        nm = "+".join([_.display_name for _ in self.all_materials])
+        new_material_.display_name = nm
+        new_material_.identifier = nm
+        new_material_.conductivity = division_grid.get_equivalent_conductivity()
+        hbph_props = getattr(new_material_.properties, "ph")  # type: EnergyMaterialPhProperties
+        hbph_props.divisions = division_grid
+
+        # --------------------------------------------------------------------------------------------------------------
         self.check_material_thicknesses(new_material_)
         self.check_material_conductivities(new_material_)
 
