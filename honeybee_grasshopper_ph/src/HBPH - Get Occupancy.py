@@ -3,7 +3,7 @@
 # 
 # This component is part of the PH-Tools toolkit <https://github.com/PH-Tools>.
 # 
-# Copyright (c) 2022, PH-Tools and bldgtyp, llc <phtools@bldgtyp.com> 
+# Copyright (c) 2025, PH-Tools and bldgtyp, llc <phtools@bldgtyp.com> 
 # Honeybee-PH is free software; you can redistribute it and/or modify 
 # it under the terms of the GNU General Public License as published 
 # by the Free Software Foundation; either version 3 of the License, 
@@ -20,25 +20,22 @@
 # @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 #
 """
-Set the residential PH-Style occupancy for the Honeybee-Rooms input. For Phius, the 
-total occupancy with be the number-of-bedrooms + 1 for each dwelling unit.
+Report out the occupancy related information for a set of Honenybee-Rooms.
 -
-EM January 22, 2025
+EM January 26, 2025
     Args:
-        _name_: (str) The name of the Phius program to search the dataset for.
+
+        _hb_rooms: (list[Room]) A list of HB-Rooms to get the data from. 
         
-        description_: (Optional[str]) Search within the 'description' field of the Phius
-            program data set instead of the name.
-        
-        protocol_: (Optional[str]) A sub-category "Protocol" to filter the Phius programs by. For
-            instance - "PHIUS_MultiFamily" or "PHIUS_NonRes", etc...
-            
-        base_program_: (Optional[honeybee_energy.programtype.ProgramType]) A base program 
-            to use for the Phius Program, to fill in any missing info (hot-water, gas, etc..)
-            
     Returns:
-        programs_ (List[honeybee_energy.programtype.ProgramType]) A list of the Honeybee
-            ProgramTypes found in the Phius dataset which match the search criteria.
+        total_num_bedrooms_: The total number of bedrooms found in the
+            HB-Rooms input.
+
+        total_num_people_: The total number of occupants found in the 
+            HB-Rooms input.
+
+        total_num_dwellings_: The total number of 'dwelling units' found in the 
+            HB-Rooms input.
 """
 
 import scriptcontext as sc
@@ -46,12 +43,6 @@ import Rhino as rh
 import rhinoscriptsyntax as rs
 import ghpythonlib.components as ghc
 import Grasshopper as gh
-
-
-try:
-    from honeybee_ph_utils import preview
-except ImportError as e:
-    raise ImportError('\nFailed to import honeybee_ph_utils:\n\t{}'.format(e))
 
 try:
     from honeybee_ph_rhino import gh_compo_io
@@ -67,16 +58,12 @@ except ImportError as e:
 #-------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
-ghenv.Component.Name = "HBPH - Phius Program Finder"
+ghenv.Component.Name = "HBPH - Get Occupancy"
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
-    from honeybee_energy_ph.library import programtypes
-    reload(programtypes)
-    reload(gh_io)
-    from honeybee_ph_standards.programtypes import PHIUS_programs
-    reload(PHIUS_programs)
-    from honeybee_ph_rhino.gh_compo_io.program import find_phius_program as gh_compo_io
+    from honeybee_ph_rhino.gh_compo_io.program import get_res_occupancy as gh_compo_io
     reload(gh_compo_io)
+    reload(gh_io)
 
 
 # ------------------------------------------------------------------------------
@@ -85,11 +72,9 @@ IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 
 
 #-------------------------------------------------------------------------------
-gh_compo_interface = gh_compo_io.GHCompo_FindPhiusProgram(
-        IGH,
-        _name_,
-        description_,
-        protocol_,
-        base_program_,
-    )
-programs_ = gh_compo_interface.run()
+# -- Create the new Single-Family Home Program from the Rooms
+gh_compo_interface = gh_compo_io.GHCompo_GetResOccupancy(
+    IGH,
+    _hb_rooms,
+)
+total_num_bedrooms_, total_num_people_, total_num_dwellings_ = gh_compo_interface.run()

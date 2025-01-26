@@ -23,7 +23,7 @@
 Create a new detailed Passive House style equipment which can be added to the 
 honeybee Rooms.
 -
-EM October 2, 2022
+EM January 26, 2025
 """
 
 import scriptcontext as sc
@@ -38,9 +38,16 @@ except ImportError as e:
     raise ImportError('\nFailed to import honeybee_ph_utils:\n\t{}'.format(e))
 
 try:
-    from honeybee_ph_rhino import gh_compo_io, gh_io
+    from honeybee_ph_rhino import gh_compo_io
+    from honeybee_ph_rhino.gh_compo_io.program import create_elec_equip
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
+
+try:
+    from ph_gh_component_io import gh_io
+except ImportError as e:
+    raise ImportError('\nFailed to import ph_gh_component_io:\n\t{}'.format(e))
+
 
 
 #-------------------------------------------------------------------------------
@@ -51,7 +58,9 @@ DEV = True
 honeybee_ph_rhino._component_info_.set_component_params(ghenv)
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
+    from honeybee_ph_rhino.gh_compo_io.program import create_elec_equip as gh_compo_io
     reload(gh_compo_io)
+    reload(create_elec_equip)
     reload(gh_io)
 
 
@@ -62,7 +71,7 @@ IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 
 #-------------------------------------------------------------------------------
 # -- Setup the input nodes, get all the user input values
-input_dict = gh_compo_io.prog_create_elec_equip.get_component_inputs(_type)
+input_dict = create_elec_equip.get_component_inputs(_type)
 gh_io.setup_component_inputs(IGH, input_dict, _start_i=2)
 input_values_dict = gh_io.get_component_input_values(ghenv)
 

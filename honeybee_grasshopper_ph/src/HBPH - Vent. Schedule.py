@@ -26,7 +26,7 @@ equivalent constant-value fresh air ventilation operation scheduled which can th
 used to control the Honeybee-Energy fresh air ventilation. Note that the values here
 will also be stored and used as detailed inputs into  WUFI-Passive or PHPP upon export.
 -
-EM October 2, 2022
+EM January 22, 2025
     Args:
         _name_: Optional name for the Ventilation Schedule
         
@@ -58,9 +58,15 @@ except ImportError as e:
     raise ImportError('\nFailed to import honeybee_ph_utils:\n\t{}'.format(e))
 
 try:
-    from honeybee_ph_rhino import gh_compo_io, gh_io
+    from honeybee_ph_rhino import gh_compo_io
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
+
+try:
+    from ph_gh_component_io import gh_io
+except ImportError as e:
+    raise ImportError('\nFailed to import ph_gh_component_io:\n\t{}'.format(e))
+
 
 # ------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
@@ -68,8 +74,10 @@ reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Vent. Schedule"
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
+    from honeybee_ph_rhino.gh_compo_io.program import create_vent_schd as gh_compo_io
     reload(gh_compo_io)
     reload(gh_io)
+
 # ------------------------------------------------------------------------------
 # -- GH Interface
 IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )

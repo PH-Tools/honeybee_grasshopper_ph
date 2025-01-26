@@ -13,8 +13,9 @@ ghenv.Component.SubCategory = "00 | Utils"
 ghenv.Component.ToggleObsolete(False)
 
 import os
-import Grasshopper.Kernel as ghK
 import shutil
+
+import Grasshopper.Kernel as ghK
 from GhPython.Component import ZuiPythonComponent
 
 

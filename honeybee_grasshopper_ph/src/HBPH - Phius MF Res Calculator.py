@@ -30,7 +30,7 @@ in the Phius Multifamily Workbook. These include MEL, Interior-Lighting, Exterio
 This does NOT include the other residential appliances (fridge, cooking, etc..). Be sure to add those 
 to the Residential Honeybee-Rooms in addition to the elec_equipment_ created by this component.
 -
-EM June 8, 2023
+EM January 22, 2025
 
     Args:
         int_light_HE_frac_: (float) default=1.0 | The % (0-1.0) of interior lighting
@@ -96,9 +96,15 @@ except ImportError as e:
     raise ImportError('\nFailed to import honeybee_ph_utils:\n\t{}'.format(e))
 
 try:
-    from honeybee_ph_rhino import gh_compo_io, gh_io
+    from honeybee_ph_rhino import gh_compo_io
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
+
+try:
+    from ph_gh_component_io import gh_io
+except ImportError as e:
+    raise ImportError('\nFailed to import ph_gh_component_io:\n\t{}'.format(e))
+
 
 #-------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
@@ -112,7 +118,7 @@ if DEV:
     reload(gh_io)
     from honeybee_energy_ph.load import phius_mf
     reload(phius_mf)
-    from honeybee_ph_rhino.gh_compo_io import prog_Phius_MF_calc as gh_compo_io
+    from honeybee_ph_rhino.gh_compo_io.program import phius_MF_calc as gh_compo_io
     reload(gh_compo_io)
 
 

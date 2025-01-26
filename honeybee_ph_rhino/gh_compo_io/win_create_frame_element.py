@@ -14,8 +14,8 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
 
 try:
-    from honeybee_ph_rhino.gh_compo_io import ghio_validators
     from honeybee_ph_rhino import gh_io
+    from honeybee_ph_rhino.gh_compo_io import ghio_validators
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 

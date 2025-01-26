@@ -5,7 +5,7 @@
 These are called when the component is instantiated within the Grasshopper canvas.
 """
 
-RELEASE_VERSION = "Honeybee-PH v1.7.07"
+RELEASE_VERSION = "Honeybee-PH v1.8.00"
 CATEGORY = "HB-PH"
 SUB_CATEGORIES = {
     0: "00 | Utils",
@@ -292,6 +292,12 @@ COMPONENT_PARAMS = {
         "Category": CATEGORY,
         "SubCategory": 1,
     },
+    "HBPH - Get Occupancy": {
+        "NickName": "Get Occupancy",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
     "HBPH - Phius MF Res Calculator": {
         "NickName": "Phius MF Res Calc",
         "Message": RELEASE_VERSION,
@@ -306,6 +312,24 @@ COMPONENT_PARAMS = {
     },
     "HBPH - Create Conversion Factor": {
         "NickName": "Factor",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
+    "HBPH - Create Program - Single Family Home": {
+        "NickName": "Create SFH Program",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
+    "HBPH - Set Dwelling": {
+        "NickName": "Set Dwelling",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
+    "HBPH - Add Process Equipment": {
+        "NickName": "Add Process Equipment",
         "Message": RELEASE_VERSION,
         "Category": CATEGORY,
         "SubCategory": 1,

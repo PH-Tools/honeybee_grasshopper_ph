@@ -20,33 +20,20 @@
 # @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 #
 """
-Set the PH-Style occupancy for the Honeybee-Rooms input.
+Set a group of HB-Rooms as a single 'Dwelling'. This is required in order to properly calculate
+the Phius occupancy, lighting, and electrical equipment usage. 
 -
-Note that this componet will create a new, unique 'People' load for EACH HB-Room input, and will
-set the values accordigly. On some larger projects with many rooms, creating these duplicate 'People' 
-objects may not be ideal, and may lead to longer run-times. As an alternative, use the 'Set People 
-PH Attributes' component to create a Honeybee-Energy Program, which can then be assigned to multiple rooms at once.
--
-For Phius residential projects, a room's "_num_people" should be the rooms's "number-of-bedrooms" + 1
+If you are creating a single-family home, simply input all of your rooms
+to this component. If you are creating a multi-unit (apartment) building, split up your rooms onto separate 
+branches as appropriate. All of the Rooms on a single Branch will be set to the same 'dwelling'.
 -
 EM January 26, 2025
     Args:
-        _num_bedrooms: (list[int]) A list of number of bedrooms for EACH Honeybee-Room input.
-            This should ideally be the same length as the '_hb_rooms' input, and in the same 
-            order. If only a single value is input, that value will get applied to all of the 
-            Honeybee-Rooms input. Note that this value is the number of bedrooms PER-HB-ROOM, 
-            not the total number of bedrooms in the entire model.
-        
-        _num_people: (List[float]) A list of the number of people for EACH Honeybee-Room input.
-            This should ideally be the same length as the '_hb_rooms' input, and in the same 
-            order. If only a single value is input, that value will get applied to all of the 
-            Honeybee-Rooms input. Note that this value is the number of people PER-HB-ROOM, 
-            not the total number of people in the entire model.      
-        
-        _hb_rooms: (List[Room]) A list of Honeybee-Rooms to set the occupancy values on.
+
+        _hb_rooms: (DataTree[Room]) The HB-Rooms to set as a 'dwelling'
             
     Returns:
-        hb_rooms_ (List[Room]) A list of the Honeybee Rooms with the ph-style occupancy set.
+        hb_rooms_: (DataTree[Room]) The HB-Rooms with their 'dwelling' set.
 """
 
 
@@ -76,10 +63,10 @@ except ImportError as e:
 #-------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
-ghenv.Component.Name = "HBPH - Set Res Occupancy"
+ghenv.Component.Name = "HBPH - Set Dwelling"
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
-    from honeybee_ph_rhino.gh_compo_io.program import set_res_occupancy as gh_compo_io
+    from honeybee_ph_rhino.gh_compo_io.program import set_dwelling as gh_compo_io
     reload(gh_compo_io)
     reload(gh_io)
 
@@ -89,10 +76,8 @@ IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 
 
 #-------------------------------------------------------------------------------
-gh_compo_interface = gh_compo_io.GHCompo_SetResOccupancy(
+gh_compo_interface = gh_compo_io.GHCompo_SetDwelling(
         IGH,
-        _num_bedrooms,
-        _num_people,
         _hb_rooms,
     )
-hb_rooms_= gh_compo_interface.run()
+hb_rooms_ = gh_compo_interface.run()

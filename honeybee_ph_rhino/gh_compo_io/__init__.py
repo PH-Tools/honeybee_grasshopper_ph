@@ -52,13 +52,7 @@ from honeybee_ph_rhino.gh_compo_io.hvac.create_ventilator import GHCompo_CreateP
 from honeybee_ph_rhino.gh_compo_io.organize_spaces import GHCompo_OrganizeSpaces
 
 # -- Program [Schedule / Load]
-from honeybee_ph_rhino.gh_compo_io.prog_add_elec_equip import GHCompo_AddElecEquip
-from honeybee_ph_rhino.gh_compo_io.prog_create_elec_equip import GHCompo_CreateElecEquip
-from honeybee_ph_rhino.gh_compo_io.prog_create_operating_period import GHCompo_CreateOccPeriod
-from honeybee_ph_rhino.gh_compo_io.prog_create_vent_schd import GHCompo_CreateVentSched
-from honeybee_ph_rhino.gh_compo_io.prog_find_Phius_program import GHCompo_FindPhiusProgram
-from honeybee_ph_rhino.gh_compo_io.prog_Phius_MF_calc import GHCompo_CalcPhiusMFLoads
-from honeybee_ph_rhino.gh_compo_io.prog_set_res_occupancy import GHCompo_SetResOccupancy
+from honeybee_ph_rhino.gh_compo_io.program import *
 from honeybee_ph_rhino.gh_compo_io.set_spec_heat_cap import GHCompo_SetRoomSpecHeatCaps
 
 # -- Shading

@@ -3,6 +3,8 @@
 
 """GHCompo Interface: HBPH - Add PH Equipment ."""
 
+# TODO: Remove this component. Use the new 'HBPH - Add Process Equipment' component instead.
+
 try:
     from typing import List, Tuple
 except ImportError:
@@ -252,6 +254,13 @@ class GHCompo_AddElecEquip(object):
         self.phi_defaults = _phi_defaults
         self.equipment = _equipment
         self.hb_rooms = _hb_rooms
+
+        msg = (
+            "Deprecation Warning: This component should not be used any longer. Please use the new"
+            "'HBPH - Add Process Equipment' component to add PhEquipment instead."
+        )
+        print(msg)
+        self.IGH.error(msg)
 
     def run(self):
         # type: () -> Tuple[List[room.Room], List[ph_equipment.PhEquipment]]
