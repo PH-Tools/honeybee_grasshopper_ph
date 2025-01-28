@@ -27,7 +27,7 @@ This may not always be what you want, and so if you want to add equipment ONLY
 to certain rooms (ie: add a Cooktopto ONLY the Kitchen), then break up your 
 Rooms accordingly and only pass in the relevant Honeybee-Room(s).
 -
-EM January 26, 2025
+EM January 28, 2025
     Args:
 
         _equipment: (list[str | PHEquipment]) A List of new HBPH 'Equipment' to add 

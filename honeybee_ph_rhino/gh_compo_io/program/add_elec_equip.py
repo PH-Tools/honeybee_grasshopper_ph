@@ -51,6 +51,8 @@ class HBElecEquipWithRooms:
         self.hb_electric_equipment = _hb_electric_equipment.duplicate()
         self.hb_rooms = []  # type: list[room.Room]
 
+        raise Exception("This component is deprecated. Please use the new 'HBPH - Add Process Equipment' component.")
+
     def set_hb_room_ee(self):
         # type: () -> None
         """Set all of the HB-Rooms in the set with the HBE-ElecEquipment obj."""

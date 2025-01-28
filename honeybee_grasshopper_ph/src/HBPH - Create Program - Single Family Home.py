@@ -20,43 +20,30 @@
 # @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 #
 """
-Create a new Honeybee Energy Program for a Single-Family-Home. 
--
-Lighting, MEL, Hot-Water, and Occupancy:
+Set HB-Rooms to have "Single-Family-Home" style program attributes: 
+* Infiltration: HB-Standard 'Average'=0.0003 m3/s-m2
+* Ventilation: Phius Standard=0.4ACH
+* Setpoints: Phius Standard Heating=20C [68F], Cooling=25C [77F], Dehumid=60%RH
+* Elecrical Equipment: Phius Default Residential Equipment Set.
+* Interior Lighting, Hot-Water:
     2014 Building America House Simulation Protocols
     E. Wilson, C. Engebrecht Metzger, S. Horowitz, and R. Hendron
     National Renewable Energy Laboratory
     https://www.nrel.gov/docs/fy14osti/60988.pdf
 -
-Infiltration: HB-Standard 'Average' 0.0003 m3/s-m2
-- 
-Ventilation: PH-Standard 0.4ACH
+* Occupancy: Set from HBE-Occupancy 
+NOTE: If you wish to set 'Passive House' style residential occupancy values, 
+use the "HBPH - Set Res Occupancy" component BEFORE using this one. If no PH-Style
+occupancy values are found, this component will keep the existing HB-Energy values.
 -
-Setpoints: PH Standard- Heating=20C, Cooling=25C, Dehumid=60%RH
--
-NOTE: This Program incluces ONLY Misc Electrical Loads. In order to add specific
-Appliance loads (Refrigerator, Cooktop, etc.) either create and add the loads using 
-a Honeybee 'Process Load' or use the 'HBPH - Create Residential Appliance' component.
--
-EM January 22, 2025
+EM January 27, 2025
     Args:
 
-        _hb_rooms: (list[Room]) A list of the HB-Rooms to add the new 
-            HBPH Supportive Devices to.
+        _hb_rooms: (list[Room]) A list of HB-Rooms to re-set the Honeybee-Energy
+            properties on.
 
-        _base_program: An optional ProgramType object that will be used as the
-            starting point for the new ProgramType output from this component.
-            This can also be text for the name of a ProgramType within the library
-            such as that output from the "HB Search Program Types" component.
-
-        _floor_area: (float): The reference floor area to use when determining the 
-            load values to apply. In most cases this should the 'FFA' (finished floor area) /, 
-            iCFA / TFA value representing the net-interior-floor-area.
-
-        _num_bedrooms: (float) The total number of bedrooms for the group of HB Rooms input.
-        
     Returns:
-        program_: The new Honeybee-Energy Progam which can be applied to the Rooms.
+        hb_rooms_: The Honeybee-Rooms with the new Residential attributes set.
 """
 
 import scriptcontext as sc
@@ -95,9 +82,6 @@ IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 # -- Create the new Single-Family Home Program from the Rooms
 gh_compo_interface = gh_compo_io.GHCompo_CreatePHProgramSingleFamilyHome(
     IGH,
-    _base_program,
-    _floor_area,
-    _num_bedrooms,
     _hb_rooms,
 )
-program_ = gh_compo_interface.run()
+hb_rooms_ = gh_compo_interface.run()

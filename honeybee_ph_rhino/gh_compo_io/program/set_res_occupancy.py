@@ -6,6 +6,7 @@
 from collections import defaultdict
 from contextlib import contextmanager
 from statistics import mean
+import os
 
 try:
     from typing import Generator
@@ -18,7 +19,7 @@ except ImportError:
     izip = zip  # Python 3
 
 try:
-    from honeybee.properties import RoomProperties
+    from honeybee.config import folders
     from honeybee.room import Room
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
@@ -30,7 +31,8 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy:\n\t{}".format(e))
 
 try:
-    from honeybee_energy_ph.properties.load.people import PeoplePhProperties, PhDwellings
+    from honeybee_energy_ph.properties.load.people import PeoplePhProperties
+    from honeybee_ph_standards.schedules._load_schedules import load_schedules_from_json_file
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
 
@@ -49,16 +51,16 @@ except ImportError as e:
 def unlocked(_hbe_people):
     # type: (People) -> Generator[People, None, None]
     """Unlock the HB-Energy 'People' load."""
-    _hbe_people.unlock()
+    _hbe_people.unlock()  # type: ignore
     yield _hbe_people
-    _hbe_people.lock()
+    _hbe_people.lock()  # type: ignore
 
 
 def _get_avg_occ_rate(_hb_room):
     # type: (Room) -> float
     """Get the HBE-People Occupancy-Schedule average annual value."""
     hbe_prop = getattr(_hb_room.properties, "energy")  # type: RoomEnergyProperties
-    return mean(hbe_prop.people.occupancy_schedule.values())
+    return mean(hbe_prop.people.occupancy_schedule.values())  # type: ignore
 
 
 def _group_rooms_by_dwellings(_hb_rooms):
@@ -86,7 +88,7 @@ def set_number_of_bedrooms(_hb_rooms, _num_bedrooms):
         hbe_prop = getattr(hb_room.properties, "energy")  # type: RoomEnergyProperties
         people_prop_ph = getattr(hbe_prop.people.properties, "ph")  # type: PeoplePhProperties
         people_prop_ph.number_bedrooms = n_br
-        print("Setting {} Number of Bedrooms: {}".format(hb_room.display_name, n_br))
+        print("[{}] Setting Number of Bedrooms: {}".format(hb_room.display_name, n_br))
     return None
 
 
@@ -97,7 +99,7 @@ def set_number_of_people(_hb_rooms, _num_people):
         hbe_prop = getattr(hb_room.properties, "energy")  # type: RoomEnergyProperties
         people_prop_ph = getattr(hbe_prop.people.properties, "ph")  # type: PeoplePhProperties
         people_prop_ph.number_people = n_ppl
-        print("Setting {} Number of People: {}".format(hb_room.display_name, n_ppl))
+        print("[{}] Setting Number of People: {}".format(hb_room.display_name, n_ppl))
     return None
 
 
@@ -121,22 +123,48 @@ def set_people_per_m2(_hb_rooms, _IGH):
         total_floor_area_m2 = sum(_get_room_floor_area_m2(rm, _IGH) for rm in room_group)
 
         # -- Set the 'People' load for each room in the 'Group'
-        for hb_room in _hb_rooms:
+        for hb_room in room_group:
             total_peak_ppl = total_average_ph_ppl / _get_avg_occ_rate(hb_room)
             people_per_area = total_peak_ppl / total_floor_area_m2
             room_e_prop = getattr(hb_room.properties, "energy")  # type: RoomEnergyProperties
+
+            # Note: we made sure to duplicate the room and the People before
+            # so we can safely unlock the People load here.
             with unlocked(room_e_prop.people) as ppl:
                 ppl.people_per_area = people_per_area
-                print("Setting {} People/Area: {:.3f} ppl/m2".format(hb_room.display_name, people_per_area))
+                print("[{}] Setting People/Area: {:.3f} ppl/m2".format(hb_room.display_name, people_per_area))
     return
 
 
+def set_ph_res_occ_schedule(_hb_rooms):
+    # type: (list[Room]) -> None
+    """Set the PH-Style Occupancy Schedule on each HB-Room."""
+    file_pth = os.path.join(
+        folders.python_package_path, "honeybee_ph_standards", "schedules", "hbph_sfh_occupancy.json"
+    )
+    occ_schd = load_schedules_from_json_file(file_pth)["hbph_sfh_Occupant_Presence"]
+    activity_schd = load_schedules_from_json_file(file_pth)["hbph_sfh_Occupant_Activity"]
+
+    for hb_room in _hb_rooms:
+        room_e_prop = getattr(hb_room.properties, "energy")  # type: RoomEnergyProperties
+        if not room_e_prop.people:
+            continue
+
+        # Note: we made sure to duplicate the room and the People before
+        # so we can safely unlock the People load here.
+        with unlocked(room_e_prop.people) as ppl:
+            print("[{}] Setting PH-Style Occupancy Schedules".format(hb_room.display_name))
+            ppl.occupancy_schedule = occ_schd
+            ppl.activity_schedule = activity_schd
+
+
 class GHCompo_SetResOccupancy(object):
-    def __init__(self, _IGH, _num_bedrooms, _num_people, _hb_rooms):
-        # type: (gh_io.IGH, list[int], list[float], list[Room]) -> None
+    def __init__(self, _IGH, _num_bedrooms, _num_people, _set_ph_res_schedule, _hb_rooms):
+        # type: (gh_io.IGH, list[int], list[float], bool | None, list[Room]) -> None
         self.IGH = _IGH
         self._number_bedrooms = _num_bedrooms
         self._number_people = _num_people
+        self.set_ph_res_schedule = False if _set_ph_res_schedule == False else True
         self.hb_rooms = _hb_rooms
 
     @property
@@ -226,6 +254,8 @@ class GHCompo_SetResOccupancy(object):
             return self.hb_rooms
 
         hb_rooms_ = self.duplicate_rooms(self.hb_rooms)
+        if self.set_ph_res_schedule:
+            set_ph_res_occ_schedule(hb_rooms_)
         set_number_of_bedrooms(hb_rooms_, self.number_bedrooms)
         set_number_of_people(hb_rooms_, self.number_people)
         set_people_per_m2(hb_rooms_, self.IGH)

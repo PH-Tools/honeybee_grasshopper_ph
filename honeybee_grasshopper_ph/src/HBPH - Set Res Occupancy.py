@@ -29,7 +29,7 @@ PH Attributes' component to create a Honeybee-Energy Program, which can then be 
 -
 For Phius residential projects, a room's "_num_people" should be the rooms's "number-of-bedrooms" + 1
 -
-EM January 26, 2025
+EM January 28, 2025
     Args:
         _num_bedrooms: (list[int]) A list of number of bedrooms for EACH Honeybee-Room input.
             This should ideally be the same length as the '_hb_rooms' input, and in the same 
@@ -42,6 +42,10 @@ EM January 26, 2025
             order. If only a single value is input, that value will get applied to all of the 
             Honeybee-Rooms input. Note that this value is the number of people PER-HB-ROOM, 
             not the total number of people in the entire model.      
+
+        _set_res_schedule_: (bool) Default=True. Set the Room's Occupancy and Occupant-Activity schedule
+            to the Passive-House deffaults? If set to 'False', the Room's existing schedule will be 
+            maintained. If None, will re-set the schedule to match the PH res-typical schedule.
         
         _hb_rooms: (List[Room]) A list of Honeybee-Rooms to set the occupancy values on.
             
@@ -93,6 +97,7 @@ gh_compo_interface = gh_compo_io.GHCompo_SetResOccupancy(
         IGH,
         _num_bedrooms,
         _num_people,
+        _set_res_schedule_,
         _hb_rooms,
     )
 hb_rooms_= gh_compo_interface.run()

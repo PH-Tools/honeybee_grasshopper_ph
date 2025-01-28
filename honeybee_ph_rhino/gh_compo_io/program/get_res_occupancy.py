@@ -87,13 +87,19 @@ class GHCompo_GetResOccupancy(object):
             if not hbe_prop.people:
                 continue
 
-            hbph_ppl_prop = getattr(hbe_prop.people.properties, "ph")  # type: PeoplePhProperties
-
             # -- Calculate the number of occupants
-            peak_ppl_per_m2 = hbe_prop.people.people_per_area
-            avg_occ_rate = mean(hbe_prop.people.occupancy_schedule.values())
+            hbph_ppl_prop = getattr(hbe_prop.people.properties, "ph")  # type: PeoplePhProperties
             area_m2 = get_area_value_in_unit(self.IGH, hb_room.floor_area, "M2")
-            avg_ppl = peak_ppl_per_m2 * avg_occ_rate * area_m2
+            if hbph_ppl_prop.number_people:
+                # -- Try and get the PH-Style info first
+                peak_ppl_per_m2 = hbph_ppl_prop.number_people / area_m2
+                avg_ppl = float(hbph_ppl_prop.number_people)
+            else:
+                # -- If No PH-Style data, try and use the HB-E info
+                peak_ppl_per_m2 = hbe_prop.people.people_per_area
+                avg_occ_rate = mean(hbe_prop.people.occupancy_schedule.values()) # type: ignore
+                avg_ppl = peak_ppl_per_m2 * area_m2 * avg_occ_rate
+            
             num_br = hbph_ppl_prop.number_bedrooms
 
             total_num_ppl += avg_ppl
