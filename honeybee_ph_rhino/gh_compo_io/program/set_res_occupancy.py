@@ -68,7 +68,9 @@ def _group_rooms_by_dwellings(_hb_rooms):
     """Group the HB-Rooms by their 'dwelling'."""
     room_groups = defaultdict(list)
     for hb_room in _hb_rooms:
-        room_groups[hb_room.zone].append(hb_room)
+        rm_prop_e = getattr(hb_room.properties, "energy")  # type: RoomEnergyProperties
+        ppl_prop_ph = getattr(rm_prop_e.people.properties, "ph") # type: PeoplePhProperties
+        room_groups[ppl_prop_ph.dwellings.identifier].append(hb_room)
 
     return [v for v in room_groups.values()]
 

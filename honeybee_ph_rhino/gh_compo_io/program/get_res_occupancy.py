@@ -6,19 +6,17 @@
 from statistics import mean
 
 try:
-    from honeybee.properties import RoomProperties
     from honeybee.room import Room
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
 try:
-    from honeybee_energy.load import people
     from honeybee_energy.properties.room import RoomEnergyProperties
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy:\n\t{}".format(e))
 
 try:
-    from honeybee_energy_ph.properties.load.people import PeoplePhProperties, PhDwellings
+    from honeybee_energy_ph.properties.load.people import PeoplePhProperties
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
 
@@ -63,10 +61,9 @@ def get_area_value_in_unit(_IGH, _input, _target_unit):
 def get_num_of_dwellings(_hb_rooms):
     # type: (list[Room]) -> int
     """Return the total number of dwellings in the list of HB-Rooms."""
-    zones = set()
-    for hb_room in _hb_rooms:
-        zones.add(hb_room.zone)
-    return len(zones)
+    ph_dwelling_objs = {r.properties.energy.people.properties.ph.dwellings for r in _hb_rooms} # type: ignore
+    print("Found {} unique PH-Dwelling objects".format(len(ph_dwelling_objs)))
+    return sum(d.num_dwellings for d in ph_dwelling_objs)
 
 
 class GHCompo_GetResOccupancy(object):

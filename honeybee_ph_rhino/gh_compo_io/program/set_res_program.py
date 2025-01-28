@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 # -*- Python Version: 2.7 -*-
 
-"""GHCompo Interface: HBPH - Create Program: Single Family Home."""
+"""GHCompo Interface: HBPH - Set Residential Program."""
 
 from collections import defaultdict
 import os
 from statistics import mean
-from functools import partial
 
 try:
     from System import Object  # type: ignore
@@ -40,27 +39,12 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy:\n\t{}".format(e))
 
 try:
-    from honeybee_ph.properties.room import RoomPhProperties
-except ImportError as e:
-    raise ImportError("\nFailed to import honeybee_ph:\n\t{}".format(e))
-
-try:
-    from honeybee_ph_standards.schedules._load_schedules import load_schedules_from_json_file
-except ImportError as e:
-    raise ImportError("\nFailed to import honeybee_ph_standards:\n\t{}".format(e))
-
-try:
     from honeybee_energy_ph.load import ph_equipment
     from honeybee_energy_ph.properties.load.process import ProcessPhProperties
     from honeybee_energy_ph.properties.load.lighting import LightingPhProperties
     from honeybee_energy_ph.properties.load.people import PeoplePhProperties
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
-
-try:
-    from ph_gh_component_io import gh_io
-except ImportError as e:
-    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
 try:
     from ph_units.converter import convert
@@ -70,6 +54,11 @@ except ImportError as e:
 
 try:
     from honeybee_ph_rhino.gh_compo_io.program._schedules import SchedulesCollection
+except ImportError as e:
+    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
+
+try:
+    from ph_gh_component_io import gh_io
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
@@ -406,7 +395,6 @@ class GHCompo_CreatePHProgramSingleFamilyHome(object):
         net_floor_area_in_rh_doc_units = get_total_spaces_area_rh_doc_units(_hb_rooms)
         if not net_floor_area_in_rh_doc_units:
             raise ValueError("Failed to get net floor area of HB-Rooms?")
-        net_floor_area_m2 = get_area_value_in_unit(self.IGH, net_floor_area_in_rh_doc_units, "M2")
         net_floor_area_ft2 = get_area_value_in_unit(self.IGH, net_floor_area_in_rh_doc_units, "FT2")
         return net_floor_area_ft2
 

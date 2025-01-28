@@ -75,7 +75,7 @@ reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Add PH Equipment"
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
-    from honeybee_ph_rhino.gh_compo_io.program import add_elec_equip as gh_compo_io
+    from honeybee_ph_rhino.gh_compo_io.program._deprecated_ import add_elec_equip as gh_compo_io
 
     reload(gh_compo_io)
     reload(gh_io)

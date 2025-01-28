@@ -3,6 +3,7 @@
 
 """GHCompo Interface: HBPH - Phius MF Res Calculator."""
 
+# TODO: REMOVE THIS MODULE... now just 'get' the data... 
 
 from collections import defaultdict
 
@@ -33,7 +34,7 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
 
 try:
-    from honeybee_ph_rhino import gh_io
+    from ph_gh_component_io import gh_io
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
@@ -104,6 +105,8 @@ def check_inputs(_hb_rooms, _IGH):
         )
         print(msg)
         _IGH.warning(msg)
+    else:
+        print("{} Stories found".format(len({rm.story for rm in _hb_rooms})))
 
     # -- Check that al the rooms have "PH-Spaces"
     rm_with_error = spaces_error(_hb_rooms)
@@ -129,7 +132,7 @@ def check_inputs(_hb_rooms, _IGH):
 
 
 def sort_rooms_by_story(_hb_rooms):
-    # type (list[room.Room]) -> list[list[room.Room]]
+    # type: (list[room.Room]) -> list[list[room.Room]]
     """Returns lists of the rooms, organized by their Honeybee 'story'.
 
     Arguments:
@@ -145,6 +148,14 @@ def sort_rooms_by_story(_hb_rooms):
     for rm in _hb_rooms:
         d[rm.story].append(rm)
     return [d[story_key] for story_key in sorted(d.keys())]
+
+
+def room_is_dwelling(_hb_room):
+    # type: (room.Room) -> bool
+    """Return True if the Honeybee-Room is a 'dwelling' (residential)?"""
+    hb_room_prop_e = getattr(_hb_room.properties, "energy")  # type: RoomEnergyProperties
+    hb_room_prop_e_prop_ph = getattr(hb_room_prop_e.people.properties, "ph")  # type: PeoplePhProperties
+    return hb_room_prop_e_prop_ph.is_residential
 
 
 # -----------------------------------------------------------------------------
@@ -173,38 +184,39 @@ class GHCompo_CalcPhiusMFLoads(object):
         self.include_garage = bool(_include_garage)
         self.hb_rooms = _hb_rooms
 
+        msg = (
+            "Deprecation Warning: This component should not be used any longer. Please use the new"
+            "'HBPH - Set Residential Program' component instead."
+        )
+        print(msg)
+        self.IGH.error(msg)
+        raise Exception(msg)
+
+
     @property
     def num_dwelling_units(self):
         # type: () -> int
-        return sum(
-            rm.properties.energy.people.properties.ph.number_dwelling_units
-            for rm in self.hb_rooms
-            if self._room_is_dwelling(rm)
-        )
+        """Return the total number of dwellings in the list of HB-Rooms."""
+        ph_dwelling_objs = {r.properties.energy.people.properties.ph.dwellings for r in self.hb_rooms} # type: ignore
+        print("Found {} unique PH-Dwelling objects".format(len(ph_dwelling_objs)))
+        return sum(d.num_dwellings for d in ph_dwelling_objs)
 
     @property
     def num_of_stories(self):
         # type: () -> int
         return len({rm.story for rm in self.hb_rooms})
 
-    def _room_is_dwelling(self, _hb_room):
-        # type: (room.Room) -> bool
-        """Return True if the Honeybee-Room is a 'dwelling' (residential)?"""
-        hb_room_prop_e = _hb_room.properties.energy  # type: RoomEnergyProperties
-        hb_room_prop_e_prop_ph = hb_room_prop_e.people.properties.ph  # type: PeoplePhProperties
-        return hb_room_prop_e_prop_ph.is_residential
-
     def calc_res_electric_consumption(self, _hb_res_rooms):
         # type: (List[room.Room]) -> Tuple[List[str], float, float, float, float, List[str]]
 
-        # ---------------------------------------------------------------------------
+        # -------------------------------------------------------------------------------
         # -- Determine the Input Res Honeybee Room attributes by story
 
         rooms_by_story = sort_rooms_by_story(_hb_res_rooms)
         phius_stories = [phius_mf.PhiusResidentialStory(room_list) for room_list in rooms_by_story]
         phius_stories = sorted(phius_stories, reverse=True)
 
-        # ---------------------------------------------------------------------------
+        # -------------------------------------------------------------------------------
         # -- Calculate the total Res. Elec. Energy Consumption
         mel_by_story = [story.mel for story in phius_stories]
         lighting_int_by_story = [story.lighting_int for story in phius_stories]
@@ -216,6 +228,7 @@ class GHCompo_CalcPhiusMFLoads(object):
         total_res_ext_lighting = sum(lighting_ext_by_story)
         total_res_garage_lighting = sum(lighting_garage_by_story)
 
+        # -------------------------------------------------------------------------------
         # -- Collect for output preview
         res_data_by_story_ = [
             ",".join(
@@ -400,8 +413,8 @@ class GHCompo_CalcPhiusMFLoads(object):
         if self.hb_rooms:
             # ---------------------------------------------------------------------------
             # -- Break out the Res from the non-Res HB-Rooms
-            hb_res_rooms_ = [rm for rm in self.hb_rooms if self._room_is_dwelling(rm)]
-            hb_nonres_rooms_ = [rm for rm in self.hb_rooms if not self._room_is_dwelling(rm)]
+            hb_res_rooms_ = [rm for rm in self.hb_rooms if room_is_dwelling(rm)]
+            hb_nonres_rooms_ = [rm for rm in self.hb_rooms if not room_is_dwelling(rm)]
 
             if not hb_res_rooms_:
                 msg = "Warning: No Residential HB-Rooms found?"

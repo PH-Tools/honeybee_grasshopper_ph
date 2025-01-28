@@ -118,7 +118,7 @@ if DEV:
     reload(gh_io)
     from honeybee_energy_ph.load import phius_mf
     reload(phius_mf)
-    from honeybee_ph_rhino.gh_compo_io.program import phius_MF_calc as gh_compo_io
+    from honeybee_ph_rhino.gh_compo_io.program._deprecated_ import phius_MF_calc as gh_compo_io
     reload(gh_compo_io)
 
 
