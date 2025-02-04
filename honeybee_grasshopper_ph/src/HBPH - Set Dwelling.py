@@ -27,8 +27,15 @@ If you are creating a single-family home, simply input all of your rooms
 to this component. If you are creating a multi-unit (apartment) building, split up your rooms onto separate 
 branches as appropriate. All of the Rooms on a single Branch will be set to the same 'dwelling'.
 -
-EM January 26, 2025
+EM January 31, 2025
     Args:
+
+        _num_dwellings_: (DataTree[int]) Default=1. Optional input for the number of dwellings 
+            for the input hb-room. This is useful if you are doing multi-unit residential projects
+            and are modeling HB-Rooms as 'blocks' or groups of dwellings in order to simplify 
+            the overall model geometry. In this case, input a DataTree with values that match the 
+            order of the HB-Rooms input. If you are modeling a single-family project, or each 
+            HB-Room maps to a single dwelling, then leave this input blank.
 
         _hb_rooms: (DataTree[Room]) The HB-Rooms to set as a 'dwelling'
             
@@ -78,6 +85,7 @@ IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 #-------------------------------------------------------------------------------
 gh_compo_interface = gh_compo_io.GHCompo_SetDwelling(
         IGH,
+        _num_dwellings_,
         _hb_rooms,
     )
 hb_rooms_ = gh_compo_interface.run()

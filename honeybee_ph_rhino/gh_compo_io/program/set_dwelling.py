@@ -6,6 +6,11 @@
 import os
 
 try:
+    from typing import Any
+except ImportError as e:
+    pass # IronPython2.7
+
+try:
     from Grasshopper import DataTree  # type: ignore
     from Grasshopper.Kernel.Data import GH_Path  # type: ignore
     from System import Object  # type: ignore
@@ -51,7 +56,6 @@ except ImportError as e:
 # -- Component Interface
 
 
-
 def get_new_people(_hbe_people, _occ_schd, _act_schd):
     # type:  (People | None, ScheduleRuleset, ScheduleRuleset) -> People
     """Get a new HBE-People object."""
@@ -73,10 +77,18 @@ class GHCompo_SetDwelling(object):
     default_occ_schd = load_schedules_from_json_file(file_pth)["hbph_sfh_Occupant_Presence"]
     default_activity_schd = load_schedules_from_json_file(file_pth)["hbph_sfh_Occupant_Activity"]
 
-    def __init__(self, _IGH, _hb_rooms):
-        # type: (gh_io.IGH, DataTree[Room]) -> None
+    def __init__(self, _IGH, _num_dwellings, _hb_rooms, *args, **kwargs):
+        # type: (gh_io.IGH, DataTree[int], DataTree[Room], *Any, **Any) -> None
         self.IGH = _IGH
+        self.num_dwellings = _num_dwellings
         self.hb_rooms = _hb_rooms
+
+    def get_num_dwellings(self, branch):
+        # type: (int) -> int
+        try:
+            return self.num_dwellings.Branch(branch)[0]
+        except Exception as e:
+            return 1
 
     def run(self):
         # type: () -> DataTree[Room]
@@ -85,13 +97,14 @@ class GHCompo_SetDwelling(object):
             
             # -- Create a new Dwelling Object to be applied to all the Rooms
             dwelling_name = clean_and_id_ep_string("HBPH_DWELLING")
-            ph_dwellings_obj = PhDwellings(_num_dwellings=1)
-            ph_dwellings_obj.identifier = dwelling_name 
+            num_dwellings = self.get_num_dwellings(branch=i)
+            ph_dwellings_obj = PhDwellings(_num_dwellings=num_dwellings)
+            ph_dwellings_obj.identifier = dwelling_name
             
             # -- Set the Dwelling information on all the Rooms
             dup_rooms_ = []
             for hb_room in branch:
-                print("Setting room: '{}' to residential dwelling: '{}'".format(hb_room.display_name, dwelling_name))
+                print("Setting room: '{}' to residential: '{}' with {} dwelling unit(s)".format(hb_room.display_name, dwelling_name, num_dwellings))
                 dup_room = hb_room.duplicate() # type: Room
                 dup_room.zone = dwelling_name
                 dup_room_prop_e = getattr(dup_room.properties, "energy") # type: RoomEnergyProperties
