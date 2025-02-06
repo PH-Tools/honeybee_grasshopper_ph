@@ -13,7 +13,15 @@ try:
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
-from honeybee_energy_ph.construction import thermal_bridge
+try:
+    from honeybee_ph.properties.room import RoomPhProperties
+except ImportError as e:
+    raise ImportError("\nFailed to import honeybee_ph:\n\t{}".format(e))
+
+try:
+    from honeybee_energy_ph.construction import thermal_bridge
+except ImportError as e:
+    raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
 
 
 class GHCompo_AddTBs(object):
@@ -30,7 +38,8 @@ class GHCompo_AddTBs(object):
 
             # -- add the new TBs to the HB-Room Building Segment
             for tb in self.thermal_bridges:
-                new_room.properties.ph.ph_bldg_segment.thermal_bridges[str(tb.identifier)] = tb
+                rm_prop_ph = getattr(new_room.properties, "ph") # type: RoomPhProperties
+                rm_prop_ph.ph_bldg_segment.thermal_bridges[str(tb.identifier)] = tb
 
             hb_rooms_.append(new_room)
 
