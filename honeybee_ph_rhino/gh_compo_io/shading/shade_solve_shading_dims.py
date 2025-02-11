@@ -313,7 +313,7 @@ def find_overhang_shading(_aperture, _shading_objs, _IGH, _limit=99):
     # the window. Create a 'test plane' that is _extents (99m) tall and 0.5m past the wall surface, test if
     # any objects intersect that plane. If so, add them to the set of things
     # test in the next step
-    ap_prop_ph = _aperture.properties.ph  # type: hbph_aperture.AperturePhProperties
+    ap_prop_ph = getattr(_aperture.properties, "ph")  # type: hbph_aperture.AperturePhProperties
     depth = float(ap_prop_ph.install_depth) + 0.5
     edge1 = _IGH.ghpythonlib_components.LineSDL(origin_point, UpVector, _limit)
     edge2 = _IGH.ghpythonlib_components.LineSDL(origin_point, from_vector3d(_aperture.geometry.normal), depth)

@@ -8,7 +8,7 @@ from collections import defaultdict
 try:
     from typing import Any, Type
 except ImportError:
-    pass #IronPython 2.7
+    pass  # IronPython 2.7
 
 try:
     from honeybee.room import Room
@@ -78,7 +78,7 @@ def check_res_room_inputs(_hb_rooms, _IGH):
         msg = "Warning: No Residential HB-Rooms found?"
         print(msg)
         _IGH.warning(msg)
-        
+
     # -- Check the HBE-Stories
     if stories_error(_hb_rooms):
         msg = (
@@ -132,7 +132,6 @@ def sort_rooms_by_story(_hb_rooms):
     for rm in _hb_rooms:
         d[rm.story].append(rm)
     return [d[story_key] for story_key in sorted(d.keys())]
-
 
 
 # -----------------------------------------------------------------------------
@@ -208,7 +207,7 @@ def get_non_residential_room_data(_hb_rooms):
     non_res_totals_ = [sp.to_phius_mf_workbook_results() for sp in sorted(non_res_spaces, key=lambda x: x.name)]
     non_res_totals_.insert(
         0,
-        str(    
+        str(
             "Lighting Power Density (W/sf), Usage (days/year), Daily Usage (hrs/day), MELCOMM (kWh/yr.sf), LIGHTCOMM (kWh/yr), MELCOMM (kWh/yr)"
         ),
     )
@@ -227,14 +226,14 @@ def get_non_residential_room_data(_hb_rooms):
 class GHCompo_GetPhiusMFLoadData(object):
     def __init__(self, _IGH, _hb_rooms, *args, **kwargs):
         # type: (gh_io.IGH, list[Room], *Any, **Any) -> None
-        self.IGH=_IGH
-        self.hb_rooms=_hb_rooms
+        self.IGH = _IGH
+        self.hb_rooms = _hb_rooms
 
     def run(self):
         # type: () -> tuple[list, list, list, list, list]
         if not self.hb_rooms:
             return [], [], [], [], []
-        
+
         # ---------------------------------------------------------------------
         # -- Break out the Res, from the Non-Res. HB-Rooms
         hb_res_rooms_ = [rm for rm in self.hb_rooms if room_is_dwelling(rm)]
@@ -242,7 +241,7 @@ class GHCompo_GetPhiusMFLoadData(object):
 
         # -- Check the inputs for errors, display warnings
         check_res_room_inputs(hb_res_rooms_, self.IGH)
-        
+
         # -- Calculate the annual electric consumption for the rooms
         # ---------------------------------------------------------------------
         (

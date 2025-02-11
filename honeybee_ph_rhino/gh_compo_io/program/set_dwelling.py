@@ -8,7 +8,7 @@ import os
 try:
     from typing import Any
 except ImportError as e:
-    pass # IronPython2.7
+    pass  # IronPython2.7
 
 try:
     from Grasshopper import DataTree  # type: ignore
@@ -26,8 +26,8 @@ except ImportError as e:
 
 try:
     from honeybee_energy.load.people import People
-    from honeybee_energy.schedule.ruleset import ScheduleRuleset
     from honeybee_energy.properties.room import RoomEnergyProperties
+    from honeybee_energy.schedule.ruleset import ScheduleRuleset
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy:\n\t{}".format(e))
 
@@ -67,7 +67,7 @@ def get_new_people(_hbe_people, _occ_schd, _act_schd):
             _act_schd,
         )
     else:
-        return _hbe_people.duplicate() # type: ignore
+        return _hbe_people.duplicate()  # type: ignore
 
 
 class GHCompo_SetDwelling(object):
@@ -94,25 +94,29 @@ class GHCompo_SetDwelling(object):
         # type: () -> DataTree[Room]
         hb_rooms_ = DataTree[Object]()
         for i, branch in enumerate(self.hb_rooms.Branches):
-            
+
             # -- Create a new Dwelling Object to be applied to all the Rooms
             dwelling_name = clean_and_id_ep_string("HBPH_DWELLING")
             num_dwellings = self.get_num_dwellings(branch=i)
             ph_dwellings_obj = PhDwellings(_num_dwellings=num_dwellings)
             ph_dwellings_obj.identifier = dwelling_name
-            
+
             # -- Set the Dwelling information on all the Rooms
             dup_rooms_ = []
             for hb_room in branch:
-                print("Setting room: '{}' to residential: '{}' with {} dwelling unit(s)".format(hb_room.display_name, dwelling_name, num_dwellings))
-                dup_room = hb_room.duplicate() # type: Room
+                print(
+                    "Setting room: '{}' to residential: '{}' with {} dwelling unit(s)".format(
+                        hb_room.display_name, dwelling_name, num_dwellings
+                    )
+                )
+                dup_room = hb_room.duplicate()  # type: Room
                 dup_room.zone = dwelling_name
-                dup_room_prop_e = getattr(dup_room.properties, "energy") # type: RoomEnergyProperties
-                
+                dup_room_prop_e = getattr(dup_room.properties, "energy")  # type: RoomEnergyProperties
+
                 # -- Build the new People and add to the HB-Room
                 # -- Note: be sure to duplicate the People before changing the dwelling.
                 dup_ppl = get_new_people(dup_room_prop_e.people, self.default_occ_schd, self.default_activity_schd)
-                ppl_prop_ph = getattr(dup_ppl.properties, "ph") # type: PeoplePhProperties
+                ppl_prop_ph = getattr(dup_ppl.properties, "ph")  # type: PeoplePhProperties
                 ppl_prop_ph.dwellings = ph_dwellings_obj
                 dup_room_prop_e.people = dup_ppl
 

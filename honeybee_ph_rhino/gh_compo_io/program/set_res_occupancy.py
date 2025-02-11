@@ -3,10 +3,10 @@
 
 """GHCompo Interface: HBPH - Set PH-Style Occupancy."""
 
+import os
 from collections import defaultdict
 from contextlib import contextmanager
 from statistics import mean
-import os
 
 try:
     from typing import Generator
@@ -69,7 +69,7 @@ def _group_rooms_by_dwellings(_hb_rooms):
     room_groups = defaultdict(list)
     for hb_room in _hb_rooms:
         rm_prop_e = getattr(hb_room.properties, "energy")  # type: RoomEnergyProperties
-        ppl_prop_ph = getattr(rm_prop_e.people.properties, "ph") # type: PeoplePhProperties
+        ppl_prop_ph = getattr(rm_prop_e.people.properties, "ph")  # type: PeoplePhProperties
         room_groups[ppl_prop_ph.dwellings.identifier].append(hb_room)
 
     return [v for v in room_groups.values()]

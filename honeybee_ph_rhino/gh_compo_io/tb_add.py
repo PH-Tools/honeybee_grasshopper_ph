@@ -38,7 +38,7 @@ class GHCompo_AddTBs(object):
 
             # -- add the new TBs to the HB-Room Building Segment
             for tb in self.thermal_bridges:
-                rm_prop_ph = getattr(new_room.properties, "ph") # type: RoomPhProperties
+                rm_prop_ph = getattr(new_room.properties, "ph")  # type: RoomPhProperties
                 rm_prop_ph.ph_bldg_segment.thermal_bridges[str(tb.identifier)] = tb
 
             hb_rooms_.append(new_room)

@@ -37,7 +37,7 @@ For background and reference on the methodology used, see: "Solar Gains in a
 Passive House: A Monthly Approach to Calculating Global Irradiaton Entering a 
 Shaded Window" By Andrew Peel, 2007.
 -
-EM October 2, 2022
+EM February 11, 2025
     Args:
         _shading_surfaces: (List[Brep]) <Optional> Any shading geometry (walls, overhangs, side-reveals
             neighbors, trees, etc...) you'd like to take into account when generating 
@@ -69,9 +69,15 @@ except ImportError as e:
     raise ImportError('\nFailed to import honeybee_ph_utils:\n\t{}'.format(e))
 
 try:
-    from honeybee_ph_rhino import gh_compo_io, gh_io
+    from honeybee_ph_rhino import gh_compo_io
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
+    
+try:
+    from ph_gh_component_io import gh_io
+except ImportError as e:
+    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
+
 
 # ------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
@@ -79,6 +85,7 @@ reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Add Shading Dims"
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
+    from honeybee_ph_rhino.gh_compo_io.shading import shade_solve_shading_dims as gh_compo_io
     reload(gh_compo_io)
     reload(gh_io)
 

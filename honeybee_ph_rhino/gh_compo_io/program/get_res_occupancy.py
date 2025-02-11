@@ -61,7 +61,7 @@ def get_area_value_in_unit(_IGH, _input, _target_unit):
 def get_num_of_dwellings(_hb_rooms):
     # type: (list[Room]) -> int
     """Return the total number of dwellings in the list of HB-Rooms."""
-    ph_dwelling_objs = {r.properties.energy.people.properties.ph.dwellings for r in _hb_rooms} # type: ignore
+    ph_dwelling_objs = {r.properties.energy.people.properties.ph.dwellings for r in _hb_rooms}  # type: ignore
     print("Found {} unique PH-Dwelling objects".format(len(ph_dwelling_objs)))
     return sum(d.num_dwellings for d in ph_dwelling_objs)
 
@@ -94,9 +94,9 @@ class GHCompo_GetResOccupancy(object):
             else:
                 # -- If No PH-Style data, try and use the HB-E info
                 peak_ppl_per_m2 = hbe_prop.people.people_per_area
-                avg_occ_rate = mean(hbe_prop.people.occupancy_schedule.values()) # type: ignore
+                avg_occ_rate = mean(hbe_prop.people.occupancy_schedule.values())  # type: ignore
                 avg_ppl = peak_ppl_per_m2 * area_m2 * avg_occ_rate
-            
+
             num_br = hbph_ppl_prop.number_bedrooms
 
             total_num_ppl += avg_ppl

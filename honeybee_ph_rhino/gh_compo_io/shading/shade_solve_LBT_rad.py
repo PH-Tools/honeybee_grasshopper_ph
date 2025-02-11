@@ -11,7 +11,7 @@ except:
     pass  # Python3
 
 try:
-    from typing import Any, Collection, List, Optional, Tuple
+    from typing import Any, Collection
 except ImportError:
     pass  # IronPython
 
@@ -43,7 +43,7 @@ except ImportError as e:
     raise ImportError("\nFailed to import ladybug:\n\t{}".format(e))
 
 try:
-    from ladybug_geometry.geometry3d import Mesh3D, Point3D
+    from ladybug_geometry.geometry3d import Mesh3D
     from ladybug_rhino.fromgeometry import from_mesh3d, from_point3d, from_vector3d
     from ladybug_rhino.fromobjects import legend_objects
     from ladybug_rhino.grasshopper import de_objectify_output
@@ -54,18 +54,30 @@ except ImportError as e:
     raise ImportError("\nFailed to import ladybug_rhino:\n\t{}".format(e))
 
 try:
-    from honeybee_ph_rhino import gh_io
-    from honeybee_ph_rhino.gh_compo_io.shade_create_bldg_shd import create_inset_aperture_surface
-    from honeybee_ph_rhino.gh_compo_io.shade_LBT_rad_settings import HBPH_LBTRadSettings
+    from honeybee_ph_rhino.gh_compo_io.shading.shade_create_bldg_shd import create_inset_aperture_surface
+    from honeybee_ph_rhino.gh_compo_io.shading.shade_LBT_rad_settings import HBPH_LBTRadSettings
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
+
+
+try:
+    from ph_units.converter import _standardize_unit_name, convert, unit_type_alias_dict
+except ImportError as e:
+    raise ImportError("\nFailed to import ph_units:\n\t{}".format(e))
+
+
+try:
+    from ph_gh_component_io import gh_io
+except ImportError as e:
+    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
+
 
 # Radiation and Shading Factor Calcs
 # -----------------------------------------------------------------------------
 
 
 def hbph_to_joined_gridded_mesh3d(geometry, grid_size, offset_distance=0, _mesh_params=None):
-    # type: (Any, float, float, Optional[rg.MeshingParameters]) -> Mesh3D
+    # type: (list[rg.Brep | rg.Mesh], float, float, rg.MeshingParameters | None) -> Mesh3D
     """
     ------------------------------------------------------------------
     ADAPTED FROM LADYBUG ladybug_rhino.togeometry.to_joined_gridded_mesh3d()
@@ -77,11 +89,12 @@ def hbph_to_joined_gridded_mesh3d(geometry, grid_size, offset_distance=0, _mesh_
     Args:
         * breps: An array of Rhino Breps and/or Rhino meshes that will be converted
             into a single, joined gridded Ladybug Mesh3D.
-
         * grid_size: A number for the grid size dimension with which to make the mesh.
-
         * offset_distance: A number for the distance at which to offset the mesh from
             the underlying brep. The default is 0.
+        * _mesh_params: Optional Rhino Meshing Parameters. Default=None
+    Returns:
+        A single gridded Ladybug Mesh3D from the Rhino geometry.
     """
     lb_meshes = []
     for geo in geometry:
@@ -96,7 +109,7 @@ def hbph_to_joined_gridded_mesh3d(geometry, grid_size, offset_distance=0, _mesh_
 
 
 def hbph_to_gridded_mesh3d(brep, grid_size, offset_distance=0, _mesh_params=None):
-    # type: (Any, float, float, Optional[rg.MeshingParameters]) -> Mesh3D
+    # type: (Any, float, float, rg.MeshingParameters | None) -> Mesh3D
     """
     ------------------------------------------------------------------
     ADAPTED FROM LADYBUG ladybug_rhino.togeometry.to_gridded_mesh3d()
@@ -110,19 +123,17 @@ def hbph_to_gridded_mesh3d(brep, grid_size, offset_distance=0, _mesh_params=None
     method provides a workable alternative to this if it is needed.
 
     Args:
-        * brep: Any:
-            A Rhino Brep that will be converted into a gridded Ladybug Mesh3D.
-        * grid_size: float:
-            A number for the grid size dimension with which to make the mesh.
-        * offset_distance: float:
-            A number for the distance at which to offset the mesh from
+        * brep: A Rhino Brep that will be converted into a gridded Ladybug Mesh3D.
+        * grid_size: A number for the grid size dimension with which to make the mesh.
+        * offset_distance: A number for the distance at which to offset the mesh from
             the underlying brep. The default is 0.
-        * _mesh_params: Optional[rg.MeshingParameters]
-            Optional Rhino Meshing Parameters to use for the meshing.
+        * _mesh_params: Optional Rhino Meshing Parameters to use for the meshing.
+    Returns:
+        A gridded Ladybug Mesh3D from the Rhino Brep.
     """
     # -------------------------------------------------------------------------
     # Mesh the brep using the supplied Params
-    mesh_grids = rg.Mesh.CreateFromBrep(brep, _mesh_params)
+    mesh_grids = rg.Mesh.CreateFromBrep(brep, _mesh_params)  # type: ignore
 
     # -------------------------------------------------------------------------
     # Join the meshes into one
@@ -172,72 +183,101 @@ def create_shading_mesh(_bldg_shading_breps, _mesh_params):
 
 
 def deconstruct_sky_matrix(_sky_mtx):
-    # type: (Any) -> Tuple[List[rg.Vector3d], List[float]]
+    # type: (Any) ->tuple[list[rg.Vector3d], list[float]]
     """Copied from Ladybug 'IncidentRadiation' Component
 
-    Arguments:
-    ----------
-        * _sky_mtx: A Ladybug Sky Matrix for the season
+    Ground reflected irradiance is crudely accounted for by means of an emissive
+    "ground hemisphere," which is like the sky dome hemisphere and is derived from
+    the ground reflectance that is associated with the connected _sky_mtx. This
+    means that including geometry that represents the ground surface will effectively
+    block such crude ground reflection.
 
-    Returns:
-    --------
-        * [Tuple]
-            - [0] sky_vecs: (List[rg.Vector3d])
-            - [1] total_sky_rad: (list[float])
+    Args:
+        * _sky_mtx: A Ladybug Sky Matrix for the season
+    Returns: (tuple)
+        * [0] (list[rg.Vector3d])
+        * [1] (list[float]) kWh/m2
     """
 
-    mtx = de_objectify_output(_sky_mtx)
-    total_sky_rad = [dir_rad + dif_rad for dir_rad, dif_rad in zip(mtx[1], mtx[2])]
-    lb_vecs = view_sphere.tregenza_dome_vectors if len(total_sky_rad) == 145 else view_sphere.reinhart_dome_vectors
-    if mtx[0][0] != 0:  # there is a north input for sky; rotate vectors
-        north_angle = math.radians(mtx[0][0])
-        lb_vecs = [vec.rotate_xy(north_angle) for vec in lb_vecs]
-    sky_vecs = [from_vector3d(vec) for vec in lb_vecs]
+    def is_north_input(_sky_mtx):
+        # type: (Any) -> bool
+        """There is a north input for sky."""
+        return _sky_mtx[0][0] != 0
 
-    return (sky_vecs, total_sky_rad)
+    # deconstruct the matrix and get the sky dome vectors
+    mtx = de_objectify_output(_sky_mtx)
+    total_sky_rad_kwh_m2 = [dir_rad + dif_rad for dir_rad, dif_rad in zip(mtx[1], mtx[2])]
+    ground_rad = [(sum(total_sky_rad_kwh_m2) / len(total_sky_rad_kwh_m2)) * mtx[0][1]] * len(total_sky_rad_kwh_m2)
+    total_sky_and_ground_rad = total_sky_rad_kwh_m2 + ground_rad
+
+    lb_vecs = (
+        view_sphere.tregenza_dome_vectors if len(total_sky_rad_kwh_m2) == 145 else view_sphere.reinhart_dome_vectors
+    )
+    if is_north_input(mtx):
+        # Rotate vectors
+        north_angle = math.radians(mtx[0][0])
+        lb_vecs = tuple(vec.rotate_xy(north_angle) for vec in lb_vecs)
+
+    ground_vecs = tuple(vec.reverse() for vec in lb_vecs)
+    sky_vecs = [from_vector3d(vec) for vec in lb_vecs]
+    sky_and_ground_vecs = [from_vector3d(vec) for vec in lb_vecs + ground_vecs]
+
+    return (sky_vecs, total_sky_rad_kwh_m2)
+
+
+def radiation_in_rh_doc_unit(_radiation_kwh_m2, _unit_name):
+    # type: (list[float], str) -> list[float]
+    """Return the Sky-dome radiation values in kWh/rh-document-unit (in2, ft2, m2, etc...)"""
+    area_unit_name = _standardize_unit_name(_unit_name.strip(), unit_type_alias_dict)
+    if area_unit_name.strip() == "M2":
+        return _radiation_kwh_m2
+    else:
+        unit_name = "KWH/{}".format(area_unit_name)
+        return [convert(_, "KWH/M2", unit_name) or 0.0 for _ in _radiation_kwh_m2]
 
 
 def build_window_meshes(_window_surface, _grid_size, _shading_mesh_params, _window_mesh_params=None):
-    # type: (Any, float, rg.MeshingParameters, Optional[rg.MeshingParameters]) -> Tuple[List[Point3D], List[Normal], Mesh3D, Optional[Mesh3D], rg.Mesh]
+    # type: (rg.Brep, float, rg.MeshingParameters, rg.MeshingParameters | None) -> tuple[list[rg.Point3d], list[rg.Vector3d], Mesh3D, rg.Mesh | None, rg.Mesh]
     """Create the Ladybug Mesh3D grided mesh for the window being analyzed
 
-    Arguments:
-    ----------
-        * _window_surface: (Brep) A single window Brep from the scene
-        * _grid_size: (float)
-        * _shading_mesh_params: (Rhino.Geometry.MeshingParameters)
-        * _window_mesh_params: (Rhino.Geometry.MeshingParameters)
-
+    Args:
+        * _window_surface: A single window Brep from the scene
+        * _grid_size:
+        * _shading_mesh_params:
+        * _window_mesh_params:
     Returns: (tuple)
-        * points: (list: Ladybug Point3D) All the analysis points on the window
-        * normals: (list: Ladybug Normal) All the normals for the analysis points
-        * window_mesh: (ladybug_geometry.geometry3d.Mesh3D) The window
-        * window_back_mesh: (Optional[ladybug_geometry.geometry3d.Mesh3D]) A copy of the window shifted 'back'
+        * [0] points: All the analysis points on the window
+        * [1] normals: All the surface normal vectors for the analysis points
+        * [2] window_mesh: The LB window Mesh
+        * [3] window_back_mesh: A copy of the window Mesh shifted 'back'
             just a little bit (0.1 units). Used when solving the 'unshaded' situation.
-        * window_rh_mesh: (Rhino.Geometry.Mesh): The window as a Rhino-Mesh
+        * [4] window_rh_mesh: The window as a Rhino-Mesh
     """
 
     # Create the gridded mesh for the window surface
-    # ---------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------------
     offset_dist = 0.001
     if not _window_mesh_params:
-        window_mesh = to_joined_gridded_mesh3d([_window_surface], _grid_size, offset_dist)  # type: ignore
         # -- If no custom params are supplied, use the standard Ladybug method
+        window_lb_mesh = to_joined_gridded_mesh3d([_window_surface], _grid_size, offset_dist)  # type: ignore
     else:
         # -- otherwise, use the custom settings provided by the user
-        window_mesh = hbph_to_joined_gridded_mesh3d([_window_surface], _grid_size, offset_dist, _window_mesh_params)
+        window_lb_mesh = hbph_to_joined_gridded_mesh3d([_window_surface], _grid_size, offset_dist, _window_mesh_params)
 
-    if not window_mesh:
+    if not window_lb_mesh:
         raise Exception("Failed to create a mesh for the window surface {}.".format(_window_surface))
-    window_rh_mesh = from_mesh3d(window_mesh)
-    points = [from_point3d(pt) for pt in window_mesh.face_centroids]
-    normals = [from_vector3d(vec) for vec in window_mesh.face_normals]
+    window_rh_mesh_front = from_mesh3d(window_lb_mesh)
+    points = [from_point3d(pt) for pt in window_lb_mesh.face_centroids]
 
-    # Create a 'back' for the window
-    # ---------------------------------------------------------------------------
+    if not window_lb_mesh.face_normals:
+        raise Exception("Failed to get the normals for the window surface {}.".format(_window_surface))
+    normals = [from_vector3d(vec) for vec in window_lb_mesh.face_normals]
+
+    # Create a 'back' mesh for the window
+    # -----------------------------------------------------------------------------------
     # Mostly this is done so it can be passed to the ladybug_rhino.intersect.intersect_mesh_rays()
     # solver as a surface which is certain to *not* shade the window at all
-    window_back_mesh = None
+    window_rh_mesh_back = None  # type: rg.Mesh | None
     for sr in _window_surface.Surfaces:
         window_normal = sr.NormalAt(0.5, 0.5)
         window_normal.Unitize()
@@ -245,12 +285,13 @@ def build_window_meshes(_window_surface, _grid_size, _shading_mesh_params, _wind
 
         window_back = _window_surface.Duplicate()
         window_back.Translate(window_normal)
-        window_back_mesh = rg.Mesh.CreateFromBrep(window_back, _shading_mesh_params)[0]
+        window_rh_mesh_back = rg.Mesh.CreateFromBrep(window_back, _shading_mesh_params)[0]
 
-    return points, normals, window_mesh, window_back_mesh, window_rh_mesh
+    return points, normals, window_lb_mesh, window_rh_mesh_back, window_rh_mesh_front
 
 
 def generate_intersection_data(_shade_mesh, _win_mesh_back, _points, _sky_vecs, _normals, _cpu_count):
+    # type: (rg.Mesh, rg.Mesh, list[rg.Point3d], list[rg.Vector3d], list[rg.Vector3d], int | None) -> tuple[list[int], list[int], list[int], list[int]]
     """Creates all the Intersection Matrix data for both the Shaded and the UNShaded conditions
 
     Note that for the 'Unshaded' case you still have to pass the solver *something*, so
@@ -259,40 +300,48 @@ def generate_intersection_data(_shade_mesh, _win_mesh_back, _points, _sky_vecs, 
 
     Adapted from Ladybug 'IncidentRadiation' Component
 
-    Arguments:
-        _shade_mesh: (Mesh) The context shading joined mesh
-        _win_mesh_back: (Mesh) The window surface pushed 'back' a little.
-        _points: (_)
-        _sky_vecs: (_)
-        _normals: (list: Ladybug Normals)
-        _parallel: (int | None)
+    Args:
+        * _shade_mesh: The context shading joined mesh
+        * _win_mesh_back: The window surface pushed 'back' a little.
+        * _points:
+        * _sky_vecs:
+        * _normals:
+        * _cpu_count:
     Returns: (tuple)
-        int_matrix_init_shaded: Intersection Matrix for window WITH shading
-        int_matrix_init_unshaded: Intersection Matrix for window WITHOUT shading
-        angles_s: Shaded
-        angles_u: UN-Shaded
+        * [0] int_matrix_init_shaded: Intersection Matrix for window WITH shading
+        * [1] int_matrix_init_unshaded: Intersection Matrix for window WITHOUT shading
+        * [2] angles_s: Shaded
+        * [3] angles_u: UN-Shaded
     """
 
     # intersect the rays with the mesh
     # ---------------------------------------------------------------------------
     int_matrix_init_shaded, angles_s = intersect_mesh_rays(_shade_mesh, _points, _sky_vecs, _normals, _cpu_count)
+    if not angles_s:
+        raise Exception("Failed to get the intersection angles for the shading mesh.")
 
     int_matrix_init_unshaded, angles_u = intersect_mesh_rays(_win_mesh_back, _points, _sky_vecs, _normals, _cpu_count)
+    if not angles_u:
+        raise Exception("Failed to get the intersection angles for the unshaded window mesh.")
 
     return int_matrix_init_shaded, int_matrix_init_unshaded, angles_s, angles_u
 
 
-def calc_win_radiation(_int_matrix_init, _angles, _total_sky_rad, _window_mesh):
-    """Computes total kWh per window based on the int_matrix and sky vec angles
+def calc_win_radiation(_int_matrix_init, _angles, _total_sky_rad_kWh_m2, _window_mesh):
+    # type: (list[int], list[int], list[float], Mesh3D) -> tuple[list[float], list[float]]
+    """Computes total kWh per window based on the int_matrix and sky vec angles.
 
-    Arguments:
-        _int_matrix_init: (_)
-        _angles: (_)
-        _total_sky_rad: (_)
-        _window_mesh: (ladybug_geometry.geometry3d.Mesh3D)
+    Note: the LBT radiation values are in kWh/m2 (I think), so we need to account for
+    the fact that the Mesh areas might NOT be in m2.
+
+    Ars:
+        _int_matrix_init
+        _angles:
+        _total_sky_rad:
+        _window_mesh:
     Returns: (tuple)
-        average_window_kWh: (float) The area-weighted average total kWh radiation
-        for the window over the analysis period specified.
+        * [0] (list[float]) The total kWh per window mesh-face
+        * [1] (list[float]) The face areas of the window mesh
     """
 
     results_kWh = []
@@ -302,8 +351,11 @@ def calc_win_radiation(_int_matrix_init, _angles, _total_sky_rad, _window_mesh):
     count = (k for k in range(len(_angles) * 10))  # just a super large counter
 
     for c, int_vals, angs in zip(count, _int_matrix_init, _angles):
+        if not _window_mesh.face_areas:
+            raise Exception("Failed to get the face areas for the window mesh.")
+
         pt_rel = (ival * math.cos(ang) for ival, ang in zip(int_vals, angs))
-        rad_result = sum(r * w for r, w in zip(pt_rel, _total_sky_rad))
+        rad_result = sum(r * w for r, w in zip(pt_rel, _total_sky_rad_kWh_m2))
 
         int_matrix.append(pt_rel)
         results_kWh.append(rad_result * _window_mesh.face_areas[c])
@@ -317,18 +369,19 @@ def calc_win_radiation(_int_matrix_init, _angles, _total_sky_rad, _window_mesh):
 
 
 def create_graphic_container(_season, _data, _study_mesh, _legend_par):
+    # type: (str, list[float], Mesh3D, Any) -> tuple[GraphicContainer, rg.TextDot]
     """Creates the Ladybug 'Graphic' Object from the result data
 
     Copied from Ladybug 'IncidentRadiation' Component
 
-    Arguments:
-        _season: (str) 'Winter' or 'Summer'. Used in the title.
-        _data: (list: float:) A list of the result data to use to color / style the output
-        _study_mesh: (ladybug_geometry.geometry3d.Mesh3D) The joined Mesh used in the analysis
-        _legend_par: Ladybug Legend Parameters
+    Args:
+        * _season: (str) 'Winter' or 'Summer'. Used in the title.
+        * _data: (list: float:) A list of the result data to use to color / style the output
+        * _study_mesh: (ladybug_geometry.geometry3d.Mesh3D) The joined Mesh used in the analysis
+        * _legend_par: Ladybug Legend Parameters
     Returns: (tuple)
-        graphic: (ladybug.graphic.GraphicContainer) The Ladybug Graphic Object
-        title: The text title
+        * [0] graphic: (ladybug.graphic.GraphicContainer) The Ladybug Graphic Object
+        * [1] title: The text title
     """
 
     graphic = GraphicContainer(_data, _study_mesh.min, _study_mesh.max, _legend_par)
@@ -345,22 +398,23 @@ def create_graphic_container(_season, _data, _study_mesh, _legend_par):
 
 
 def create_window_mesh(_lb_meshes):
+    # type: (list[Mesh3D]) -> Mesh3D
     return Mesh3D.join_meshes(_lb_meshes)
 
 
 def create_rhino_mesh(_graphic, _lb_mesh):
+    # type: (GraphicContainer, Mesh3D) -> tuple[rg.Mesh, list[rg.TextDot]]
     """Copied from Ladybug 'IncidentRadiation' Component
 
-    Arguments:
-        _graphic: (ladybug.graphic.GraphicContainer) The Ladybug Graphic object
-        _lb_mesh: (Ladybug Mesh) A single joined mesh of the entire scene
+    Args:
+        * _graphic: The Ladybug Graphic object
+        * _lb_mesh: A single joined mesh of the entire scene
     Returns: (tuple)
-        mesh: (_)
-        legend: (_)
+        * [0] mesh:
+        * [1] legend:
     """
 
     # Create all of the visual outputs
-
     _lb_mesh.colors = _graphic.value_colors
     mesh = from_mesh3d(_lb_mesh)
     legend = legend_objects(_graphic.legend)
@@ -382,7 +436,7 @@ class GHCompo_SolveLBTRad(object):
         _hb_rooms,
         _run,
     ):
-        # type: (gh_io.IGH, HBPH_LBTRadSettings, List, List, List[room.Room], bool) -> None
+        # type: (gh_io.IGH, HBPH_LBTRadSettings, list, list, list[room.Room], bool) -> None
         self.IGH = _IGH
         self.settings = _settings
         self.shading_surfaces_winter = _shading_surfaces_winter
@@ -428,7 +482,7 @@ class GHCompo_SolveLBTRad(object):
             self.IGH.warning(msg)
 
     def run(self):
-        # type: () -> Tuple[Any, Any, List[float], Any, List[float],  List[room.Room], List[str]]
+        # type: () -> tuple[Any, Any, list[float], Any, list[float],  list[room.Room], list[str]]
 
         if not self.run_solver or not self.settings or not self.hb_rooms:
             return (None, None, [], None, [], self.hb_rooms, [])
@@ -442,9 +496,12 @@ class GHCompo_SolveLBTRad(object):
         shade_mesh_summer = create_shading_mesh(self.shading_surfaces_summer, self.settings.mesh_params)
 
         # Deconstruct the sky-matrix and get the sky dome vectors. Winter (w) and Summer (s)
+        # Convert the radiation values from kWh/m2 to the Rhino Document units
         # ---------------------------------------------------------------------
-        w_sky_vecs, w_total_sky_rad = deconstruct_sky_matrix(self.settings.winter_sky_matrix)
-        s_sky_vecs, s_total_sky_rad = deconstruct_sky_matrix(self.settings.summer_sky_matrix)
+        w_sky_vecs, w_total_sky_rad_kWh_m2 = deconstruct_sky_matrix(self.settings.winter_sky_matrix)
+        s_sky_vecs, s_total_sky_rad_kWh_m2 = deconstruct_sky_matrix(self.settings.summer_sky_matrix)
+        w_total_sky_rad = radiation_in_rh_doc_unit(w_total_sky_rad_kWh_m2, self.IGH.get_rhino_areas_unit_name())
+        s_total_sky_rad = radiation_in_rh_doc_unit(s_total_sky_rad_kWh_m2, self.IGH.get_rhino_areas_unit_name())
 
         # Calc window surface shaded and unshaded radiation
         # ---------------------------------------------------------------------

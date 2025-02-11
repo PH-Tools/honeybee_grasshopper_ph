@@ -3,7 +3,7 @@
 
 """GHCompo Interface: HBPH - Phius MF Res Calculator."""
 
-# TODO: REMOVE THIS MODULE... now just 'get' the data... 
+# TODO: REMOVE THIS MODULE... now just 'get' the data...
 
 from collections import defaultdict
 
@@ -192,12 +192,11 @@ class GHCompo_CalcPhiusMFLoads(object):
         self.IGH.error(msg)
         raise Exception(msg)
 
-
     @property
     def num_dwelling_units(self):
         # type: () -> int
         """Return the total number of dwellings in the list of HB-Rooms."""
-        ph_dwelling_objs = {r.properties.energy.people.properties.ph.dwellings for r in self.hb_rooms} # type: ignore
+        ph_dwelling_objs = {r.properties.energy.people.properties.ph.dwellings for r in self.hb_rooms}  # type: ignore
         print("Found {} unique PH-Dwelling objects".format(len(ph_dwelling_objs)))
         return sum(d.num_dwellings for d in ph_dwelling_objs)
 

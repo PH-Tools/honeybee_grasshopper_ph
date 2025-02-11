@@ -1,5 +1,5 @@
 # -- Import all the interfaces to simplify the API within Grasshopper
-# -- Hot Water
+# -- Assemblies
 from honeybee_ph_rhino.gh_compo_io.assmbly_create_air_layer_mat import GHCompo_AirLayerMaterial
 from honeybee_ph_rhino.gh_compo_io.assmbly_create_detailed_const import GHCompo_CreateDetailedConstructions
 from honeybee_ph_rhino.gh_compo_io.assmbly_create_heterogeneous_material import GHCompo_CreateHeterogeneousMaterial
@@ -14,10 +14,7 @@ from honeybee_ph_rhino.gh_compo_io.building_create_team_member import GHCompo_Cr
 # -- Building Segment
 from honeybee_ph_rhino.gh_compo_io.building_segment import GHCompo_BuildingSegment
 from honeybee_ph_rhino.gh_compo_io.building_set_project_data import GHCompo_SetProjectData
-
-# -- Certification
-from honeybee_ph_rhino.gh_compo_io.cert.Phi import GHCompo_PhiCertification
-from honeybee_ph_rhino.gh_compo_io.cert.Phius import GHCompo_PhiusCertification
+from honeybee_ph_rhino.gh_compo_io.cert import *
 
 # -- Climate
 from honeybee_ph_rhino.gh_compo_io.climate_conver_fact import GHCompo_ConversionFactor
@@ -33,6 +30,7 @@ from honeybee_ph_rhino.gh_compo_io.climate_site_from_phius_file import GHCompo_C
 # -- Foundations
 from honeybee_ph_rhino.gh_compo_io.foundations_add import GHCompo_AddFoundations
 from honeybee_ph_rhino.gh_compo_io.foundations_create import GHCompo_CreateFoundations
+from honeybee_ph_rhino.gh_compo_io.hvac import *
 from honeybee_ph_rhino.gh_compo_io.hvac.add_exhaust_vent import GHCompo_AddExhaustVent
 from honeybee_ph_rhino.gh_compo_io.hvac.add_renewable_system import GHCompo_AddRenewableEnergyDevices
 from honeybee_ph_rhino.gh_compo_io.hvac.add_supportive_devices import GHCompo_AddMechSupportiveDevices
@@ -44,30 +42,12 @@ from honeybee_ph_rhino.gh_compo_io.hvac.create_space_conditioning_sys import GHC
 from honeybee_ph_rhino.gh_compo_io.hvac.create_supportive_device import GHCompo_CreateSupportiveDevice
 from honeybee_ph_rhino.gh_compo_io.hvac.create_vent_duct import GHCompo_CreateVentDuct
 
-# -- Mech
-from honeybee_ph_rhino.gh_compo_io.hvac.create_vent_sys import GHCompo_CreateVentSystem
-from honeybee_ph_rhino.gh_compo_io.hvac.create_ventilator import GHCompo_CreatePhVentilator
-
 # -- Organize
 from honeybee_ph_rhino.gh_compo_io.organize_spaces import GHCompo_OrganizeSpaces
-
-# -- Program [Schedule / Load]
 from honeybee_ph_rhino.gh_compo_io.program import *
 from honeybee_ph_rhino.gh_compo_io.set_spec_heat_cap import GHCompo_SetRoomSpecHeatCaps
-
-# -- Shading
-from honeybee_ph_rhino.gh_compo_io.shade_create_bldg_shd import GHCompo_CreateBuildingShading
-from honeybee_ph_rhino.gh_compo_io.shade_LBT_rad_settings import GHCompo_CreateLBTRadSettings
-from honeybee_ph_rhino.gh_compo_io.shade_solve_LBT_rad import GHCompo_SolveLBTRad
-from honeybee_ph_rhino.gh_compo_io.shade_solve_shading_dims import GHCompo_SolveShadingDims
-from honeybee_ph_rhino.gh_compo_io.shw.apply_shw import GHCompo_ApplySHWSys
-from honeybee_ph_rhino.gh_compo_io.shw.create_heater import GHCompo_CreateSHWHeater
-from honeybee_ph_rhino.gh_compo_io.shw.create_pipe_branches import GHCompo_CreateSHWBranchPipes
-from honeybee_ph_rhino.gh_compo_io.shw.create_pipe_fixtures import GHCompo_CreateSHWFixturePipes
-from honeybee_ph_rhino.gh_compo_io.shw.create_pipe_trunks import GHCompo_CreateSHWTrunkPipes
-from honeybee_ph_rhino.gh_compo_io.shw.create_recirc_pipes import GHCompo_CreateSHWRecircPipes
-from honeybee_ph_rhino.gh_compo_io.shw.create_system import GHCompo_CreateSHWSystem
-from honeybee_ph_rhino.gh_compo_io.shw.create_tank import GHCompo_CreateSHWTank
+from honeybee_ph_rhino.gh_compo_io.shading import *
+from honeybee_ph_rhino.gh_compo_io.shw import *
 
 # -- Interior Spaces
 from honeybee_ph_rhino.gh_compo_io.space_add_spc import GHCompo_AddPHSpaces

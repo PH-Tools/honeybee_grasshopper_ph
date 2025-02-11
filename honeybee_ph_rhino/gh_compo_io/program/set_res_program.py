@@ -3,20 +3,20 @@
 
 """GHCompo Interface: HBPH - Set Residential Program."""
 
-from collections import defaultdict
 import os
+from collections import defaultdict
 from statistics import mean
 
 try:
-    from System import Object  # type: ignore
     from Grasshopper import DataTree  # type: ignore
     from Grasshopper.Kernel.Data import GH_Path  # type: ignore
+    from System import Object  # type: ignore
 except ImportError:
     pass  # IronPython 2.7
 
 try:
-    from honeybee.room import Room
     from honeybee.config import folders
+    from honeybee.room import Room
     from honeybee.typing import clean_and_id_ep_string
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
@@ -29,20 +29,20 @@ try:
     from honeybee_energy.load.infiltration import Infiltration
     from honeybee_energy.load.lighting import Lighting
     from honeybee_energy.load.people import People
+    from honeybee_energy.load.process import Process
     from honeybee_energy.load.setpoint import Setpoint
     from honeybee_energy.load.ventilation import Ventilation
-    from honeybee_energy.load.process import Process
     from honeybee_energy.programtype import ProgramType
-    from honeybee_energy.schedule.ruleset import ScheduleRuleset
     from honeybee_energy.properties.room import RoomEnergyProperties
+    from honeybee_energy.schedule.ruleset import ScheduleRuleset
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy:\n\t{}".format(e))
 
 try:
     from honeybee_energy_ph.load import ph_equipment
-    from honeybee_energy_ph.properties.load.process import ProcessPhProperties
     from honeybee_energy_ph.properties.load.lighting import LightingPhProperties
     from honeybee_energy_ph.properties.load.people import PeoplePhProperties
+    from honeybee_energy_ph.properties.load.process import ProcessPhProperties
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
 
@@ -67,10 +67,8 @@ def get_total_spaces_area_rh_doc_units(_hb_rooms):
     # type: (list[Room]) -> float
     """Get the total area of all the spaces in the HB-Rooms."""
     return sum(
-        space.weighted_net_floor_area 
-        for room in _hb_rooms 
-        for space in room.properties.ph.spaces # type: ignore
-    ) or sum(r.floor_area for r in _hb_rooms)  
+        space.weighted_net_floor_area for room in _hb_rooms for space in room.properties.ph.spaces  # type: ignore
+    ) or sum(r.floor_area for r in _hb_rooms)
 
 
 def _group_rooms_by_dwellings(_hb_rooms):
@@ -162,8 +160,8 @@ def set_people(_people, gross_floor_area_m2, num_people, _presence_schedule, _ac
     peak_ppl = num_people
     people_per_m2 = peak_ppl / gross_floor_area_m2
 
-    new_ppl = _people.duplicate() # type: People #type: ignore
-    new_ppl.identifier=clean_and_id_ep_string("HBPH_SFH_People")
+    new_ppl = _people.duplicate()  # type: People #type: ignore
+    new_ppl.identifier = clean_and_id_ep_string("HBPH_SFH_People")
     new_ppl.people_per_area = people_per_m2
     new_ppl.occupancy_schedule = _presence_schedule
     new_ppl.activity_schedule = _activity_schedule
@@ -228,10 +226,10 @@ def set_zero_MEL(_elec_equip):
 def set_infiltration(_infiltration, flow_per_ext_m2=0.0003):
     # type: (Infiltration, float) -> Infiltration
     """Reset the HBE-Infiltration Attributes."""
-    hbe_infiltration = _infiltration.duplicate() # type: Infiltration # type: ignore
-    hbe_infiltration.identifier=clean_and_id_ep_string("HBPH_PH_Infiltration")
-    hbe_infiltration.flow_per_exterior_area=flow_per_ext_m2
-    hbe_infiltration.schedule=schedule_by_identifier("Always On")
+    hbe_infiltration = _infiltration.duplicate()  # type: Infiltration # type: ignore
+    hbe_infiltration.identifier = clean_and_id_ep_string("HBPH_PH_Infiltration")
+    hbe_infiltration.flow_per_exterior_area = flow_per_ext_m2
+    hbe_infiltration.schedule = schedule_by_identifier("Always On")
     return hbe_infiltration
 
 
@@ -239,12 +237,12 @@ def set_ventilation(_ventilation):
     # type: (Ventilation) -> Ventilation
     """Reset the HBE-Ventilation Attributes."""
     hbe_ventilation = _ventilation.duplicate()  # type: Ventilation # type: ignore
-    hbe_ventilation.identifier=clean_and_id_ep_string("HBPH_SFH_Ventilation")
-    hbe_ventilation.flow_per_person=0
-    hbe_ventilation.flow_per_area=0
-    hbe_ventilation.flow_per_zone=0
-    hbe_ventilation.air_changes_per_hour=0.4
-    hbe_ventilation.schedule=None
+    hbe_ventilation.identifier = clean_and_id_ep_string("HBPH_SFH_Ventilation")
+    hbe_ventilation.flow_per_person = 0
+    hbe_ventilation.flow_per_area = 0
+    hbe_ventilation.flow_per_zone = 0
+    hbe_ventilation.air_changes_per_hour = 0.4
+    hbe_ventilation.schedule = None
     return hbe_ventilation
 
 
@@ -252,9 +250,9 @@ def set_setpoint(_setpoint, _heating_schedule, _cooling_schedule, _dehumidifying
     # type: (Setpoint, ScheduleRuleset, ScheduleRuleset, float) -> Setpoint
     """Reseet the HBE-Setpoint Attributes."""
     new_setpoint = _setpoint.duplicate()  # type: Setpoint # type: ignore
-    new_setpoint.identifier=clean_and_id_ep_string("HBPH_SFH_Setpoint")
-    new_setpoint.heating_schedule=_heating_schedule
-    new_setpoint.cooling_schedule=_cooling_schedule
+    new_setpoint.identifier = clean_and_id_ep_string("HBPH_SFH_Setpoint")
+    new_setpoint.heating_schedule = _heating_schedule
+    new_setpoint.cooling_schedule = _cooling_schedule
     new_setpoint.dehumidifying_setpoint = _dehumidifying_setpoint
     return new_setpoint
 
@@ -288,15 +286,15 @@ def set_shw(_shw, _num_bedrooms, _gross_floor_area_m2, _schedule):
         + gallons_per_day_sinks
     )
     gallons_per_hour_combined = gallons_per_day_combined / 24
-    
+
     if _shw:
         hbe_shw = _shw.duplicate()  # type: ServiceHotWater # type: ignore
-    else: # -- Create a new ServiceHotWater object
+    else:  # -- Create a new ServiceHotWater object
         hbe_shw = ServiceHotWater(
             identifier=clean_and_id_ep_string("HBPH_SFH_ServiceHotWater"),
             flow_per_area=convert(gallons_per_hour_combined, "GA", "L") / _gross_floor_area_m2,  # type: ignore,
             schedule=_schedule,
-            target_temperature= 43.3  # type: ignore
+            target_temperature=43.3,  # type: ignore
         )
     hbe_shw.identifier = clean_and_id_ep_string("HBPH_SFH_ServiceHotWater")
     hbe_shw.flow_per_area = convert(gallons_per_hour_combined, "GA", "L") / _gross_floor_area_m2  # type: ignore
@@ -350,7 +348,6 @@ def create_phius_default_equipment_set(_schedules, _num_occupants, _num_bedrooms
     return new_process_loads
 
 
-
 class GHCompo_CreatePHProgramSingleFamilyHome(object):
     # Schedule Files
 
@@ -368,7 +365,7 @@ class GHCompo_CreatePHProgramSingleFamilyHome(object):
         if not self.hb_rooms:
             return False
         return True
-    
+
     def duplicate_rooms(self, _hb_rooms):
         # type: (list[Room]) -> list[Room]
         """Duplicate the HB-Rooms AND the HBE-People Load."""
@@ -379,7 +376,7 @@ class GHCompo_CreatePHProgramSingleFamilyHome(object):
             room_e_prop.people = room_e_prop.people.duplicate()
             dup_rooms_.append(dup_room)
         return dup_rooms_
-    
+
     def get_gross_floor_area(self, _hb_rooms):
         # type: (list[Room]) -> float
         """Get the Gross Floor Area [m2] of a set of HB-Rooms."""
@@ -401,8 +398,8 @@ class GHCompo_CreatePHProgramSingleFamilyHome(object):
     def set_room_program(self, _hb_room, _gross_floor_area_m2, _net_floor_area_ft2, _num_occupants, _num_bedrooms):
         # type: (Room, float, float, float, float) -> None
         """Set the ProgramType values on a single HB-Room.
-        
-        Rather than create a new program, re-set the program values one at a time to ensure that we 
+
+        Rather than create a new program, re-set the program values one at a time to ensure that we
         preserve any extension attributes (ph, revive, etc.)
         """
         hb_prop_e = getattr(_hb_room.properties, "energy")  # type: RoomEnergyProperties
@@ -438,7 +435,7 @@ class GHCompo_CreatePHProgramSingleFamilyHome(object):
     def run(self):
         # type: () -> DataTree[Room]
         hb_rooms_ = DataTree[Object]()
-        
+
         if not self.ready:
             return hb_rooms_
 
@@ -450,7 +447,7 @@ class GHCompo_CreatePHProgramSingleFamilyHome(object):
             gross_floor_area_m2 = self.get_gross_floor_area(dup_rooms)
             net_floor_area_ft2 = self.get_net_floor_area(dup_rooms)
             num_bedrooms, num_occupants = get_occupancy_values(self.IGH, dup_rooms)
-            
+
             # -- Create the Phius default Process Loads (Appliances)
             default_process_loads = create_phius_default_equipment_set(
                 self.schedules,

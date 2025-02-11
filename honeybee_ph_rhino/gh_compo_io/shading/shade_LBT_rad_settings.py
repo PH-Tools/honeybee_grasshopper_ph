@@ -65,17 +65,17 @@ class GHCompo_CreateLBTRadSettings(object):
     def __init__(
         self,
         _IGH,
-        _epw_file,
-        _north,
-        _winter_sky_matrix,
-        _summer_sky_matrix,
-        _mesh_params,
-        _grid_size,
-        _legend_par,
-        _cpus,
+        _epw_file=None,
+        _north=None,
+        _winter_sky_matrix=None,
+        _summer_sky_matrix=None,
+        _mesh_params=None,
+        _grid_size=None,
+        _legend_par=None,
+        _cpus=None,
         _window_mesh_params=None,
     ):
-        # type: (gh_io.IGH, str, float, Any, Any, rg.MeshingParameters, Optional[str], Any, Optional[int], Optional[rg.MeshingParameters]) -> None
+        # type: (gh_io.IGH, str | None, float | None, Any, Any, rg.MeshingParameters | None, str | None, Any, int | None, rg.MeshingParameters | None) -> None
         self.IGH = _IGH
         self.epw_file = _epw_file
         self.north = _north
