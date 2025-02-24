@@ -1,6 +1,6 @@
-honeybee-core>=1.61.4
-honeybee-energy>=1.112.9
-ladybug-rhino>=1.43.5
-honeybee-ph>=1.30.0
-PHX>=1.50.0
-PH-units>=1.5.20
+honeybee-core>=1.61.6
+honeybee-energy>=1.112.11
+ladybug-rhino>=1.43.7
+honeybee-ph>=1.30.3
+PHX>=1.50.3
+PH-units>=1.5.23
