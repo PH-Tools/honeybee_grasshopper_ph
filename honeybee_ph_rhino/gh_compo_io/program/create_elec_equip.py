@@ -5,10 +5,11 @@
 
 from copy import copy  # Use copy so that specific equipments can overwrite base with their own hints
 
+
 try:
-    from typing import Dict, Optional
+    from typing import Type
 except ImportError:
-    pass  # IronPython 2.7
+    pass # IronPython 2.7
 
 from GhPython import Component  # type: ignore
 from Grasshopper.Kernel.Parameters import Hints  # type: ignore
@@ -200,6 +201,9 @@ inputs_Custom_Elec = copy(inputs_base)
 inputs_Custom_Lighting = copy(inputs_base)
 inputs_Custom_MEL = copy(inputs_base)
 
+inputs_phius_defaults = {}
+inputs_phi_defaults = {}
+
 # -----------------------------------------------------------------------------
 
 input_groups = {
@@ -217,6 +221,8 @@ input_groups = {
     11: inputs_Custom_Elec,
     17: inputs_Custom_Lighting,
     18: inputs_Custom_MEL,
+    100: inputs_phius_defaults,
+    200: inputs_phi_defaults,
 }
 
 # -----------------------------------------------------------------------------
@@ -245,23 +251,42 @@ def get_component_inputs(_equipment_type):
 
 
 class GHCompo_CreateElecEquip(object):
+    phius_defaults = [
+        ph_equipment.PhDishwasher.phius_default,
+        ph_equipment.PhClothesWasher.phius_default,
+        ph_equipment.PhClothesDryer.phius_default,
+        ph_equipment.PhFridgeFreezer.phius_default,
+        ph_equipment.PhCooktop.phius_default,
+        ph_equipment.PhPhiusMEL.phius_default,
+        ph_equipment.PhPhiusLightingInterior.phius_default,
+        ph_equipment.PhPhiusLightingExterior.phius_default,
+    ]
+    phi_defaults = [
+        ph_equipment.PhDishwasher.phi_default,
+        ph_equipment.PhClothesWasher.phi_default,
+        ph_equipment.PhClothesDryer.phi_default,
+        ph_equipment.PhFridgeFreezer.phi_default,
+        ph_equipment.PhCooktop.phi_default,
+    ]
     equipment_classes = {
-        1: ph_equipment.PhDishwasher,
-        2: ph_equipment.PhClothesWasher,
-        3: ph_equipment.PhClothesDryer,
-        4: ph_equipment.PhRefrigerator,
-        5: ph_equipment.PhFreezer,
-        6: ph_equipment.PhFridgeFreezer,
-        7: ph_equipment.PhCooktop,
-        13: ph_equipment.PhPhiusMEL,
-        14: ph_equipment.PhPhiusLightingInterior,
-        15: ph_equipment.PhPhiusLightingExterior,
-        16: ph_equipment.PhPhiusLightingGarage,
-        11: ph_equipment.PhCustomAnnualElectric,
-        17: ph_equipment.PhCustomAnnualLighting,
-        18: ph_equipment.PhCustomAnnualMEL,
+        None: [],
+        1: [ph_equipment.PhDishwasher],
+        2: [ph_equipment.PhClothesWasher],
+        3: [ph_equipment.PhClothesDryer],
+        4: [ph_equipment.PhRefrigerator],
+        5: [ph_equipment.PhFreezer],
+        6: [ph_equipment.PhFridgeFreezer],
+        7: [ph_equipment.PhCooktop],
+        13: [ph_equipment.PhPhiusMEL],
+        14: [ph_equipment.PhPhiusLightingInterior],
+        15: [ph_equipment.PhPhiusLightingExterior],
+        16: [ph_equipment.PhPhiusLightingGarage],
+        11: [ph_equipment.PhCustomAnnualElectric],
+        17: [ph_equipment.PhCustomAnnualLighting],
+        18: [ph_equipment.PhCustomAnnualMEL],
+        100: phius_defaults,
+        200: phi_defaults,
     }
-
     valid_equipment_types = [
         "1-dishwasher",
         "2-clothes_washer",
@@ -277,47 +302,69 @@ class GHCompo_CreateElecEquip(object):
         "11-Custom_Electric_per_Year",
         "17-Custom_Electric_Lighting_per_Year",
         "18-Custom_Electric_MEL_per_Use",
+        "100-PhiUS_Defaults",
+        "200-Phi_Defaults",
     ]
     # "21-Commercial_Dishwasher", "22-Commercial_Refrigerator", "23-Commercial_Cooking", "24-Commercial_Custom"]
 
     def __init__(self, _IGH, _equip_type, _input_dict):
-        # type: (gh_io.IGH, int, Dict) -> None
+        # type: (gh_io.IGH, int, dict) -> None
         self.IGH = _IGH
         self.equip_type = _equip_type
         self.input_dict = _input_dict
 
     @property
     def equip_type(self):
-        # type: () -> Optional[int]
+        # type: () -> int | None
         return self._equip_type
 
     @equip_type.setter
     def equip_type(self, _in):
+        # type: (int) -> None
         self._equip_type = input_to_int(_in)
 
-    def run(self):
-        # type: () -> Optional[ph_equipment.PhEquipment]
-
-        if not self.equip_type:
-            msg = "Set the 'equipment_type' to configure the user-inputs."
+    @property
+    def ready(self):
+        # type: () -> bool
+        if self.equip_type is None:
+            msg = "Set the '_type' to configure the user-inputs."
             self.IGH.warning(msg)
-            return None
+            return False
+        return True
 
+    def get_equipment_classes(self):
+        # type: () -> list[Type[ph_equipment.PhEquipment]]
+        """Get a list of the equipment classes to build, based on the equipment-type input."""
         try:
-            equipment_class = self.equipment_classes[self.equip_type]
+            return self.equipment_classes[self.equip_type]
         except KeyError as e:
             raise Exception(
-                "Error: Input Equipment type: '{}' not supported. Please only input: "
+                "Error: Input Equipment type: '{}' is not supported. Please only input: "
                 "{}".format(self.equip_type, self.valid_equipment_types)
             )
-
-        equipment_ = equipment_class()
-        for attr_name in dir(equipment_):
+    
+    def set_object_attributes(self, _equipment_obj):
+        # type: (ph_equipment.PhEquipment) -> ph_equipment.PhEquipment
+        """Set the object's attributes based on the component inputs"""
+        for attr_name in dir(_equipment_obj):
             if attr_name.startswith("_"):
                 continue
 
             input_val = self.input_dict.get(attr_name)
             if input_val:
-                setattr(equipment_, attr_name, input_val)
+                setattr(_equipment_obj, attr_name, input_val)
+        
+        return _equipment_obj
+
+    def run(self):
+        # type: () -> list[ph_equipment.PhEquipment]
+        equipment_ = []
+        if not self.ready:
+            return equipment_
+
+        for equip_class in self.get_equipment_classes():
+            equipment_obj = equip_class()
+            equipment_obj = self.set_object_attributes(equipment_obj)
+            equipment_.append(equipment_obj)
 
         return equipment_

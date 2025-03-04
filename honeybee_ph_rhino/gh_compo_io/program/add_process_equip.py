@@ -18,10 +18,8 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
 try:
-    from honeybee_energy.lib.schedules import schedule_by_identifier
     from honeybee_energy.load.process import Process
     from honeybee_energy.properties.room import RoomEnergyProperties
-    from honeybee_energy.schedule.ruleset import ScheduleRuleset
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy:\n\t{}".format(e))
 
@@ -30,11 +28,6 @@ try:
     from honeybee_energy_ph.properties.load.process import ProcessPhProperties
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
-
-try:
-    from honeybee_ph_standards.schedules._load_schedules import load_schedules_from_json_file
-except ImportError as e:
-    raise ImportError("\nFailed to import honeybee_ph_standards:\n\t{}".format(e))
 
 try:
     from ph_gh_component_io import gh_io

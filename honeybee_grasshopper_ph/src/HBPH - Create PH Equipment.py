@@ -23,7 +23,31 @@
 Create a new detailed Passive House style equipment which can be added to the 
 honeybee Rooms.
 -
-EM January 26, 2025
+EM March 4, 2025
+    Args:
+        _type: (str) Input either -
+1-dishwasher,
+2-clothes_washer,
+3-clothes_dryer,
+4-fridge,
+5-freezer,
+6-fridge_freezer,
+7-cooking,
+13-PHIUS_MEL,
+14-PHIUS_Lighting_Int,
+15-PHIUS_Lighting_Ext,
+16-PHIUS_Lighting_Garage,
+11-Custom_Electric_per_Year,
+17-Custom_Electric_Lighting_per_Year,
+18-Custom_Electric_MEL_per_Use,
+100-PhiUS_Defaults,
+200-Phi_Defaults,
+
+        _display_name: (str) Optional display name
+    
+    Returns:
+        equipment_: (list[PhEquipment]) New HBPH Electric Equipment which can be added to one 
+            or more Honeybee-Rooms using the "HBPH - Add Process Equipment" component.
 """
 
 import scriptcontext as sc
@@ -87,4 +111,5 @@ equipment_ = gh_compo_interface.run()
 
 #-------------------------------------------------------------------------------
 # -- Preview
-preview.object_preview(equipment_)
+for e in equipment_:
+    preview.object_preview(e)
