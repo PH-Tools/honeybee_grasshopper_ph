@@ -3,9 +3,18 @@ title: "Learn More"
 weight: 30
 ---
 
+## [Video] Full Course (30 hours)
+[![RBC Course](/honeybee_grasshopper_ph/img/learn_more/RBC_Splash.png)](https://collective.reimaginebuildings.com)
+We are very happy to partner with the [Reimagine Buildings Collective](https://collective.reimaginebuildings.com) to offer a comprehensive on-demand video course covering **all** aspects of Honeybee, Honeybee-Energy, and Honeybee-PH (both PHPP and WUFI-Passive). This course includes more than 30 hours of on-demand 'model-along' style video tutorials and is available **FOR FREE** to all **Reimagine Buildings Collective** members. We hope to see you there! 
+
+Check out the video below for a full description and introduction to the course:
+- [Feb. 2025 | Reimagine Buildings Collective: Intro to Honeybee-PH Course](https://www.youtube.com/watch?v=DRD-pGVjzQo)
+
+
 ## [Video] Introduction to Honeybee-PH
 
 Several 'Introduction to HBPH' sessions have been recorded and are available trough YouTube:
+
 
 - [Sept. 2024 | PH-Accelerator: Improving our Passive House Modeling Tools (1 hour)](https://www.youtube.com/watch?v=l0T2UfkgsM8)
 
@@ -34,46 +43,3 @@ In this 14 episode series, we take a simple single-family home building from a b
 
 [![YouTube Logo](/honeybee_grasshopper_ph/img/learn_more/WUFI_YouTube_Splash.png)](https://youtube.com/playlist?list=PLi6KNBJLE8H9i0O_Y7NYoZuu4ZYOEd0RE)
 
-
-
-<!-- - - -
-## Windows
-coming soon...
-
-## Window Shading
-coming soon...
-
-## "Spaces"
-coming soon...
-
-## Ventilation Systems
-coming soon...
-
-## Hot-Water Systems (DHW)
-coming soon...
-
-## Heating and Cooling Systems
-coming soon...
-
-## Loads and Schedules
-coming soon...
-
-## Thermal Bridges
-coming soon...
-
-## The "Building Segment"
-coming soon...
-
-## PH Certification Settings
-coming soon...
-
-## Climate / Location
-coming soon...
-
-## PDF Reports
-coming soon...
-
-## FAQ:
-### Can Honeybee-PH models be used for certification?
-
-### Can Honeybee-PH be used alongside DesignPH? -->

@@ -2,10 +2,10 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Categories on PH-Tools.honeybee-grasshopper-ph</title>
-    <link>http://localhost:1313/honeybee_grasshopper_ph/categories/</link>
+    <link>https://ph-tools.github.io/honeybee_grasshopper_ph/categories/</link>
     <description>Recent content in Categories on PH-Tools.honeybee-grasshopper-ph</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <atom:link href="http://localhost:1313/honeybee_grasshopper_ph/categories/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://ph-tools.github.io/honeybee_grasshopper_ph/categories/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>

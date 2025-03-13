@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head><script src="/honeybee_grasshopper_ph/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=honeybee_grasshopper_ph/livereload" data-no-instant defer></script>
+<head>
 
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -78,13 +78,14 @@
                     
 
 <ul class="nav scrollbar">
-    <a class="sidebar-section-head" href="http://localhost:1313/honeybee_grasshopper_ph/install/">Install</a>
+    <a class="sidebar-section-head" href="https://ph-tools.github.io/honeybee_grasshopper_ph/install/">Install</a>
     <nav id="TableOfContents">
   <ul>
     <li><a href="#youtube-walk-through">YouTube Walk Through</a></li>
     <li><a href="#requirements">Requirements</a></li>
     <li><a href="#rhino--grasshopper-installation">Rhino / Grasshopper Installation</a></li>
     <li><a href="#install-trouble">Install Trouble?</a></li>
+    <li><a href="#error-on-windows">Error on Windows?</a></li>
   </ul>
 </nav>
 </ul>
@@ -99,8 +100,8 @@
 <h2 id="requirements">Requirements</h2>
 <p>In order to successfully install Honeybee-PH, please make sure that your system already has all of the required software installed and working:</p>
 <ul>
-<li><a href="https://www.rhino3d.com/">Rhino-3D v7+</a></li>
-<li><a href="https://www.ladybug.tools/">Ladybug-Tools v1.7+</a></li>
+<li><a href="https://www.rhino3d.com/">Rhino-3D v8</a></li>
+<li><a href="https://www.ladybug.tools/">Ladybug-Tools v1.8</a></li>
 <li><a href="https://wufi.de/en/software/wufi-passive/">WUFI-Passive</a></li>
 <li><a href="https://passivehouse.com/04_phpp/04_phpp.htm">PHPP v9 or v10</a></li>
 <li>Windows v10+ or MacOS v13+</li>
@@ -114,7 +115,7 @@
 <h2 id="rhino--grasshopper-installation">Rhino / Grasshopper Installation</h2>
 <p>In order to successfully install the <strong>Honeybee-PH</strong> toolkit, follow the steps outlined below:</p>
 <ul>
-<li>Step 1: Ensure you have Rhino v7 or better installed.</li>
+<li>Step 1: Ensure you have Rhino v8 installed.</li>
 <li>Step 2: <strong>WINDOWS USERS</strong> Use the <a href="https://app.pollination.cloud/cad-plugins"><strong>One-Click Installer for Grasshopper</strong></a> in order to install Ladybug Tools onto your system.</li>
 <li>Step 3: <strong>MACOS USERS</strong> Use the <a href="https://www.food4rhino.com/en/app/ladybug-tools"><strong>Food4Rhino Installer</strong></a> in order to install Ladybug Tools onto your system.</li>
 <li>Step 4: In Grasshopper, use the Ladybug Tools &ldquo;LB Versioner&rdquo; component to update your installation to the latest version.
@@ -128,7 +129,7 @@
 <p>If you run into any errors or trouble during install, check:</p>
 <ul>
 <li>
-<p>Do you have Rhino <strong>v7</strong> or <strong>v8</strong>? HBPH is not compatible with earlier versions of Rhino.</p>
+<p>Do you have <strong>Rhino v8</strong>? Unfortunately HBPH is not compatible with earlier versions of Rhino.</p>
 </li>
 <li>
 <p>If you are on Windows, are you using the Ladybug Tools Pollination <a href="https://app.pollination.cloud/cad-plugins"><strong>One-Click Installer for Grasshopper</strong></a>? This is the recommended method now for all Windows users. It&rsquo;s free, and much easier than the older Food4Rhino installer.</p>
@@ -138,16 +139,28 @@
 <img src="/honeybee_grasshopper_ph/img/install/hb_config.png" alt="HB Check Versions"></p>
 </li>
 <li>
-<p>Do you have a compatible version of Ladybug Tools installed? Honeybee-PH requires Ladybug Tools v1.7 or better to work properly. If you have an older version of Ladybug Tools installed, you should use the Ladybug Tools &ldquo;LB Versioner&rdquo; component to update your installation to the latest version before trying to use Honeybee-PH.</p>
+<p>Do you have a compatible version of Ladybug Tools installed? Honeybee-PH requires Ladybug Tools v1.8 or better to work properly. If you have an older version of Ladybug Tools installed, you should use the Ladybug Tools &ldquo;LB Versioner&rdquo; component to update your installation to the latest version before trying to use Honeybee-PH.</p>
 </li>
 <li>
 <p>Are you using vanilla Ladybug-Tools, or are you using <a href="https://www.pollination.cloud/">Pollination</a>? If you are using Pollination on Windows, it is possible that your Ladybug-Tools are installed in a different directory than normal. This means you may need additional permissions before you can install Honeybee-PH. If you run into any permissions issues, try running Rhino &lsquo;Run as administrator&rsquo; from your Start Menu and then running the Installation.
 <img src="/honeybee_grasshopper_ph/img/install/run_admin.png" alt="Run as Admin"></p>
 </li>
-<li>
-<p>Still having trouble? Check out the <a href="/honeybee_grasshopper_ph/contact/">Contact</a> page for additional resources.</p>
-</li>
 </ul>
+<h2 id="error-on-windows">Error on Windows?</h2>
+<p>If you are on Windows, in some circumstances you may be getting an error during installation. This may sometimes be due to a weird behavior of the &lsquo;python&rsquo; language that Honeybee and Honeybee-PH is written in. Try the steps below if you are encountering an error during installation:</p>
+<ol>
+<li>Using <strong>File Exporer</strong> navigate to the <code>C:\Users\ --you-- \AppData\Roaming\</code> directory.</li>
+<li>Look within this directory for a directory named &lsquo;Python&rsquo; in there?
+<img src="/honeybee_grasshopper_ph/img/install/bad_python.png" alt="Bad Python"></li>
+<li>If you have a directory named &lsquo;Python, <strong>delete it!</strong> That isn&rsquo;t supposed to be there.</li>
+<li>Now try running the Grasshopper Installer one more time.</li>
+</ol>
+
+
+  <p class="important">
+    <strong>Still having trouble?</strong> Check out the <a target="_blank" href="/honeybee_grasshopper_ph/contact/">Contact</a> page for ways to get in touch with us.
+  </p>
+
 
                 </div>
             </div>
@@ -156,7 +169,7 @@
 </div>
 <div class="container">
 	<footer class="footer">
-		<p>&copy;2021-2024 bldgtyp, llc</p>
+		<p>&copy;2021-2025 bldgtyp, llc</p>
 		<p>PH-Tools and PHX are a projects of bldgtyp, llc
 			If you'd like to contribute or talk more about any of the PH-Tools projects,
 			contact: phtools@bldgtyp.com, or check out the <a target="_blank"

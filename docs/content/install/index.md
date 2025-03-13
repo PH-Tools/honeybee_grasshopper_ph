@@ -11,8 +11,8 @@ Watch a detailed step-by-step walk through showing both the LadybugTools install
 
 ## Requirements
 In order to successfully install Honeybee-PH, please make sure that your system already has all of the required software installed and working:
-- [Rhino-3D v7+](https://www.rhino3d.com/)
-- [Ladybug-Tools v1.7+](https://www.ladybug.tools/)
+- [Rhino-3D v8](https://www.rhino3d.com/)
+- [Ladybug-Tools v1.8](https://www.ladybug.tools/)
 - [WUFI-Passive](https://wufi.de/en/software/wufi-passive/)
 - [PHPP v9 or v10](https://passivehouse.com/04_phpp/04_phpp.htm)
 - Windows v10+ or MacOS v13+
@@ -26,7 +26,7 @@ In order to successfully install Honeybee-PH, please make sure that your system 
 ## Rhino / Grasshopper Installation
 In order to successfully install the **Honeybee-PH** toolkit, follow the steps outlined below:
 
-- Step 1: Ensure you have Rhino v7 or better installed.
+- Step 1: Ensure you have Rhino v8 installed.
 - Step 2: **WINDOWS USERS** Use the [**One-Click Installer for Grasshopper**](https://app.pollination.cloud/cad-plugins) in order to install Ladybug Tools onto your system.
 - Step 3: **MACOS USERS** Use the [**Food4Rhino Installer**](https://www.food4rhino.com/en/app/ladybug-tools) in order to install Ladybug Tools onto your system.
 - Step 4: In Grasshopper, use the Ladybug Tools "LB Versioner" component to update your installation to the latest version.
@@ -37,16 +37,30 @@ In order to successfully install the **Honeybee-PH** toolkit, follow the steps o
 
 ## Install Trouble?
 If you run into any errors or trouble during install, check:
-- Do you have Rhino **v7** or **v8**? HBPH is not compatible with earlier versions of Rhino.
+- Do you have **Rhino v8**? Unfortunately HBPH is not compatible with earlier versions of Rhino.
 
 - If you are on Windows, are you using the Ladybug Tools Pollination [**One-Click Installer for Grasshopper**](https://app.pollination.cloud/cad-plugins)? This is the recommended method now for all Windows users. It's free, and much easier than the older Food4Rhino installer.
 
 - Are you sure you already have Ladybug-Tools and Honeybee installed? You can use the Honeybee "HB Check Versions" component to check that your Python, Radiance, and OS installs are working properly?
 ![HB Check Versions](/honeybee_grasshopper_ph/img/install/hb_config.png)
 
-- Do you have a compatible version of Ladybug Tools installed? Honeybee-PH requires Ladybug Tools v1.7 or better to work properly. If you have an older version of Ladybug Tools installed, you should use the Ladybug Tools "LB Versioner" component to update your installation to the latest version before trying to use Honeybee-PH.
+- Do you have a compatible version of Ladybug Tools installed? Honeybee-PH requires Ladybug Tools v1.8 or better to work properly. If you have an older version of Ladybug Tools installed, you should use the Ladybug Tools "LB Versioner" component to update your installation to the latest version before trying to use Honeybee-PH.
 
 - Are you using vanilla Ladybug-Tools, or are you using [Pollination](https://www.pollination.cloud/)? If you are using Pollination on Windows, it is possible that your Ladybug-Tools are installed in a different directory than normal. This means you may need additional permissions before you can install Honeybee-PH. If you run into any permissions issues, try running Rhino 'Run as administrator' from your Start Menu and then running the Installation.
 ![Run as Admin](/honeybee_grasshopper_ph/img/install/run_admin.png)
 
-- Still having trouble? Check out the [Contact](/{{< gh_pages_name >}}/contact/) page for additional resources.
+
+## Error on Windows?
+If you are on Windows, in some circumstances you may be getting an error during installation. This may sometimes be due to a weird behavior of the 'python' language that Honeybee and Honeybee-PH is written in. Try the steps below if you are encountering an error during installation:
+
+1. Using **File Exporer** navigate to the `C:\Users\ --you-- \AppData\Roaming\` directory.
+2. Look within this directory for a directory named 'Python' in there?
+![Bad Python](/honeybee_grasshopper_ph/img/install/bad_python.png)
+3. If you have a directory named 'Python, **delete it!** That isn't supposed to be there.
+4. Now try running the Grasshopper Installer one more time.
+
+{{< raw_html >}}
+  <p class="important">
+    <strong>Still having trouble?</strong> Check out the <a target="_blank" href="/{{< gh_pages_name >}}/contact/">Contact</a> page for ways to get in touch with us.
+  </p>
+{{< /raw_html >}}
