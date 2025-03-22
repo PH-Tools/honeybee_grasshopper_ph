@@ -199,3 +199,36 @@ a.button {
   font-size: 20px;
   text-shadow: 2px 2px 8px rgb(255, 255, 255);
 }
+
+.powershell {
+  font-family: var(--base-font-family);
+  padding: 20px;
+  margin: 20px;
+  color: var(--color-powershell);
+  background-color: var(--color-powershell-background);
+  border-left: lightblue 5px solid;
+}
+
+.folder {
+  font-family: var(--base-font-family);
+  padding: 20px 20px 20px 50px;
+  margin: 20px;
+  color: var(--color-folder);
+  background-color: var(--color-folder-background);
+  border-left: rgb(239, 189, 70) 5px solid;
+  position: relative;
+}
+
+.folder::before {
+  content: "";
+  display: inline-block;
+  background-image: url('../img/folder_open_24dp_1F1F1F.svg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 24px;
+  height: 24px;
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}

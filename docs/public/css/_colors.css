@@ -12,4 +12,8 @@
     --color-ph-tools-dark: rgb(103, 102, 148);
     --color-ph-tools-light: rgb(212, 212, 235);
     --color-ph-tools-very-light: rgb(237, 237, 248);
+    --color-powershell: #212529;
+    --color-powershell-background: #f0f0f0;
+    --color-folder: #212529;
+    --color-folder-background: rgb(251, 222, 155);
 }

@@ -64,3 +64,90 @@ If you are on Windows, in some circumstances you may be getting an error during 
     <strong>Still having trouble?</strong> Check out the <a target="_blank" href="/{{< gh_pages_name >}}/contact/">Contact</a> page for ways to get in touch with us.
   </p>
 {{< /raw_html >}}
+
+
+## Manual Installation?
+In some cases, users will not be able to utilize the automatic installer - for instance if Rhino cannot be run in 'admin' mode for some reason. In this case, it is still possible to manually install **Honeybee-PH** and the required libraries, although this is much more difficult and **not recommended** for most users. In order to manually install **Honeybee-PH**, follow the steps below:
+
+**| Step 1:** Locate *YOUR* **`...\ladybug_tools\...`** folder. For most users, this will be: 
+
+{{< raw_html >}}
+  <p class="folder">
+    C:\Program Files\ladybug_tools\
+  </p>
+{{< /raw_html >}}
+
+but for some users it may also be located in: 
+
+{{< raw_html >}}
+  <p class="folder">
+    C:\Users\--Your-User-Name--\ladybug_tools\
+  </p>
+{{< /raw_html >}}
+
+**| Step 2:** Run **`Powershell`** from your windows start menu
+
+**| Step 3:** In Powershell, [**`pip-install`**](https://packaging.python.org/en/latest/tutorials/installing-packages/) the required libraries into *YOUR* **`ladybug_tools`** folder (see above). This is done by using one of the following commands from inside Powershell, depending on where *YOUR* ladybug_tools folder is found (see above). Run *EITHER*: 
+
+{{< raw_html >}}
+  <p class="powershell">
+    C:\"Program Files"\ladybug_tools\python\python -m pip install honeybee-ph PHX
+  </p>
+{{< /raw_html >}}
+
+*OR*
+
+{{< raw_html >}}
+  <p class="powershell">
+    C:\Users\--Your-User-Name--\ladybug_tools\python\python -m pip install honeybee-ph PHX
+  </p>
+{{< /raw_html >}}
+
+**| Step 4:** Installation may take a few moments as it downloads the packages, and may require you to hit `enter` one or more times during the installation to confirm. If it succeeds, you should now see several **new** folders in *YOUR* **ladybug_tools** folder. To check, look in *EITHER*:
+
+{{< raw_html >}}
+  <p class="folder">
+    C:\"Program Files"\ladybug_tools\python\Lib\site-packages\...
+  </p>
+{{< /raw_html >}}
+
+*OR*
+
+{{< raw_html >}}
+  <p class="folder">
+    C:\Users\--Your-User-Name--\ladybug_tools\python\Lib\site-packages\...
+  </p>
+{{< /raw_html >}}
+
+Look for folders named **honeybee_ph, PHX, and ph_units**. If those folders are present, installation has succeeded!
+
+**| Step 5:** Now that the new libraries are installed, you will need to download the Grasshopper tools, and manually copy/past them into the correct folders. Start by downloading the latest version of the **Honeybee-PH** Grasshopper Components here: 
+
+> [Grasshopper Tools](https://github.com/PH-Tools/honeybee_grasshopper_ph/archive/refs/heads/main.zip)
+
+**| Step 6:** Unzip the downloaded file, and copy the **`...\honeybee_ph_rhino`** folder into your Grasshopper **`...\ladybug_tools\python\lib\site-packages\`** folder.
+![Copy GH Library](/honeybee_grasshopper_ph/img/install/copy_GH_libraries.png)
+
+**| Step 7:** Now, copy the **`...\honeybee_grasshopper_ph\user_objects`** folder into your Grasshopper UserObjects folder. The Grasshopper UserObjects folder should be located in:
+
+{{< raw_html >}}
+  <p class="folder">
+    C:\Users\--Your-User-Name--\AppData\Roaming\Grasshopper\UserObjects\...
+  </p>
+{{< /raw_html >}}
+![Copy GH Components](/honeybee_grasshopper_ph/img/install/copy_GH_components.png)
+
+**| Step 8:** Download the **Grasshopper Component-IO** library as well. Download it here:
+
+> [Grasshopper Component-IO](https://github.com/PH-Tools/PH_GH_Component_IO/archive/refs/heads/main.zip)
+
+**| Step 9:** Last, copy the **`...\ph_gh_component_io`** folder into your **`\ladybug_tools\python\lib\site-packages\`** folder.
+![Copy GH-IO Library](/honeybee_grasshopper_ph/img/install/copy_GH_IO_library.png)
+
+This should complete the manual installation of the Honeybee-PH tools. You should now be able to open Rhino and Grasshopper, and proceed to use the **Honeybee-PH** components as normal. 
+
+{{< raw_html >}}
+  <p class="important">
+    <strong>Still having trouble?</strong> Check out the <a target="_blank" href="/{{< gh_pages_name >}}/contact/">Contact</a> page for ways to get in touch with us.
+  </p>
+{{< /raw_html >}}
