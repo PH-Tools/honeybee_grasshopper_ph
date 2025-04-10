@@ -92,8 +92,8 @@ class GHCompo_CreateWoodFramingMaterial(object):
             roughness="MediumRough",
             thickness=0.1,
         )
-        hbph_props = getattr(mat_, "properties")  # type: EnergyMaterialPhProperties
-        hbph_props.ph_color = PhColor.from_argb(255, 255, 128, 0)
+        hbph_props_ph = getattr(mat_.properties, "ph")  # type: EnergyMaterialPhProperties
+        hbph_props_ph.ph_color = PhColor.from_argb(255, 255, 128, 0)
         return mat_
 
     def _convert(self, value, to_unit="M"):

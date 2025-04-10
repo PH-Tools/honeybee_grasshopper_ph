@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 # -*- Python Version: 2.7 -*-
 
-"""GHCompo Interface: HBPH - Get Phius Multi-Family Load Data."""
+"""GHCompo Interface: HBPH - Get Phius Multi-Family Residential Room Load Data."""
 
 from collections import defaultdict
 
 try:
-    from typing import Any, Type
+    from typing import Any
 except ImportError:
     pass  # IronPython 2.7
 
@@ -20,13 +20,9 @@ try:
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
-try:
-    from honeybee_ph.properties.room import RoomPhProperties
-except ImportError as e:
-    raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
 try:
-    from honeybee_energy_ph.load import ph_equipment, phius_mf
+    from honeybee_energy_ph.load import phius_mf
     from honeybee_energy_ph.properties.load.people import PeoplePhProperties
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
@@ -137,15 +133,19 @@ def sort_rooms_by_story(_hb_rooms):
 # -----------------------------------------------------------------------------
 
 
-def get_residential_room_data(_hb_rooms, _area_unit):
-    # type: (list[Room], str) -> tuple[list, list]
-    """Calculate the annual electric consumption for the residential rooms."""
+def create_phius_stories(_hb_rooms, _area_unit):
+    # type: (list[Room], str) -> list[phius_mf.PhiusResidentialStory]
+    """Create a list of PhiusResidentialStory objects from the HB-Rooms."""
 
-    # -------------------------------------------------------------------------------
-    # -- Determine the Input Res Honeybee Room attributes by story
     rooms_by_story = sort_rooms_by_story(_hb_rooms)
     phius_stories = [phius_mf.PhiusResidentialStory(room_list, _area_unit) for room_list in rooms_by_story]
     phius_stories = sorted(phius_stories, reverse=True)
+    return phius_stories
+
+
+def get_res_room_data_as_string(phius_stories):
+    # type: (list[phius_mf.PhiusResidentialStory]) -> tuple[list[str], list[str]]
+    """Return the Phius Story electrical energy, by level, formatted to match the Phius Multifamily Calc."""
 
     # -------------------------------------------------------------------------------
     # -- Collect for output preview
@@ -185,37 +185,24 @@ def get_residential_room_data(_hb_rooms, _area_unit):
     )
 
 
-def get_non_residential_room_data(_hb_rooms):
-    # type: (list[Room]) -> tuple[list, list, list]
-    """Calculate the annual electric consumption for the non-residential rooms."""
+def get_total_energy_consumption(phius_stories):
+    # type: (list[phius_mf.PhiusResidentialStory]) -> tuple[float, float, float, float]
+    total_mel_ = 0
+    total_lighting_int_ = 0
+    total_lighting_ext_ = 0
+    total_lighting_garage_ = 0
 
-    prog_collection = phius_mf.PhiusNonResProgramCollection()
-
-    # -- Build a new Phius Non-Res-Space for each PH-Space found
-    non_res_spaces = []  # type: list[phius_mf.PhiusNonResRoom]
-    for hb_room in _hb_rooms:
-        room_prop_ph = getattr(hb_room.properties, "ph")  # type: RoomPhProperties
-        for space in room_prop_ph.spaces:
-            new_nonres_space = phius_mf.PhiusNonResRoom.from_ph_space(space)
-            prog_collection.add_program(new_nonres_space.program_type)
-            non_res_spaces.append(new_nonres_space)
-
-    # -- Collect the program data for preview / output
-    non_res_program_data_ = prog_collection.to_phius_mf_workbook()
-
-    non_res_room_data_ = [sp.to_phius_mf_workbook() for sp in sorted(non_res_spaces, key=lambda x: x.name)]
-    non_res_totals_ = [sp.to_phius_mf_workbook_results() for sp in sorted(non_res_spaces, key=lambda x: x.name)]
-    non_res_totals_.insert(
-        0,
-        str(
-            "Lighting Power Density (W/sf), Usage (days/year), Daily Usage (hrs/day), MELCOMM (kWh/yr.sf), LIGHTCOMM (kWh/yr), MELCOMM (kWh/yr)"
-        ),
-    )
+    for story in phius_stories:
+        total_mel_ += story.mel
+        total_lighting_int_ += story.lighting_int
+        total_lighting_ext_ += story.lighting_ext
+        total_lighting_garage_ += story.lighting_garage
 
     return (
-        non_res_program_data_,
-        non_res_room_data_,
-        non_res_totals_,
+        total_mel_,
+        total_lighting_int_,
+        total_lighting_ext_,
+        total_lighting_garage_,
     )
 
 
@@ -223,44 +210,27 @@ def get_non_residential_room_data(_hb_rooms):
 # -- Component Interface
 
 
-class GHCompo_GetPhiusMFLoadData(object):
+class GHCompo_GetPhiusMFResidentialLoadData(object):
     def __init__(self, _IGH, _hb_rooms, *args, **kwargs):
         # type: (gh_io.IGH, list[Room], *Any, **Any) -> None
         self.IGH = _IGH
         self.hb_rooms = _hb_rooms
 
     def run(self):
-        # type: () -> tuple[list, list, list, list, list]
+        # type: () -> tuple[list[str], list[str], float, float, float, float, list[Room]]
         if not self.hb_rooms:
-            return [], [], [], [], []
+            return [], [], 0, 0, 0, 0, []
 
         # ---------------------------------------------------------------------
         # -- Break out the Res, from the Non-Res. HB-Rooms
         hb_res_rooms_ = [rm for rm in self.hb_rooms if room_is_dwelling(rm)]
-        hb_nonres_rooms_ = [rm for rm in self.hb_rooms if not room_is_dwelling(rm)]
 
         # -- Check the inputs for errors, display warnings
         check_res_room_inputs(hb_res_rooms_, self.IGH)
 
-        # -- Calculate the annual electric consumption for the rooms
         # ---------------------------------------------------------------------
-        (
-            res_data_by_story_,
-            res_totals_,
-        ) = get_residential_room_data(hb_res_rooms_, self.IGH.get_rhino_areas_unit_name())
+        phius_stories = create_phius_stories(hb_res_rooms_, self.IGH.get_rhino_areas_unit_name())
+        mf_calculator_check = get_res_room_data_as_string(phius_stories)
+        total_energy_consumption = get_total_energy_consumption(phius_stories)
 
-        # ---------------------------------------------------------------------
-        (
-            non_res_program_data_,
-            non_res_room_data_,
-            non_res_totals_,
-        ) = get_non_residential_room_data(hb_nonres_rooms_)
-
-        # ---------------------------------------------------------------------
-        return (
-            res_data_by_story_,
-            res_totals_,
-            non_res_program_data_,
-            non_res_room_data_,
-            non_res_totals_,
-        )
+        return mf_calculator_check + total_energy_consumption + (hb_res_rooms_,)

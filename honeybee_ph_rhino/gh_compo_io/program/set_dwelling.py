@@ -86,7 +86,7 @@ class GHCompo_SetDwelling(object):
     def get_num_dwellings(self, branch):
         # type: (int) -> int
         try:
-            return self.num_dwellings.Branch(branch)[0]
+            return int(self.num_dwellings.Branch(branch)[0])
         except Exception as e:
             return 1
 

@@ -6,7 +6,7 @@
 try:
     from typing import Any, Callable
 except ImportError:
-    pass # IronPython 2.7
+    pass  # IronPython 2.7
 
 try:
     from honeybee_ph_rhino.gh_io import input_to_int
@@ -16,7 +16,7 @@ except ImportError as e:
 try:
     from ph_gh_component_io import gh_io
 except ImportError as e:
-    raise ImportError('\nFailed to import ph_gh_component_io:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import ph_gh_component_io:\n\t{}".format(e))
 
 # -- Use-Types
 CONSUMER = 1
@@ -28,10 +28,11 @@ GAS = 1
 ELECTRIC_RESISTANCE = 2
 HEAT_PUMP = 3
 
+
 def get_conversion_function(_use_type, _heater_type):
     # type: (int | None, int | None) -> Callable[[float], float] | None
-    """Returns a UEF -> EF conversion function based on use-type and heater-type.  
-    
+    """Returns a UEF -> EF conversion function based on use-type and heater-type.
+
     Conversion functions are based on the RESNET calculator:
     > 'RESNET Energy Factor Conversion Equations based on Water Heater Type'
     > https://www.resnet.us/wp-content/uploads/RESNET-EF-Calculator-2017.xlsx
@@ -55,9 +56,9 @@ def get_conversion_function(_use_type, _heater_type):
             GAS: lambda uef: 1.0005 * uef + 0.0019,
             ELECTRIC_RESISTANCE: lambda uef: min(1.0219 * uef - 0.0025, 1.0),
             HEAT_PUMP: lambda uef: uef,
-        }
+        },
     }
-    return conversion_functions.get(_use_type, {}).get(_heater_type , None)
+    return conversion_functions.get(_use_type, {}).get(_heater_type, None)
 
 
 class GHCompo_CalculateWaterHeaterEnergyFactor(object):
@@ -79,7 +80,7 @@ class GHCompo_CalculateWaterHeaterEnergyFactor(object):
         # type: (int | None) -> None
 
         # Map standard WUFI heater-types to RESNET types
-        heater_type_map ={   
+        heater_type_map = {
             None: None,
             1: ELECTRIC_RESISTANCE,
             2: GAS,
@@ -111,20 +112,25 @@ class GHCompo_CalculateWaterHeaterEnergyFactor(object):
             return False
 
         return True
-    
+
     def run(self):
         # type: () -> float | None
         if not self.ready:
             return None
 
         # -- Calculate the Right EF Value
-        print("Getting RESNET conversion function for use-type={} | heater-type={}".format(self.use_type, self.heater_type))
+        print(
+            "Getting RESNET conversion function for use-type={} | heater-type={}".format(
+                self.use_type, self.heater_type
+            )
+        )
         func = get_conversion_function(self.use_type, self.heater_type)
         if func is None:
-            msg = "Failed to find a conversion function for use-type={} | heater-type={}.".format(self.use_type, self.heater_type)
+            msg = "Failed to find a conversion function for use-type={} | heater-type={}.".format(
+                self.use_type, self.heater_type
+            )
             print(msg)
             self.IGH.error(msg)
             return None
 
         return func(self.UEF)
-

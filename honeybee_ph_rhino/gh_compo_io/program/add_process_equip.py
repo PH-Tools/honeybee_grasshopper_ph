@@ -36,27 +36,14 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
 try:
-    from ph_units.converter import convert
-except ImportError as e:
-    raise ImportError("\nFailed to import ph_units:\n\t{}".format(e))
-
-try:
     from honeybee_ph_rhino.gh_compo_io.program._schedules import SchedulesCollection
+    from honeybee_ph_rhino.gh_compo_io.program._get_room_data import get_room_floor_area_ft2
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
+
 # ------------------------------------------------------------------------------
 # -- Component Interface
-
-
-def _get_room_floor_area_ft2(_hb_room, _IGH):
-    # type: (Room, gh_io.IGH) -> float
-    room_floor_area_ft2 = convert(_hb_room.floor_area, _IGH.get_rhino_areas_unit_name(), "FT2") or 0.0
-    if not room_floor_area_ft2:
-        _IGH.warning("Error: Room: '{}' has no floor surfaces?".format(_hb_room.display_name))
-    print("Room Floor Area: '{}' = {} ft2".format(_hb_room.display_name, room_floor_area_ft2))
-    return room_floor_area_ft2
-
 
 class GHCompo_AddProcessEquip(object):
     ph_equip_types = {
@@ -113,7 +100,7 @@ class GHCompo_AddProcessEquip(object):
         # type: () -> float
         """Get the total floor area of all the rooms in ft2."""
         if not self._total_floor_area_ft2:
-            self._total_floor_area_ft2 = sum(_get_room_floor_area_ft2(rm, self.IGH) for rm in self.hb_rooms)
+            self._total_floor_area_ft2 = sum(get_room_floor_area_ft2(rm, self.IGH) for rm in self.hb_rooms)
         return self._total_floor_area_ft2
 
     def get_default_ph_equipment_set(self, _type):

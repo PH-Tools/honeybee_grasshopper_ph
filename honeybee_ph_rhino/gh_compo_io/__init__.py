@@ -1,10 +1,4 @@
 # -- Import all the interfaces to simplify the API within Grasshopper
-from honeybee_ph_rhino.gh_compo_io.cert import *
-from honeybee_ph_rhino.gh_compo_io.hvac import *
-from honeybee_ph_rhino.gh_compo_io.shading import *
-from honeybee_ph_rhino.gh_compo_io.shw import *
-from honeybee_ph_rhino.gh_compo_io.program import *
-
 # -- Assemblies
 from honeybee_ph_rhino.gh_compo_io.assmbly_create_air_layer_mat import GHCompo_AirLayerMaterial
 from honeybee_ph_rhino.gh_compo_io.assmbly_create_detailed_const import GHCompo_CreateDetailedConstructions
@@ -20,6 +14,7 @@ from honeybee_ph_rhino.gh_compo_io.building_create_team_member import GHCompo_Cr
 # -- Building Segment
 from honeybee_ph_rhino.gh_compo_io.building_segment import GHCompo_BuildingSegment
 from honeybee_ph_rhino.gh_compo_io.building_set_project_data import GHCompo_SetProjectData
+from honeybee_ph_rhino.gh_compo_io.cert import *
 
 # -- Climate
 from honeybee_ph_rhino.gh_compo_io.climate_conver_fact import GHCompo_ConversionFactor
@@ -35,10 +30,14 @@ from honeybee_ph_rhino.gh_compo_io.climate_site_from_phius_file import GHCompo_C
 # -- Foundations
 from honeybee_ph_rhino.gh_compo_io.foundations_add import GHCompo_AddFoundations
 from honeybee_ph_rhino.gh_compo_io.foundations_create import GHCompo_CreateFoundations
+from honeybee_ph_rhino.gh_compo_io.hvac import *
 
 # -- Organize
 from honeybee_ph_rhino.gh_compo_io.organize_spaces import GHCompo_OrganizeSpaces
+from honeybee_ph_rhino.gh_compo_io.program import *
 from honeybee_ph_rhino.gh_compo_io.set_spec_heat_cap import GHCompo_SetRoomSpecHeatCaps
+from honeybee_ph_rhino.gh_compo_io.shading import *
+from honeybee_ph_rhino.gh_compo_io.shw import *
 
 # -- Interior Spaces
 from honeybee_ph_rhino.gh_compo_io.space_add_spc import GHCompo_AddPHSpaces

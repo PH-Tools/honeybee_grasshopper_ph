@@ -5,7 +5,7 @@
 These are called when the component is instantiated within the Grasshopper canvas.
 """
 
-RELEASE_VERSION = "Honeybee-PH v1.9.03"
+RELEASE_VERSION = "Honeybee-PH v1.10.00"
 CATEGORY = "HB-PH"
 SUB_CATEGORIES = {
     0: "00 | Utils",
@@ -340,8 +340,26 @@ COMPONENT_PARAMS = {
         "Category": CATEGORY,
         "SubCategory": 1,
     },
-    "HBPH - Get Phius Multi-Family Load Data": {
-        "NickName": "Get Phius MF Data",
+    "HBPH - Get Phius Multi-Family Non-Residential Room Loads": {
+        "NickName": "Get Phius MF Non-Res Loads",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
+    "HBPH - Get Phius Multi-Family Residential Room Loads": {
+        "NickName": "Get Phius MF Res Room Loads",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
+    "HBPH - Set Phius Multi-Family Residential Room Loads": {
+        "NickName": "Set Phius MF Res Room Loads",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
+    "HBPH - Set Phius Multi-Family Non-Residential Room Loads": {
+        "NickName": "Set Phius MF Res Room Loads",
         "Message": RELEASE_VERSION,
         "Category": CATEGORY,
         "SubCategory": 1,

@@ -5,11 +5,10 @@
 
 from copy import copy  # Use copy so that specific equipments can overwrite base with their own hints
 
-
 try:
     from typing import Type
 except ImportError:
-    pass # IronPython 2.7
+    pass  # IronPython 2.7
 
 from GhPython import Component  # type: ignore
 from Grasshopper.Kernel.Parameters import Hints  # type: ignore
@@ -342,7 +341,7 @@ class GHCompo_CreateElecEquip(object):
                 "Error: Input Equipment type: '{}' is not supported. Please only input: "
                 "{}".format(self.equip_type, self.valid_equipment_types)
             )
-    
+
     def set_object_attributes(self, _equipment_obj):
         # type: (ph_equipment.PhEquipment) -> ph_equipment.PhEquipment
         """Set the object's attributes based on the component inputs"""
@@ -353,7 +352,7 @@ class GHCompo_CreateElecEquip(object):
             input_val = self.input_dict.get(attr_name)
             if input_val:
                 setattr(_equipment_obj, attr_name, input_val)
-        
+
         return _equipment_obj
 
     def run(self):
