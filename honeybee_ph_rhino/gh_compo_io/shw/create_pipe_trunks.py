@@ -113,6 +113,7 @@ class _TrunkPipeBuilder(object):
         hbph_obj = hot_water_piping.PhHvacPipeTrunk()
         hbph_obj.display_name = self.display_name
         hbph_obj.multiplier = self.multiplier
+        hbph_obj.demand_recirculation = self.demand_recirculation
 
         for geom_segment in self.geometry_segments:
             hbph_obj.pipe_element.add_segment(

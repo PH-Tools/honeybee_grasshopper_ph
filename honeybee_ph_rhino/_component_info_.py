@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-# -*- Python Version: 2.7 -*-
+# -https://github.com/PH-Tools/honeybee_grasshopper_ph*- Python Version: 2.7 -*-
 
 """Names and meta-data for all the Honeybee-PH Grasshopper Components.
 These are called when the component is instantiated within the Grasshopper canvas.
 """
 
-RELEASE_VERSION = "Honeybee-PH v1.10.00"
+RELEASE_VERSION = "Honeybee-PH v1.10.01"
 CATEGORY = "HB-PH"
 SUB_CATEGORIES = {
     0: "00 | Utils",
