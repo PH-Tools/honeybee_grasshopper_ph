@@ -49,35 +49,32 @@ def room_is_dwelling(_hb_room):
 # -----------------------------------------------------------------------------
 
 
-def get_non_res_spaces(_hb_rooms):
-    # type: (list[Room]) -> list[phius_mf.PhiusNonResRoom]
-    """Returns a list of Phius Non-Res-Space objects."""
+def get_PhiusNonResRooms(_hb_rooms, _area_unit):
+    # type: (list[Room], str) -> list[phius_mf.PhiusNonResRoom]
+    """Returns a list of PhiusNonResRoom objects."""
 
     non_res_spaces = []
     for hb_room in _hb_rooms:
         room_prop_ph = getattr(hb_room.properties, "ph")  # type: RoomPhProperties
         for space in room_prop_ph.spaces:
-            new_nonres_space = phius_mf.PhiusNonResRoom.from_ph_space(space)
+            new_nonres_space = phius_mf.PhiusNonResRoom.from_ph_space(space, _area_unit)
             non_res_spaces.append(new_nonres_space)
 
     return non_res_spaces
 
 
-def get_mf_calc_program_data(_hb_rooms):
-    # type: (list[Room]) -> list[str]
+def get_mf_calc_program_data(_phius_non_res_rooms):
+    # type: (list[phius_mf.PhiusNonResRoom]) -> list[str]
     """Return the Phius Non-Res-Space program data, formatted to match the Phius Multifamily Calc."""
 
     prog_collection = phius_mf.PhiusNonResProgramCollection()
-    for hb_room in _hb_rooms:
-        room_prop_ph = getattr(hb_room.properties, "ph")  # type: RoomPhProperties
-        for space in room_prop_ph.spaces:
-            new_nonres_space = phius_mf.PhiusNonResRoom.from_ph_space(space)
-            prog_collection.add_program(new_nonres_space.program_type)
+    for phius_non_res_room in _phius_non_res_rooms:
+        prog_collection.add_program(phius_non_res_room.program_type)
 
     return prog_collection.to_phius_mf_workbook()
 
 
-def get_mf_calc_room_data(non_res_spaces):
+def get_mf_calc_room_data_as_string(non_res_spaces):
     # type: (list[phius_mf.PhiusNonResRoom]) -> tuple[list[str], list[str]]
     """Return the Phius Non-Res-Space electrical energy, by room, formatted to match the Phius Multifamily Calc."""
 
@@ -114,15 +111,15 @@ class GHCompo_GetPhiusMFNonResidentialLoadData(object):
         # type: () -> tuple[list[str], list[str], list[str], float, float, list[Room]]
         if not self.hb_rooms:
             return [], [], [], 0, 0, []
-
+        
         # ---------------------------------------------------------------------
         # -- Break out the Non-Res. HB-Rooms, Create Non-Res. Spaces
         hb_nonres_rooms = [rm for rm in self.hb_rooms if not room_is_dwelling(rm)]
-        non_res_spaces = get_non_res_spaces(hb_nonres_rooms)
+        phius_non_res_rooms = get_PhiusNonResRooms(hb_nonres_rooms, self.IGH.get_rhino_areas_unit_name())
 
         # ---------------------------------------------------------------------
-        program_data = get_mf_calc_program_data(hb_nonres_rooms)
-        mf_calculator_check = get_mf_calc_room_data(non_res_spaces)
-        total_energy_consumption = get_total_energy_consumption(non_res_spaces)
+        program_data = get_mf_calc_program_data(phius_non_res_rooms)
+        room_data = get_mf_calc_room_data_as_string(phius_non_res_rooms)
+        total_energy_consumption = get_total_energy_consumption(phius_non_res_rooms)
 
-        return (program_data,) + mf_calculator_check + total_energy_consumption + (hb_nonres_rooms, )
+        return (program_data,) + room_data + total_energy_consumption + (hb_nonres_rooms, )
