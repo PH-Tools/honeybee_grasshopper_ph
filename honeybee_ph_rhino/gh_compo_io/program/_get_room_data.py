@@ -74,17 +74,17 @@ def get_num_occupants(hb_room, _IGH):
         return 0
 
     # -- Calculate the number of occupants
-    hbph_ppl_prop = getattr(hbe_prop.people.properties, "ph")  # type: PeoplePhProperties
+    hbph_ppl_prop = getattr(hbe_prop.people.properties, "ph", None)  # type: PeoplePhProperties | None
     area_m2 = get_area_value_in_unit(_IGH, hb_room.floor_area, "M2")
-    if hbph_ppl_prop.number_people:
-        # -- Try and get the PH-Style info first
-        peak_ppl_per_m2 = hbph_ppl_prop.number_people / area_m2
-        avg_ppl = float(hbph_ppl_prop.number_people)
-    else:
-        # -- If No PH-Style data, try and use the HB-E info
+    if not hbph_ppl_prop:
+        # -- If No PH-Style data, use the HB-Energy Program's info
         peak_ppl_per_m2 = hbe_prop.people.people_per_area
         avg_occ_rate = mean(hbe_prop.people.occupancy_schedule.values())  # type: ignore
         avg_ppl = peak_ppl_per_m2 * area_m2 * avg_occ_rate
+    else:
+        # -- Get the PH-Style info 
+        peak_ppl_per_m2 = hbph_ppl_prop.number_people / area_m2
+        avg_ppl = float(hbph_ppl_prop.number_people)
 
     return avg_ppl
 
