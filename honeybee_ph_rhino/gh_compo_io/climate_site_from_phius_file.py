@@ -249,9 +249,9 @@ class GHCompo_CreateSiteFromPhiusFile(object):
     }
 
     def __init__(self, _IGH, _source_file_path, _site_elevation, _climate_zone, *args, **kwargs):
-        # type: (gh_io.IGH, str, str, str, List, Dict) -> None
+        # type: (gh_io.IGH, str, float | None, str, List, Dict) -> None
         self.IGH = _IGH
-        self.data = self._read_file(_source_file_path)
+        self.data = self._get_input_data(_source_file_path)
         self.monthly_data_collection = MonthlyDataInputCollection()
         self.peak_load_data_collection = PeakLoadInputCollection()
         self.site_elevation = _site_elevation
@@ -273,8 +273,14 @@ class GHCompo_CreateSiteFromPhiusFile(object):
 
         return cz_number
 
+    def _get_input_data(self, _source_file_path):
+        # type: (str | None) -> list[str]
+        """Read in the Phius Data file and return a cleaned list of the contents."""
+        raw_data = self._read_file(_source_file_path)
+        return self._clean_input_data(raw_data)
+
     def _read_file(self, _source_file_path):
-        # type: (Optional[str]) -> List[str]
+        # type: (str | None) -> list[str]
         """Read in the Phius Data file (TXT only) and return a list of the contents."""
 
         if not _source_file_path:
@@ -289,6 +295,12 @@ class GHCompo_CreateSiteFromPhiusFile(object):
             return []
 
         return self.IGH.ghpythonlib_components.ReadFile(_source_file_path)
+
+    def _clean_input_data(self, _data):
+        # type: (list[str]) -> list[str]
+        """Remove any blank lines from the input data."""
+    
+        return [line for line in _data if line.strip()]
 
     def _create_input_data_collection(self):
         # type: () -> None
@@ -308,18 +320,18 @@ class GHCompo_CreateSiteFromPhiusFile(object):
         }
         """
 
-        for line in self.data[2:10]:
+        for line in self.data[1:9]:
             # -- Log the monthly data
             line = line.split("\t")
             self.monthly_data_collection[line[0]] = line[1:13]
 
-        for line in self.data[2:8]:
+        for line in self.data[1:7]:
             line = line.split("\t")
             # -- Log the peak load data
-            self.peak_load_data_collection.peak_heat_load_1[line[0]] = float(line[13])
-            self.peak_load_data_collection.peak_heat_load_2[line[0]] = float(line[14])
-            self.peak_load_data_collection.peak_cooling_load_1[line[0]] = float(line[15])
-            self.peak_load_data_collection.peak_cooling_load_2[line[0]] = float(line[15])
+            self.peak_load_data_collection.peak_heat_load_1[line[0]] = float(line[12])
+            self.peak_load_data_collection.peak_heat_load_2[line[0]] = float(line[13])
+            self.peak_load_data_collection.peak_cooling_load_1[line[0]] = float(line[14])
+            self.peak_load_data_collection.peak_cooling_load_2[line[0]] = float(line[14])
 
         # -- Log the header / location data
         self.monthly_data_collection["LOCATION_DATA"] = self.data[1].split("\t")
