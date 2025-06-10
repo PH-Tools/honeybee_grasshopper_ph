@@ -319,19 +319,26 @@ class GHCompo_CreateSiteFromPhiusFile(object):
             "Sky Temperature": [10, 14, 17, ... 4],
         }
         """
-
         for line in self.data[1:9]:
             # -- Log the monthly data
             line = line.split("\t")
-            self.monthly_data_collection[line[0]] = line[1:13]
+
+            # -- Get the field name
+            field_name = line[0] # North, South, East, West, Global, Dewpoint, Sky Temperature
+
+            self.monthly_data_collection[field_name] = line[1:13]
 
         for line in self.data[1:7]:
             line = line.split("\t")
+
+            # -- Get the field name
+            field_name = line[0] # North, South, East, West, Global, Dewpoint, Sky Temperature
+            
             # -- Log the peak load data
-            self.peak_load_data_collection.peak_heat_load_1[line[0]] = float(line[12])
-            self.peak_load_data_collection.peak_heat_load_2[line[0]] = float(line[13])
-            self.peak_load_data_collection.peak_cooling_load_1[line[0]] = float(line[14])
-            self.peak_load_data_collection.peak_cooling_load_2[line[0]] = float(line[14])
+            self.peak_load_data_collection.peak_heat_load_1[field_name] = float(line[13])
+            self.peak_load_data_collection.peak_heat_load_2[field_name] = float(line[14])
+            self.peak_load_data_collection.peak_cooling_load_1[field_name] = float(line[15])
+            self.peak_load_data_collection.peak_cooling_load_2[field_name] = float(line[15])
 
         # -- Log the header / location data
         self.monthly_data_collection["LOCATION_DATA"] = self.data[1].split("\t")
