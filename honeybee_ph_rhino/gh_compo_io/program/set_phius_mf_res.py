@@ -77,6 +77,7 @@ def build_lighting_ext(total_lighting_ext, number_of_rooms):
     lighting_obj.energy_demand = total_lighting_ext / number_of_rooms
     lighting_obj.comment = "LIGHTS_Ext_Dwelling"
     lighting_obj.quantity = 1
+    lighting_obj.in_conditioned_space = False
     return lighting_obj
 
 
@@ -89,6 +90,7 @@ def build_lighting_garage(total_lighting_garage, number_of_rooms):
     lighting_obj.energy_demand = total_lighting_garage / number_of_rooms
     lighting_obj.comment = "LIGHTS_Garage"
     lighting_obj.quantity = 1
+    lighting_obj.in_conditioned_space = False
     return lighting_obj
 
 
