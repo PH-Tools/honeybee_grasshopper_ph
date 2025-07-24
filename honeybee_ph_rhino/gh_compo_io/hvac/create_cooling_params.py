@@ -72,7 +72,7 @@ inputs_ventilation.update(
         ),
         5: ComponentInput(
             _name="min_coil_temp",
-            _description="(float) Deg. C",
+            _description="(float) Deg. C - Default=10.0 Deg. C",
             _type_hint=Component.NewStrHint(),
             _target_unit="C",
         ),
@@ -191,7 +191,7 @@ def get_component_inputs(_param_type):
 
 class FacadePhCoolingVentilation(object):
     display_name = ghio_validators.HBName("display_name", default="_unnamed_ventilation_cooling_")
-    min_coil_temp = ghio_validators.UnitDegreeC("min_coil_temp", default=12)
+    min_coil_temp = ghio_validators.UnitDegreeC("min_coil_temp", default=10)
     capacity = ghio_validators.UnitKW("capacity", default=10)
 
     def __init__(self, _IGH, _input_dict):
@@ -217,7 +217,7 @@ class FacadePhCoolingVentilation(object):
 
 class FacadePhCoolingRecirculation(object):
     display_name = ghio_validators.HBName("display_name", default="_unnamed_recirculation_cooling_")
-    min_coil_temp = ghio_validators.UnitDegreeC("min_coil_temp", default=12)
+    min_coil_temp = ghio_validators.UnitDegreeC("min_coil_temp", default=10)
     flow_rate_m3_s = ghio_validators.UnitM3_S("flow_rate_m3_s", default=0.0278)
     capacity = ghio_validators.UnitKW("capacity", default=10)
 
