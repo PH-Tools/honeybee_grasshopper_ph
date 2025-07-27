@@ -103,23 +103,31 @@ class MonthlyDataInputCollection(object):
 
     @property
     def location_data(self):
-        # type: () -> List[float]
+        # type: () -> List[str | float]
         return self["LOCATION_DATA"]
 
     @property
     def display_name(self):
         # type: () -> str
-        return self.location_data[0]
+        return str(self.location_data[0])
 
     @property
     def station_elevation(self):
         # type: () -> float
-        return self.location_data[6]
+        for i, data_item in enumerate(self.location_data):
+            if "Height" in str(data_item):
+                return float(str(self.location_data[i + 1]).strip())
+        raise ValueError(
+            "'Height' not found in location data? Please check the input file format."
+        )
 
     @property
     def daily_temp_swing(self):
         # type: () -> float
-        return self.location_data[10] or 8
+        for i, data_item in enumerate(self.location_data):
+            if "Daily temperature variation" in str(data_item):
+                return float(str(self.location_data[i + 1]).strip())
+        return 8.0
 
     @property
     def average_wind_speed(self):
@@ -129,12 +137,23 @@ class MonthlyDataInputCollection(object):
     @property
     def latitude(self):
         # type: () -> float
-        return self.location_data[2]
+        for i, data_item in enumerate(self.location_data):
+            if "Latitude" in str(data_item):
+                return float(str(self.location_data[i + 1]).strip())
+        raise ValueError(
+            "'Latitude' not found in location data? Please check the input file format."
+        )
 
     @property
     def longitude(self):
         # type: () -> float
-        return self.location_data[4]
+        for i, data_item in enumerate(self.location_data):
+            if "Longitude" in str(data_item):
+                return float(str(self.location_data[i + 1]).strip())
+        raise ValueError(
+            "'Longitude' not found in location data? Please check the input file format."
+        )
+
 
     def __str__(self):
         return "\n".join(
@@ -341,7 +360,7 @@ class GHCompo_CreateSiteFromPhiusFile(object):
             self.peak_load_data_collection.peak_cooling_load_2[field_name] = float(line[15])
 
         # -- Log the header / location data
-        self.monthly_data_collection["LOCATION_DATA"] = self.data[1].split("\t")
+        self.monthly_data_collection["LOCATION_DATA"] = self.data[0].split("\t")
 
     def _create_location(self):
         # type: () -> site.Location
