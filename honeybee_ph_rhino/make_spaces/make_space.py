@@ -168,7 +168,7 @@ def add_spaces_to_honeybee_rooms(_spaces, _hb_rooms, _inherit_names=False):
                 if not dup_room.geometry.is_point_inside(pt):
                     continue
 
-                print("Hosting Space: {}  in HB-Room: {}".format(space_data.space.name, dup_room.display_name))
+                print("Hosting Space: {}  in HB-Room: {}".format(space_data.space.full_name, dup_room.display_name))
 
                 sp = space_data.space.duplicate()
                 sp.host = dup_room

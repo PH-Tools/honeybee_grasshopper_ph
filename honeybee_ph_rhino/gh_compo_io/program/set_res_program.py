@@ -162,7 +162,9 @@ def set_people(_people, gross_floor_area_m2, num_people, _presence_schedule, _ac
 
     new_ppl = _people.duplicate()  # type: People #type: ignore
     new_ppl.identifier = clean_and_id_ep_string("HBPH_SFH_People")
+    new_ppl.display_name = "HBPH_SFH_People"
     new_ppl.people_per_area = people_per_m2
+    print("Setting People Per Area: {:.4f}".format(people_per_m2))
     new_ppl.occupancy_schedule = _presence_schedule
     new_ppl.activity_schedule = _activity_schedule
     return new_ppl
@@ -193,13 +195,15 @@ def set_interior_lighting(_lighting, _net_floor_area_ft2, _gross_floor_area_m2, 
     b = INT_LIGHTING_W_PER_DWELLING + (INT_LIGHTING_W_FT2 * _net_floor_area_ft2)
     annual_kWh = a * b * PHIUS_RESNET_FRACTION
     annual_Wh = annual_kWh * 1000
-    peak_watts = annual_Wh * mean(_schedule.values())
+    peak_watts = annual_Wh / mean(_schedule.values()) / 8760
     peak_watts_per_m2 = peak_watts / _gross_floor_area_m2
 
     # -- Build the normal HBE-Lighting object
     hbe_lighting = _lighting.duplicate()  # type: Lighting # type: ignore
     hbe_lighting.identifier = clean_and_id_ep_string("HBPH_SFH_Lighting")
+    hbe_lighting.display_name = "HBPH_SFH_Lighting"
     hbe_lighting.watts_per_area = peak_watts_per_m2
+    print("Setting Lighting Watts Per Area: {:.4f}".format(peak_watts_per_m2))
     hbe_lighting.schedule = _schedule
     hbe_lighting.return_air_fraction = 0.0
     hbe_lighting.radiant_fraction = 0.32
@@ -209,6 +213,7 @@ def set_interior_lighting(_lighting, _net_floor_area_ft2, _gross_floor_area_m2, 
     ph_equip = ph_equipment.PhPhiusLightingInterior.phius_default()
     prop_ph = getattr(hbe_lighting.properties, "ph")  # type: LightingPhProperties
     prop_ph.ph_equipment = ph_equip
+    
     return hbe_lighting
 
 
@@ -218,7 +223,9 @@ def set_zero_MEL(_elec_equip):
 
     hbe_ee = _elec_equip.duplicate()  # type: ElectricEquipment # type: ignore
     hbe_ee.identifier = clean_and_id_ep_string("HBPH_SFH_Equipment")
+    hbe_ee.display_name = "HBPH_SFH_ElectricEquipment"
     hbe_ee.watts_per_area = 0.0
+    print("Setting Electric Equipment Watts Per Area: 0.0")
     hbe_ee.schedule = schedule_by_identifier("Always On")
     return hbe_ee
 
@@ -226,9 +233,12 @@ def set_zero_MEL(_elec_equip):
 def set_infiltration(_infiltration, flow_per_ext_m2=0.0003):
     # type: (Infiltration, float) -> Infiltration
     """Reset the HBE-Infiltration Attributes."""
+
     hbe_infiltration = _infiltration.duplicate()  # type: Infiltration # type: ignore
     hbe_infiltration.identifier = clean_and_id_ep_string("HBPH_PH_Infiltration")
+    hbe_infiltration.display_name = "HBPH_SFH_Infiltration"
     hbe_infiltration.flow_per_exterior_area = flow_per_ext_m2
+    print("Setting Infiltration Flow Per Exterior Area: {:.6f}".format(flow_per_ext_m2))
     hbe_infiltration.schedule = schedule_by_identifier("Always On")
     return hbe_infiltration
 
@@ -252,8 +262,11 @@ def set_setpoint(_setpoint, _heating_schedule, _cooling_schedule, _dehumidifying
     new_setpoint = _setpoint.duplicate()  # type: Setpoint # type: ignore
     new_setpoint.identifier = clean_and_id_ep_string("HBPH_SFH_Setpoint")
     new_setpoint.heating_schedule = _heating_schedule
+    print("Setting Heating Setpoint Schedule: {} C".format(mean(_heating_schedule.values())))
     new_setpoint.cooling_schedule = _cooling_schedule
+    print("Setting Cooling Setpoint Schedule: {} C".format(mean(_cooling_schedule.values())))
     new_setpoint.dehumidifying_setpoint = _dehumidifying_setpoint
+    print("Setting Dehumidifying Setpoint: {} %RH".format(_dehumidifying_setpoint))
     return new_setpoint
 
 
@@ -303,10 +316,11 @@ def set_shw(_shw, _num_bedrooms, _gross_floor_area_m2, _schedule):
     return hbe_shw
 
 
-def create_phius_default_equipment_set(_schedules, _num_occupants, _num_bedrooms, _total_floor_area_ft2):
-    # type: (SchedulesCollection, float, float, float) -> list[Process]
+def create_phius_default_equipment_set(_schedules, _num_occupants, _num_bedrooms, _total_floor_area_ft2, _num_hb_rooms=1):
+    # type: (SchedulesCollection, float, float, float, int) -> list[Process]
     """Create the default Phius Process Loads Set for a single-family home."""
     default_ph_equipment = [
+        ph_equipment.PhFridgeFreezer.phius_default(),
         ph_equipment.PhDishwasher.phius_default(),
         ph_equipment.PhClothesWasher.phius_default(),
         ph_equipment.PhClothesDryer.phius_default(),
@@ -326,10 +340,10 @@ def create_phius_default_equipment_set(_schedules, _num_occupants, _num_bedrooms
             _num_units=1,
             _floor_area_ft2=_total_floor_area_ft2,
             _num_bedrooms=_num_bedrooms,
-        )
+        ) / _num_hb_rooms
 
         new_process = Process(
-            identifier=clean_and_id_ep_string("HBPH_Process"),
+            identifier=clean_and_id_ep_string("HBPH_Process_{}".format(ph_equip.__class__.__name__)),
             watts=watts,
             schedule=schd,
             fuel_type="Electricity",
@@ -402,6 +416,9 @@ class GHCompo_CreatePHProgramSingleFamilyHome(object):
         Rather than create a new program, re-set the program values one at a time to ensure that we
         preserve any extension attributes (ph, revive, etc.)
         """
+        print("- "*25)
+        print("Setting Loads and Schedules for HB-Room: {}".format(_hb_room.display_name))
+        
         hb_prop_e = getattr(_hb_room.properties, "energy")  # type: RoomEnergyProperties
         hb_prop_e.people = set_people(
             hb_prop_e.people,
@@ -430,6 +447,7 @@ class GHCompo_CreatePHProgramSingleFamilyHome(object):
             _gross_floor_area_m2,
             self.schedules.hot_water,
         )
+        
         return None
 
     def run(self):
@@ -448,12 +466,19 @@ class GHCompo_CreatePHProgramSingleFamilyHome(object):
             net_floor_area_ft2 = self.get_net_floor_area(dup_rooms)
             num_bedrooms, num_occupants = get_occupancy_values(self.IGH, dup_rooms)
 
+            print("Room Group {}:".format(i))
+            print("  Gross Floor Area [m2]: {:.4f}".format(gross_floor_area_m2))
+            print("  Net Floor Area [ft2]: {:.4f}".format(net_floor_area_ft2))
+            print("  Number of Bedrooms: {}".format(num_bedrooms))
+            print("  Number of Occupants: {}".format(num_occupants))
+
             # -- Create the Phius default Process Loads (Appliances)
             default_process_loads = create_phius_default_equipment_set(
                 self.schedules,
                 num_occupants,
                 num_bedrooms,
                 net_floor_area_ft2,
+                len(dup_rooms)
             )
 
             for rm in dup_rooms:
@@ -468,6 +493,14 @@ class GHCompo_CreatePHProgramSingleFamilyHome(object):
 
                 # -- Add the default Process Loads to the HB-Rooms
                 rm_prop_e = getattr(rm.properties, "energy")  # type: RoomEnergyProperties
+                if len(rm_prop_e.process_loads) != 0:
+                    msg = (
+                        "HB-Room: {} already has {} Process Loads defined. "
+                        "New Single-Family default process loads will be ADDED to these existing ones. "
+                        "In most cases, you should remove these existing process loads before adding the new ones.".format(rm.display_name, len(rm_prop_e.process_loads))
+                    )
+                    print(msg)
+                    self.IGH.warning(msg)
                 for equip in default_process_loads:
                     rm_prop_e.add_process_load(equip)
 
