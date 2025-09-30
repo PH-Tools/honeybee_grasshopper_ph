@@ -22,19 +22,21 @@ class WufiWriteSettings(object):
         _group_components=True,
         _merge_faces=False,
         _merge_spaces_by_erv=False,
+        _merge_exhaust_vent_devices=False,
         _generate_log_files=0,
         *args,
         **kwargs
     ):
-        # type: (bool, Union[bool, float], bool, int, *Any, **Any) -> None
+        # type: (bool, Union[bool, float],bool, bool, int, *Any, **Any) -> None
         self.group_components = _group_components
         self.merge_faces = _merge_faces
         self.merge_spaces_by_erv = _merge_spaces_by_erv
+        self.merge_exhaust_vent_devices = _merge_exhaust_vent_devices   
         self.generate_log_files = _generate_log_files
 
     def __str__(self):
-        return "WufiWriteSettings(group_components={}, merge_faces={}, merge_spaces_by_erv={}, generate_log_files={})".format(
-            self.group_components, self.merge_faces, self.merge_spaces_by_erv, self.generate_log_files
+        return "WufiWriteSettings(group_components={}, merge_faces={}, merge_spaces_by_erv={}, merge_exhaust_vent_devices={}, generate_log_files={})".format(
+            self.group_components, self.merge_faces, self.merge_spaces_by_erv, self.merge_exhaust_vent_devices, self.generate_log_files
         )
 
     def __repr__(self):
@@ -48,9 +50,9 @@ class GHCompo_WriteWufiXmlSettings(object):
     """GHCompo Interface: HBPH - Write WUFI XML Settings."""
 
     def __init__(
-        self, _IGH, _group_components, _merge_faces, _merge_spaces_by_erv, _generate_log_files, *args, **kwargs
+        self, _IGH, _group_components, _merge_faces, _merge_spaces_by_erv, _merge_exhaust_vent_devices, _generate_log_files, *args, **kwargs
     ):
-        # type: (gh_io.IGH, bool, Union[bool, float], bool, int, *Any, **Any) -> None
+        # type: (gh_io.IGH, bool, Union[bool, float], bool, bool, int, *Any, **Any) -> None
         self.IGH = _IGH
         self.generate_log_files = _generate_log_files or 0
 
@@ -74,11 +76,18 @@ class GHCompo_WriteWufiXmlSettings(object):
         else:
             self.merge_spaces_by_erv = True
 
+        # -- Merge exhaust vent devices?
+        if _merge_exhaust_vent_devices is None or _merge_exhaust_vent_devices == False:
+            self.merge_exhaust_vent_devices = False  # default == False
+        else:
+            self.merge_exhaust_vent_devices = True
+
     def run(self):
         # type: () -> WufiWriteSettings
         return WufiWriteSettings(
             self.group_components,
             self.merge_faces,
             self.merge_spaces_by_erv,
+            self.merge_exhaust_vent_devices,
             self.generate_log_files,
         )

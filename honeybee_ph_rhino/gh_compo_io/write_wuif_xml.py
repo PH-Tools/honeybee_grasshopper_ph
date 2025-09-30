@@ -57,6 +57,7 @@ class GHCompo_WriteWufiXml(object):
                 self.settings.group_components,
                 self.settings.merge_faces,
                 self.settings.merge_spaces_by_erv,
+                self.settings.merge_exhaust_vent_devices,
                 self.settings.generate_log_files,
             )
             self.give_user_warnings(stdout)

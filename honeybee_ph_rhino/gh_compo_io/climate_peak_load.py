@@ -4,11 +4,6 @@
 """GHCompo Interface: HBPH - PH Climate Peak Load."""
 
 try:
-    from typing import Optional
-except ImportError:
-    pass  # IronPython 2.7
-
-try:
     from honeybee_ph import site
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph:\n\t{}".format(e))
@@ -46,7 +41,7 @@ class GHCompo_CreatePeakLoad(object):
         _ground_temp,
         _sky_temp,
     ):
-        # type: (gh_io.IGH, str, float, float, float, float, float, float, Optional[float], Optional[float], Optional[float]) -> None
+        # type: (gh_io.IGH, str, float, float, float, float, float, float, float | None, float | None, float | None) -> None
         self.IGH = _IGH
         self.display_name = _display_name
         self.temp = _temp
@@ -55,7 +50,7 @@ class GHCompo_CreatePeakLoad(object):
         self.rad_south = _rad_south
         self.rad_west = _rad_west
         self.rad_global = _rad_global
-        self.dewpoint = _dewpoint_temp
+        self.dewpoint_temp = _dewpoint_temp
         self.ground_temp = _ground_temp
         self.sky_temp = _sky_temp
 
@@ -68,7 +63,7 @@ class GHCompo_CreatePeakLoad(object):
             self.rad_south,
             self.rad_west,
             self.rad_global,
-            self.dewpoint,
+            self.dewpoint_temp,
             self.ground_temp,
             self.sky_temp,
         )

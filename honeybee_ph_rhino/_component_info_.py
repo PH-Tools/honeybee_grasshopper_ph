@@ -5,7 +5,7 @@
 These are called when the component is instantiated within the Grasshopper canvas.
 """
 
-RELEASE_VERSION = "Honeybee-PH v1.10.13"
+RELEASE_VERSION = "Honeybee-PH v1.11.01"
 CATEGORY = "HB-PH"
 SUB_CATEGORIES = {
     0: "00 | Utils",
@@ -128,12 +128,6 @@ COMPONENT_PARAMS = {
     },
     "HBPH - Get FloorSegment Data": {
         "NickName": "Get Seg. Data",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 1,
-    },
-    "HBPH - Create Spaces": {
-        "NickName": "Create PH Spaces",
         "Message": RELEASE_VERSION,
         "Category": CATEGORY,
         "SubCategory": 1,
@@ -373,12 +367,6 @@ COMPONENT_PARAMS = {
     },
     "HBPH - Create PH Window Frame": {
         "NickName": "Create Frame",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 1,
-    },
-    "HBPH - Create PH Glazing": {
-        "NickName": "Create Glazing",
         "Message": RELEASE_VERSION,
         "Category": CATEGORY,
         "SubCategory": 1,

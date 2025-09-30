@@ -42,6 +42,10 @@ EM June 5, 2024
             Best practice is to leave it 'False' and to report out all the detailed
             rooms one at a time.
 
+        _merge_exhaust_vent_devices: (bool) Default=False. Set 'True' to have the WUFI-XML
+            report out the exhaust-ventilation (fans, kitchen hoods) 'merged' by type in order
+            to simplify and shorten the WUFI-model. 
+
         _generate_log_files: (int) Default=0. Input a log-level here if 
             you would like PHX to generate log-files which record the operations 
             and progress of the HBJSON->XML process. Input either:
@@ -91,11 +95,12 @@ IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 
 # ------------------------------------------------------------------------------
 gh_compo_interface = gh_compo_io.GHCompo_WriteWufiXmlSettings(
-        IGH,
-        _group_components,
-        _merge_faces,
-        _merge_spaces_by_erv,
-        _generate_log_files,
+    _IGH=IGH,
+    _group_components=_group_components,
+    _merge_faces=_merge_faces,
+    _merge_spaces_by_erv=_merge_spaces_by_erv,
+    _merge_exhaust_vent_devices=_merge_exhaust_vent_devices,
+    _generate_log_files=_generate_log_files,
 )
 settings_ = gh_compo_interface.run()
 
