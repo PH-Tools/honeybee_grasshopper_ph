@@ -114,10 +114,10 @@ class GHCompo_BuildingSegment(object):
         self._co2e_factors = factors.FactorCollection("CO2", self._default_phius_CO2_factors)
 
         for factor in (
-            factors.build_factors_from_library(phius_source_energy_factors.factors_2021) + _source_energy_factors
+            factors.build_factors_from_library(phius_source_energy_factors.factors_2024) + _source_energy_factors
         ):
             self.source_energy_factors.add_factor(factor)
-        for factor in factors.build_factors_from_library(phius_CO2_factors.factors_2021) + _co2_factors:
+        for factor in factors.build_factors_from_library(phius_CO2_factors.factors_2024) + _co2_factors:
             self.co2e_factors.add_factor(factor)
 
         self.co2e_factors.validate_fuel_types(self._allowed_fuels)
