@@ -4,11 +4,6 @@
 """GHCompo Interface: HBPH - Create PH Glazing."""
 
 try:
-    from typing import List, Optional
-except ImportError:
-    pass  # IronPython 2.7
-
-try:
     from honeybee.aperture import Aperture
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
@@ -16,12 +11,12 @@ except ImportError as e:
 try:
     from honeybee_ph.properties.aperture import AperturePhProperties
 except ImportError as e:
-    raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
+    raise ImportError("\nFailed to import honeybee_ph:\n\t{}".format(e))
 
 try:
-    from honeybee_ph_rhino import gh_io
+    from ph_gh_component_io import gh_io
 except ImportError as e:
-    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
+    raise ImportError("\nFailed to import ph_gh_component_io:\n\t{}".format(e))
 
 try:
     from ph_units.converter import convert
@@ -34,7 +29,7 @@ class GHCompo_SetApertureInstallDepth(object):
     """Interface to collect and clean user-inputs."""
 
     def __init__(self, _IGH, _apertures, _install_depth):
-        # type: (gh_io.IGH, List[Aperture], Optional[str]) -> None
+        # type: (gh_io.IGH, list[Aperture], str | None) -> None
         self.IGH = _IGH
         self._apertures = _apertures
         self._install_depth = self.calc_install_depth(_install_depth or "4 in.")
@@ -60,10 +55,15 @@ class GHCompo_SetApertureInstallDepth(object):
             return install_depth
 
     def run(self):
-        # type: () -> List[Aperture]
+        # type: () -> list[Aperture]
         apertures_ = []
         for aperture in self._apertures:
             dup_ap = aperture.duplicate()
-            dup_ap.properties.ph.install_depth = self._install_depth  # type: ignore
+            dup_ap_prop_ph = getattr(dup_ap.properties, "ph", None)  # type: AperturePhProperties | None
+            if not dup_ap_prop_ph:
+                raise ValueError(
+                    "Aperture {} does not have PH properties. Cannot set install depth.".format(dup_ap.display_name)
+                )
+            dup_ap_prop_ph.install_depth = self._install_depth
             apertures_.append(dup_ap)
         return apertures_

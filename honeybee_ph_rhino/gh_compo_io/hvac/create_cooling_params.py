@@ -352,7 +352,7 @@ class GHCompo_CreateCoolingSystem(object):
         # -- Figure out which Cooling Param type is being built
         try:
             cooling_param_class = self.cooling_param_classes[self.param_type]
-        except KeyError as e:
+        except KeyError:
             raise Exception(
                 "Error: Input '_cooling_type' value of: '{}' is not supported by this GH-Component. "
                 "Please only input one of the types: {}".format(self.param_type, self.valid_cooling_param_types)

@@ -45,7 +45,7 @@ def stories_error(_hb_rooms):
             return True
         else:
             return False
-    except AttributeError as e:
+    except AttributeError:
         return True
 
 

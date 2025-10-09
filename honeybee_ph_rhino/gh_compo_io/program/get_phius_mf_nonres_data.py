@@ -111,7 +111,7 @@ class GHCompo_GetPhiusMFNonResidentialLoadData(object):
         # type: () -> tuple[list[str], list[str], list[str], float, float, list[Room]]
         if not self.hb_rooms:
             return [], [], [], 0, 0, []
-        
+
         # ---------------------------------------------------------------------
         # -- Break out the Non-Res. HB-Rooms, Create Non-Res. Spaces
         hb_nonres_rooms = [rm for rm in self.hb_rooms if not room_is_dwelling(rm)]
@@ -122,4 +122,4 @@ class GHCompo_GetPhiusMFNonResidentialLoadData(object):
         room_data = get_mf_calc_room_data_as_string(phius_non_res_rooms)
         total_energy_consumption = get_total_energy_consumption(phius_non_res_rooms)
 
-        return (program_data,) + room_data + total_energy_consumption + (hb_nonres_rooms, )
+        return (program_data,) + room_data + total_energy_consumption + (hb_nonres_rooms,)

@@ -64,7 +64,7 @@ class SpacePhVentFlowRates(object):
             return "{}(v_sup={:.4f} m3/s, v_eta={:.4f} m3/s, v_tran={:.4f} m3/s)".format(
                 self.__class__.__name__, self.v_sup, self.v_eta, self.v_tran
             )
-        except Exception as e:
+        except Exception:
             return "{}(v_sup={} m3/s, v_eta={} m3/s, v_tran={} m3/s)".format(
                 self.__class__.__name__, self.v_sup, self.v_eta, self.v_tran
             )

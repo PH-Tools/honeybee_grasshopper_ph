@@ -260,7 +260,7 @@ class GHCompo_CreateSpaceConditioningSystem(object):
         # --- Figure out which type of system should be built
         try:
             heating_system_class = self.system_classes[self.system_type]
-        except KeyError as e:
+        except KeyError:
             raise Exception(
                 "Error: Input Heating type: '{}' not supported by this GH-Component. Please only input: "
                 "{}".format(self.system_type, self.valid_system_types)

@@ -83,7 +83,7 @@ class GHCompo_CreateSupportiveDevice(object):
         try:
             print(type(self.device_type), self.device_type)
             device_class = self.device_classes[self.device_type]
-        except KeyError as e:
+        except KeyError:
             raise Exception(
                 "Error: Input Device type: '{}' not supported by this GH-Component. "
                 "Please only input:{}".format(self.device_type, self.valid_device_types)

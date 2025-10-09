@@ -4,11 +4,6 @@
 """GHCompo Interface: HBPH - Create PH Glazing."""
 
 try:
-    from typing import Any, List, Optional, Union
-except ImportError:
-    pass  # IronPython 2.7
-
-try:
     from honeybee.aperture import Aperture
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
@@ -19,9 +14,9 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
 
 try:
-    from honeybee_ph_rhino import gh_io
+    from ph_gh_component_io import gh_io
 except ImportError as e:
-    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
+    raise ImportError("\nFailed to import ph_gh_component_io:\n\t{}".format(e))
 
 try:
     from ph_units.converter import convert
@@ -34,13 +29,13 @@ class GHCompo_SetApertureRevealDistance(object):
     """Interface to collect and clean user-inputs."""
 
     def __init__(self, _IGH, _reveal_distance, _apertures, *args, **kwargs):
-        # type: (gh_io.IGH, Optional[str], List[Aperture], *Any, **Any) -> None
+        # type: (gh_io.IGH, str | None, list[Aperture], list, dict) -> None
         self.IGH = _IGH
         self._reveal_distance = self.calc_reveal_distance(_reveal_distance)
         self._apertures = _apertures
 
     def calc_reveal_distance(self, _install_depth):
-        # type: (Optional[str]) -> Optional[Union[int, float]]
+        # type: (str | None) -> float | None
         """Calculate the reveal distance of the window glazing, considering Rhino unit-types."""
         if not _install_depth:
             return None
@@ -62,7 +57,7 @@ class GHCompo_SetApertureRevealDistance(object):
             return install_depth
 
     def run(self):
-        # type: () -> List[Aperture]
+        # type: () -> list[Aperture]
         apertures_ = []
         for aperture in self._apertures:
             dup_ap = aperture.duplicate()

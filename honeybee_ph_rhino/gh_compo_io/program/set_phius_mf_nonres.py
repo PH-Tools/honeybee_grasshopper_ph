@@ -18,8 +18,8 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
 try:
-    from honeybee_energy.properties.room import RoomEnergyProperties
     from honeybee_energy.load.process import Process
+    from honeybee_energy.properties.room import RoomEnergyProperties
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
@@ -35,8 +35,13 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
 try:
+    from honeybee_ph_rhino.gh_compo_io.program._get_room_data import (
+        get_num_bedrooms,
+        get_num_dwellings,
+        get_num_occupants,
+        get_room_floor_area_ft2,
+    )
     from honeybee_ph_rhino.gh_compo_io.program._schedules import SchedulesCollection
-    from honeybee_ph_rhino.gh_compo_io.program._get_room_data import get_num_dwellings, get_room_floor_area_ft2, get_num_occupants, get_num_bedrooms
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
@@ -74,16 +79,7 @@ def build_lighting_int(total_lighting_int, number_of_rooms):
 
 class GHCompo_SetPhiusMFNonResidentialRoomLoads(object):
 
-    def __init__(
-        self,
-        _IGH,
-        _equipment,
-        _total_mel,
-        _total_lighting,
-        _hb_rooms,
-        *args,
-        **kwargs
-    ):
+    def __init__(self, _IGH, _equipment, _total_mel, _total_lighting, _hb_rooms, *args, **kwargs):
         # type: (gh_io.IGH, list[ph_equipment.PhEquipment],float, float, list[Room], *Any, **Any) -> None
         self.IGH = _IGH
         self.hb_rooms = _hb_rooms or []
@@ -106,7 +102,7 @@ class GHCompo_SetPhiusMFNonResidentialRoomLoads(object):
         if not self.hb_rooms:
             return False
         return True
-    
+
     def collect_hb_room_props(self):
         # type: () -> None
         """Collect the room properties for the Phius-MF-PhEquipment."""
@@ -155,7 +151,7 @@ class GHCompo_SetPhiusMFNonResidentialRoomLoads(object):
     def add_process_loads_to_rooms(self, _hb_rooms, _process_loads):
         # type: (list[Room], list[Process]) -> list[Room]
         """Add each of the Process Loads to each of the Rooms."""
-        
+
         hb_rooms_ = []  # type: list[Room]
         for r in _hb_rooms:
             new_room = r.duplicate()  # type: Room
@@ -169,7 +165,7 @@ class GHCompo_SetPhiusMFNonResidentialRoomLoads(object):
     def setup_ph_equipment(self):
         # type: () -> None
         """Setup the Phius-MF-PhEquipment for the room loads."""
-        
+
         # -- Build the Phius-MF-PhEquipment
         self.ph_equipment.append(build_mel(self.total_mel, self.total_num_hb_rooms))
         self.ph_equipment.append(build_lighting_int(self.total_lighting_int, self.total_num_hb_rooms))
@@ -179,7 +175,7 @@ class GHCompo_SetPhiusMFNonResidentialRoomLoads(object):
 
         if not self.ready:
             return self.hb_rooms
-        
+
         self.collect_hb_room_props()
         self.setup_ph_equipment()
         new_process_loads = self.create_ph_process_load(self.ph_equipment)

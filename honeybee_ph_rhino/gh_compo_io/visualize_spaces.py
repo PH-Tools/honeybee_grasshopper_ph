@@ -7,7 +7,7 @@ from uuid import uuid4
 
 try:
     from typing import Any, List, Optional, Tuple
-except ImportError as e:
+except ImportError:
     pass  # IronPython 2.7
 
 try:
@@ -15,7 +15,7 @@ try:
     from Grasshopper.Kernel.Data import GH_Path  # type: ignore
     from Rhino.Geometry import Brep  # type: ignore
     from System import Object  # type: ignore
-except ImportError as e:
+except ImportError:
     pass  # Outside Rhino
 
 try:

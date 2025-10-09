@@ -82,7 +82,7 @@ def get_num_occupants(hb_room, _IGH):
         avg_occ_rate = mean(hbe_prop.people.occupancy_schedule.values())  # type: ignore
         avg_ppl = peak_ppl_per_m2 * area_m2 * avg_occ_rate
     else:
-        # -- Get the PH-Style info 
+        # -- Get the PH-Style info
         peak_ppl_per_m2 = hbph_ppl_prop.number_people / area_m2
         avg_ppl = float(hbph_ppl_prop.number_people)
 

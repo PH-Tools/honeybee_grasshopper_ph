@@ -20,14 +20,14 @@
 # @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 #
 """
-Calculate the Phius Multifamily Elec. Equipment Residential values (MEL and Lighting). The results of this 
+Calculate the Phius Multifamily Elec. Equipment Residential values (MEL and Lighting). The results of this
 component should match the Phius Multifamily Calculator.
 Note also that for this to work properly, each dwelling unit (apt) should be its own Honeybee-Room.
 -
 The resulting elec_equipment_ objects can be added to the Honeybee-Rooms by using a "Add PH Equipment"
 component and passing them to the 'equipment_' inputs. Note that this component will only calcuate the values
 in the Phius Multifamily Workbook. These include MEL, Interior-Lighting, Exterior-Lighting, and Garage-Lighting.
-This does NOT include the other residential appliances (fridge, cooking, etc..). Be sure to add those 
+This does NOT include the other residential appliances (fridge, cooking, etc..). Be sure to add those
 to the Residential Honeybee-Rooms in addition to the elec_equipment_ created by this component.
 -
 EM January 22, 2025
@@ -35,52 +35,52 @@ EM January 22, 2025
     Args:
         int_light_HE_frac_: (float) default=1.0 | The % (0-1.0) of interior lighting
             that is 'high efficiency'
-            
+
         ext_light_HE_frac_: (float) default=1.0 default=1.0 | The % (0-1.0) of exterior
             lighting that is 'high efficiency'
-        
+
         garage_light_HE_frac_: (float) default=1.0 | The % (0-1.0) of garage lighting
             that is 'high efficiency'
-        
+
         include_garage_: (bool) Default=False. Set to True to include the standard Phius
             garage lighting.
-        
+
         include_elevator_: (bool) Default=False. Set to True to include the standard Phius Elevator
             which is based on the number of stories. (<=6-stories Hyrdaulic, <=20-stories Geared Traction, 21+stories Gearless Traction)
 -
 The calculator will follow the protocol outlined in the Phius Multi-Family Calculator to estimate
-elevator energy usage based on the total height of the building (num stories) and the total 
+elevator energy usage based on the total height of the building (num stories) and the total
 number of dwelling units. For more information, see:
 https://www.energystar.gov/sites/default/files/asset/document/ENERGY_STAR_MFNC_Simulation_Guidelines_AppG2016_Version_1_Rev01.pdf
 
-   
-        _hb_rooms: (list[room.Room]): A list of the Honeybee Rooms to calculate the Phius Multifamily 
-            Elec. Equipment for. 
-            
+
+        _hb_rooms: (list[room.Room]): A list of the Honeybee Rooms to calculate the Phius Multifamily
+            Elec. Equipment for.
+
     Returns:
-        res_data_by_story_: (For Error-Checking) This is the input data for the residential stories. This 
+        res_data_by_story_: (For Error-Checking) This is the input data for the residential stories. This
             data can be copy/pasted into the Phius MF Claculator "Dwelling Units" B5 for vertification.
-        
+
         res_totals_: (For Error-Checking) This is the computed residential story energy consumption. This
             data should match the values computed in the Phius MF Calculator "Dwelling Units" Columns J:N
-            
+
         non_res_program_data_: (For Error-Checking) This is the input data for the non-residential programs
-            found on the Honeybee-Rooms. This can be copy/pasted into the Phius MF Calculator worksheet 
+            found on the Honeybee-Rooms. This can be copy/pasted into the Phius MF Calculator worksheet
             "Common Areas" "Default Space Types" section for verification.
-        
+
         non_res_room_data_: (For Error-Checking) This is the input data for the non-residential spaces found
             in the Honeybee-Rooms. This can be copy/pasted intpo the Phius MF Calculator worksheet "Common Areas"
             "Rooms Table" section for verification.
-        
+
         non_res_totals_: (For Error-Checking) This is the computed non-residential room energy consumption. This
             data should match the values computed in the Phius MF Calculator worksheet "Common Areas" columns H:M
-            
-        elec_equipment_: The PH-Electric Equipment objects for the MEL, Interior-Lighting, Exterior-Lighting 
+
+        elec_equipment_: The PH-Electric Equipment objects for the MEL, Interior-Lighting, Exterior-Lighting
             and Garage-Lighting. This equipment can be added to the Honeybee-Rooms by using an 'Add PH Equipment'
             component and passing these objects into the 'equipment_' input node.
-            
+
         hb_res_rooms_: The residential HB-Rooms.
-        
+
         hb_nonres_rooms_: The non-residential HB-Rooms.
 """
 

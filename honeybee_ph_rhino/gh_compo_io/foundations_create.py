@@ -360,7 +360,7 @@ class GHCompo_CreateFoundations(object):
         try:
             foundation_class = self.foundation_classes[self.foundation_type_number]
             return foundation_class()
-        except KeyError as e:
+        except KeyError:
             raise Exception(
                 "Error: Input foundation type: '{}' not supported. Please only input: "
                 "{}".format(self.foundation_type_number, self.valid_foundation_type_names)

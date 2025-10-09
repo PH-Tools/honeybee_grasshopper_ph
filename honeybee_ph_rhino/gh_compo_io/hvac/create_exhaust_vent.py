@@ -68,7 +68,7 @@ class GHCompo_CreateExhaustVent(object):
         # -- Figure out which Vent Device type is being built
         try:
             device_class = self.device_classes[self.system_type]
-        except KeyError as e:
+        except KeyError:
             raise Exception(
                 "Error: Input Device type: '{}' not supported by this GH-Component. "
                 "Please only input:{}".format(self.system_type, self.valid_device_types)

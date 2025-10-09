@@ -5,7 +5,7 @@
 These are called when the component is instantiated within the Grasshopper canvas.
 """
 
-RELEASE_VERSION = "Honeybee-PH v1.11.04"
+RELEASE_VERSION = "Honeybee-PH v1.12.01"
 CATEGORY = "HB-PH"
 SUB_CATEGORIES = {
     0: "00 | Utils",
@@ -409,6 +409,12 @@ COMPONENT_PARAMS = {
     },
     "HBPH - Set Window Reveal Distance": {
         "NickName": "Set Reveal Distance (d_reveal)",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
+    "HBPH - Set Aperture Psi-Installs": {
+        "NickName": "Set Aperture Psi-Installs",
         "Message": RELEASE_VERSION,
         "Category": CATEGORY,
         "SubCategory": 1,

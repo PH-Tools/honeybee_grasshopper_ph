@@ -336,7 +336,7 @@ class GHCompo_CreateElecEquip(object):
         """Get a list of the equipment classes to build, based on the equipment-type input."""
         try:
             return self.equipment_classes[self.equip_type]
-        except KeyError as e:
+        except KeyError:
             raise Exception(
                 "Error: Input Equipment type: '{}' is not supported. Please only input: "
                 "{}".format(self.equip_type, self.valid_equipment_types)

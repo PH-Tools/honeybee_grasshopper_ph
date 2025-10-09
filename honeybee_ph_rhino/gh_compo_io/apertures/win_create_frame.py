@@ -3,12 +3,6 @@
 
 """GHCompo Interface: HBPH - Create PH Window Frame."""
 
-
-try:
-    from typing import Optional
-except ImportError:
-    pass  # IronPython 2.7
-
 try:
     from honeybee.typing import clean_and_id_ep_string
 except ImportError as e:
@@ -20,18 +14,18 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
 
 try:
-    from honeybee_ph_rhino.gh_compo_io import ghio_validators
+    from ph_gh_component_io import validators
 except ImportError as e:
-    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
+    raise ImportError("\nFailed to import ph_gh_component_io:\n\t{}".format(e))
 
 
 class GHCompo_CreatePhWinFrame(object):
     """Interface to collect and clean PhWindowFrame user-inputs."""
 
-    display_name = ghio_validators.HBName("display_name")
+    display_name = validators.HBName("display_name")
 
     def __init__(self, _display_name, _top, _right, _bottom, _left):
-        # type: (str, Optional[window.PhWindowFrameElement], Optional[window.PhWindowFrameElement],  Optional[window.PhWindowFrameElement],  Optional[window.PhWindowFrameElement]) -> None
+        # type: (str, window.PhWindowFrameElement | None, window.PhWindowFrameElement | None,  window.PhWindowFrameElement | None,  window.PhWindowFrameElement | None) -> None
         self.display_name = _display_name or clean_and_id_ep_string("PhWindowFrame")
         self._top = _top
         self._right = _right

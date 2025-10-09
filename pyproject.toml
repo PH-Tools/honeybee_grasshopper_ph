@@ -1,2 +1,15 @@
 [tool.black]
 line-length = 120
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+# Ignore specific rules that are problematic for Python 2.7 compatibility
+ignore = [
+    "F401", # Imported but unused (common with type hints in comments for Python 2.7)
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Allow wildcard imports in __init__.py files
+"__init__.py" = ["F403", "F405"]

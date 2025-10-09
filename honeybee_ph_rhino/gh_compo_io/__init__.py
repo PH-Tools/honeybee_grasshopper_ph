@@ -1,5 +1,7 @@
 # -- Import all the interfaces to simplify the API within Grasshopper
 # -- Assemblies
+# -- Window Constructions
+from honeybee_ph_rhino.gh_compo_io.apertures import *
 from honeybee_ph_rhino.gh_compo_io.assmbly_create_air_layer_mat import GHCompo_AirLayerMaterial
 from honeybee_ph_rhino.gh_compo_io.assmbly_create_detailed_const import GHCompo_CreateDetailedConstructions
 from honeybee_ph_rhino.gh_compo_io.assmbly_create_heterogeneous_material import GHCompo_CreateHeterogeneousMaterial
@@ -53,19 +55,8 @@ from honeybee_ph_rhino.gh_compo_io.tb_create import GHCompo_CreateTB
 # -- Visualize
 from honeybee_ph_rhino.gh_compo_io.visualize_spaces import GHCompo_VisualizeSpaces
 from honeybee_ph_rhino.gh_compo_io.visualize_win_frames import GHCompo_VisualizeWindowFrameElements
-from honeybee_ph_rhino.gh_compo_io.win_calc_phius_blind import GHCompo_CalcPhiusShadeTransmittance
-from honeybee_ph_rhino.gh_compo_io.win_create_constr import GHCompo_CreatePhConstruction
-from honeybee_ph_rhino.gh_compo_io.win_create_frame import GHCompo_CreatePhWinFrame
-from honeybee_ph_rhino.gh_compo_io.win_create_frame_element import GHCompo_CreatePhWinFrameElement
-
-# -- Window Constructions
-from honeybee_ph_rhino.gh_compo_io.win_create_glazing import GHCompo_CreatePhGlazing
-from honeybee_ph_rhino.gh_compo_io.win_set_inst_depth import GHCompo_SetApertureInstallDepth
-from honeybee_ph_rhino.gh_compo_io.win_set_monthly_shd_fac import GHCompo_SetWindowMonthlyShadeFactor
-from honeybee_ph_rhino.gh_compo_io.win_set_reveal_distance import GHCompo_SetApertureRevealDistance
-from honeybee_ph_rhino.gh_compo_io.win_set_seasonal_shading_factors import GHCompo_SetWindowSeasonalShadingFactors
 from honeybee_ph_rhino.gh_compo_io.write_PHPP import GHCompo_WriteToPHPP
-from honeybee_ph_rhino.gh_compo_io.write_wufi_xml_settings import GHCompo_WriteWufiXmlSettings
 
 # -- Export
+from honeybee_ph_rhino.gh_compo_io.write_wufi_xml_settings import GHCompo_WriteWufiXmlSettings
 from honeybee_ph_rhino.gh_compo_io.write_wuif_xml import GHCompo_WriteWufiXml

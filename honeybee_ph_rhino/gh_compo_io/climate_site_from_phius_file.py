@@ -117,9 +117,7 @@ class MonthlyDataInputCollection(object):
         for i, data_item in enumerate(self.location_data):
             if "Height" in str(data_item):
                 return float(str(self.location_data[i + 1]).strip())
-        raise ValueError(
-            "'Height' not found in location data? Please check the input file format."
-        )
+        raise ValueError("'Height' not found in location data? Please check the input file format.")
 
     @property
     def daily_temp_swing(self):
@@ -140,9 +138,7 @@ class MonthlyDataInputCollection(object):
         for i, data_item in enumerate(self.location_data):
             if "Latitude" in str(data_item):
                 return float(str(self.location_data[i + 1]).strip())
-        raise ValueError(
-            "'Latitude' not found in location data? Please check the input file format."
-        )
+        raise ValueError("'Latitude' not found in location data? Please check the input file format.")
 
     @property
     def longitude(self):
@@ -150,10 +146,7 @@ class MonthlyDataInputCollection(object):
         for i, data_item in enumerate(self.location_data):
             if "Longitude" in str(data_item):
                 return float(str(self.location_data[i + 1]).strip())
-        raise ValueError(
-            "'Longitude' not found in location data? Please check the input file format."
-        )
-
+        raise ValueError("'Longitude' not found in location data? Please check the input file format.")
 
     def __str__(self):
         return "\n".join(
@@ -318,7 +311,7 @@ class GHCompo_CreateSiteFromPhiusFile(object):
     def _clean_input_data(self, _data):
         # type: (list[str]) -> list[str]
         """Remove any blank lines from the input data."""
-    
+
         return [line for line in _data if line.strip()]
 
     def _create_input_data_collection(self):
@@ -343,7 +336,7 @@ class GHCompo_CreateSiteFromPhiusFile(object):
             line = line.split("\t")
 
             # -- Get the field name
-            field_name = line[0] # North, South, East, West, Global, Dewpoint, Sky Temperature
+            field_name = line[0]  # North, South, East, West, Global, Dewpoint, Sky Temperature
 
             self.monthly_data_collection[field_name] = line[1:13]
 
@@ -351,8 +344,8 @@ class GHCompo_CreateSiteFromPhiusFile(object):
             line = line.split("\t")
 
             # -- Get the field name
-            field_name = line[0] # North, South, East, West, Global, Dewpoint, Sky Temperature
-            
+            field_name = line[0]  # North, South, East, West, Global, Dewpoint, Sky Temperature
+
             # -- Log the peak load data
             self.peak_load_data_collection.peak_heat_load_1[field_name] = float(line[13])
             self.peak_load_data_collection.peak_heat_load_2[field_name] = float(line[14])

@@ -7,14 +7,14 @@ import os
 
 try:
     from typing import Any
-except ImportError as e:
+except ImportError:
     pass  # IronPython2.7
 
 try:
     from Grasshopper import DataTree  # type: ignore
     from Grasshopper.Kernel.Data import GH_Path  # type: ignore
     from System import Object  # type: ignore
-except ImportError as e:
+except ImportError:
     pass  # IronPython 2.7
 
 try:
@@ -87,7 +87,7 @@ class GHCompo_SetDwelling(object):
         # type: (int) -> int
         try:
             return int(self.num_dwellings.Branch(branch)[0])
-        except Exception as e:
+        except Exception:
             return 1
 
     def run(self):

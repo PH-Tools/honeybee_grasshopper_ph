@@ -20,7 +20,7 @@
 # @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 #
 """
-Set HB-Rooms to have "Single-Family-Home" style program attributes: 
+Set HB-Rooms to have "Single-Family-Home" style program attributes:
 * Infiltration: HB-Standard 'Average'=0.0003 m3/s-m2
 * Ventilation: Phius Standard=0.4ACH
 * Setpoints: Phius Standard Heating=20C [68F], Cooling=25C [77F], Dehumid=60%RH
@@ -31,8 +31,8 @@ Set HB-Rooms to have "Single-Family-Home" style program attributes:
     National Renewable Energy Laboratory
     https://www.nrel.gov/docs/fy14osti/60988.pdf
 -
-* Occupancy: Set from HBE-Occupancy 
-NOTE: If you wish to set 'Passive House' style residential occupancy values, 
+* Occupancy: Set from HBE-Occupancy
+NOTE: If you wish to set 'Passive House' style residential occupancy values,
 use the "HBPH - Set Res Occupancy" component BEFORE using this one. If no PH-Style
 occupancy values are found, this component will keep the existing HB-Energy values.
 -

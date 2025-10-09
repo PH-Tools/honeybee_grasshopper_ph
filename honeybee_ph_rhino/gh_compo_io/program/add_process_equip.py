@@ -36,14 +36,15 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
 try:
-    from honeybee_ph_rhino.gh_compo_io.program._schedules import SchedulesCollection
     from honeybee_ph_rhino.gh_compo_io.program._get_room_data import get_room_floor_area_ft2
+    from honeybee_ph_rhino.gh_compo_io.program._schedules import SchedulesCollection
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
 
 # ------------------------------------------------------------------------------
 # -- Component Interface
+
 
 class GHCompo_AddProcessEquip(object):
     ph_equip_types = {

@@ -20,7 +20,7 @@
 # @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 #
 """
-Add one or more detailed Passive House style electric-equipment objects to the 
+Add one or more detailed Passive House style electric-equipment objects to the
 honeybee Rooms.
 -
 EM January 22, 2025
@@ -34,13 +34,13 @@ EM January 22, 2025
         > "3" for Multifamily NonResidential appliance set (none).
             Note - for Multifamily, be sure to add in the Int. / Ext. Lighting and MEL from
             the Phius MF Calculator using a 'Create PH Appliance' HBPH Component.
-        
+
         phi_defaults_: (bool) default=False. Set True to add the default PHI equipment
             set to the model.
-        
+
         equipment_: (List[PhEquipment]) A List of Passive-House style electric
             equipment to add onto the Honeybee-Room.
-            
+
     Returns:
         hb_rooms_: (List[Room]) A list of the Honeybee Rooms with the new appliances
             added to them.

@@ -518,7 +518,10 @@ class ComponentInput:
         self.target_unit = _target_unit
 
     def __str__(self):
-        return "{}(name={})".format(self.__class__.__name__, self.name, self.access, self.type_hint)
+        return "{}(name={})".format(
+            self.__class__.__name__,
+            self.name,
+        )
 
     def __repr__(self):
         return str(self)

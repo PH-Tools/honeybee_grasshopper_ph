@@ -14,13 +14,11 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
 
 try:
-    from honeybee_ph_rhino import gh_io
-    from honeybee_ph_rhino.gh_compo_io import ghio_validators
+    from ph_gh_component_io import gh_io, validators
 except ImportError as e:
-    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
+    raise ImportError("\nFailed to import ph_gh_component_io:\n\t{}".format(e))
 
 try:
-    from ph_units.converter import convert
     from ph_units.parser import parse_input
 except ImportError as e:
     raise ImportError("\nFailed to import ph_units:\n\t{}".format(e))
@@ -29,12 +27,12 @@ except ImportError as e:
 class GHCompo_CreatePhWinFrameElement(object):
     """Interface to collect and clean PhWindowFrameElement user-inputs."""
 
-    display_name = ghio_validators.HBName("display_name")
-    width = ghio_validators.UnitM("width", default=0.1)
-    u_factor = ghio_validators.UnitW_M2K("u_factor", default=1.0)
-    psi_glazing = ghio_validators.UnitW_MK("psi_glazing", default=0.04)
-    psi_install = ghio_validators.UnitW_MK("psi_install", default=0.04)
-    chi_value = ghio_validators.UnitW_K("chi_value", default=0.0)
+    display_name = validators.HBName("display_name")
+    width = validators.UnitM("width", default=0.1)
+    u_factor = validators.UnitW_M2K("u_factor", default=1.0)
+    psi_glazing = validators.UnitW_MK("psi_glazing", default=0.04)
+    psi_install = validators.UnitW_MK("psi_install", default=0.04)
+    chi_value = validators.UnitW_K("chi_value", default=0.0)
 
     def __init__(self, _IGH, _display_name, _width, _u_factor, _psi_glazing, _psi_install, _chi_value):
         # type: (gh_io.IGH, str, float, float, float, float, float) -> None
@@ -48,7 +46,7 @@ class GHCompo_CreatePhWinFrameElement(object):
 
     def value_with_unit(self, _value):
         # type: (str | float | None) -> str | None
-        """ "Return a string of a value and a unit. If none is supplied, with use the Rhino-doc's unit type."""
+        """Return a string of a value and a unit. If none is supplied, with use the Rhino-doc's unit type."""
 
         if _value is None:
             return None

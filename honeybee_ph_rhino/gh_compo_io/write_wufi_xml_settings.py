@@ -31,12 +31,16 @@ class WufiWriteSettings(object):
         self.group_components = _group_components
         self.merge_faces = _merge_faces
         self.merge_spaces_by_erv = _merge_spaces_by_erv
-        self.merge_exhaust_vent_devices = _merge_exhaust_vent_devices   
+        self.merge_exhaust_vent_devices = _merge_exhaust_vent_devices
         self.generate_log_files = _generate_log_files
 
     def __str__(self):
         return "WufiWriteSettings(group_components={}, merge_faces={}, merge_spaces_by_erv={}, merge_exhaust_vent_devices={}, generate_log_files={})".format(
-            self.group_components, self.merge_faces, self.merge_spaces_by_erv, self.merge_exhaust_vent_devices, self.generate_log_files
+            self.group_components,
+            self.merge_faces,
+            self.merge_spaces_by_erv,
+            self.merge_exhaust_vent_devices,
+            self.generate_log_files,
         )
 
     def __repr__(self):
@@ -50,7 +54,15 @@ class GHCompo_WriteWufiXmlSettings(object):
     """GHCompo Interface: HBPH - Write WUFI XML Settings."""
 
     def __init__(
-        self, _IGH, _group_components, _merge_faces, _merge_spaces_by_erv, _merge_exhaust_vent_devices, _generate_log_files, *args, **kwargs
+        self,
+        _IGH,
+        _group_components,
+        _merge_faces,
+        _merge_spaces_by_erv,
+        _merge_exhaust_vent_devices,
+        _generate_log_files,
+        *args,
+        **kwargs
     ):
         # type: (gh_io.IGH, bool, Union[bool, float], bool, bool, int, *Any, **Any) -> None
         self.IGH = _IGH

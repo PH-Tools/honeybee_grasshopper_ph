@@ -213,7 +213,7 @@ def set_interior_lighting(_lighting, _net_floor_area_ft2, _gross_floor_area_m2, 
     ph_equip = ph_equipment.PhPhiusLightingInterior.phius_default()
     prop_ph = getattr(hbe_lighting.properties, "ph")  # type: LightingPhProperties
     prop_ph.ph_equipment = ph_equip
-    
+
     return hbe_lighting
 
 
@@ -316,7 +316,9 @@ def set_shw(_shw, _num_bedrooms, _gross_floor_area_m2, _schedule):
     return hbe_shw
 
 
-def create_phius_default_equipment_set(_schedules, _num_occupants, _num_bedrooms, _total_floor_area_ft2, _num_hb_rooms=1):
+def create_phius_default_equipment_set(
+    _schedules, _num_occupants, _num_bedrooms, _total_floor_area_ft2, _num_hb_rooms=1
+):
     # type: (SchedulesCollection, float, float, float, int) -> list[Process]
     """Create the default Phius Process Loads Set for a single-family home."""
     default_ph_equipment = [
@@ -334,13 +336,16 @@ def create_phius_default_equipment_set(_schedules, _num_occupants, _num_bedrooms
     for ph_equip in default_ph_equipment:
         # -- Create the HB-Process-Load
         schd = _schedules[ph_equip.__class__.__name__]
-        watts = ph_equip.annual_avg_wattage(
-            _schedule=schd,
-            _num_occupants=_num_occupants,
-            _num_units=1,
-            _floor_area_ft2=_total_floor_area_ft2,
-            _num_bedrooms=_num_bedrooms,
-        ) / _num_hb_rooms
+        watts = (
+            ph_equip.annual_avg_wattage(
+                _schedule=schd,
+                _num_occupants=_num_occupants,
+                _num_units=1,
+                _floor_area_ft2=_total_floor_area_ft2,
+                _num_bedrooms=_num_bedrooms,
+            )
+            / _num_hb_rooms
+        )
 
         new_process = Process(
             identifier=clean_and_id_ep_string("HBPH_Process_{}".format(ph_equip.__class__.__name__)),
@@ -416,9 +421,9 @@ class GHCompo_CreatePHProgramSingleFamilyHome(object):
         Rather than create a new program, re-set the program values one at a time to ensure that we
         preserve any extension attributes (ph, revive, etc.)
         """
-        print("- "*25)
+        print("- " * 25)
         print("Setting Loads and Schedules for HB-Room: {}".format(_hb_room.display_name))
-        
+
         hb_prop_e = getattr(_hb_room.properties, "energy")  # type: RoomEnergyProperties
         hb_prop_e.people = set_people(
             hb_prop_e.people,
@@ -447,7 +452,7 @@ class GHCompo_CreatePHProgramSingleFamilyHome(object):
             _gross_floor_area_m2,
             self.schedules.hot_water,
         )
-        
+
         return None
 
     def run(self):
@@ -474,11 +479,7 @@ class GHCompo_CreatePHProgramSingleFamilyHome(object):
 
             # -- Create the Phius default Process Loads (Appliances)
             default_process_loads = create_phius_default_equipment_set(
-                self.schedules,
-                num_occupants,
-                num_bedrooms,
-                net_floor_area_ft2,
-                len(dup_rooms)
+                self.schedules, num_occupants, num_bedrooms, net_floor_area_ft2, len(dup_rooms)
             )
 
             for rm in dup_rooms:
@@ -497,7 +498,9 @@ class GHCompo_CreatePHProgramSingleFamilyHome(object):
                     msg = (
                         "HB-Room: {} already has {} Process Loads defined. "
                         "New Single-Family default process loads will be ADDED to these existing ones. "
-                        "In most cases, you should remove these existing process loads before adding the new ones.".format(rm.display_name, len(rm_prop_e.process_loads))
+                        "In most cases, you should remove these existing process loads before adding the new ones.".format(
+                            rm.display_name, len(rm_prop_e.process_loads)
+                        )
                     )
                     print(msg)
                     self.IGH.warning(msg)

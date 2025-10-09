@@ -4,16 +4,9 @@
 """GHCompo Interface: HBPH - Set Seasonal Shading Factors."""
 
 try:
-    from typing import Dict, List
-except ImportError:
-    pass  # IronPython 2.7
-
-try:
     from itertools import izip_longest as zip_longest  # type: ignore # Python-2
 except ImportError:
-    from itertools import zip_longest
-
-    # Python 3
+    from itertools import zip_longest  # Python 3
 
 try:
     from honeybee.aperture import Aperture
@@ -26,14 +19,14 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph:\n\t{}".format(e))
 
 try:
-    from honeybee_ph_rhino import gh_io
+    from ph_gh_component_io import gh_io
 except ImportError as e:
-    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
+    raise ImportError("\nFailed to import ph_gh_component_io:\n\t{}".format(e))
 
 
 class GHCompo_SetWindowSeasonalShadingFactors(object):
     def __init__(self, _IGH, _hb_apertures, _winter_factors, _summer_factors, *args, **kwargs):
-        # type: (gh_io.IGH, List[Aperture], List[float], List[float], List, Dict) -> None
+        # type: (gh_io.IGH, list[Aperture], list[float], list[float], list, dict) -> None
         self.IGH = _IGH
         self.hb_apertures = _hb_apertures
         self.winter_factors = _winter_factors
@@ -53,7 +46,7 @@ class GHCompo_SetWindowSeasonalShadingFactors(object):
             return factor
 
     def run(self):
-        # type: () -> List[Aperture]
+        # type: () -> list[Aperture]
         apertures_ = []
         for ap, w_factor, s_factor in zip_longest(self.hb_apertures, self.winter_factors, self.summer_factors):
             new_ap = ap.duplicate()
