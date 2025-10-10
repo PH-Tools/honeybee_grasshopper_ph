@@ -25,6 +25,8 @@ except ImportError as e:
 
 try:
     from honeybee_energy_ph.construction.window import PhWindowFrame
+    from honeybee_energy_ph.properties.construction.window import WindowConstructionPhProperties
+    from honeybee_energy_ph.properties.construction.windowshade import WindowConstructionShadePhProperties
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
 
@@ -40,33 +42,50 @@ except ImportError as e:
     raise ImportError("\nFailed to import ph_units:\n\t{}".format(e))
 
 
-def get_ph_frame(self):
+def get_ph_frame(_aperture):
     # type: (Aperture) -> PhWindowFrame | None
     """Get the PH frame type from an Aperture."""
-
-    ap_prop_energy = getattr(self, "properties", None)
+    
+    # ---
+    ap_prop_energy = getattr(_aperture.properties, "energy", None)  # type: ApertureEnergyProperties | None
     if not ap_prop_energy:
-        return None
-    if ap_prop_energy and ap_prop_energy.energy.construction and ap_prop_energy.energy.construction.properties:
-        return ap_prop_energy.energy.construction.properties.ph.ph_frame
-    return None
+        raise ValueError("Aperture {} has no properties.energy ?".format(_aperture.display_name))
+    
+    # --- Get the right PH properties based on the construction type
+    try:
+        prop_ph = getattr(ap_prop_energy.construction.window_construction.properties, "ph") # type: WindowConstructionShadePhProperties
+        # It is a WindowConstructionShade
+    except AttributeError:
+        # It is a regular WindowConstruction
+        try:
+            prop_ph = getattr(ap_prop_energy.construction.properties, "ph") # type: WindowConstructionPhProperties
+        except AttributeError:
+            raise ValueError("Aperture {} construction is an unsupported type: {}?".format(_aperture.display_name, type(ap_prop_energy.construction)))
+    
+    return prop_ph.ph_frame
 
 
-def set_ph_frame(aperture, ph_frame):
+def set_ph_frame(_aperture, _ph_frame):
     # type: (Aperture, PhWindowFrame) -> Aperture
     """Set the PH frame type on an Aperture."""
 
-    dup_ap_prop_energy = getattr(aperture.properties, "energy", None)  # type: ApertureEnergyProperties | None
-    if not dup_ap_prop_energy:
-        raise ValueError("Aperture {} has no Energy properties?".format(aperture.display_name))
-    dup_ap_const_prop = getattr(dup_ap_prop_energy.construction, "properties", None)
-    if not dup_ap_const_prop:
-        raise ValueError(
-            "Aperture Construction {} has no Energy construction?".format(dup_ap_prop_energy.construction.display_name)
-        )
-    dup_ap_const_prop.ph.ph_frame = ph_frame
-
-    return aperture
+    ap_prop_energy = getattr(_aperture.properties, "energy", None)  # type: ApertureEnergyProperties | None
+    if not ap_prop_energy:
+        raise ValueError("Aperture {} has no properties.energy ?".format(_aperture.display_name))
+    
+    # --- Get the right PH properties based on the construction type
+    try:
+        prop_ph = getattr(ap_prop_energy.construction.window_construction.properties, "ph") # type: WindowConstructionShadePhProperties
+        # It is a WindowConstructionShade
+    except AttributeError:
+        # It is a regular WindowConstruction
+        try:
+            prop_ph = getattr(ap_prop_energy.construction.properties, "ph") # type: WindowConstructionPhProperties
+        except AttributeError:
+            raise ValueError("Aperture {} construction is an unsupported type: {}?".format(_aperture.display_name, type(ap_prop_energy.construction)))
+    
+    prop_ph.ph_frame = _ph_frame
+    return _aperture
 
 
 class GHCompo_SetAperturePsiInstallValues(object):
@@ -75,7 +94,7 @@ class GHCompo_SetAperturePsiInstallValues(object):
     def __init__(self, _IGH, _psi_install_values, _apertures, *args, **kwargs):
         # type: (gh_io.IGH, DataTree[str], DataTree[Aperture], list, dict) -> None
         self.IGH = _IGH
-        self.psi_install_values_w_mk = self.set_psi_install_values_w_mk(_psi_install_values)
+        self.psi_install_values_w_mk = self._set_psi_install_values_w_mk(_psi_install_values)
         self._apertures = _apertures
 
     @property
@@ -89,7 +108,7 @@ class GHCompo_SetAperturePsiInstallValues(object):
             return False
         return True
 
-    def set_psi_install_values_w_mk(self, _input):
+    def _set_psi_install_values_w_mk(self, _input):
         # type: (DataTree[str]) -> DataTree[float]
         """Convert the input psi-install values to W/mK, considering User-provded unit-types."""
 
