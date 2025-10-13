@@ -24,14 +24,15 @@ Set the Room averge Specific Heat Capacity (Wh/m2-K). If a single value is provi
 will be used to set the attribute value of each Honeybee-Room input. If a list is provided, 
 the values will be applied to the Honeybee-Rooms in the order input.
 -
-EM March 29, 2023
+EM Oct 13, 2025
     Args:
         _room_spec_capacities: (Wh/m2k) Input either -
-"1-Lightweight" (Default)
-"2-Mixed"
-"3-Massive"
+- 1-Lightweight (Default)
+- 2-Mixed
+- 3-Massive
+- Any user-defined value (Wh/m2k)
 
-        _hb_rooms: (List[roomn.Room]) A list of the Honeybee Rooms to set the
+        _hb_rooms: (List[room.Room]) A list of the Honeybee Rooms to set the
             Specific Heat Capacity (Wh/m2k) on.
         
     Returns:
@@ -52,10 +53,14 @@ except ImportError as e:
     raise ImportError('\nFailed to import honeybee_ph_utils:\n\t{}'.format(e))
 
 try:
-    from honeybee_ph_rhino import gh_compo_io, gh_io
+    from honeybee_ph_rhino import gh_compo_io
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee_ph_rhino:\n\t{}'.format(e))
 
+try:
+    from ph_gh_component_io import gh_io
+except ImportError as e:
+    raise ImportError('\nFailed to import ph_gh_component_io:\n\t{}'.format(e))
 
 #-------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
@@ -63,6 +68,8 @@ reload(honeybee_ph_rhino._component_info_)
 ghenv.Component.Name = "HBPH - Set Spec Heat Capacity"
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
+    from honeybee_ph.properties import room
+    reload(room)
     from honeybee_ph_rhino.gh_compo_io import set_spec_heat_cap as gh_compo_io
     reload(gh_compo_io)
 
