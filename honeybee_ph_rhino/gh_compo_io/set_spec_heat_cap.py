@@ -34,12 +34,16 @@ class GHCompo_SetRoomSpecHeatCaps(object):
 
     def _get_user_input_for_idx(self, idx):
         # type: (int) -> str | int
-        """Get user input for a given index, or return default ("1")."""
+        """Get user input for a given index, or return default '1'"""
         try:
             input = self.spec_capacities[idx]
         except IndexError:
-            print("Warning: no input provided for index {}. Using default value (1).".format(idx))
-            input = "1"
+            try:
+                input = self.spec_capacities[0]
+                print("Info: no input provided for '_room_spec_capacities' index-{}. Using value from index-0: '{}'".format(idx, input))
+            except IndexError:
+                print("Info: no input provided for '_room_spec_capacities'. Using default: '1-LIGHTWEIGHT'")
+                input = "1"
         
         try:
             value = input_to_int(input) or "1"
