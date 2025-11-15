@@ -41,9 +41,8 @@ class GHCompo_WriteWufiXml(object):
     def give_user_warnings(self, _stdout):
         # type: (str) -> None
         """Give user warnings if any."""
-
         for line in _stdout.split("\n"):
-            if "WARNING:" in line:
+            if "WARNING" in line:
                 self.IGH.warning(line)
 
     def run(self):
