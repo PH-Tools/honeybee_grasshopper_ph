@@ -54,11 +54,16 @@ def get_PhiusNonResRooms(_hb_rooms, _area_unit):
     """Returns a list of PhiusNonResRoom objects."""
 
     non_res_spaces = []
-    for hb_room in _hb_rooms:
-        room_prop_ph = getattr(hb_room.properties, "ph")  # type: RoomPhProperties
-        for space in room_prop_ph.spaces:
-            new_nonres_space = phius_mf.PhiusNonResRoom.from_ph_space(space, _area_unit)
-            non_res_spaces.append(new_nonres_space)
+    for i, hb_room in enumerate(_hb_rooms):
+        try:
+            room_prop_ph = getattr(hb_room.properties, "ph")  # type: RoomPhProperties
+            for space in room_prop_ph.spaces:
+                new_nonres_space = phius_mf.PhiusNonResRoom.from_ph_space(space, _area_unit)
+                non_res_spaces.append(new_nonres_space)
+        except Exception as e:
+            msg = "Failed to get Phius-Non-Res data from Honeybee-Room [{}] '{}':\n\t{}".format(i, hb_room.display_name, e)
+            print(msg)
+            raise Exception(msg)
 
     return non_res_spaces
 

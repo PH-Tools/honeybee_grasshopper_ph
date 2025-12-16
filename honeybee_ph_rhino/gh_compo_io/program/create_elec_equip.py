@@ -39,11 +39,11 @@ inputs_base = {
         _description="(str) User defined comment / note.",
         _type_hint=Component.NewStrHint(),
     ),
-    3: ComponentInput(_name="reference_quantity", _description="() some WUFI stuff."),
+    3: ComponentInput(_name="reference_quantity", _description="() some WUFI stuff.", _type_hint=Hints.GH_IntegerHint_CS()),
     4: ComponentInput(
         _name="quantity",
         _description="(int) The total number of appliances / pieces of equipment included.",
-        _type_hint=Hints.GH_IntegerHint_CS(),
+        _type_hint=Component.NewStrHint(),
     ),
     5: ComponentInput(
         _name="in_conditioned_space",
@@ -53,7 +53,7 @@ inputs_base = {
     6: ComponentInput(
         _name="reference_energy_norm",
         _description="() some other WUFI stuff.",
-        _type_hint=Component.NewStrHint(),
+        _type_hint=Hints.GH_IntegerHint_CS(),
     ),
     7: ComponentInput(
         _name="energy_demand",
@@ -351,6 +351,7 @@ class GHCompo_CreateElecEquip(object):
 
             input_val = self.input_dict.get(attr_name)
             if input_val:
+                print("Setting attribute '{}' to '{}' [{}]".format(attr_name, input_val, type(input_val)))
                 setattr(_equipment_obj, attr_name, input_val)
 
         return _equipment_obj
