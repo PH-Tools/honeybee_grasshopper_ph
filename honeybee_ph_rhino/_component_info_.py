@@ -5,7 +5,7 @@
 These are called when the component is instantiated within the Grasshopper canvas.
 """
 
-RELEASE_VERSION = "Honeybee-PH v1.14.01"
+RELEASE_VERSION = "Honeybee-PH v1.15.01"
 CATEGORY = "HB-PH"
 SUB_CATEGORIES = {
     0: "00 | Utils",
@@ -476,6 +476,12 @@ COMPONENT_PARAMS = {
     },
     "HBPH - Create Wood Framing Material": {
         "NickName": "Create Wood Framing Mat",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
+    "HBPH - PH Additional Zone": {
+        "NickName": "PH Additional Zone",
         "Message": RELEASE_VERSION,
         "Category": CATEGORY,
         "SubCategory": 1,

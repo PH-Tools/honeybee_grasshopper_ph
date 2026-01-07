@@ -45,23 +45,29 @@ except ImportError as e:
 def get_ph_frame(_aperture):
     # type: (Aperture) -> PhWindowFrame | None
     """Get the PH frame type from an Aperture."""
-    
+
     # ---
     ap_prop_energy = getattr(_aperture.properties, "energy", None)  # type: ApertureEnergyProperties | None
     if not ap_prop_energy:
         raise ValueError("Aperture {} has no properties.energy ?".format(_aperture.display_name))
-    
+
     # --- Get the right PH properties based on the construction type
     try:
-        prop_ph = getattr(ap_prop_energy.construction.window_construction.properties, "ph") # type: WindowConstructionShadePhProperties
+        prop_ph = getattr(
+            ap_prop_energy.construction.window_construction.properties, "ph"
+        )  # type: WindowConstructionShadePhProperties
         # It is a WindowConstructionShade
     except AttributeError:
         # It is a regular WindowConstruction
         try:
-            prop_ph = getattr(ap_prop_energy.construction.properties, "ph") # type: WindowConstructionPhProperties
+            prop_ph = getattr(ap_prop_energy.construction.properties, "ph")  # type: WindowConstructionPhProperties
         except AttributeError:
-            raise ValueError("Aperture {} construction is an unsupported type: {}?".format(_aperture.display_name, type(ap_prop_energy.construction)))
-    
+            raise ValueError(
+                "Aperture {} construction is an unsupported type: {}?".format(
+                    _aperture.display_name, type(ap_prop_energy.construction)
+                )
+            )
+
     return prop_ph.ph_frame
 
 
@@ -72,18 +78,24 @@ def set_ph_frame(_aperture, _ph_frame):
     ap_prop_energy = getattr(_aperture.properties, "energy", None)  # type: ApertureEnergyProperties | None
     if not ap_prop_energy:
         raise ValueError("Aperture {} has no properties.energy ?".format(_aperture.display_name))
-    
+
     # --- Get the right PH properties based on the construction type
     try:
-        prop_ph = getattr(ap_prop_energy.construction.window_construction.properties, "ph") # type: WindowConstructionShadePhProperties
+        prop_ph = getattr(
+            ap_prop_energy.construction.window_construction.properties, "ph"
+        )  # type: WindowConstructionShadePhProperties
         # It is a WindowConstructionShade
     except AttributeError:
         # It is a regular WindowConstruction
         try:
-            prop_ph = getattr(ap_prop_energy.construction.properties, "ph") # type: WindowConstructionPhProperties
+            prop_ph = getattr(ap_prop_energy.construction.properties, "ph")  # type: WindowConstructionPhProperties
         except AttributeError:
-            raise ValueError("Aperture {} construction is an unsupported type: {}?".format(_aperture.display_name, type(ap_prop_energy.construction)))
-    
+            raise ValueError(
+                "Aperture {} construction is an unsupported type: {}?".format(
+                    _aperture.display_name, type(ap_prop_energy.construction)
+                )
+            )
+
     prop_ph.ph_frame = _ph_frame
     return _aperture
 

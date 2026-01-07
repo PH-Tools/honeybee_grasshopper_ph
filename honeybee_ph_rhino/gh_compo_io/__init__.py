@@ -12,6 +12,7 @@ from honeybee_ph_rhino.gh_compo_io.assmbly_create_wood_framing_material import G
 from honeybee_ph_rhino.gh_compo_io.assmbly_set_mat_color import GHCompo_SetMaterialColor
 from honeybee_ph_rhino.gh_compo_io.assmbly_set_material_column_and_row import GHCompo_SetMaterialColumnAndRow
 from honeybee_ph_rhino.gh_compo_io.building_create_team_member import GHCompo_CreateProjectTeamMember
+from honeybee_ph_rhino.gh_compo_io.addnl_zone import GHCompo_AdditionalZone
 
 # -- Building Segment
 from honeybee_ph_rhino.gh_compo_io.building_segment import GHCompo_BuildingSegment
@@ -33,6 +34,9 @@ from honeybee_ph_rhino.gh_compo_io.climate_site_from_phius_file import GHCompo_C
 from honeybee_ph_rhino.gh_compo_io.foundations_add import GHCompo_AddFoundations
 from honeybee_ph_rhino.gh_compo_io.foundations_create import GHCompo_CreateFoundations
 from honeybee_ph_rhino.gh_compo_io.hvac import *
+
+# -- OpenPH
+from honeybee_ph_rhino.gh_compo_io.openph import *
 
 # -- Organize
 from honeybee_ph_rhino.gh_compo_io.organize_spaces import GHCompo_OrganizeSpaces
@@ -60,6 +64,3 @@ from honeybee_ph_rhino.gh_compo_io.write_PHPP import GHCompo_WriteToPHPP
 # -- Export
 from honeybee_ph_rhino.gh_compo_io.write_wufi_xml_settings import GHCompo_WriteWufiXmlSettings
 from honeybee_ph_rhino.gh_compo_io.write_wuif_xml import GHCompo_WriteWufiXml
-
-# -- OpenPH
-from honeybee_ph_rhino.gh_compo_io.openph import *

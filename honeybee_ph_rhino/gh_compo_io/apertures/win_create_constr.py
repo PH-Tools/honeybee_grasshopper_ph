@@ -29,8 +29,7 @@ except ImportError as e:
 try:
     from ph_gh_component_io import gh_io, validators
 except ImportError as e:
-    raise ImportError('\nFailed to import ph_gh_component_io:\n\t{}'.format(e))
-
+    raise ImportError("\nFailed to import ph_gh_component_io:\n\t{}".format(e))
 
 
 class GHCompo_CreatePhConstruction(object):

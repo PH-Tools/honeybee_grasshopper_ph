@@ -39,7 +39,9 @@ inputs_base = {
         _description="(str) User defined comment / note.",
         _type_hint=Component.NewStrHint(),
     ),
-    3: ComponentInput(_name="reference_quantity", _description="() some WUFI stuff.", _type_hint=Hints.GH_IntegerHint_CS()),
+    3: ComponentInput(
+        _name="reference_quantity", _description="() some WUFI stuff.", _type_hint=Hints.GH_IntegerHint_CS()
+    ),
     4: ComponentInput(
         _name="quantity",
         _description="(int) The total number of appliances / pieces of equipment included.",

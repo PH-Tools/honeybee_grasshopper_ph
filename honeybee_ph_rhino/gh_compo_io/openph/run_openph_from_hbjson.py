@@ -12,9 +12,10 @@ except ImportError as e:
 
 try:
     from ph_gh_component_io.gh_io import IGH
-    from ph_gh_component_io.run_subprocess import run_subprocess, process_stderr, process_stdout
+    from ph_gh_component_io.run_subprocess import process_stderr, process_stdout, run_subprocess
 except ImportError as e:
     raise ImportError("\nFailed to import from ph_gh_component_io:\n\t{}".format(e))
+
 
 class GHCompo_RunOpenPhFromHBJSON(object):
     """GHCompo Interface: HBPH - Run OpenPH with HBJSON File."""
@@ -30,7 +31,7 @@ class GHCompo_RunOpenPhFromHBJSON(object):
     def ready(self):
         # type: () -> bool
         return self.hbjson_file is not None and self.calc is True
-    
+
     @property
     def py3_script_file(self):
         # type: () -> str
@@ -41,7 +42,7 @@ class GHCompo_RunOpenPhFromHBJSON(object):
             "scripts",
             "run_openph_with_hbjson_file.py",
         )
-    
+
     @property
     def output_folder(self):
         # type: () -> str | None
@@ -52,12 +53,12 @@ class GHCompo_RunOpenPhFromHBJSON(object):
                 return os.path.dirname(self.hbjson_file)
             else:
                 return None
-    
+
     def run(self):
         # type: () -> str | None
         if not self.ready:
             return None
-        
+
         print("running OpenPH with HBJSON file: {}".format(self.hbjson_file))
         print("self.py3_script_file={}".format(self.py3_script_file))
 

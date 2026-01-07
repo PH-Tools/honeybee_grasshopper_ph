@@ -9,15 +9,14 @@ This script is called from the command line with the following arguments:
     * [2] (str): The path to the output folder.
 """
 
-from collections import namedtuple
 import os
-from pathlib import Path
 import sys
+from collections import namedtuple
+from pathlib import Path
 
 from openph.from_HBJSON import create_phpp
-from openph.to_table import TableDisplayManager, TableNames, TableGroup
+from openph.to_table import TableDisplayManager, TableGroup, TableNames
 from openph_demand.to_table import DemandTableNames
-
 from PHX.from_HBJSON import create_project, read_HBJSON_file
 
 
@@ -72,9 +71,7 @@ def main(output_folder: Path, source_file_path: Path) -> None:
 
     # -- Generate the PhxProject from the HB-Model
     # -------------------------------------------------------------------------
-    phx_project = create_project.convert_hb_model_to_PhxProject(
-        hb_model, _group_components=True
-    )
+    phx_project = create_project.convert_hb_model_to_PhxProject(hb_model, _group_components=True)
 
     # -- Build the PHPP Model
     # -------------------------------------------------------------------------
@@ -84,7 +81,7 @@ def main(output_folder: Path, source_file_path: Path) -> None:
         # ---------------------------------------------------------------------
         display = TableDisplayManager(ph_energy_phpp)
         print(f"\nAvailable table views: {display.available_tables}\n")
-        
+
         # ---------------------------------------------------------------------
         # Group 1.1: Climate Tables (Core)
         # ---------------------------------------------------------------------
@@ -149,7 +146,6 @@ def main(output_folder: Path, source_file_path: Path) -> None:
         )
         demand_group.render(format="html", output_path=OUTPUT_DIR / "energy_demand.html")
 
-
         # ---------------------------------------------------------------------
         # Group 2.3: Energy-Demand | Cooling Detail Tables
         # ---------------------------------------------------------------------
@@ -177,7 +173,6 @@ def main(output_folder: Path, source_file_path: Path) -> None:
 
         cooling_detail_group = TableGroup(cooling_detail_tables)
         cooling_detail_group.render(format="html", output_path=OUTPUT_DIR / "summer_radiation.html")
-
 
 
 if __name__ == "__main__":

@@ -12,7 +12,7 @@ try:
     from ph_gh_component_io import gh_io
     from ph_gh_component_io.input_tools import input_to_int
 except ImportError as e:
-    raise ImportError('\nFailed to import ph_gh_component_io:\n\t{}'.format(e))
+    raise ImportError("\nFailed to import ph_gh_component_io:\n\t{}".format(e))
 
 try:
     from honeybee_ph.properties.room import PhSpecificHeatCapacity, RoomPhProperties, get_ph_prop_from_room
@@ -40,18 +40,21 @@ class GHCompo_SetRoomSpecHeatCaps(object):
         except IndexError:
             try:
                 input = self.spec_capacities[0]
-                print("Info: no input provided for '_room_spec_capacities' index-{}. Using value from index-0: '{}'".format(idx, input))
+                print(
+                    "Info: no input provided for '_room_spec_capacities' index-{}. Using value from index-0: '{}'".format(
+                        idx, input
+                    )
+                )
             except IndexError:
                 print("Info: no input provided for '_room_spec_capacities'. Using default: '1-LIGHTWEIGHT'")
                 input = "1"
-        
+
         try:
             value = input_to_int(input) or "1"
             return value
         except ValueError as e:
             msg = "Error: the input for index {}: '{}' is not valid.\n{}".format(idx, input, e)
             raise Exception(msg)
-
 
     def get_spec_capacity_for_input_idx(self, idx):
         # type: (int) -> tuple[PhSpecificHeatCapacity, int | None]
@@ -69,7 +72,7 @@ class GHCompo_SetRoomSpecHeatCaps(object):
         hb_rooms_ = [room.duplicate() for room in self.hb_rooms]  # type: list[room.Room]
 
         for i, room in enumerate(hb_rooms_):
-            room_ph_props = get_ph_prop_from_room(room) # type: RoomPhProperties
+            room_ph_props = get_ph_prop_from_room(room)  # type: RoomPhProperties
             spec_capacity_type, spec_capacity_value = self.get_spec_capacity_for_input_idx(i)
             room_ph_props.specific_heat_capacity = spec_capacity_type
             room_ph_props.specific_heat_capacity_wh_m2k = spec_capacity_value
