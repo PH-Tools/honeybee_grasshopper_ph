@@ -14,8 +14,8 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
 try:
-    from honeybee_ph import bldg_segment, phi, phius, site
-    from honeybee_ph.bldg_segment import PhVentilationSummerBypassMode, PhWindExposureType
+    from honeybee_ph import phi, phius, site
+    from honeybee_ph.bldg_segment import PhVentilationSummerBypassMode, PhWindExposureType, SetPoints, BldgSegment
     from honeybee_ph.properties.room import RoomPhProperties
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph:\n\t{}".format(e))
@@ -176,9 +176,9 @@ class GHCompo_BuildingSegment(object):
         self._wind_exposure_type = PhWindExposureType(input_to_int(_input) or 1)
 
     def _create_hbph_set_points(self):
-        # type: () -> bldg_segment.SetPoints
+        # type: () -> SetPoints
         """Return a new HBPH SetPoints object with attributes from user input."""
-        obj = bldg_segment.SetPoints()
+        obj = SetPoints()
         obj.winter = self.set_points.winter
         obj.summer = self.set_points.summer
         return obj
@@ -196,10 +196,10 @@ class GHCompo_BuildingSegment(object):
         self.thermal_bridges = tb_dict
 
     def _create_bldg_segment(self):
-        # type: () -> bldg_segment.BldgSegment
+        # type: () -> BldgSegment
         """Returns a new HBPH BldgSegment object with attribute value set."""
 
-        obj = bldg_segment.BldgSegment()
+        obj = BldgSegment()
         ignore = [
             "_identifier",
             "user_data",
@@ -215,7 +215,7 @@ class GHCompo_BuildingSegment(object):
         return obj
 
     def run(self):
-        # type: () -> Tuple[List[room.Room], bldg_segment.BldgSegment]
+        # type: () -> Tuple[List[room.Room], BldgSegment]
 
         # -------------------------------------------------------------------------------------
         # -- Create the actual HBPH Building Segment Object
