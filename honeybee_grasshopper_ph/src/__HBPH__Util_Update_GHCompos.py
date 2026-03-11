@@ -13,10 +13,8 @@ ghenv.Component.SubCategory = "00 | Utils"
 ghenv.Component.ToggleObsolete(False)
 
 import os
-import shutil
-
 import Grasshopper.Kernel as ghK
-
+import shutil
 
 class AllComponents():
     def __init__(self, _name_identifier, _source_dir, _ghdoc, _ghK):
@@ -75,8 +73,8 @@ def copy_py_code(_save_address):
             
             print 'Writing {} code to: --> {}'.format(obj.Name, address)
             with open(address, 'wb') as f:
-                code_text = obj.Code.replace("\\r", "\\n").encode('utf-8')
-                for line in code_text.split("\\n"):
+                code_text = obj.Code.replace("\", "\").encode('utf-8')
+                for line in code_text.split("\"):
                     f.write(line)
 
 

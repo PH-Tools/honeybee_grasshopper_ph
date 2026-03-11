@@ -20,25 +20,20 @@
 # @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 #
 """
-Convert an HBJSON file into a new WUFI-XML file which can then be opened using 
-WUFI-Passive. This will read in the HBJSON, rebuild the HB-Model before converting the 
-Model into a WUFI-Passive file.
+Convert an existing HBJSON file to a Passive House Exchange (PHX) model and write out 
+the model data to a .PPP file. This file can be imported into the PHPP using the standard 
+'Tools' macro-file which comes with the PHPP. Look in the '03_PHPP_XX_Tools' which comes 
+with the PHPP for details.
 -
-EM June 5, 2024
+EM March 11, 2026
     Args:
-        _filename: (str) The filename for the WUFI XML file.
-        
-        _save_folder: (str) The folder path to save the WUFI XML file to.
-        
-        _hb_json_file: (str) The path to the HBJSON file to convert into WUFI XML.
-        
-        _settings: The WUFI Settings object. Connect the "HBPH - Write WUFI XML Settings"
-            'settings_' output.
-
-        _write_xml: (bool) Set True to run. 
+        _hbjson_file: (str) The full file path to the HBJSON you would like to write 
+            out to PHPP.
+    
+        _write: (bool) Set True to run the PPP File writer.
             
     Returns:
-        xml_file_: The full path to the output WUFI XML file.
+        -
 """
 
 import scriptcontext as sc
@@ -49,35 +44,36 @@ import Grasshopper as gh
 
 
 try:
+    from honeybee_ph_utils import preview
+except ImportError as e:
+    raise ImportError('Failed to import honeybee_ph_utils:\t{}'.format(e))
+
+try:
     from honeybee_ph_rhino import gh_compo_io, gh_io
 except ImportError as e:
     raise ImportError('Failed to import honeybee_ph_rhino:\t{}'.format(e))
 
 
-# ------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
-ghenv.Component.Name = "HBPH - Write WUFI XML"
+ghenv.Component.Name = "HBPH - Write to PPP File"
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
-    from PHX import run
-    reload(run)
-    from honeybee_ph_rhino.gh_compo_io import write_wuif_xml as gh_compo_io
     reload(gh_compo_io)
     reload(gh_io)
-    
+
 # ------------------------------------------------------------------------------
 # -- GH Interface
 IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 
 
 # ------------------------------------------------------------------------------
-gh_compo_interface = gh_compo_io.GHCompo_WriteWufiXml(
+gh_compo_interface = gh_compo_io.GHCompo_WritePPPFile(
         IGH,
-        _filename,
+        _hbjson_file,
+        _ppp_filename,
         _save_folder,
-        _hb_json_file,
-        _settings,
-        _write_xml,
+        _write,
 )
-xml_file_ = gh_compo_interface.run()
+gh_compo_interface.run()

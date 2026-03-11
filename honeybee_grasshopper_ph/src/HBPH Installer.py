@@ -92,22 +92,22 @@ try:
     lbr_loaded = True
 except ImportError as e:
     lbr_loaded = False
-    msg =   '\nFailed to import ladybug_rhino:\n'\
-            'Please make sure Ladybug and Honeybee are installed properly before proceeding.\n\t{}'.format(e)
+    msg =   'Failed to import ladybug_rhino:'\
+            'Please make sure Ladybug and Honeybee are installed properly before proceeding.\t{}'.format(e)
     raise ImportError(msg)
 
 try:
     from ladybug import futil
 except ImportError as e:
-    msg =   '\nFailed to import ladybug.futil:\n'\
-            'Please make sure Ladybug and Honeybee are installed properly before proceeding.\n\t{}'.format(e)
+    msg =   'Failed to import ladybug.futil:'\
+            'Please make sure Ladybug and Honeybee are installed properly before proceeding.\t{}'.format(e)
     raise ImportError(msg)
 
 try:
     from honeybee.config import folders as hb_folders
 except ImportError as e:
-    msg =   '\nFailed to import honeybee.config.folders:\n'\
-            'Please make sure Ladybug and Honeybee are installed properly before proceeding.\n\t{}'.format(e)
+    msg =   'Failed to import honeybee.config.folders:'\
+            'Please make sure Ladybug and Honeybee are installed properly before proceeding.\t{}'.format(e)
     raise ImportError(msg)
 
 
@@ -183,9 +183,9 @@ def user_system_meets_min_LBT_version(_min_version_allowed):
     if not lbt_gh:
         msg = (
             "Error: Please make sure that you have Ladybug Tools and Honeybee installed "
-            "before proceeding with the installation. \n"
-            "Cannot determine the Ladybug Tools version installed? \n"
-            " - ladybug_rhino.config.lbt_grasshopper_version={} \n".format(lbt_gh)
+            "before proceeding with the installation. "
+            "Cannot determine the Ladybug Tools version installed? "
+            " - ladybug_rhino.config.lbt_grasshopper_version={} ".format(lbt_gh)
             )
         print msg
         raise Exception(msg)
@@ -205,9 +205,9 @@ def check_system_setup():
     
     print "Rhino running in 'Admin' mode:", is_windows_user_admin()
     if not is_windows_user_admin():
-        msg = " Error: This Honeybee-PH installer will only work if Rhino is started in 'Admin' mode.\n"\
-                "To proceed with the installation: \n"\
-                "Please close Rhino and re-open it by 'right-clicking' on the Rhino application, and selecting 'Run as Administrator'.\n"\
+        msg = " Error: This Honeybee-PH installer will only work if Rhino is started in 'Admin' mode."\
+                "To proceed with the installation: "\
+                "Please close Rhino and re-open it by 'right-clicking' on the Rhino application, and selecting 'Run as Administrator'."\
                 "Once you are in 'admin' mode, please re-open this installer and you will be able to continue with the Honeybee-PH Installation."
         raise Exception(msg)
     
@@ -291,8 +291,8 @@ def run_pip_command(python_exe, package_name, version=None, target=None, _env=No
     
     stdout, stderr = output
     
-    error_msg = 'Package "{}" may not have been updated correctly\n' \
-        'or its usage in the plugin may have changed. See pip stderr below:\n' \
+    error_msg = 'Package "{}" may not have been updated correctly' \
+        'or its usage in the plugin may have changed. See pip stderr below:' \
         '{}'.format(package_name, stderr)
     
     return error_msg
@@ -459,23 +459,23 @@ def get_files_from_github_repo(_github_repo_name, _target_directory, _branch='ma
     #-- Try and download the Github Repo as a .zip file, then unzip the file
     try:
         print("- "*25)
-        print("Downloading:: {}\nto:: {}".format(github_url, downloaded_zip_file_path))
+        print("Downloading:: {}to:: {}".format(github_url, downloaded_zip_file_path))
         futil.download_file_by_name(github_url, directory_to_download_to, name_of_zipfile_to_download, mkdir=True)
         
-        print("Unzipping:: {}\nto:: {}/".format(downloaded_zip_file_path, temp_unzip_directory))
+        print("Unzipping:: {}to:: {}/".format(downloaded_zip_file_path, temp_unzip_directory))
         futil.unzip_file(downloaded_zip_file_path, directory_to_download_to, mkdir=True)
     except IOError as e:
         msg = (
-            "There was an error downloading the {} package to your computer.\n"
+            "There was an error downloading the {} package to your computer."
             "If you have Ladybug Tools installed in you 'ProgramFiles' directory, (ie: if you "
-            "are using Pollination instead of the Food4Rhino LBT installer) you may \n"
+            "are using Pollination instead of the Food4Rhino LBT installer) you may "
             "need to run Rhino 'as administrator' in order to "
-            "install to this directory?\n".format(_github_repo_name)
+            "install to this directory?".format(_github_repo_name)
             )
         raise IOError(msg)
     except Exception as e:
         msg = "There was a error downloading {} to {} and unzipping the file "\
-            "to {}.\n{}".format(github_url, downloaded_zip_file_path, temp_unzip_directory, e)
+            "to {}.{}".format(github_url, downloaded_zip_file_path, temp_unzip_directory, e)
         raise Exception(msg)
 
 
@@ -540,7 +540,7 @@ def copy_grasshopper_components_to_UserObjects(_repo_name, _download_directory, 
                 print("Error deleting file or directory: {}".format(e))
 
     print('- '*25)
-    print('Copying downloaded Grasshopper Components from::\n{} to::\n{}'.format(hbph_gh_source_folder, target))
+    print('Copying downloaded Grasshopper Components from::{} to::{}'.format(hbph_gh_source_folder, target))
     
     futil.copy_file_tree(hbph_gh_source_folder, target, overwrite=True)
     
@@ -631,7 +631,7 @@ def install_honeybee_ph(_hbph_version, _phx_version, _hbph_gh_branch, _lbt_pytho
     # -------------------------------------------------------------------------
     # Give a success message
     print "- " * 50
-    msg = 'Honeybee-PH and PHX have been successfully installed!\n'\
+    msg = 'Honeybee-PH and PHX have been successfully installed!'\
         'Please RESTART RHINO to being using the new components + libraries.'
     print(msg)
     lbt_gh.give_popup_message(msg, 'Installation Successful!')
@@ -658,8 +658,8 @@ if _install:
         _env=CUSTOM_ENV
     )
 else:
-    msg = 'Please:\n'\
-    '- Be sure you have already installed Ladybug Tools.\n'\
-    '- Are connected to the internet.\n'\
+    msg = 'Please:'\
+    '- Be sure you have already installed Ladybug Tools.'\
+    '- Are connected to the internet.'\
     '- Set _install to "True" to install Honeybee-PH and all its dependencies on this system.'   
     print(msg)
