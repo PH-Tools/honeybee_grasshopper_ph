@@ -37,6 +37,11 @@ class GHCompo_PHPPCodes(object):
         if _in is None:
             self._dataset_name = ""
 
+        if str(_in).strip() == "DE-9999-PHPP-Standard":
+            self._dataset_name = _in
+            self.display_name = "9999-PHPP-Standard"
+            return
+
         vals = _in.split("-")
         if len(vals) != 2:
             raise Exception(
