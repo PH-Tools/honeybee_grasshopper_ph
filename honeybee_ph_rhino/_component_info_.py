@@ -530,6 +530,12 @@ COMPONENT_PARAMS = {
         "Category": CATEGORY,
         "SubCategory": 3,
     },
+    "HBPH - Write METR JSON": {
+        "NickName": "Write METR JSON",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 3,
+    },
     # -- Foundations
     "HBPH - Add Foundations": {
         "NickName": "Add Foundations",
