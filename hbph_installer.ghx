@@ -251,7 +251,7 @@
                     <item name="Name" type_name="gh_string" type_code="10">Scribble</item>
                     <item name="NickName" type_name="gh_string" type_code="10">Scribble</item>
                     <item name="Size" type_name="gh_single" type_code="5">50</item>
-                    <item name="Text" type_name="gh_string" type_code="10">MAR 28, 2026 [v1.18.5]</item>
+                    <item name="Text" type_name="gh_string" type_code="10">MAR 28, 2026 [v1.18.6]</item>
                   </items>
                   <chunks count="1">
                     <chunk name="Attributes">
@@ -1328,8 +1328,8 @@ EM January 9, 2026</item>
                     <item name="SourceCount" type_name="gh_int32" type_code="3">0</item>
                     <item name="UserText" type_name="gh_string" type_code="10">plotly&gt;=5.24.1
 ladybug-rhino&gt;=1.44.9
-honeybee-ph&gt;=1.32.7
-PHX&gt;=1.56.6</item>
+honeybee-ph&gt;=1.32.8
+PHX&gt;=1.56.7</item>
                   </items>
                   <chunks count="2">
                     <chunk name="Attributes">
