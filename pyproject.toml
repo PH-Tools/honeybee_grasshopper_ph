@@ -1,3 +1,19 @@
+# -- Bump My Version ---------------------------------------------------------------
+# This manages the RELEASE_VERSION in _component_info_.py
+# The orchestrator workflow calls: bump-my-version bump patch|minor|major
+[tool.bumpversion]
+current_version = "1.17.3"
+commit = true
+tag = true
+tag_name = "v{new_version}"
+commit_message = "bump: Honeybee-PH {current_version} -> {new_version} [skip ci]"
+
+[[tool.bumpversion.files]]
+filename = "honeybee_ph_rhino/_component_info_.py"
+search = 'RELEASE_VERSION = "Honeybee-PH v{current_version}"'
+replace = 'RELEASE_VERSION = "Honeybee-PH v{new_version}"'
+
+# -- Code Quality ------------------------------------------------------------------
 [tool.black]
 line-length = 120
 

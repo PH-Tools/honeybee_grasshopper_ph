@@ -1,0 +1,126 @@
+name: Release Honeybee-PH
+
+# Manually triggered from the GitHub Actions UI.
+# This is the "one button" release orchestrator that:
+#   1. Fetches the latest published PyPI versions of all PH-Tools libraries
+#   2. Updates requirements.txt with those versions
+#   3. Bumps the RELEASE_VERSION in _component_info_.py
+#   4. Updates the hbph_installer.ghx with the latest version pins
+#   5. Commits, tags, and creates a GitHub Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump_level:
+        description: "Version bump for Honeybee-PH Grasshopper components"
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+jobs:
+  release:
+    name: Orchestrate release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.10"
+
+      - name: Install tools
+        run: pip install bump-my-version requests
+
+      # ---------------------------------------------------------------
+      # Fetch the latest version of each PH-Tools package from PyPI
+      # ---------------------------------------------------------------
+      - name: Fetch latest PyPI versions
+        id: versions
+        run: |
+          python3 -c "
+          import json, os, requests
+
+          packages = {
+              'honeybee_ph': 'honeybee-ph',
+              'PHX':         'PHX',
+              'PH_units':    'PH-units',
+              'honeybee_ref':'honeybee-ref',
+          }
+
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+              for key, pypi_name in packages.items():
+                  resp = requests.get(f'https://pypi.org/pypi/{pypi_name}/json', timeout=30)
+                  resp.raise_for_status()
+                  version = resp.json()['info']['version']
+                  print(f'  {pypi_name}: {version}')
+                  out.write(f'{key}={version}\n')
+          "
+
+      # ---------------------------------------------------------------
+      # Update requirements.txt
+      # ---------------------------------------------------------------
+      - name: Update requirements.txt
+        run: |
+          python3 scripts/update_requirements.py \
+            --honeybee-ph=${{ steps.versions.outputs.honeybee_ph }} \
+            --phx=${{ steps.versions.outputs.PHX }} \
+            --ph-units=${{ steps.versions.outputs.PH_units }} \
+            --honeybee-ref=${{ steps.versions.outputs.honeybee_ref }}
+
+      # ---------------------------------------------------------------
+      # Bump the component version in _component_info_.py
+      # ---------------------------------------------------------------
+      - name: Bump component version
+        id: bump
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          bump-my-version bump ${{ inputs.bump_level }} --no-commit --no-tag
+          NEW_VERSION=$(bump-my-version show current_version)
+          echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+          echo "Bumped to: $NEW_VERSION"
+
+      # ---------------------------------------------------------------
+      # Update installer .ghx with latest PyPI versions
+      # ---------------------------------------------------------------
+      - name: Update installer
+        run: |
+          python3 scripts/update_installer_ghx.py \
+            --honeybee-ph=${{ steps.versions.outputs.honeybee_ph }} \
+            --phx=${{ steps.versions.outputs.PHX }}
+
+      # ---------------------------------------------------------------
+      # Commit all changes, tag, and push
+      # ---------------------------------------------------------------
+      - name: Commit and tag
+        run: |
+          git add -A
+          git commit -m "release: Honeybee-PH v${{ steps.bump.outputs.new_version }} [skip ci]"
+          git tag "v${{ steps.bump.outputs.new_version }}"
+          git push --follow-tags
+
+      # ---------------------------------------------------------------
+      # Create a GitHub Release (users see this)
+      # ---------------------------------------------------------------
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.bump.outputs.new_version }}
+          name: Honeybee-PH v${{ steps.bump.outputs.new_version }}
+          generate_release_notes: true
+          body: |
+            ## Bundled Library Versions
+            | Package | Version |
+            |---------|---------|
+            | honeybee-ph | ${{ steps.versions.outputs.honeybee_ph }} |
+            | PHX | ${{ steps.versions.outputs.PHX }} |
+            | PH-units | ${{ steps.versions.outputs.PH_units }} |
+            | honeybee-ref | ${{ steps.versions.outputs.honeybee_ref }} |
