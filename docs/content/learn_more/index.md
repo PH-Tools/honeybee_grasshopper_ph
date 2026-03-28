@@ -3,6 +3,10 @@ title: "Learn More"
 weight: 30
 ---
 
+## Honeybee-PH API Reference
+[https://ph-tools.github.io/honeybee_ph/](https://ph-tools.github.io/honeybee_ph/)
+
+
 ## [Video] Full Course (30 hours)
 [![RBC Course](/honeybee_grasshopper_ph/img/learn_more/RBC_Splash.png)](https://collective.reimaginebuildings.com)
 We are very happy to partner with the [Reimagine Buildings Collective](https://collective.reimaginebuildings.com) to offer a comprehensive on-demand video course covering **all** aspects of Honeybee, Honeybee-Energy, and Honeybee-PH (both PHPP and WUFI-Passive). This course includes more than 30 hours of on-demand 'model-along' style video tutorials and is available **FOR FREE** to all **Reimagine Buildings Collective** members. We hope to see you there! 
