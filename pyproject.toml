@@ -2,7 +2,7 @@
 # This manages the RELEASE_VERSION in _component_info_.py
 # The orchestrator workflow calls: bump-my-version bump patch|minor|major
 [tool.bumpversion]
-current_version = "1.18.2"
+current_version = "1.18.3"
 commit = true
 tag = true
 tag_name = "v{new_version}"
