@@ -83,7 +83,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          bump-my-version bump ${{ inputs.bump_level }} --no-commit --no-tag
+          bump-my-version bump ${{ inputs.bump_level }} --no-commit --no-tag --allow-dirty
           NEW_VERSION=$(bump-my-version show current_version)
           echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
           echo "Bumped to: $NEW_VERSION"
