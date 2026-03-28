@@ -15,7 +15,7 @@ except ImportError as e:
 
 try:
     from honeybee_ph import phi, phius, site
-    from honeybee_ph.bldg_segment import PhVentilationSummerBypassMode, PhWindExposureType, SetPoints, BldgSegment
+    from honeybee_ph.bldg_segment import BldgSegment, PhVentilationSummerBypassMode, PhWindExposureType, SetPoints
     from honeybee_ph.properties.room import RoomPhProperties
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph:\n\t{}".format(e))

@@ -96,7 +96,7 @@ class GHCompo_AdditionalZone(object):
     def slope(self):
         # type: () -> float
         """The slope used to determine the temperature reduction factor."""
-        
+
         slope = (AVERAGE_TEMP_C_INSIDE - self.average_monthly_outdoor_air_drybulb_temps_C) / (
             REDUCTION_FACTOR_INSIDE - REDUCTION_FACTOR_OUTSIDE
         )
@@ -113,7 +113,7 @@ class GHCompo_AdditionalZone(object):
     def ready(self):
         # type: () -> bool
         """Check if the component has all required inputs to run."""
-        
+
         if not self.attached_zone_name:
             return False
         if not self.attached_zone_temp_C:
@@ -127,7 +127,11 @@ class GHCompo_AdditionalZone(object):
         """Print log messages for the user."""
 
         print("Attached Zone Temp: {:.2f} deg-C".format(self.attached_zone_temp_C))
-        print("Average Monthly Outdoor Air Drybulb Temps: {:.2f} deg-C".format(self.average_monthly_outdoor_air_drybulb_temps_C))
+        print(
+            "Average Monthly Outdoor Air Drybulb Temps: {:.2f} deg-C".format(
+                self.average_monthly_outdoor_air_drybulb_temps_C
+            )
+        )
         print(
             "slope = ({:.2f} - {:.2f}) / ({:.2f} - {:.2f}) = {:.2f}".format(
                 AVERAGE_TEMP_C_INSIDE,
@@ -147,7 +151,7 @@ class GHCompo_AdditionalZone(object):
         # type: () -> PhAdditionalZone | None
         if not self.ready:
             return None
-        
+
         self.print_inputs()
 
         return PhAdditionalZone(

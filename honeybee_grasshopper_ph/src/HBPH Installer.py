@@ -55,10 +55,10 @@ try:
 except AttributeError:
     pass # Rhino 7
     
-import os
-import sys
 import json
+import os
 import subprocess
+import sys
 
 try:
     import ctypes
@@ -71,17 +71,17 @@ except ImportError:
     pass # IronPython 2.7
 
 try:
-    from exceptions import IOError # type: ignore
+    from exceptions import IOError  # type: ignore
 except ImportError:
     pass # IronPython 2.7
 
 try:
-    import Rhino # type: ignore
+    import Rhino  # type: ignore
 except ImportError:
     pass # Outside Rhino/Grasshopper
 
 try:
-    from Grasshopper.Folders import UserObjectFolders # type: ignore
+    from Grasshopper.Folders import UserObjectFolders  # type: ignore
 except ImportError:
     pass # Outside Rhino/Grasshopper
 

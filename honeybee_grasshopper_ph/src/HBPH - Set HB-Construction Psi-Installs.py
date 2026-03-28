@@ -3,7 +3,7 @@
 #
 # This component is part of the PH-Tools toolkit <https://github.com/PH-Tools>.
 #
-# Copyright (c) 2025, PH-Tools and bldgtyp, llc <phtools@bldgtyp.com>
+# Copyright (c) 2026, PH-Tools and bldgtyp, llc <phtools@bldgtyp.com>
 # Honeybee-PH is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published
 # by the Free Software Foundation; either version 3 of the License,
@@ -20,51 +20,32 @@
 # @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 #
 """
-Convert a Water-Heater 'UEF' value into an equivalent 'EF' value.
+Set the Psi-Install values of Honeybee-Energy Window-Constructons. These values represent
+the additional heat-loss where the aperture conncects to the host surface.
 -
-The Uniform Energy Factor (UEF) and Energy Factor (EF) are both efficiency ratings for
-water heaters, but UEF is the newer standard that replaced EF to provide more accurate
-and representative efficiency measurements.
--
-This is required for certain types of water-heaters in WUFI-Passive. The calculator
-here follows the conversion factors found in:
-    'RESNET Energy Factor Conversion Equations based on Water Heater Type'
-    https://www.resnet.us/wp-content/uploads/RESNET-EF-Calculator-2017.xlsx
--
-EM March 6, 2025
+EM March 13, 2026
     Args:
 
-        _heater_type: (str) Input either -
-1-Elec. Resistance
-2-Boiler (gas/oil)
-3-Boiler (wood)
-4-District Heating
-5-Heat Pump (annual COP)
-6-Heat Pump (monthly COP)
-7-Heat Pump (inside)
+        _psi_install_values_w_mk: (DataTree[float]) The Psi-Install values to apply to the
+            Honeybee-Energy Window Constructons. If only a single value is supplied, it will be
+            applied to eeach of the Constructions. If a DataTree of values is applied, this
+            component will try and match up the values with the items in the `_hb_apertures`
+            input wherever possible.
 
-        _use_type: (str) Input either -
-1-Consumer (ie: single-family home, etc.)
-2-Instant
-3-Commercial (ie: apartment building, etc.)
-
-        _UEF: (float) The manufacturer's stated 'UEF' value for the water-heater.
+        _hb_win_constructions: (DataTree[Apertures]) The Honeybee-Apertures to set the Psi-Install
+            values of.
 
     Returns:
-        annual_energy_factor_: The 'EF' value calculated from the input 'UEF'
-"""
 
+        hb_win_constructions_: The Honeybee-Energy Window-Constructions with the new
+            Psi-Install values applied.
+"""
 
 import ghpythonlib.components as ghc
 import Grasshopper as gh
 import Rhino as rh
 import rhinoscriptsyntax as rs
 import scriptcontext as sc
-
-try:
-    from honeybee_ph_utils import preview
-except ImportError as e:
-    raise ImportError("Failed to import honeybee_ph_utils:\t{}".format(e))
 
 try:
     from honeybee_ph_rhino import gh_compo_io
@@ -81,10 +62,10 @@ except ImportError as e:
 import honeybee_ph_rhino._component_info_
 
 reload(honeybee_ph_rhino._component_info_)
-ghenv.Component.Name = "HBPH - Calculate Water Heater Energy Factor"
+ghenv.Component.Name = "HBPH - Set HB-Construction Psi-Installs"
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
-    from honeybee_ph_rhino.gh_compo_io.hvac import calc_water_heater_EF as gh_compo_io
+    from honeybee_ph_rhino.gh_compo_io.apertures import win_set_hb_const_psi_install_values as gh_compo_io
 
     reload(gh_compo_io)
     reload(gh_io)
@@ -93,12 +74,11 @@ if DEV:
 # -- GH Interface
 IGH = gh_io.IGH(ghdoc, ghenv, sc, rh, rs, ghc, gh)
 
-
 # -------------------------------------------------------------------------------
-gh_compo_interface = gh_compo_io.GHCompo_CalculateWaterHeaterEnergyFactor(
+gh_compo_interface = gh_compo_io.GHCompo_SetWindowConstructionPsiInstallValues(
     IGH,
-    _heater_type,
-    _use_type,
-    _UEF,
+    _psi_install_values_w_mk,
+    _hb_win_constructions,
 )
-annual_energy_factor_ = gh_compo_interface.run()
+
+hb_win_constructions_ = gh_compo_interface.run()

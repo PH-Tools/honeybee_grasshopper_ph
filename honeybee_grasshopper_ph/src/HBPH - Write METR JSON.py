@@ -3,7 +3,7 @@
 #
 # This component is part of the PH-Tools toolkit <https://github.com/PH-Tools>.
 #
-# Copyright (c) 2022, PH-Tools and bldgtyp, llc <phtools@bldgtyp.com>
+# Copyright (c) 2026, PH-Tools and bldgtyp, llc <phtools@bldgtyp.com>
 # Honeybee-PH is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published
 # by the Free Software Foundation; either version 3 of the License,
@@ -20,17 +20,25 @@
 # @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 #
 """
-Set the color for a specific Honeybee-Material. This is only relevant for WUFI-Passive
-model exports. For PHPP or other exports this color attribute is ignored.
+Convert an HBJSON file into a new METR-JSON file which can then be opened using
+METR. This will read in the HBJSON, rebuild the HB-Model before converting the
+Model into a METR-JSON file.
 -
-EM March 6, 2024
+EM March 15, 2026
     Args:
-        _material: () A Honeybee Opaque Material to assign the color for.
+        _filename: (str) The filename for the METR-JSON file.
 
-        _color: (System.Display.Color) A Color to use for the Material.
+        _save_folder: (str) The folder path to save the METR-JSON file to.
+
+        _hb_json_file: (str) The path to the HBJSON file to convert into METR-JSON.
+
+        _settings: The WUFI/METR Settings object. Connect the "HBPH - Write WUFI XML Settings"
+            'settings_' output.
+
+        _write_json: (bool) Set True to run.
 
     Returns:
-        material_: () The Honeyboee Opaque Material with the color assigned.
+        json_file_: The full path to the output METR-JSON file.
 """
 
 import ghpythonlib.components as ghc
@@ -49,13 +57,16 @@ except ImportError as e:
 import honeybee_ph_rhino._component_info_
 
 reload(honeybee_ph_rhino._component_info_)
-ghenv.Component.Name = "HBPH - Set Material Color"
-DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
+ghenv.Component.Name = "HBPH - Write METR JSON"
+DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev="260315")
 if DEV:
-    reload(gh_io)
-    from honeybee_ph_rhino.gh_compo_io import assmbly_set_mat_color as gh_compo_io
+    from PHX import run
+
+    reload(run)
+    from honeybee_ph_rhino.gh_compo_io import write_metr_json as gh_compo_io
 
     reload(gh_compo_io)
+    reload(gh_io)
 
 # ------------------------------------------------------------------------------
 # -- GH Interface
@@ -63,9 +74,12 @@ IGH = gh_io.IGH(ghdoc, ghenv, sc, rh, rs, ghc, gh)
 
 
 # ------------------------------------------------------------------------------
-gh_compo_interface = gh_compo_io.GHCompo_SetMaterialColor(
+gh_compo_interface = gh_compo_io.GHCompo_WriteMetrJson(
     IGH,
-    _material,
-    _color,
+    _filename,
+    _save_folder,
+    _hb_json_file,
+    _settings,
+    _write_metr_json,
 )
-material_ = gh_compo_interface.run()
+json_file_ = gh_compo_interface.run()
