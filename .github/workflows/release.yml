@@ -95,7 +95,8 @@ jobs:
         run: |
           python3 scripts/update_installer_ghx.py \
             --honeybee-ph=${{ steps.versions.outputs.honeybee_ph }} \
-            --phx=${{ steps.versions.outputs.PHX }}
+            --phx=${{ steps.versions.outputs.PHX }} \
+            --release-version=${{ steps.bump.outputs.new_version }}
 
       # ---------------------------------------------------------------
       # Commit all changes, tag, and push
