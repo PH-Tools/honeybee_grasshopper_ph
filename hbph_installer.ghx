@@ -823,6 +823,32 @@ def get_package_name_and_version(package):
 
     return package.split(delimiter)
 
+def parse_version_tuple(version_str):
+    # type: (str) -&gt; tuple
+    """Parse a version string like '1.32.9' into a tuple of ints for comparison."""
+    try:
+        return tuple(int(x) for x in version_str.split('.'))
+    except (ValueError, AttributeError):
+        return (0,)
+
+def find_installed_dist_info(_package_install_folder_name, _min_version, _site_packages_path):
+    # type: (str, str, str) -&gt; Optional[str]
+    """Find a dist-info folder for the package with version &gt;= _min_version.
+
+    Returns the folder name if found, or None.
+    """
+    min_ver = parse_version_tuple(_min_version)
+    prefix = "{}-".format(_package_install_folder_name)
+    suffix = ".dist-info"
+
+    for entry in os.listdir(_site_packages_path):
+        if entry.startswith(prefix) and entry.endswith(suffix):
+            version_str = entry[len(prefix):-len(suffix)]
+            installed_ver = parse_version_tuple(version_str)
+            if installed_ver &gt;= min_ver:
+                return entry
+    return None
+
 def pip_install(_package, _lbt_python_exe_path, _lbt_python_package_path, _package_install_folder_name=None, _env=None):
     # type: (str, str, str, Optional[str], Optional[Dict]) -&gt; None
     """PIP install a specified package from PyPi to the Ladybug Tools Python.
@@ -867,23 +893,18 @@ def pip_install(_package, _lbt_python_exe_path, _lbt_python_package_path, _packa
     print "  _package_install_folder_name=", _package_install_folder_name
     print "  _env['PYTHONHOME']=", _env['PYTHONHOME'] 
     
-    package_dist_folder_name = "{}-{}.dist-info".format(_package_install_folder_name, package_version)
-    print "package_dist_folder_name=", package_dist_folder_name
-    
-    package_dist_folder_path = os.path.join(_lbt_python_package_path, package_dist_folder_name)
-    print "package_dist_folder_path=", package_dist_folder_path
-    
     stdout, stderr = run_pip_command(_lbt_python_exe_path, package_name, package_version, _env=_env)
-    
-    if os.path.isdir(package_dist_folder_path):
-        print("Package '{}' (v-{}) successfully installed to: {}".format(package_name, package_version, _lbt_python_package_path))
+
+    found_dist = find_installed_dist_info(_package_install_folder_name, package_version, _lbt_python_package_path)
+    if found_dist:
+        print("Package '{}' (&gt;={}) successfully installed to: {} [found: {}]".format(package_name, package_version, _lbt_python_package_path, found_dist))
     else:
-        print("ERROR: Package '{}' (v-{}) failed to install to: {}".format(package_name, package_version, _lbt_python_package_path))
-        print("ERROR: Could not find {}".format(package_dist_folder_path))
+        print("ERROR: Package '{}' (&gt;={}) failed to install to: {}".format(package_name, package_version, _lbt_python_package_path))
+        print("ERROR: Could not find any {}-*.dist-info with version &gt;= {} in {}".format(_package_install_folder_name, package_version, _lbt_python_package_path))
         print("ERROR: {}".format(str(stderr)))
         print("ERROR: {}".format(str(stdout)))
 
-        msg = "ERROR: Failed to install {} v{}".format(package_name, package_version)
+        msg = "ERROR: Failed to install {} &gt;={}".format(package_name, package_version)
         COMPONENT.AddRuntimeMessage(Message.Error, msg)
 
 
