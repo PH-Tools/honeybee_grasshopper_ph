@@ -838,11 +838,11 @@ def find_installed_dist_info(_package_install_folder_name, _min_version, _site_p
     Returns the folder name if found, or None.
     """
     min_ver = parse_version_tuple(_min_version)
-    prefix = "{}-".format(_package_install_folder_name)
+    prefix = "{}-".format(_package_install_folder_name.lower())
     suffix = ".dist-info"
 
     for entry in os.listdir(_site_packages_path):
-        if entry.startswith(prefix) and entry.endswith(suffix):
+        if entry.lower().startswith(prefix) and entry.lower().endswith(suffix):
             version_str = entry[len(prefix):-len(suffix)]
             installed_ver = parse_version_tuple(version_str)
             if installed_ver &gt;= min_ver:
