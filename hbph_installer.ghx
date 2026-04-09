@@ -251,7 +251,7 @@
                     <item name="Name" type_name="gh_string" type_code="10">Scribble</item>
                     <item name="NickName" type_name="gh_string" type_code="10">Scribble</item>
                     <item name="Size" type_name="gh_single" type_code="5">50</item>
-                    <item name="Text" type_name="gh_string" type_code="10">APR 08, 2026 [v1.18.16]</item>
+                    <item name="Text" type_name="gh_string" type_code="10">APR 09, 2026 [v1.18.17]</item>
                   </items>
                   <chunks count="1">
                     <chunk name="Attributes">
