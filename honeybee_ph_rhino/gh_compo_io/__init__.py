@@ -18,6 +18,7 @@ from honeybee_ph_rhino.gh_compo_io.building_create_team_member import GHCompo_Cr
 from honeybee_ph_rhino.gh_compo_io.building_segment import GHCompo_BuildingSegment
 from honeybee_ph_rhino.gh_compo_io.building_set_project_data import GHCompo_SetProjectData
 from honeybee_ph_rhino.gh_compo_io.cert import *
+from honeybee_ph_rhino.gh_compo_io.summer_ventilation import *
 
 # -- Climate
 from honeybee_ph_rhino.gh_compo_io.climate_conver_fact import GHCompo_ConversionFactor

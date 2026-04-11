@@ -15,7 +15,7 @@ except ImportError as e:
 
 try:
     from honeybee_ph import phi, phius, site
-    from honeybee_ph.bldg_segment import BldgSegment, PhVentilationSummerBypassMode, PhWindExposureType, SetPoints
+    from honeybee_ph.bldg_segment import BldgSegment, PhVentilationSummerBypassMode, PhWindExposureType, SetPoints, SummerVentilation
     from honeybee_ph.properties.room import RoomPhProperties
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph:\n\t{}".format(e))
@@ -86,12 +86,12 @@ class GHCompo_BuildingSegment(object):
         _mech_room_temp,
         _hb_rooms,
         _non_combustible_materials=False,
-        _hvr_summer_bypass_mode="4",
+        _summer_ventilation_=None,
         _wind_exposure_type="1",
         *args,
         **kwargs
     ):
-        # type: (gh_io.IGH, str, int, int, site.Site, List, List, phius.PhiusCertification, phi.PhiCertification, str, str, str, List[room.Room], bool, str, str, *Any, **Any) -> None
+        # type: (gh_io.IGH, str, int, int, site.Site, List, List, phius.PhiusCertification, phi.PhiCertification, str, str, str, List[room.Room], bool, str | None | SummerVentilation, str, *Any, **Any) -> None
         self.IGH = _IGH
         self._display_name = _segment_name or "_unnamed_bldg_segment_"
         self.num_floor_levels = _num_floor_levels
@@ -106,7 +106,7 @@ class GHCompo_BuildingSegment(object):
         self.non_combustible_materials = _non_combustible_materials or False
         self._create_tb_dict()
 
-        # -------------------------------------------------------------------------------------
+        # --------------------------------------------------------------------------------------------------------------
         # -- Sort out the fuel factors and any inputs
         self._source_energy_factors = factors.FactorCollection(
             "Source_Energy", self._default_phius_source_energy_factors
@@ -121,8 +121,17 @@ class GHCompo_BuildingSegment(object):
             self.co2e_factors.add_factor(factor)
 
         self.co2e_factors.validate_fuel_types(self._allowed_fuels)
-        self.summer_hrv_bypass_mode = _hvr_summer_bypass_mode or "4"
         self.wind_exposure_type = _wind_exposure_type or "1"
+
+        # --------------------------------------------------------------------------------------------------------------
+        # -- Handle older API for summer-ventilation and hrv-bypass mode
+        if isinstance(_summer_ventilation_, int) or isinstance(_summer_ventilation_, str):
+            self.summer_ventilation = SummerVentilation()
+            self.summer_ventilation.summer_bypass_mode = PhVentilationSummerBypassMode(input_to_int(_summer_ventilation_) or 4)
+        elif _summer_ventilation_ is not None:
+            self.summer_ventilation = _summer_ventilation_
+        else:
+            self.summer_ventilation = SummerVentilation()
 
     @property
     def source_energy_factors(self):
@@ -154,16 +163,6 @@ class GHCompo_BuildingSegment(object):
     def _default_phius_CO2_factors(self):
         # type: () -> List[factors.Factor]
         return factors.build_factors_from_library(phius_CO2_factors.factors_2021)
-
-    @property
-    def summer_hrv_bypass_mode(self):
-        # type: () -> PhVentilationSummerBypassMode
-        return self._summer_hrv_bypass_mode
-
-    @summer_hrv_bypass_mode.setter
-    def summer_hrv_bypass_mode(self, _input):
-        # type: (str) -> None
-        self._summer_hrv_bypass_mode = PhVentilationSummerBypassMode(input_to_int(_input) or 4)
 
     @property
     def wind_exposure_type(self):

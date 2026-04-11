@@ -272,6 +272,12 @@ COMPONENT_PARAMS = {
         "Category": CATEGORY,
         "SubCategory": 1,
     },
+    "HBPH - Create Summer Ventilation": {
+        "NickName": "Create Summer Ventilation",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
     #  -- Elec Equipment
     "HBPH - Create PH Equipment": {
         "NickName": "Create PH Equipment",
