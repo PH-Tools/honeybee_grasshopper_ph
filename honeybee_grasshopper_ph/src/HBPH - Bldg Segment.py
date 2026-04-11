@@ -33,7 +33,7 @@ model. Only Honeybee Faces with boundary conditions of "Outdoors", "Ground" and
 -
 Use this before passing the honeybee-rooms on to the 'HB Model' component.
 -
-EM June 6, 2024
+EM April 11, 2026
     Args:
         segment_name_: Name for the building-segment
                
@@ -75,25 +75,13 @@ EM June 6, 2024
             heated outdoor space such as a garage or breezeway. For Phius Certification, 
             use the 'ERV_HRV_Outside Calculator' tool which can be downloaded from the 
             Phius website www.phius.org
-
+            
         non_combustible_materials_: (bool) Default=False. Set True if the building is made 
             of non-combustible materials which allows for a higher air-leakage rate.
             
-        hrv_summer_bypass_mode_: (str) Input either - 
-"1-None"
-"2-Temperature Controlled"
-"3-Enthalpy Controlled"
-"4-Always" (Default)
+        _summer_ventilation_: (SummerVentilation) Optional settings for Summer Ventilation 
+            due to windows, dedicated extract fans, and HRV/ERV.
     
-        wind_exposure_type_: (str) Input either - 
-"1-Several Sides Exposed | No Screening" (Default)
-"2-Several Sides Exposed | Moderate Screening"
-"3-Several Sides Exposed | High Screening"
-"4-One Side Exposed | No Screening"
-"5-One Side Exposed | Moderate Screening"
-"6-User Determined"
-"7-One Side Exposed | High Screening"
-
     Returns:
         hb_rooms_: The honeyee-Rooms with building-segment information added.
 """
@@ -135,7 +123,6 @@ if DEV:
 # -- GH Interface
 IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 
-
 # -------------------------------------------------------------------------------------
 gh_compo_interface = gh_compo_io.GHCompo_BuildingSegment(
         IGH,
@@ -152,8 +139,7 @@ gh_compo_interface = gh_compo_io.GHCompo_BuildingSegment(
         mech_room_temp_,
         _hb_rooms,
         non_combustible_materials_,
-        hrv_summer_bypass_mode_,
-        wind_exposure_type_,
+        _summer_ventilation_,
 )
 hb_rooms_, hbph_segment = gh_compo_interface.run()
 
