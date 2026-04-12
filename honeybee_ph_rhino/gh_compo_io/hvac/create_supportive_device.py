@@ -42,6 +42,7 @@ class GHCompo_CreateSupportiveDevice(object):
 
     norm_energy_demand_W = ghio_validators.UnitW("norm_energy_demand_W", default=0.0)
     annual_period_operation_khrs = ghio_validators.FloatPositiveValue("annual_period_operation_khrs", default=8.760)
+    ihg_utilization_factor = ghio_validators.FloatPercentage("ihg_utilization_factor", default=1.0)
 
     def __init__(
         self,
@@ -52,8 +53,9 @@ class GHCompo_CreateSupportiveDevice(object):
         _in_conditioned_space,
         _norm_energy_demand_W,
         _annual_period_operation_khrs,
+        _ihg_utilization_factor
     ):
-        # type: (gh_io.IGH, str, int, int, bool, float, float) -> None
+        # type: (gh_io.IGH, str, int, int, bool, float, float, float) -> None
         self.IGH = _IGH
         self.display_name = _display_name
         self._device_type = input_tools.input_to_int(_device_type)
@@ -61,7 +63,8 @@ class GHCompo_CreateSupportiveDevice(object):
         self.in_conditioned_space = _in_conditioned_space
         self.norm_energy_demand_W = _norm_energy_demand_W
         self.annual_period_operation_khrs = _annual_period_operation_khrs
-
+        self.ihg_utilization_factor = _ihg_utilization_factor
+        
     @property
     def device_type(self):
         # type: () -> Optional[int]
@@ -97,5 +100,6 @@ class GHCompo_CreateSupportiveDevice(object):
         supportive_device.in_conditioned_space = self.in_conditioned_space
         supportive_device.norm_energy_demand_W = self.norm_energy_demand_W
         supportive_device.annual_period_operation_khrs = self.annual_period_operation_khrs
-
+        supportive_device.ihg_utilization_factor = self.ihg_utilization_factor
+        
         return supportive_device

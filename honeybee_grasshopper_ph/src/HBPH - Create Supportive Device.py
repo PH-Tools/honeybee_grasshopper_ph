@@ -30,7 +30,7 @@ any components to the HB-Energy model. If you need to model mechancial equipment
 / OpenStudio simulation then you must also use the Honeybee-Energy / IronBug components to setup
 those devices separate from the inputs defined on the component here.
 -
-EM April 21, 2024
+EM April 12, 2026
     Args:
         _display_name: (str) Name for the new PH-HVAC Supportive Device created
         
@@ -49,6 +49,9 @@ EM April 21, 2024
         
         _yearly_runtime_kHrs: (float) The total annual runtime of the devide 
             expressed in kilo-hours (ie: 8,760 hrs/year = 8.760 kHrs/year)
+
+        _ihg_utilization_factor: (float) OPTIONAL Default=1.0 utilization factor to apply
+            when calcultion the impact on internal-heat-gains from this device. 
         
     Returns:
         supportive_device_: A PH-HVAC Supportive Device which can be added to a 
@@ -99,7 +102,8 @@ gh_compo_interface = gh_compo_io.GHCompo_CreateSupportiveDevice(
     _device_quantity,
     _inside,
     _energy_demand_W,
-    _yearly_runtime_kHrs
+    _yearly_runtime_kHrs,
+    _ihg_utilization_factor,
 )
 supportive_device_ = gh_compo_interface.run()
 
