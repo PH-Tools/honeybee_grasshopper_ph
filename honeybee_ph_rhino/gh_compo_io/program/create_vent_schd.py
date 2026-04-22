@@ -72,7 +72,7 @@ class GHCompo_CreateVentSched(object):
             ph_properties.daily_operating_periods.add_period_to_collection(self.op_period_basic)
 
         if self.op_period_minimum:
-            self.op_period_minimum.name = "low"
+            self.op_period_minimum.name = "minimum"
             ph_properties.daily_operating_periods.add_period_to_collection(self.op_period_minimum)
 
         # ---------------------------------------------------------------------
