@@ -336,19 +336,19 @@ https://github.com/bldgtyp/branding
   - Replace `hugo.yml` with a simple workflow that deploys `docs/public/` to Pages (no Hugo build needed — just static HTML redirect files)
   - This keeps the old URLs alive as redirects indefinitely, at zero maintenance cost
 - [x] **5.9** Update this repo's README if it references the docs site URL
-- [ ] **5.10** Commit all cleanup changes
+- [x] **5.10** Commit all cleanup changes
 - [x] **5.11** Verify the `release.yml` workflow still works (it should — it doesn't depend on `docs/`) — confirmed, no deps on docs/
-- [ ] **5.12** Verify old URLs (`ph-tools.github.io/honeybee_grasshopper_ph/`, `.../install/`, etc.) redirect to new site
+- [x] **5.12** Verify old URLs (`ph-tools.github.io/honeybee_grasshopper_ph/`, `.../install/`, etc.) redirect to new site
 
 ### Phase 6: Dreamhost Decommission
 
-- [ ] **6.1** Confirm new site is stable and DNS is fully propagated (wait at least 1 week after Phase 3)
-- [ ] **6.2** **Before downgrading**: check that `ph-nav.com` or `ph-switch.com` (already on DNS-Only) support custom A records in the Dreamhost panel. If they do, proceed. If DNS-Only doesn't allow custom A/CNAME records, either keep the cheapest hosting tier or move DNS to Cloudflare (free).
-- [ ] **6.3** In Dreamhost panel: downgrade `passivehousetools.com` from "Shared Unlimited" to "DNS Only".
-- [ ] **6.4** **Immediately after downgrade**: verify `dig passivehousetools.com A` still returns GitHub Pages IPs. If DNS breaks, re-upgrade hosting tier and investigate.
-- [ ] **6.5** Delete the `ftp` and `ssh` A records (Dreamhost hosting artifacts, no longer needed)
-- [ ] **6.6** Verify domain registration is set to auto-renew (expires 2027-01-04)
-- [ ] **6.7** Verify `passivehouse.tools` → `passivehousetools.com` redirect still works after hosting removal (it should — the redirect is configured on `passivehouse.tools`, not on the `passivehousetools.com` hosting plan)
+- [ ] **6.1** *(follow-up)* Confirm new site is stable and DNS is fully propagated (wait at least 1 week after Phase 3)
+- [x] **6.2** Dreamhost DNS-Only supports custom A records — confirmed during Phase 3 (custom A records added while on DNS-Only)
+- [x] **6.3** Dreamhost hosting plan already deactivated during Phase 3 — domain is now "DNS Only"
+- [x] **6.4** `dig passivehousetools.com A` returns GitHub Pages IPs — confirmed
+- [ ] **6.5** *(follow-up)* Delete the `ftp` and `ssh` A records (Dreamhost hosting artifacts, no longer needed)
+- [ ] **6.6** *(follow-up)* Verify domain registration is set to auto-renew (expires 2027-01-04)
+- [ ] **6.7** *(follow-up)* Verify `passivehouse.tools` → `passivehousetools.com` redirect still works
 
 ---
 
