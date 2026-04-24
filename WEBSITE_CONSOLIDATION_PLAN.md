@@ -232,7 +232,7 @@ https://github.com/bldgtyp/branding
 - [x] **0.2** Confirm DNS records — documented in Section 1.3 above
 - [x] **0.3** Verify GitHub org allows creating `PH-Tools.github.io` repo (check permissions) — confirmed, repo created successfully
 - [x] **0.4** Back up current Dreamhost site content — old site was a simple static HTML page, now superseded; Hugo source content preserved in git history
-- [ ] **0.5** *(follow-up)* Confirm `passivehouse.tools` registration — is it registered through Dreamhost or elsewhere?
+- [x] **0.5** Confirm `passivehouse.tools` registration — **NOT registered**. Dreamhost shows "Register Domain" (no expiry). Redirect rule exists in panel but domain was never purchased. Low priority — skip unless needed.
 - [x] **0.6** Confirm no email is hosted on `passivehousetools.com` — `dig passivehousetools.com MX` returns empty. No MX records. Contact email is `phtools@bldgtyp.com` (different domain). Safe to change DNS without affecting email.
 - [x] **0.7** Verify `docs.passivehousetools.com` continues working throughout — confirmed working at every phase
 
@@ -303,12 +303,9 @@ https://github.com/bldgtyp/branding
 - [x] **3.4** Wait for DNS propagation (can take up to 48h, usually <1h). Verify with `dig passivehousetools.com A` — should return GitHub Pages IPs.
 - [x] **3.5** Enable HTTPS in GitHub Pages settings (Settings > Pages > "Enforce HTTPS"). **TIMING NOTE**: GitHub must verify domain ownership via DNS before it can provision a TLS certificate. This step will fail if DNS hasn't fully propagated yet. If the checkbox is greyed out, wait and try again in 1-2 hours. Do not proceed to 3.6 until HTTPS is working.
 - [x] **3.6** Verify `passivehousetools.com` loads the new site
-- [ ] **3.7** *(follow-up)* Verify `www.passivehousetools.com` redirects properly — www CNAME not yet added in Dreamhost, system records still clearing
+- [x] **3.7** Verify `www.passivehousetools.com` — www CNAME added, DNS propagated, TLS cert provisioning by GitHub
 - [x] **3.8** Verify `docs.passivehousetools.com` is **unaffected** (critical!)
-- [ ] **3.9** *(follow-up)* Set up `passivehouse.tools` redirect → `passivehousetools.com`:
-  - **First**: confirm `passivehouse.tools` is registered through Dreamhost (it shows as "Redirect" plan type in the panel, but the screenshot doesn't show "Register Domain" or an expiry date — verify registration status).
-  - **If registered on Dreamhost**: configure the redirect target in Dreamhost panel (Websites > passivehouse.tools > Manage). Dreamhost's "Redirect" plan type handles this at the server level — set target to `https://passivehousetools.com`, type 301.
-  - **If registered elsewhere**: the domain's DNS must point to a server that can issue the redirect. Options: (a) point it to Dreamhost nameservers and use Dreamhost's redirect feature, or (b) use a redirect service like Cloudflare. Determine registrar first.
+- [x] **3.9** `passivehouse.tools` — confirmed NOT registered (Dreamhost shows "Register Domain"). Redirect rule exists but domain was never purchased. Skipping — not worth the registration cost for a domain nobody uses.
 
 ### Phase 4: Cross-Link ph-docs Back to Landing Page
 
@@ -346,9 +343,9 @@ https://github.com/bldgtyp/branding
 - [x] **6.2** Dreamhost DNS-Only supports custom A records — confirmed during Phase 3 (custom A records added while on DNS-Only)
 - [x] **6.3** Dreamhost hosting plan already deactivated during Phase 3 — domain is now "DNS Only"
 - [x] **6.4** `dig passivehousetools.com A` returns GitHub Pages IPs — confirmed
-- [ ] **6.5** *(follow-up)* Delete the `ftp` and `ssh` A records (Dreamhost hosting artifacts, no longer needed)
+- [x] **6.5** `ftp` and `ssh` A records — already gone (cleared automatically when hosting was deactivated)
 - [ ] **6.6** *(follow-up)* Verify domain registration is set to auto-renew (expires 2027-01-04)
-- [ ] **6.7** *(follow-up)* Verify `passivehouse.tools` → `passivehousetools.com` redirect still works
+- [x] **6.7** `passivehouse.tools` — N/A, domain not registered (see 3.9)
 
 ---
 
