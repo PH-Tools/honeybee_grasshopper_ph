@@ -89,7 +89,12 @@ inputs_heat_pump_annual.update(
     {
         3: ComponentInput(
             _name="annual_COP",
-            _description="COP: watts-out/watts-in",
+            _description="COP: energy-out/energy-in",
+            _type_hint=Component.NewStrHint(),
+        ),
+        4: ComponentInput(
+            _name="total_system_perf_ratio",
+            _description="Inverse of the COP. energy-in/energy-out",
             _type_hint=Component.NewStrHint(),
         ),
         6: ComponentInput(_name="_percent_bldg_cooling_covered", _description=""),
