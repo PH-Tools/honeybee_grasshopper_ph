@@ -62,9 +62,9 @@ EM May 21, 2024
         _insul_quality: (List[str]) The quality of the insulation installed at the 
             mountings, suspension elements, and other thermal-bridges.
             input either -
-            - "0-None"
-            - "1-Moderate"
-            - "2-Good"
+            - "1-None"
+            - "2-Moderate"
+            - "3-Good"
         
         _daily_period: (List[float]) The daily operating period in hours.
         

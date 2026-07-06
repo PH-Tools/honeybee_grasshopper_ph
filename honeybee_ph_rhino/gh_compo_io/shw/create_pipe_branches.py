@@ -115,7 +115,7 @@ class _BranchPipeBuilder(object):
                     _insul_thickness_mm=0.0,
                     _insul_conductivity=0.04,
                     _insul_refl=False,
-                    _insul_quality=None,
+                    _insul_quality=1,
                     _daily_period=24,
                     _water_temp_c=self.water_temp_c,
                     _material=self.pipe_material,

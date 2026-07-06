@@ -58,11 +58,11 @@ class _RecircPipeBuilder(object):
         _insul_thickness_mm="25.4 MM",
         _insul_conductivity="0.04 W/MK",
         _insul_reflective=True,
-        _insul_quality=None,
+        _insul_quality=1,
         _daily_period=24.0,
         _water_temp_c="60.0 DEG-C",
     ):
-        # type: (gh_io.IGH, Union[Polyline3D, LineSegment3D], str, str, str, str, bool, None, float, str) -> None
+        # type: (gh_io.IGH, Union[Polyline3D, LineSegment3D], str, str, str, str, bool, int, float, str) -> None
         self.IGH = IGH
         self.geometry = _geometry
         self.display_name = _name
@@ -70,7 +70,7 @@ class _RecircPipeBuilder(object):
         self.insul_thickness_mm = _insul_thickness_mm
         self.insul_conductivity = _insul_conductivity
         self.insul_reflective = _insul_reflective
-        self.insul_quality = _insul_quality
+        self.insul_quality = _insul_quality or 1
         self.daily_period = _daily_period
         self.water_temp_c = _water_temp_c
 
