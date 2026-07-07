@@ -51,8 +51,16 @@ EM April 12, 2026
             expressed in kilo-hours (ie: 8,760 hrs/year = 8.760 kHrs/year)
 
         _ihg_utilization_factor: (float) OPTIONAL Default=1.0 utilization factor to apply
-            when calcultion the impact on internal-heat-gains from this device. 
-        
+            when calcultion the impact on internal-heat-gains from this device.
+
+        _ihg_usage_profile: (int) OPTIONAL The PHPP season / block that this device's
+            internal-heat-gain lands in. Leave blank to default off the '_device_type'
+            (DHW pumps -> None, heat pumps -> Winter, others -> All Year). Input either -
+1-All Year
+2-Winter
+3-Summer
+4-None (DHW)
+
     Returns:
         supportive_device_: A PH-HVAC Supportive Device which can be added to a 
             mechanical system.
@@ -104,6 +112,7 @@ gh_compo_interface = gh_compo_io.GHCompo_CreateSupportiveDevice(
     _energy_demand_W,
     _yearly_runtime_kHrs,
     _ihg_utilization_factor,
+    _ihg_usage_profile,
 )
 supportive_device_ = gh_compo_interface.run()
 
