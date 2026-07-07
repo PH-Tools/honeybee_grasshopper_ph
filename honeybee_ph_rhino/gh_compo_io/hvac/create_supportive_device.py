@@ -21,6 +21,7 @@ except ImportError as e:
 
 try:
     from honeybee_phhvac import supportive_device
+    from honeybee_phhvac.supportive_device import default_ihg_usage_profile
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_phhvac:\n\t{}".format(e))
 
@@ -40,6 +41,13 @@ class GHCompo_CreateSupportiveDevice(object):
         "10-Other / Custom ",
     ]
 
+    valid_ihg_usage_profiles = [
+        "1-All Year",
+        "2-Winter",
+        "3-Summer",
+        "4-None (DHW)",
+    ]
+
     norm_energy_demand_W = ghio_validators.UnitW("norm_energy_demand_W", default=0.0)
     annual_period_operation_khrs = ghio_validators.FloatPositiveValue("annual_period_operation_khrs", default=8.760)
     ihg_utilization_factor = ghio_validators.FloatPercentage("ihg_utilization_factor", default=1.0)
@@ -53,9 +61,10 @@ class GHCompo_CreateSupportiveDevice(object):
         _in_conditioned_space,
         _norm_energy_demand_W,
         _annual_period_operation_khrs,
-        _ihg_utilization_factor
+        _ihg_utilization_factor,
+        _ihg_usage_profile
     ):
-        # type: (gh_io.IGH, str, int, int, bool, float, float, float) -> None
+        # type: (gh_io.IGH, str, int, int, bool, float, float, float, Optional[int]) -> None
         self.IGH = _IGH
         self.display_name = _display_name
         self._device_type = input_tools.input_to_int(_device_type)
@@ -64,7 +73,8 @@ class GHCompo_CreateSupportiveDevice(object):
         self.norm_energy_demand_W = _norm_energy_demand_W
         self.annual_period_operation_khrs = _annual_period_operation_khrs
         self.ihg_utilization_factor = _ihg_utilization_factor
-        
+        self.ihg_usage_profile = input_tools.input_to_int(_ihg_usage_profile)
+
     @property
     def device_type(self):
         # type: () -> Optional[int]
@@ -101,5 +111,12 @@ class GHCompo_CreateSupportiveDevice(object):
         supportive_device.norm_energy_demand_W = self.norm_energy_demand_W
         supportive_device.annual_period_operation_khrs = self.annual_period_operation_khrs
         supportive_device.ihg_utilization_factor = self.ihg_utilization_factor
-        
+
+        # -- Blank input -> default the season/block off the chosen device_type
+        # -- (e.g. a DHW pump -> None, a heat pump -> Winter).
+        if self.ihg_usage_profile is None:
+            supportive_device.ihg_usage_profile = default_ihg_usage_profile(self.device_type)
+        else:
+            supportive_device.ihg_usage_profile = self.ihg_usage_profile
+
         return supportive_device
