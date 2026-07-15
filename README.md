@@ -44,5 +44,11 @@ following repositories to be installed in order to work correctly:
 See the [Wiki of the lbt-grasshopper repository](https://github.com/ladybug-tools/lbt-grasshopper/wiki)
 for the installation instructions for the entire Ladybug Tools Grasshopper plugin.
 
+## Development
+
+This repo is the Grasshopper **UI layer** only — component logic lives in `honeybee_ph_rhino/` (IronPython 2.7) and the data model/serialization live upstream in `honeybee_ph` and `PHX`. Component workers are developed here but their tests live in `honeybee_ph`.
+
+For contributor/agent orientation see [`CLAUDE.md`](CLAUDE.md) and the [`context/`](context/) folder (PRD, the component architecture, coding standards, tech stack). Ecosystem build/release detail is in [`WORKFLOW.md`](WORKFLOW.md).
+
 
 [![IronPython](https://img.shields.io/badge/ironpython-2.7-red.svg)](https://github.com/IronLanguages/ironpython2/releases/tag/ipy-2.7.8/)
