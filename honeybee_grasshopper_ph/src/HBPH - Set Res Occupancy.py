@@ -22,33 +22,44 @@
 """
 Set the PH-Style occupancy for the Honeybee-Rooms input.
 -
-Note that this componet will create a new, unique 'People' load for EACH HB-Room input, and will
-set the values accordigly. On some larger projects with many rooms, creating these duplicate 'People' 
-objects may not be ideal, and may lead to longer run-times. As an alternative, use the 'Set People 
-PH Attributes' component to create a Honeybee-Energy Program, which can then be assigned to multiple rooms at once.
+Note that this component will create a new, unique 'People' load for EACH HB-Room input, and will
+set the values accordingly. On some larger projects with many rooms, creating these duplicate 'People'
+objects may not be ideal, and may lead to longer run-times.
 -
-For Phius residential projects, a room's "_num_people" should be the rooms's "number-of-bedrooms" + 1
+For Phius residential projects, a DWELLING's total "_num_people" should be the dwelling's
+"number-of-bedrooms" + 1. Distribute that total across the dwelling's Rooms - do not repeat the
+full dwelling value on every Room.
 -
-EM January 28, 2025
+EM July 21, 2026
     Args:
         _num_bedrooms: (list[int]) A list of number of bedrooms for EACH Honeybee-Room input.
-            This should ideally be the same length as the '_hb_rooms' input, and in the same 
-            order. If only a single value is input, that value will get applied to all of the 
-            Honeybee-Rooms input. Note that this value is the number of bedrooms PER-HB-ROOM, 
+            This should ideally be the same length as the '_hb_rooms' input, and in the same
+            order. If only a single value is input, that value will get applied to all of the
+            Honeybee-Rooms input. Note that this value is the number of bedrooms PER-HB-ROOM,
             not the total number of bedrooms in the entire model.
-        
+
         _num_people: (List[float]) A list of the number of people for EACH Honeybee-Room input.
-            This should ideally be the same length as the '_hb_rooms' input, and in the same 
-            order. If only a single value is input, that value will get applied to all of the 
-            Honeybee-Rooms input. Note that this value is the number of people PER-HB-ROOM, 
-            not the total number of people in the entire model.      
+            This should ideally be the same length as the '_hb_rooms' input, and in the same
+            order. If only a single value is input, that value will get applied to all of the
+            Honeybee-Rooms input. Note that this value is the number of people PER-HB-ROOM,
+            not the total number of people in the entire model.
+            -
+            How these occupants get distributed depends on whether 'HBPH - Set Dwelling' has
+            already been run on the Rooms:
+            * Set Dwelling FIRST: the Rooms of each dwelling are normalized together, so the
+              dwelling's total occupancy is spread evenly over the dwelling's total floor-area.
+              This is what you want for multi-family, where each apartment should be normalized
+              against its own area.
+            * Set Dwelling NOT yet run: each Room is normalized on its own, so the occupants
+              you enter for a Room stay in that Room. A Room given 0 people gets 0 people.
+            Either way the model's TOTAL occupancy is the same - only the distribution differs.
 
         _set_res_schedule_: (bool) Default=True. Set the Room's Occupancy and Occupant-Activity schedule
-            to the Passive-House deffaults? If set to 'False', the Room's existing schedule will be 
+            to the Passive-House defaults? If set to 'False', the Room's existing schedule will be
             maintained. If None, will re-set the schedule to match the PH res-typical schedule.
-        
+
         _hb_rooms: (List[Room]) A list of Honeybee-Rooms to set the occupancy values on.
-            
+
     Returns:
         hb_rooms_ (List[Room]) A list of the Honeybee Rooms with the ph-style occupancy set.
 """

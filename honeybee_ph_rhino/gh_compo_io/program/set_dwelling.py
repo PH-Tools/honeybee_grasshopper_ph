@@ -102,6 +102,11 @@ class GHCompo_SetDwelling(object):
             ph_dwellings_obj.identifier = dwelling_name
 
             # -- Set the Dwelling information on all the Rooms
+            # -- Note: do NOT set 'Room.zone' here. Honeybee-Energy reads that attribute as an
+            # -- EnergyPlus thermal-zone instruction: every Room sharing a 'zone' value gets
+            # -- merged into ONE E+ Zone (as 'Space' objects) served by a single HVAC system.
+            # -- The dwelling is identified by the shared PhDwellings object below, which is
+            # -- what honeybee_energy_ph.dwellings and PHX both group on.
             dup_rooms_ = []
             for hb_room in branch:
                 print(
@@ -110,7 +115,6 @@ class GHCompo_SetDwelling(object):
                     )
                 )
                 dup_room = hb_room.duplicate()  # type: Room
-                dup_room.zone = dwelling_name
                 dup_room_prop_e = getattr(dup_room.properties, "energy")  # type: RoomEnergyProperties
 
                 # -- Build the new People and add to the HB-Room

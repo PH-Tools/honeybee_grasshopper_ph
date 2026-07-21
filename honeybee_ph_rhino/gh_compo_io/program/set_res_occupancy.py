@@ -4,7 +4,6 @@
 """GHCompo Interface: HBPH - Set PH-Style Occupancy."""
 
 import os
-from collections import defaultdict
 from contextlib import contextmanager
 from statistics import mean
 
@@ -31,6 +30,7 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy:\n\t{}".format(e))
 
 try:
+    from honeybee_energy_ph.dwellings import group_rooms_by_dwelling
     from honeybee_energy_ph.properties.load.people import PeoplePhProperties
     from honeybee_ph_standards.schedules._load_schedules import load_schedules_from_json_file
 except ImportError as e:
@@ -61,18 +61,6 @@ def _get_avg_occ_rate(_hb_room):
     """Get the HBE-People Occupancy-Schedule average annual value."""
     hbe_prop = getattr(_hb_room.properties, "energy")  # type: RoomEnergyProperties
     return mean(hbe_prop.people.occupancy_schedule.values())  # type: ignore
-
-
-def _group_rooms_by_dwellings(_hb_rooms):
-    # type: (list[Room]) -> list[list[Room]]
-    """Group the HB-Rooms by their 'dwelling'."""
-    room_groups = defaultdict(list)
-    for hb_room in _hb_rooms:
-        rm_prop_e = getattr(hb_room.properties, "energy")  # type: RoomEnergyProperties
-        ppl_prop_ph = getattr(rm_prop_e.people.properties, "ph")  # type: PeoplePhProperties
-        room_groups[ppl_prop_ph.dwellings.identifier].append(hb_room)
-
-    return [v for v in room_groups.values()]
 
 
 def _get_room_floor_area_m2(_hb_room, _IGH):
@@ -109,7 +97,18 @@ def set_people_per_m2(_hb_rooms, _IGH):
     # type: (list[Room], gh_io.IGH) -> None
     """Set the HB-Energy 'People' load on each HB-Room.
 
-    The HBE Occupancy level will be set for the entire 'dwelling'.
+    The HBE Occupancy level is set uniformly across each 'dwelling': the group's total
+    PH-occupancy is spread over the group's total floor-area.
+
+    Note on component ordering: Rooms are grouped by their PhDwellings identity, so this
+    depends on whether 'HBPH - Set Dwelling' has already run.
+        * Set Dwelling FIRST  -> Rooms group per-dwelling (required for multi-family, so
+          that each apartment is normalized against its own floor-area).
+        * Set Dwelling LATER  -> each Room is its own group, and the occupants entered for
+          a Room stay in that Room. Un-tagged Rooms are NOT pooled together; pooling them
+          would smear occupants into Rooms the user gave zero people (a crawlspace, say),
+          which is visible now that each Room is its own EnergyPlus Zone.
+    Either way the model's TOTAL occupancy is identical -- only the distribution differs.
     """
 
     def _get_num_ppl(_hb_room):
@@ -119,7 +118,7 @@ def set_people_per_m2(_hb_rooms, _IGH):
         ppl_prop_ph = getattr(hb_ppl.people.properties, "ph")  # type: PeoplePhProperties
         return ppl_prop_ph.number_people
 
-    for room_group in _group_rooms_by_dwellings(_hb_rooms):
+    for room_group in group_rooms_by_dwelling(_hb_rooms):
         # -- Get 'Group' level total values
         total_average_ph_ppl = sum(_get_num_ppl(rm) for rm in room_group)
         total_floor_area_m2 = sum(_get_room_floor_area_m2(rm, _IGH) for rm in room_group)

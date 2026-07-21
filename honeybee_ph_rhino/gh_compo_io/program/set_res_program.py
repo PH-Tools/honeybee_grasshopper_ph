@@ -4,7 +4,6 @@
 """GHCompo Interface: HBPH - Set Residential Program."""
 
 import os
-from collections import defaultdict
 from statistics import mean
 
 try:
@@ -39,6 +38,7 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy:\n\t{}".format(e))
 
 try:
+    from honeybee_energy_ph.dwellings import group_rooms_by_dwelling
     from honeybee_energy_ph.load import ph_equipment
     from honeybee_energy_ph.properties.load.lighting import LightingPhProperties
     from honeybee_energy_ph.properties.load.people import PeoplePhProperties
@@ -69,16 +69,6 @@ def get_total_spaces_area_rh_doc_units(_hb_rooms):
     return sum(
         space.weighted_net_floor_area for room in _hb_rooms for space in room.properties.ph.spaces  # type: ignore
     ) or sum(r.floor_area for r in _hb_rooms)
-
-
-def _group_rooms_by_dwellings(_hb_rooms):
-    # type: (list[Room]) -> list[list[Room]]
-    """Group the HB-Rooms by their 'dwelling'."""
-    room_groups = defaultdict(list)
-    for hb_room in _hb_rooms:
-        room_groups[hb_room.zone].append(hb_room)
-
-    return [v for v in room_groups.values()]
 
 
 def get_program(_base_program):
@@ -462,7 +452,7 @@ class GHCompo_CreatePHProgramSingleFamilyHome(object):
         if not self.ready:
             return hb_rooms_
 
-        room_groups = _group_rooms_by_dwellings(self.hb_rooms)
+        room_groups = group_rooms_by_dwelling(self.hb_rooms)
         for i, room_group in enumerate(room_groups):
             dup_rooms = self.duplicate_rooms(room_group)
 
