@@ -15,10 +15,13 @@ except ImportError:
 
 try:
     from honeybee.aperture import Aperture
+    from honeybee.typing import clean_and_id_ep_string
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
 try:
+    from honeybee_energy.construction.window import WindowConstruction
+    from honeybee_energy.construction.windowshade import WindowConstructionShade
     from honeybee_energy.properties.aperture import ApertureEnergyProperties
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy:\n\t{}".format(e))
@@ -42,33 +45,25 @@ except ImportError as e:
     raise ImportError("\nFailed to import ph_units:\n\t{}".format(e))
 
 
+def _get_ph_properties(_construction):
+    # type: (WindowConstruction | WindowConstructionShade) -> WindowConstructionPhProperties | WindowConstructionShadePhProperties
+    """Return the PH properties for a regular or shaded window construction."""
+
+    if isinstance(_construction, WindowConstructionShade):
+        return getattr(_construction.window_construction.properties, "ph")
+    if isinstance(_construction, WindowConstruction):
+        return getattr(_construction.properties, "ph")
+    raise ValueError("Unsupported construction type: {}".format(type(_construction)))
+
+
 def get_ph_frame(_aperture):
     # type: (Aperture) -> PhWindowFrame | None
     """Get the PH frame type from an Aperture."""
 
-    # ---
     ap_prop_energy = getattr(_aperture.properties, "energy", None)  # type: ApertureEnergyProperties | None
     if not ap_prop_energy:
         raise ValueError("Aperture {} has no properties.energy ?".format(_aperture.display_name))
-
-    # --- Get the right PH properties based on the construction type
-    try:
-        prop_ph = getattr(
-            ap_prop_energy.construction.window_construction.properties, "ph"
-        )  # type: WindowConstructionShadePhProperties
-        # It is a WindowConstructionShade
-    except AttributeError:
-        # It is a regular WindowConstruction
-        try:
-            prop_ph = getattr(ap_prop_energy.construction.properties, "ph")  # type: WindowConstructionPhProperties
-        except AttributeError:
-            raise ValueError(
-                "Aperture {} construction is an unsupported type: {}?".format(
-                    _aperture.display_name, type(ap_prop_energy.construction)
-                )
-            )
-
-    return prop_ph.ph_frame
+    return _get_ph_properties(ap_prop_energy.construction).ph_frame
 
 
 def set_ph_frame(_aperture, _ph_frame):
@@ -79,24 +74,40 @@ def set_ph_frame(_aperture, _ph_frame):
     if not ap_prop_energy:
         raise ValueError("Aperture {} has no properties.energy ?".format(_aperture.display_name))
 
-    # --- Get the right PH properties based on the construction type
-    try:
-        prop_ph = getattr(
-            ap_prop_energy.construction.window_construction.properties, "ph"
-        )  # type: WindowConstructionShadePhProperties
-        # It is a WindowConstructionShade
-    except AttributeError:
-        # It is a regular WindowConstruction
-        try:
-            prop_ph = getattr(ap_prop_energy.construction.properties, "ph")  # type: WindowConstructionPhProperties
-        except AttributeError:
-            raise ValueError(
-                "Aperture {} construction is an unsupported type: {}?".format(
-                    _aperture.display_name, type(ap_prop_energy.construction)
-                )
-            )
+    _get_ph_properties(ap_prop_energy.construction).ph_frame = _ph_frame
+    return _aperture
 
-    prop_ph.ph_frame = _ph_frame
+
+def duplicate_aperture_construction(_aperture):
+    # type: (Aperture) -> Aperture
+    """Give an aperture its own window construction and identifier."""
+
+    ap_prop_energy = getattr(_aperture.properties, "energy", None)  # type: ApertureEnergyProperties | None
+    if not ap_prop_energy:
+        raise ValueError("Aperture {} has no properties.energy ?".format(_aperture.display_name))
+
+    construction = ap_prop_energy.construction
+    aperture_suffix = _aperture.identifier
+
+    if isinstance(construction, WindowConstructionShade):
+        dup_construction = construction.duplicate()  # type: WindowConstructionShade
+        dup_window_construction = construction.window_construction.duplicate()  # type: WindowConstruction
+        dup_window_construction.identifier = clean_and_id_ep_string(
+            "{}_{}".format(construction.window_construction.identifier, aperture_suffix)
+        )
+        dup_window_construction.lock()
+        # WindowConstructionShade.duplicate() retains the nested construction,
+        # and Honeybee exposes no public setter for replacing it.
+        dup_construction._window_construction = dup_window_construction
+    elif isinstance(construction, WindowConstruction):
+        dup_construction = construction.duplicate()  # type: WindowConstruction
+    else:
+        raise ValueError(
+            "Aperture {} construction is an unsupported type: {}?".format(_aperture.display_name, type(construction))
+        )
+
+    dup_construction.identifier = clean_and_id_ep_string("{}_{}".format(construction.identifier, aperture_suffix))
+    ap_prop_energy.construction = dup_construction
     return _aperture
 
 
@@ -183,11 +194,13 @@ class GHCompo_SetAperturePsiInstallValues(object):
             for ap in apertures:
                 print("Processing aperture: {}".format(ap.display_name))
 
-                dup_ap = ap.duplicate()  # type: Aperture
-                ph_frame = get_ph_frame(dup_ap)
+                ph_frame = get_ph_frame(ap)
                 if not ph_frame:
-                    print("Aperture {} has no PH frame?".format(dup_ap.display_name))
+                    print("Aperture {} has no PH frame?".format(ap.display_name))
                     continue
+
+                dup_ap = ap.duplicate()  # type: Aperture
+                duplicate_aperture_construction(dup_ap)
 
                 # -- Get and apply the right Psi-Install values to the frame elements
                 dup_ph_frame = ph_frame.duplicate()  # type: PhWindowFrame

@@ -425,6 +425,12 @@ COMPONENT_PARAMS = {
         "Category": CATEGORY,
         "SubCategory": 1,
     },
+    "HBPH - Set HB-Construction Psi-Installs": {
+        "NickName": "Set HB-Construction Psi-Installs",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
     # -- Envelope
     "HBPH - Create SD Constructions": {
         "NickName": "Create SD Const.",
