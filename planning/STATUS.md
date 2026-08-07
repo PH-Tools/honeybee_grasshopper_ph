@@ -2,12 +2,13 @@
 
 Master index of tracked planning work in honeybee_grasshopper_ph.
 
-_Last updated: 2026-07-21_
+_Last updated: 2026-08-06_
 
 ## Active / current work
 
 | Item | Kind | Status | Pointer |
 |------|------|--------|---------|
+| Set Occupancy list padding | Bug fix | **Requested** — reproduced; not implemented | [`occupancy-list-padding.md`](occupancy-list-padding.md) |
 | Decouple "Dwelling" from `Room.zone` | Refactor (cross-repo) | **Code implemented** — remaining: manual component retirement, `ladybug_tools` install, 2613 re-run | [`dwelling-zone-decoupling.md`](dwelling-zone-decoupling.md) |
 | PH-Tools website consolidation | Plan (cross-repo) | Planning | [`website-consolidation.md`](website-consolidation.md) |
 
