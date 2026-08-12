@@ -12,8 +12,8 @@ of bug #59** — the per-aperture construction-duplication mechanism, which this
 (`bugs/aperture-construction-duplication.md`) — by removal of the mechanism, not by patching it.
 
 **Companion docs (same slug in each repo):**
-- `honeybee_ph/planning/refactor/aperture-psi-install.md` — **primary**: data model, resolver, issue #51
-- `PHX/planning/refactor/aperture-psi-install.md` — PHPP per-row write, WUFI/METr variant synthesis
+- `honeybee_ph/planning/archive/aperture-psi-install/` — **primary** (complete, archived): data model, resolver, issue #51
+- `PHX/planning/archive/aperture-psi-install/` — (complete, archived) PHPP per-row write, WUFI/METr variant synthesis
 - `ph-navigator-v2/planning/features_v1.1/aperture-psi-install/upstream-alignment.md`
 
 ---
@@ -72,7 +72,7 @@ component".
 
 `win_create_frame_element.py` — unchanged. `psi_install` remains a frame-element attribute
 (the type default), default 0.04 W/mK. No new flag (issue #51's `psi_install_enabled` is
-deliberately not implemented — a zero-Ψ value is the "off" state; see primary doc §8).
+deliberately not implemented — a zero-Ψ value is the "off" state; see primary doc §8 (now archived)).
 
 ### 2.5 Housekeeping
 

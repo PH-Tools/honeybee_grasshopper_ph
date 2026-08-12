@@ -22,8 +22,8 @@ Blocked on the `honeybee_ph` primary shipping and its pinned release.
 
 | Repo | Doc | Role |
 |------|-----|------|
-| `honeybee_ph` | `planning/refactor/aperture-psi-install.md` | Primary — data model + resolver + tests |
-| `PHX` | `planning/refactor/aperture-psi-install.md` | PHPP per-row write; WUFI/METr variant synthesis |
+| `honeybee_ph` | `planning/archive/aperture-psi-install/` | Primary — **complete, archived** (v1.33.33) |
+| `PHX` | `planning/archive/aperture-psi-install/` | **Complete, archived** (v1.56.73) — PHPP per-row write; WUFI/METr variant synthesis |
 | `honeybee_grasshopper_ph` | [`refactor/aperture-psi-install.md`](refactor/aperture-psi-install.md) | Components; deletes the bug-#59 mechanism |
 | `ph-navigator-v2` | `planning/features_v1.1/aperture-psi-install/upstream-alignment.md` | Phase-07 GH-client mapping |
 
