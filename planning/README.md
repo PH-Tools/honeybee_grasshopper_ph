@@ -7,6 +7,7 @@ Working plans for honeybee_grasshopper_ph. See [`.instructions.md`](.instruction
 ## Layout
 
 - `STATUS.md` — master index of active work.
+- `bugs/` — reproduced, root-caused defects awaiting a fix, flat by slug, indexed in `bugs/README.md`.
 - `features/` — plans for new capabilities.
 - `archive/` — completed/superseded work, flat by slug, indexed in `archive/README.md`.
 - `website-consolidation.md` — plan to consolidate the PH-Tools web properties (cross-repo).

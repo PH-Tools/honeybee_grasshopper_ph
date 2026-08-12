@@ -2,17 +2,30 @@
 
 Master index of tracked planning work in honeybee_grasshopper_ph.
 
-_Last updated: 2026-08-06_
+_Last updated: 2026-08-12_
 
 ## Active / current work
 
 | Item | Kind | Status | Pointer |
 |------|------|--------|---------|
+| Aperture-level Psi-Install (Install Types) | Refactor (cross-repo) | **Planned** — design agreed 2026-08-12; blocked on `honeybee_ph` primary. Supersedes/deletes the bug-#59 mechanism | [`refactor/aperture-psi-install.md`](refactor/aperture-psi-install.md) |
+| Per-aperture window construction duplication | Bug fix | **Requested** — root-caused; resolution folded into `refactor/aperture-psi-install.md` (mechanism deleted); no interim patch (decided 2026-08-12) | [`bugs/aperture-construction-duplication.md`](bugs/aperture-construction-duplication.md) |
 | Set Occupancy list padding | Bug fix | **Requested** — reproduced; not implemented | [`occupancy-list-padding.md`](occupancy-list-padding.md) |
 | Decouple "Dwelling" from `Room.zone` | Refactor (cross-repo) | **Code implemented** — remaining: manual component retirement, `ladybug_tools` install, 2613 re-run | [`dwelling-zone-decoupling.md`](dwelling-zone-decoupling.md) |
 | PH-Tools website consolidation | Plan (cross-repo) | Planning | [`website-consolidation.md`](website-consolidation.md) |
 
 ## Cross-repo work
+
+`aperture-psi-install` spans four repos. This repo holds the user-facing components and the
+root cause of bug #59 (`duplicate_aperture_construction()`), which the refactor deletes.
+Blocked on the `honeybee_ph` primary shipping and its pinned release.
+
+| Repo | Doc | Role |
+|------|-----|------|
+| `honeybee_ph` | `planning/refactor/aperture-psi-install.md` | Primary — data model + resolver + tests |
+| `PHX` | `planning/refactor/aperture-psi-install.md` | PHPP per-row write; WUFI/METr variant synthesis |
+| `honeybee_grasshopper_ph` | [`refactor/aperture-psi-install.md`](refactor/aperture-psi-install.md) | Components; deletes the bug-#59 mechanism |
+| `ph-navigator-v2` | `planning/features_v1.1/aperture-psi-install/upstream-alignment.md` | Phase-07 GH-client mapping |
 
 `dwelling-zone-decoupling` spans three repos. **This repo holds the root cause** — the only
 two references to `Room.zone` in the whole toolkit (`set_dwelling.py:113`,
