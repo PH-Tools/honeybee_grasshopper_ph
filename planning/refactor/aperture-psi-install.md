@@ -1,8 +1,9 @@
 # Refactor: Aperture-level Psi-Install — GH components
 
-**Status:** Planned — design agreed 2026-08-12; not implemented. Blocked on `honeybee_ph`
-shipping `PhApertureInstallType` + the aperture slots + resolver (the primary), and the
-pinned release reaching `requirements.txt`.
+**Status:** Code implemented (2026-08-12) — workers, registry, and src canvas wrappers on
+`refactor/aperture-psi-install`. Upstream merged: honeybee_ph PR #87, PHX PR #80.
+**Remaining (Ed, manual — see §4):** canvas component creation/edit + `.ghuser` regeneration,
+release-pin bumps via the orchestrator, then the 2310 re-export verification and closing #59/#51.
 **Date:** 2026-08-12
 **Author:** Ed May + Claude
 **Kind:** Cross-repo refactor. This repo holds the user-facing components **and the root cause
@@ -95,7 +96,30 @@ This refactor is the fix. When it ships:
 - Mark #59 and the bug doc resolved, noting the resolution mechanism differs from the one
   originally proposed.
 
-## 4. User-facing model (docs/canvas copy)
+## 4. Ed's manual canvas steps (the only remaining work)
+
+The Python side is complete, including pre-drafted canvas wrapper code. In Rhino/Grasshopper:
+
+1. **New component** `HBPH - Create Aperture Install Type`: add a GHPython component, three
+   inputs (`_display_name` str, `_psi_install` str, `_source` str; all item-access), one
+   output `install_type_`. Paste the pre-drafted code from
+   `honeybee_grasshopper_ph/src/HBPH - Create Aperture Install Type.py`.
+2. **Edit component** `HBPH - Set Aperture Psi-Installs`: rename input
+   `_psi_installs_w_mk` → `_install_types` (tree-access, no type hint) and paste the updated
+   code from `honeybee_grasshopper_ph/src/HBPH - Set Aperture Psi-Installs.py`.
+   (Note: an un-edited old component keeps working — bare psi values are auto-wrapped into
+   anonymous Install Types — but the input name/description should be updated.)
+3. Run `src/__HBPH__Util_Update_GHCompos.py` on the canvas; commit the regenerated
+   `src/*.py` + `user_objects/*.ghuser`.
+4. After the release orchestrator bumps `requirements.txt` (needs honeybee-ph ≥ the PR-#87
+   release and PHX ≥ the PR-#80 release): re-export project 2310 and verify **79** window
+   constructions / 79 `EnergyWindowMaterialSimpleGlazSys` against 939 apertures, stable
+   identifiers across repeated exports (bug doc §Verification).
+5. Close [#59](https://github.com/PH-Tools/honeybee_grasshopper_ph/issues/59) (mechanism
+   deleted) and [honeybee_ph #51](https://github.com/PH-Tools/honeybee_ph/issues/51)
+   (auto-closed by PR #87 — confirm), noting the Install-Type resolution in each.
+
+## 5. User-facing model (docs/canvas copy)
 
 Three orthogonal things, three components:
 

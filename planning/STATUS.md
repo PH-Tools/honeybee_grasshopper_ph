@@ -8,8 +8,8 @@ _Last updated: 2026-08-12_
 
 | Item | Kind | Status | Pointer |
 |------|------|--------|---------|
-| Aperture-level Psi-Install (Install Types) | Refactor (cross-repo) | **Planned** — design agreed 2026-08-12; blocked on `honeybee_ph` primary. Supersedes/deletes the bug-#59 mechanism | [`refactor/aperture-psi-install.md`](refactor/aperture-psi-install.md) |
-| Per-aperture window construction duplication | Bug fix | **Requested** — root-caused; resolution folded into `refactor/aperture-psi-install.md` (mechanism deleted); no interim patch (decided 2026-08-12) | [`bugs/aperture-construction-duplication.md`](bugs/aperture-construction-duplication.md) |
+| Aperture-level Psi-Install (Install Types) | Refactor (cross-repo) | **Code implemented** (2026-08-12) — remaining: Ed's canvas/.ghuser work, release-pin bumps, 2310 re-export check (doc §4) | [`refactor/aperture-psi-install.md`](refactor/aperture-psi-install.md) |
+| Per-aperture window construction duplication | Bug fix | **Fix implemented** (2026-08-12) — `duplicate_aperture_construction()` deleted in the refactor; #59 closes after Ed's canvas step + 2310 verification | [`bugs/aperture-construction-duplication.md`](bugs/aperture-construction-duplication.md) |
 | Set Occupancy list padding | Bug fix | **Requested** — reproduced; not implemented | [`occupancy-list-padding.md`](occupancy-list-padding.md) |
 | Decouple "Dwelling" from `Room.zone` | Refactor (cross-repo) | **Code implemented** — remaining: manual component retirement, `ladybug_tools` install, 2613 re-run | [`dwelling-zone-decoupling.md`](dwelling-zone-decoupling.md) |
 | PH-Tools website consolidation | Plan (cross-repo) | Planning | [`website-consolidation.md`](website-consolidation.md) |

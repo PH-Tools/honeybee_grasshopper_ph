@@ -32,10 +32,9 @@ except ImportError as e:
     raise ImportError("\nFailed to import ph_gh_component_io:\n\t{}".format(e))
 
 try:
-    from ph_units.converter import convert
-    from ph_units.parser import parse_input
+    from honeybee_ph_rhino.gh_compo_io.apertures.win_create_install_type import parse_psi_install_w_mk
 except ImportError as e:
-    raise ImportError("\nFailed to import ph_units:\n\t{}".format(e))
+    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
 
 def _get_ph_properties(_construction):
@@ -52,18 +51,12 @@ def _get_ph_properties(_construction):
 
 def _parse_single_psi_value(_raw_input):
     # type: (str) -> float
-    """Parse a single user-provided psi-install string and return the value in W/mK."""
+    """Parse a single user-provided psi-install string and return the value in W/mK.
 
-    input_value, input_unit = parse_input(_raw_input)
-    if not input_value:
-        raise ValueError("Failed to parse Psi-Install input: '{}'".format(_raw_input))
-
-    input_unit = input_unit or "W/MK"
-    result = convert(input_value, input_unit, "W/mK")
-    if result is None:
-        raise ValueError("Failed to convert Psi-Install input {} {} to W/mK".format(input_value, input_unit))
-
-    print("Converting: {} {} -> {:.4f} W/mK".format(input_value, input_unit, result))
+    Delegates to the shared parser (which treats an explicit 0 as a real value).
+    """
+    result = parse_psi_install_w_mk(_raw_input)
+    print("Converting: {} -> {:.4f} W/mK".format(_raw_input, result))
     return result
 
 

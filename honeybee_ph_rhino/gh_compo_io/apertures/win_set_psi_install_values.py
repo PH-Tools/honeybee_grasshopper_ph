@@ -26,6 +26,11 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
 
 try:
+    from honeybee_ph.properties.aperture import AperturePsiInstalls
+except ImportError as e:
+    raise ImportError("\nFailed to import honeybee_ph:\n\t{}".format(e))
+
+try:
     from ph_gh_component_io import gh_io
 except ImportError as e:
     raise ImportError("\nFailed to import ph_gh_component_io:\n\t{}".format(e))
@@ -38,8 +43,8 @@ try:
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
 
-# -- Input order follows PhWindowFrame element order (and AperturePsiInstalls.SIDES)
-SIDES = ("top", "right", "bottom", "left")
+# -- Input order follows PhWindowFrame element order: top / right / bottom / left
+SIDES = AperturePsiInstalls.SIDES
 
 
 def as_install_type(_input):
@@ -60,9 +65,12 @@ def as_install_type(_input):
 
 def get_tree_item(_tree, _branch_idx, _item_idx):
     # type: (DataTree, int, int) -> object | None
-    """Get a tree item with the standard fallbacks: branch->first-branch, item->last-item.
+    """Get a tree item with fallbacks: branch->first-branch, item->LAST-item.
 
     Returns None if the tree is empty (meaning: inherit from the construction).
+    NOTE: unlike the first-item fallback used by some sibling components, the item
+    fallback here is deliberately the LAST item: with t/r/b/l inputs, a single value
+    applies to all four edges, and a partial list extends its final value.
     """
     if len(_tree.Branches) == 0:
         return None
@@ -112,21 +120,25 @@ class GHCompo_SetAperturePsiInstallValues(object):
 
         output_ = DataTree[Object]()
         for branch_idx, apertures in enumerate(self._apertures.Branches):
+            # -- Coerce the branch's inputs ONCE: all apertures on a branch share the
+            # -- same four Install Type objects (shared named types, like constructions).
+            install_types_by_side = []  # type: list[PhApertureInstallType | None]
+            for side_idx, side in enumerate(SIDES):
+                install_type = as_install_type(get_tree_item(self._install_types, branch_idx, side_idx))
+                install_types_by_side.append(install_type)
+                if install_type is not None:
+                    print(
+                        "Branch {}: {} << '{}' (Psi={:.4f} W/mK)".format(
+                            branch_idx, side, install_type.display_name, install_type.psi_install
+                        )
+                    )
+
             dup_aps = []  # type: list[Aperture]
             for ap in apertures:
                 dup_ap = ap.duplicate()  # type: Aperture
                 ph_prop = dup_ap.properties.ph
-
                 for side_idx, side in enumerate(SIDES):
-                    install_type = as_install_type(get_tree_item(self._install_types, branch_idx, side_idx))
-                    setattr(ph_prop.install_types, side, install_type)
-                    if install_type is not None:
-                        print(
-                            "{}: {} << '{}' (Psi={:.4f} W/mK)".format(
-                                dup_ap.display_name, side, install_type.display_name, install_type.psi_install
-                            )
-                        )
-
+                    setattr(ph_prop.install_types, side, install_types_by_side[side_idx])
                 dup_aps.append(dup_ap)
 
             output_.AddRange(dup_aps, GH_Path(branch_idx))
