@@ -3,6 +3,7 @@ from honeybee_ph_rhino.gh_compo_io.apertures.win_create_constr import GHCompo_Cr
 from honeybee_ph_rhino.gh_compo_io.apertures.win_create_frame import GHCompo_CreatePhWinFrame
 from honeybee_ph_rhino.gh_compo_io.apertures.win_create_frame_element import GHCompo_CreatePhWinFrameElement
 from honeybee_ph_rhino.gh_compo_io.apertures.win_create_glazing import GHCompo_CreatePhGlazing
+from honeybee_ph_rhino.gh_compo_io.apertures.win_create_install_type import GHCompo_CreateApertureInstallType
 from honeybee_ph_rhino.gh_compo_io.apertures.win_set_hb_const_psi_install_values import (
     GHCompo_SetWindowConstructionPsiInstallValues,
 )

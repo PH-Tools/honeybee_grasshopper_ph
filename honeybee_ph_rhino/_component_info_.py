@@ -419,6 +419,12 @@ COMPONENT_PARAMS = {
         "Category": CATEGORY,
         "SubCategory": 1,
     },
+    "HBPH - Create Aperture Install Type": {
+        "NickName": "Create Install Type",
+        "Message": RELEASE_VERSION,
+        "Category": CATEGORY,
+        "SubCategory": 1,
+    },
     "HBPH - Set Aperture Psi-Installs": {
         "NickName": "Set Aperture Psi-Installs",
         "Message": RELEASE_VERSION,

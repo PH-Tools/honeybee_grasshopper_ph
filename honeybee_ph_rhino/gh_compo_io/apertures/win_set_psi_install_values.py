@@ -1,35 +1,27 @@
 # -*- coding: utf-8 -*-
 # -*- Python Version: 2.7 -*-
 
-"""GHCompo Interface: HBPH - Set Aperture Psi-Installs."""
+"""GHCompo Interface: HBPH - Set Aperture Psi-Installs.
 
+Sets per-edge 'Install Type' assignments on the Aperture's PH-properties
+(AperturePhProperties.install_types). The window construction is NEVER touched or
+duplicated: per-window install conditions are aperture-instance data, resolved
+against the construction's frame-element defaults downstream
+(honeybee_ph_utils.aperture_psi_install). See honeybee_grasshopper_ph issue #59
+for why per-aperture construction duplication must never come back.
+"""
 
 from Grasshopper import DataTree
 from Grasshopper.Kernel.Data import GH_Path
 from System import Object
 
 try:
-    from itertools import izip_longest  # type: ignore
-except ImportError:
-    from itertools import zip_longest as izip_longest
-
-try:
     from honeybee.aperture import Aperture
-    from honeybee.typing import clean_and_id_ep_string
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee:\n\t{}".format(e))
 
 try:
-    from honeybee_energy.construction.window import WindowConstruction
-    from honeybee_energy.construction.windowshade import WindowConstructionShade
-    from honeybee_energy.properties.aperture import ApertureEnergyProperties
-except ImportError as e:
-    raise ImportError("\nFailed to import honeybee_energy:\n\t{}".format(e))
-
-try:
-    from honeybee_energy_ph.construction.window import PhWindowFrame
-    from honeybee_energy_ph.properties.construction.window import WindowConstructionPhProperties
-    from honeybee_energy_ph.properties.construction.windowshade import WindowConstructionShadePhProperties
+    from honeybee_energy_ph.construction.window import PhApertureInstallType
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
 
@@ -39,152 +31,82 @@ except ImportError as e:
     raise ImportError("\nFailed to import ph_gh_component_io:\n\t{}".format(e))
 
 try:
-    from ph_units.converter import convert
-    from ph_units.parser import parse_input
+    from honeybee_ph_rhino.gh_compo_io.apertures.win_create_install_type import (
+        build_install_type,
+        parse_psi_install_w_mk,
+    )
 except ImportError as e:
-    raise ImportError("\nFailed to import ph_units:\n\t{}".format(e))
+    raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
+
+# -- Input order follows PhWindowFrame element order (and AperturePsiInstalls.SIDES)
+SIDES = ("top", "right", "bottom", "left")
 
 
-def _get_ph_properties(_construction):
-    # type: (WindowConstruction | WindowConstructionShade) -> WindowConstructionPhProperties | WindowConstructionShadePhProperties
-    """Return the PH properties for a regular or shaded window construction."""
+def as_install_type(_input):
+    # type: (PhApertureInstallType | str | float | None) -> PhApertureInstallType | None
+    """Coerce a component input to a PhApertureInstallType (or None to inherit).
 
-    if isinstance(_construction, WindowConstructionShade):
-        return getattr(_construction.window_construction.properties, "ph")
-    if isinstance(_construction, WindowConstruction):
-        return getattr(_construction.properties, "ph")
-    raise ValueError("Unsupported construction type: {}".format(type(_construction)))
-
-
-def get_ph_frame(_aperture):
-    # type: (Aperture) -> PhWindowFrame | None
-    """Get the PH frame type from an Aperture."""
-
-    ap_prop_energy = getattr(_aperture.properties, "energy", None)  # type: ApertureEnergyProperties | None
-    if not ap_prop_energy:
-        raise ValueError("Aperture {} has no properties.energy ?".format(_aperture.display_name))
-    return _get_ph_properties(ap_prop_energy.construction).ph_frame
+    Accepts a PhApertureInstallType directly, or a bare number / unit-string which is
+    wrapped in an anonymous Install Type with a content-keyed identifier (no uuids -
+    repeated values dedupe downstream).
+    """
+    if _input is None or _input == "":
+        return None
+    if isinstance(_input, PhApertureInstallType):
+        return _input
+    psi_install_w_mk = parse_psi_install_w_mk(_input)
+    return build_install_type(None, psi_install_w_mk, "user-input")
 
 
-def set_ph_frame(_aperture, _ph_frame):
-    # type: (Aperture, PhWindowFrame) -> Aperture
-    """Set the PH frame type on an Aperture."""
+def get_tree_item(_tree, _branch_idx, _item_idx):
+    # type: (DataTree, int, int) -> object | None
+    """Get a tree item with the standard fallbacks: branch->first-branch, item->last-item.
 
-    ap_prop_energy = getattr(_aperture.properties, "energy", None)  # type: ApertureEnergyProperties | None
-    if not ap_prop_energy:
-        raise ValueError("Aperture {} has no properties.energy ?".format(_aperture.display_name))
+    Returns None if the tree is empty (meaning: inherit from the construction).
+    """
+    if len(_tree.Branches) == 0:
+        return None
 
-    _get_ph_properties(ap_prop_energy.construction).ph_frame = _ph_frame
-    return _aperture
+    try:
+        branch = _tree.Branches[_branch_idx]
+    except Exception:
+        branch = _tree.Branches[0]
 
+    if len(branch) == 0:
+        return None
 
-def duplicate_aperture_construction(_aperture):
-    # type: (Aperture) -> Aperture
-    """Give an aperture its own window construction and identifier."""
-
-    ap_prop_energy = getattr(_aperture.properties, "energy", None)  # type: ApertureEnergyProperties | None
-    if not ap_prop_energy:
-        raise ValueError("Aperture {} has no properties.energy ?".format(_aperture.display_name))
-
-    construction = ap_prop_energy.construction
-    aperture_suffix = _aperture.identifier
-
-    if isinstance(construction, WindowConstructionShade):
-        dup_construction = construction.duplicate()  # type: WindowConstructionShade
-        dup_window_construction = construction.window_construction.duplicate()  # type: WindowConstruction
-        dup_window_construction.identifier = clean_and_id_ep_string(
-            "{}_{}".format(construction.window_construction.identifier, aperture_suffix)
-        )
-        dup_window_construction.lock()
-        # WindowConstructionShade.duplicate() retains the nested construction,
-        # and Honeybee exposes no public setter for replacing it.
-        dup_construction._window_construction = dup_window_construction
-    elif isinstance(construction, WindowConstruction):
-        dup_construction = construction.duplicate()  # type: WindowConstruction
-    else:
-        raise ValueError(
-            "Aperture {} construction is an unsupported type: {}?".format(_aperture.display_name, type(construction))
-        )
-
-    dup_construction.identifier = clean_and_id_ep_string("{}_{}".format(construction.identifier, aperture_suffix))
-    ap_prop_energy.construction = dup_construction
-    return _aperture
+    try:
+        return branch[_item_idx]
+    except Exception:
+        return branch[len(branch) - 1]
 
 
 class GHCompo_SetAperturePsiInstallValues(object):
     """Interface to collect and clean user-inputs."""
 
-    def __init__(self, _IGH, _psi_install_values, _apertures, *args, **kwargs):
-        # type: (gh_io.IGH, DataTree[str], DataTree[Aperture], list, dict) -> None
+    def __init__(self, _IGH, _install_types, _apertures, *args, **kwargs):
+        # type: (gh_io.IGH, DataTree, DataTree[Aperture], list, dict) -> None
         self.IGH = _IGH
-        self.psi_install_values_w_mk = self._set_psi_install_values_w_mk(_psi_install_values)
+        self._install_types = _install_types
         self._apertures = _apertures
 
     @property
     def ready(self):
         # type: () -> bool
         """Check if the component has the minimum required inputs to run."""
-
         if len(self._apertures.Branches) == 0:
             return False
-        if len(self.psi_install_values_w_mk.Branches) == 0:
+        if len(self._install_types.Branches) == 0:
             return False
         return True
 
-    def _set_psi_install_values_w_mk(self, _input):
-        # type: (DataTree[str]) -> DataTree[float]
-        """Convert the input psi-install values to W/mK, considering User-provded unit-types."""
-
-        output_ = DataTree[float]()
-        for branch_idx, psi_install_branch in enumerate(_input.Branches):
-            parse_inputs = [parse_input(val) for val in psi_install_branch]
-            for element_idx, (input_value, input_unit) in enumerate(parse_inputs):
-                if not input_value:
-                    raise ValueError("Failed to parse Psi-Install input {}?".format(psi_install_branch[element_idx]))
-
-                # -- If the user supplied an input unit, just use that
-                if not input_unit:
-                    input_unit = "W/MK"
-
-                # -- convert the input value to W/mK, always
-                psi_install_value_w_mk = convert(input_value, input_unit, "W/mK")
-                if psi_install_value_w_mk is None:
-                    raise ValueError(
-                        "Failed to convert Psi-Install input {} {} to W/mK?".format(input_value, input_unit)
-                    )
-                else:
-                    print("Converting: {} {} -> {:.4f} W/mK".format(input_value, input_unit, psi_install_value_w_mk))
-                    output_.Add(psi_install_value_w_mk, GH_Path(branch_idx))
-        return output_
-
-    def get_psi_install_value(self, branch_idx, element_idx):
-        # type: (int, int) -> float
-        """Get the right psi-install value for a given frame element, with fallbacks."""
-
-        # -- Get the branch of psi-install values to use, defaulting to the first branch if the index is out of range
-        try:
-            psi_install_branch = self.psi_install_values_w_mk.Branches[branch_idx]
-        except ValueError:
-            try:
-                psi_install_branch = self.psi_install_values_w_mk.Branches[0]
-            except ValueError:
-                raise ValueError("No Psi-Install values were provided?")
-
-        # -- Get the psi-install value to use, defaulting to the last value in the branch if the index is out of range
-        try:
-            psi_install_value = psi_install_branch[element_idx]
-        except ValueError:
-            try:
-                psi_install_value = psi_install_branch[0]
-            except ValueError:
-                raise ValueError("No Psi-Install values were provided on branch {}?".format(branch_idx))
-
-        return psi_install_value
-
     def run(self):
         # type: () -> DataTree
-        """Run the component and return the output apertures with updated Psi-Install values."""
+        """Return duplicated Apertures with their per-edge Install Types assigned.
 
+        Input order per-branch is top / right / bottom / left. A missing or empty
+        input leaves that edge as None (= inherit the construction frame default).
+        """
         if not self.ready:
             return self._apertures
 
@@ -192,26 +114,20 @@ class GHCompo_SetAperturePsiInstallValues(object):
         for branch_idx, apertures in enumerate(self._apertures.Branches):
             dup_aps = []  # type: list[Aperture]
             for ap in apertures:
-                print("Processing aperture: {}".format(ap.display_name))
-
-                ph_frame = get_ph_frame(ap)
-                if not ph_frame:
-                    print("Aperture {} has no PH frame?".format(ap.display_name))
-                    continue
-
                 dup_ap = ap.duplicate()  # type: Aperture
-                duplicate_aperture_construction(dup_ap)
+                ph_prop = dup_ap.properties.ph
 
-                # -- Get and apply the right Psi-Install values to the frame elements
-                dup_ph_frame = ph_frame.duplicate()  # type: PhWindowFrame
-                for element_idx, element in enumerate(dup_ph_frame.elements):
-                    psi_install_value_w_mk = self.get_psi_install_value(branch_idx, element_idx)
-                    element.psi_install = psi_install_value_w_mk
-                    print("element {}: {} << Psi-{} W/mk".format(element_idx, element, psi_install_value_w_mk))
+                for side_idx, side in enumerate(SIDES):
+                    install_type = as_install_type(get_tree_item(self._install_types, branch_idx, side_idx))
+                    setattr(ph_prop.install_types, side, install_type)
+                    if install_type is not None:
+                        print(
+                            "{}: {} << '{}' (Psi={:.4f} W/mK)".format(
+                                dup_ap.display_name, side, install_type.display_name, install_type.psi_install
+                            )
+                        )
 
-                # -- Assign the updated frame back to the aperture
-                dup_ap_with_ph_frame = set_ph_frame(dup_ap, dup_ph_frame)
-                dup_aps.append(dup_ap_with_ph_frame)
+                dup_aps.append(dup_ap)
 
             output_.AddRange(dup_aps, GH_Path(branch_idx))
 

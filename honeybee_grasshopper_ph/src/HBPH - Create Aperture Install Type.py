@@ -3,7 +3,7 @@
 #
 # This component is part of the PH-Tools toolkit <https://github.com/PH-Tools>.
 #
-# Copyright (c) 2025, PH-Tools and bldgtyp, llc <phtools@bldgtyp.com>
+# Copyright (c) 2026, PH-Tools and bldgtyp, llc <phtools@bldgtyp.com>
 # Honeybee-PH is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published
 # by the Free Software Foundation; either version 3 of the License,
@@ -20,30 +20,30 @@
 # @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 #
 """
-Assign per-edge Psi-Install 'Install Types' to Honeybee Apertures. The install condition
-(mid-wall, buried jamb, party-wall, ...) is a property of WHERE a window sits, not of the
-window construction - so this component sets aperture-instance data and NEVER duplicates
-the window construction. An edge with no Install Type assigned inherits the psi-install
-value from the construction's PH Frame Element (the type default).
+Create a new 'Install Type' - a named window-installation condition (mid-wall, buried jamb,
+party-wall, ...) with its Psi-Install value. Assign Install Types to aperture edges using an
+'HBPH - Set Aperture Psi-Installs' component. A Psi-Install of 0.0 is the 'no install
+thermal bridge' state. Create each condition once and re-use it across the project - the
+same named type on many windows keeps the model easy to QA and never duplicates any
+window constructions.
 -
 EM August 12, 2026
     Args:
 
-        _install_types: (DataTree) The Install Types to assign, in top / right / bottom / left
-            order (up to 4 items per branch). Accepts 'PhApertureInstallType' objects from an
-            'HBPH - Create Aperture Install Type' component, or bare numbers / unit-strings
-            (ie: "0.04" or "0.021 BTU/HR-FT-F") which are wrapped in anonymous content-keyed
-            Install Types. Supply a single item to apply it to all four edges. Assign a
-            zero-value Install Type to an edge to model 'no install thermal bridge' (ie: at
-            a party-wall or a buried jamb). Branches are matched to the '_hb_apertures'
-            branches wherever possible.
+        _display_name: (str) The name for the Install Type (ie: "Phius Mid-Wall",
+            "Buried Jamb", "Party Wall"). If none is supplied, a content-keyed name is
+            generated from the value.
 
-        _hb_apertures: (DataTree[Aperture]) The Honeybee-Apertures to assign the per-edge
-            Install Types to.
+        _psi_install: (str) The Psi-Install value. Accepts a bare number (W/mK is assumed)
+            or a value with a unit (ie: "0.021 BTU/HR-FT-F").
+
+        _source: (str) Optional free-text provenance note (ie: "Phius 1.4.4.6",
+            "Flixo calc 2026-08-01").
 
     Returns:
 
-        hb_apertures_: The Honeybee-Apertures with the Install Types assigned.
+        install_type_: The new PhApertureInstallType. Connect to an
+            'HBPH - Set Aperture Psi-Installs' component.
 """
 
 import scriptcontext as sc
@@ -66,10 +66,10 @@ except ImportError as e:
 #-------------------------------------------------------------------------------
 import honeybee_ph_rhino._component_info_
 reload(honeybee_ph_rhino._component_info_)
-ghenv.Component.Name = "HBPH - Set Aperture Psi-Installs"
+ghenv.Component.Name = "HBPH - Create Aperture Install Type"
 DEV = honeybee_ph_rhino._component_info_.set_component_params(ghenv, dev=False)
 if DEV:
-    from honeybee_ph_rhino.gh_compo_io import win_set_psi_install_values as gh_compo_io
+    from honeybee_ph_rhino.gh_compo_io import win_create_install_type as gh_compo_io
     reload(gh_compo_io)
     reload(gh_io)
 
@@ -78,10 +78,11 @@ if DEV:
 IGH = gh_io.IGH( ghdoc, ghenv, sc, rh, rs, ghc, gh )
 
 #-------------------------------------------------------------------------------
-gh_compo_interface = gh_compo_io.GHCompo_SetAperturePsiInstallValues(
+gh_compo_interface = gh_compo_io.GHCompo_CreateApertureInstallType(
     IGH,
-    _install_types,
-    _hb_apertures,
+    _display_name,
+    _psi_install,
+    _source,
 )
 
-hb_apertures_ = gh_compo_interface.run()
+install_type_ = gh_compo_interface.run()

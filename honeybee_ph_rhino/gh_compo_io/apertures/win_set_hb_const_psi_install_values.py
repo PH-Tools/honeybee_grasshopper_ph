@@ -1,7 +1,13 @@
 # -*- coding: utf-8 -*-
 # -*- Python Version: 2.7 -*-
 
-"""GHCompo Interface: HBPH - Set HB-Construction Psi-Installs."""
+"""GHCompo Interface: HBPH - Set HB-Construction Psi-Installs.
+
+Sets the construction-level *default* psi-install values on the PH frame elements of
+the window constructions passed in (one duplicated construction per input - never
+per-aperture). For per-window / per-edge install conditions use the aperture-level
+'HBPH - Set Aperture Psi-Installs' component with Install Types instead.
+"""
 
 from Grasshopper import DataTree
 from Grasshopper.Kernel.Data import GH_Path
