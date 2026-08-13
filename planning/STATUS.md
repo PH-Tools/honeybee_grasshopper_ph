@@ -8,6 +8,7 @@ _Last updated: 2026-08-12_
 
 | Item | Kind | Status | Pointer |
 |------|------|--------|---------|
+| Consume PHN per-edge Psi-Install data | Feature (in `honeybee_grasshopper_ph_plus`) | **Deferred** — gated on PHN production deploy; plan filed | [`../../honeybee_grasshopper_ph_plus/planning/features/phn-psi-install-per-edge.md`](https://github.com/PH-Tools/honeybee_grasshopper_ph_plus/blob/main/planning/features/phn-psi-install-per-edge.md) |
 | Aperture-level Psi-Install (Install Types) | Refactor (cross-repo) | **Code implemented** (2026-08-12) — remaining: Ed's canvas/.ghuser work, release-pin bumps, 2310 re-export check (doc §4) | [`refactor/aperture-psi-install.md`](refactor/aperture-psi-install.md) |
 | Per-aperture window construction duplication | Bug fix | **Fix implemented** (2026-08-12) — `duplicate_aperture_construction()` deleted in the refactor; #59 closes after Ed's canvas step + 2310 verification | [`bugs/aperture-construction-duplication.md`](bugs/aperture-construction-duplication.md) |
 | Set Occupancy list padding | Bug fix | **Requested** — reproduced; not implemented | [`occupancy-list-padding.md`](occupancy-list-padding.md) |

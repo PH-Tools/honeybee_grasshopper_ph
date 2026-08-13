@@ -2,6 +2,10 @@
 
 **Status:** Code implemented (2026-08-12) — workers, registry, and src canvas wrappers on
 `refactor/aperture-psi-install`. Upstream merged: honeybee_ph PR #87, PHX PR #80.
+**Follow-on (deferred, filed 2026-08-13):** the PHN per-edge client — `HBPH+ - PH-Nav Get
+Apertures` currently drops PHN's per-edge `installs` block (uniform default only); plan at
+`honeybee_grasshopper_ph_plus/planning/features/phn-psi-install-per-edge.md`, gated on the
+PHN production deploy.
 **Remaining:** steps 1-3 of §4 DONE 2026-08-12 (canvas components created/edited, .ghuser
 regenerated + committed, PHX reference fixtures regenerated — they now exercise the full
 pipeline end-to-end). Left: release-pin bumps via the orchestrator + the 2310 re-export
