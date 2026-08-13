@@ -2,8 +2,10 @@
 
 **Status:** Code implemented (2026-08-12) — workers, registry, and src canvas wrappers on
 `refactor/aperture-psi-install`. Upstream merged: honeybee_ph PR #87, PHX PR #80.
-**Remaining (Ed, manual — see §4):** canvas component creation/edit + `.ghuser` regeneration,
-release-pin bumps via the orchestrator, then the 2310 re-export verification and closing #59/#51.
+**Remaining:** steps 1-3 of §4 DONE 2026-08-12 (canvas components created/edited, .ghuser
+regenerated + committed, PHX reference fixtures regenerated — they now exercise the full
+pipeline end-to-end). Left: release-pin bumps via the orchestrator + the 2310 re-export
+verification (#59/#51 already closed with notes; re-open if 2310 fails).
 **Date:** 2026-08-12
 **Author:** Ed May + Claude
 **Kind:** Cross-repo refactor. This repo holds the user-facing components **and the root cause
