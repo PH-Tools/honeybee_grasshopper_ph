@@ -3,7 +3,7 @@
 #
 # This component is part of the PH-Tools toolkit <https://github.com/PH-Tools>.
 #
-# Copyright (c) 2025, PH-Tools and bldgtyp, llc <phtools@bldgtyp.com>
+# Copyright (c) 2026, PH-Tools and bldgtyp, llc <phtools@bldgtyp.com>
 # Honeybee-PH is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published
 # by the Free Software Foundation; either version 3 of the License,
