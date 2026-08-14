@@ -1,0 +1,14 @@
+#!/bin/sh
+
+repo_root=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+
+if ! command -v python3 >/dev/null 2>&1; then
+    echo "warning: honeybee_ph_rhino was not deployed: python3 was not found" >&2
+    exit 0
+fi
+
+if ! python3 "$repo_root/scripts/deploy_dev.py" --quiet; then
+    echo "warning: honeybee_ph_rhino development deploy failed; run scripts/deploy_dev.py for details" >&2
+fi
+
+exit 0
