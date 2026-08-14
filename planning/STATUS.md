@@ -14,7 +14,12 @@ _Last updated: 2026-08-14_
 | Set Occupancy list padding | Bug fix | **Requested** — reproduced; not implemented | [`occupancy-list-padding.md`](occupancy-list-padding.md) |
 | Decouple "Dwelling" from `Room.zone` | Refactor (cross-repo) | **Code implemented** — remaining: manual component retirement, `ladybug_tools` install, 2613 re-run | [`dwelling-zone-decoupling.md`](dwelling-zone-decoupling.md) |
 | PH-Tools website consolidation | Plan (cross-repo) | Planning | [`website-consolidation.md`](website-consolidation.md) |
-| Re-point default-space creation at upstream honeybee-ph factory | Refactor (cross-repo) | **Released v1.28.1** — generated pin requires `honeybee-ph>=1.33.36`; live meter/non-meter canvas verification remains | [`refactor/space-from-room-factory.md`](refactor/space-from-room-factory.md) |
+
+## Completed / archived work
+
+| Item | Kind | Status | Pointer |
+|------|------|--------|---------|
+| Re-point default-space creation at upstream honeybee-ph factory | Refactor (cross-repo) | **Complete** — released v1.28.1 with generated `honeybee-ph>=1.33.36` pin; meter, foot, multi-floor, host, and round-trip canvas checks pass | [`archive/space-from-room-factory/`](archive/space-from-room-factory/README.md) |
 
 ## Cross-repo work
 
@@ -47,8 +52,8 @@ stable; Room hosting and one-volume-per-floor behavior are intentional upstream 
 
 | Repo | Doc | Role |
 |------|-----|------|
-| `honeybee_ph` | `planning/features/space-from-room-factory/` | Primary — factory + tests — **released v1.33.36** |
-| `honeybee_grasshopper_ph` | [`refactor/space-from-room-factory.md`](refactor/space-from-room-factory.md) | **Released v1.28.1** with generated `honeybee-ph>=1.33.36` pin; live canvas verification remains |
+| `honeybee_ph` | `planning/archive/space-from-room-factory/` | Primary — **complete, archived; released v1.33.36** |
+| `honeybee_grasshopper_ph` | [`archive/space-from-room-factory/`](archive/space-from-room-factory/README.md) | **Complete, archived; released v1.28.1** with generated `honeybee-ph>=1.33.36` pin |
 
 ## Update rule
 

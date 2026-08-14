@@ -1,17 +1,17 @@
 # Refactor: Re-point default-space creation at the upstream honeybee-ph factory
 
-**Status:** Released in `honeybee_grasshopper_ph` v1.28.1 · 2026-08-14 —
-generated dependency pins are complete; live Rhino canvas verification remains.
+**Status:** Complete · Released in `honeybee_grasshopper_ph` v1.28.1;
+generated dependency pins and live Rhino verification complete · 2026-08-14
 **Author:** Ed May + Claude
 **Kind:** Cross-repo refactor (downstream side). The **primary** is
-`honeybee_ph/planning/features/space-from-room-factory/` — the new SDK-level
+`honeybee_ph/planning/archive/space-from-room-factory/` — the new SDK-level
 `Space.from_room()` factory built on pure ladybug-geometry
 (`Polyface3D.from_offset_face` for extrusion). This doc covers only the
 GH-side consumption.
 
 **Companion docs (same slug in each repo):**
-- `honeybee_ph/planning/features/space-from-room-factory/` — primary: the
-  factory itself + tests; ships first.
+- `honeybee_ph/planning/archive/space-from-room-factory/` — primary: factory,
+  tests, release evidence, and the live verification definition.
 
 ---
 
@@ -78,11 +78,17 @@ as follows:
   `honeybee_grasshopper_ph` v1.28.1 (`062402f`). The generated
   `requirements.txt` and `hbph_installer.ghx` both require
   `honeybee-ph>=1.33.36`.
-- Remaining before closeout: verify the released component on meter and
-  non-meter Rhino canvases (including iCFA and HBJSON), plus multi-floor
-  volume count and `Space.host` identity. No existing repo verification
-  definition was found; the headless worker evidence above does not replace
-  this live check.
+- Live Rhino/Grasshopper verification passes with the archived primary
+  `manual-test.ghx` definition:
+  - meter single-floor: one Space/volume/segment, 20.0 m2 floor and weighted
+    floor area, 50.0 m3 volume, and 2.5 m height;
+  - foot single-floor: one Space/volume/segment, 215.278 ft2 floor and weighted
+    floor area, 1765.739 ft3 volume, and 8.2021 ft height;
+  - foot multi-floor: one Space with two ordered volumes/segments, 12.0 ft2
+    floor and weighted floor area, 98.4252 ft3 volume, and two 8.2021 ft
+    heights.
+- All live cases preserve `Space.host is output_room` and Room-dict round-trip
+  host rebinding. No component warnings/errors were observed.
 
 ## WHY
 
