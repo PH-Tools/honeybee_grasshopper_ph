@@ -27,7 +27,6 @@ Full context index: `context/README.md`.
 4. **Do not hand-edit versions.** `RELEASE_VERSION`, `requirements.txt` pins, and `hbph_installer.ghx` are auto-updated by the release orchestrator (`.github/workflows/release.yml`). Pushing to `main` does not release.
 5. **`docs/` is a generated Hugo site** (deployed by `.github/workflows/hugo.yml`) — do not hand-edit or index it.
 6. **Tests live upstream.** There are no tests in this repo; the worker suite is in `honeybee_ph`.
-7. **Deploy worker edits before Rhino verification.** VS Code saves use `fsdeploy`; CLI/agent edits do not. For external edits, run `python3 scripts/deploy_dev.py` before testing. Versioned post-commit/checkout/merge hooks provide a fallback when enabled with `git config core.hooksPath .githooks`.
 
 ## Related repos (all under `~/Dropbox/bldgtyp-00/00_PH_Tools/`)
 

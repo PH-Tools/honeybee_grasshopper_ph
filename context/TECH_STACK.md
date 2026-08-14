@@ -25,36 +25,9 @@ Type stubs for the Rhino/GH APIs live in `stubs/` (see `stubs/ADDING_MORE_STUBS.
 
 - Not a pip package — `pyproject.toml` carries tooling config (black/ruff, bump-my-version) but no `[project]` metadata. Distribution is the `.ghuser` user objects installed via `hbph_installer.ghx`.
 
-## Dev loop (fsdeploy + Git hooks)
+## Dev loop (fsdeploy)
 
-`.vscode/settings.json` `fsdeploy` config auto-copies a saved file under
-`honeybee_ph_rhino/` into the local `ladybug_tools` site-packages and the `PHX`
-venv. This provides the immediate edit/save/Rhino loop for changes saved by VS
-Code.
-
-`fsdeploy` only receives VS Code save events; edits made by CLI tools or coding
-agents bypass it. Versioned hooks in `.githooks/` therefore run
-`python3 scripts/deploy_dev.py --quiet` after commits, checkouts, and merges.
-The deploy script mirrors the complete `honeybee_ph_rhino/` package into the
-single Ladybug Tools `python*/site-packages` directory, including source-file
-deletions. It stages the replacement before swapping the package directory.
-
-Enable the hooks once per clone:
-
-```bash
-git config core.hooksPath .githooks
-```
-
-Before testing an uncommitted external edit, deploy explicitly:
-
-```bash
-python3 scripts/deploy_dev.py
-```
-
-Set `HBPH_LBT_SITE_PACKAGES` only when the Ladybug Tools environment is not at
-`$HOME/ladybug_tools/python/lib/python*/site-packages` or more than one matching
-Python environment exists. Restart Rhino after deploying changes to already
-imported modules.
+`.vscode/settings.json` `fsdeploy` config auto-copies `honeybee_ph_rhino/` on save into the local `ladybug_tools` site-packages and the `PHX` venv, so edits are live in Rhino and the other repos immediately.
 
 ## Testing
 
