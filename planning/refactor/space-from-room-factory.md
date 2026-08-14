@@ -1,7 +1,7 @@
 # Refactor: Re-point default-space creation at the upstream honeybee-ph factory
 
-**Status:** Implemented locally · 2026-08-14 — wrapper verification passes;
-downstream release orchestration and live Rhino canvas verification remain.
+**Status:** Released in `honeybee_grasshopper_ph` v1.28.1 · 2026-08-14 —
+generated dependency pins are complete; live Rhino canvas verification remains.
 **Author:** Ed May + Claude
 **Kind:** Cross-repo refactor (downstream side). The **primary** is
 `honeybee_ph/planning/features/space-from-room-factory/` — the new SDK-level
@@ -73,10 +73,16 @@ as follows:
   pass for the worker.
 - Component signature is unchanged, so registry/source/user-object regeneration
   is not required.
-- Remaining before closeout: merge the wrapper, run the release orchestrator
-  so the generated pins carry the released `honeybee-ph`, and verify the
-  component on meter and non-meter Rhino canvases (including iCFA and HBJSON),
-  plus multi-floor volume count and `Space.host` identity.
+- Wrapper commit `edc6990` merged in PR #61 (`9d2ae2a`). Release workflow
+  31819524996 completed successfully and published
+  `honeybee_grasshopper_ph` v1.28.1 (`062402f`). The generated
+  `requirements.txt` and `hbph_installer.ghx` both require
+  `honeybee-ph>=1.33.36`.
+- Remaining before closeout: verify the released component on meter and
+  non-meter Rhino canvases (including iCFA and HBJSON), plus multi-floor
+  volume count and `Space.host` identity. No existing repo verification
+  definition was found; the headless worker evidence above does not replace
+  this live check.
 
 ## WHY
 
