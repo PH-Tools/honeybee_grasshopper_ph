@@ -2,7 +2,7 @@
 
 Master index of tracked planning work in honeybee_grasshopper_ph.
 
-_Last updated: 2026-08-12_
+_Last updated: 2026-08-14_
 
 ## Active / current work
 
@@ -14,6 +14,7 @@ _Last updated: 2026-08-12_
 | Set Occupancy list padding | Bug fix | **Requested** — reproduced; not implemented | [`occupancy-list-padding.md`](occupancy-list-padding.md) |
 | Decouple "Dwelling" from `Room.zone` | Refactor (cross-repo) | **Code implemented** — remaining: manual component retirement, `ladybug_tools` install, 2613 re-run | [`dwelling-zone-decoupling.md`](dwelling-zone-decoupling.md) |
 | PH-Tools website consolidation | Plan (cross-repo) | Planning | [`website-consolidation.md`](website-consolidation.md) |
+| Re-point default-space creation at upstream honeybee-ph factory | Refactor (cross-repo) | **Implemented locally** — primary v1.33.36 released; merge, generated pin bump, and live canvas verification remain | [`refactor/space-from-room-factory.md`](refactor/space-from-room-factory.md) |
 
 ## Cross-repo work
 
@@ -37,6 +38,17 @@ two references to `Room.zone` in the whole toolkit (`set_dwelling.py:113`,
 | `honeybee_ph` | `planning/refactor/dwelling-zone-decoupling.md` | Primary — shared helper + tests |
 | `honeybee_grasshopper_ph` | [`dwelling-zone-decoupling.md`](dwelling-zone-decoupling.md) | Root cause — the two `Room.zone` references |
 | `PHX` | `planning/refactor/dwelling-zone-decoupling.md` | Downstream consumer — clearance + dedup |
+
+`space-from-room-factory` spans two repos. The `honeybee_ph` **primary** builds the SDK-level
+default-space factory (pure ladybug-geometry) and ships first; this repo then rewrites
+`space_create_from_hb_rooms.py` as a thin wrapper. The shared `make_spaces/` helpers remain
+for their other detailed-space consumers. The common single-floor canvas behavior stays
+stable; Room hosting and one-volume-per-floor behavior are intentional upstream corrections.
+
+| Repo | Doc | Role |
+|------|-----|------|
+| `honeybee_ph` | `planning/features/space-from-room-factory/` | Primary — factory + tests — **released v1.33.36** |
+| `honeybee_grasshopper_ph` | [`refactor/space-from-room-factory.md`](refactor/space-from-room-factory.md) | Wrapper re-point complete locally; generated pin/release + live canvas verification remain |
 
 ## Update rule
 
