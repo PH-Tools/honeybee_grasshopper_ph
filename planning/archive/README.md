@@ -6,7 +6,7 @@ This README is the index — scan or grep it instead of guessing dates.
 
 | Item | Kind | Completed | Summary | Folder |
 |------|------|-----------|---------|--------|
-| _(none yet)_ | | | | |
+| Re-point default-space creation at upstream honeybee-ph factory | Refactor (cross-repo) | 2026-08-14 | Delegated default Space construction to `Space.from_room`; released v1.28.1 with generated upstream pin; meter, foot, multi-floor, host, and round-trip canvas checks pass. | [`space-from-room-factory/`](space-from-room-factory/README.md) |
 
 ## Conventions
 
