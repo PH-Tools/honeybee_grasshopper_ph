@@ -7,23 +7,18 @@ STATUS: CANONICAL ENGINEERING STANDARD
 
 ## 1. IronPython 2.7 (the one that bites)
 
-**All code in `honeybee_ph_rhino/` must be Python 2.7 / IronPython 2.7 compatible** — it runs inside Rhino's GHPython interpreter. (`scripts/` is normal Python 3; keep the two mentally separate.)
+The generic dual-runtime rules (banned syntax and modules, comment-style type
+hints, guarded `typing` imports, defensive third-party imports, and the lint
+settings they imply) live in the **ironpython-27-compatibility** skill. Apply it
+before editing anything on the Rhino load path. Only this repo's specifics are
+recorded below.
 
-- No f-strings — use `.format()`. No `pathlib`, no modern stdlib.
-- **Never bare `import typing`** — IronPython lacks it and the component crashes on import. Nest type imports:
-  ```python
-  try:
-      from typing import Any, Dict, List, Optional
-  except ImportError:
-      pass  # IronPython 2.7
-  ```
-  and use type **comments**, not annotations:
-  ```python
-  def run(self, name, value):
-      # type: (str, float) -> bool
-      ...
-  ```
-- Wrap all third-party imports (`ladybug_rhino`, `ladybug_geometry`, etc.) in `try/except` that re-raises a helpful `ImportError` — follow the pattern in existing workers.
+**Zone split:** everything in `honeybee_ph_rhino/` runs inside Rhino's GHPython
+interpreter and is IPy2.7. `scripts/` is normal Python 3. Keep the two mentally
+separate.
+
+Third-party imports here are `ladybug_rhino` and `ladybug_geometry`; follow the
+wrapping pattern already used by the existing workers.
 
 ## 2. Route Rhino/GH calls through `gh_io.IGH`
 
