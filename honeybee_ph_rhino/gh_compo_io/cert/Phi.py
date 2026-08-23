@@ -70,6 +70,7 @@ inputs_phpp_9 = {
         _name="_ihg_type",
         _description=_build_options_string(
             [
+                "1-User determined",
                 "2-Standard (default)",
                 "3-PHPP calculation ('IHG' worksheet)",
                 "4-PHPP calculation ('IHG non-res' worksheet)",
