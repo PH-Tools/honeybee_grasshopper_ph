@@ -57,7 +57,7 @@ except ImportError as e:
 
 
 def get_new_people(_hbe_people, _occ_schd, _act_schd):
-    # type:  (People | None, ScheduleRuleset, ScheduleRuleset) -> People
+    # type: (People | None, ScheduleRuleset, ScheduleRuleset) -> People
     """Get a new HBE-People object."""
     if _hbe_people is None:
         return People(
