@@ -18,7 +18,6 @@ from honeybee_ph_rhino.gh_compo_io.building_create_team_member import GHCompo_Cr
 from honeybee_ph_rhino.gh_compo_io.building_segment import GHCompo_BuildingSegment
 from honeybee_ph_rhino.gh_compo_io.building_set_project_data import GHCompo_SetProjectData
 from honeybee_ph_rhino.gh_compo_io.cert import *
-from honeybee_ph_rhino.gh_compo_io.summer_ventilation import *
 
 # -- Climate
 from honeybee_ph_rhino.gh_compo_io.climate_conver_fact import GHCompo_ConversionFactor
@@ -52,6 +51,7 @@ from honeybee_ph_rhino.gh_compo_io.space_create_from_hb_rooms import GHCompo_Cre
 from honeybee_ph_rhino.gh_compo_io.space_create_spc import GHCompo_CreatePHSpaces
 from honeybee_ph_rhino.gh_compo_io.space_create_vent_rates import GHCompo_CreateSpaceVent
 from honeybee_ph_rhino.gh_compo_io.space_get_flr_seg_data import GHCompo_GetFloorSegData
+from honeybee_ph_rhino.gh_compo_io.summer_ventilation import *
 
 # -- Thermal Bridges
 from honeybee_ph_rhino.gh_compo_io.tb_add import GHCompo_AddTBs

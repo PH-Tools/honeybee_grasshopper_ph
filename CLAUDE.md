@@ -2,7 +2,7 @@
 
 The **Grasshopper UI layer** for Honeybee-PH — the Passive House modeling components users drop onto the Rhino/Grasshopper canvas. This repo contains *only* the components; the data model and logic live upstream (`honeybee_ph`, `PHX`, `PH_units`, `honeybee_ref`), pinned in `requirements.txt`.
 
-> **Runtime constraint (critical):** everything in `honeybee_ph_rhino/` must run under **IronPython 2.7** (Rhino's GHPython interpreter). `scripts/` is normal Python 3 — that distinction matters. See `context/CODING_STANDARDS.md`.
+> **Runtime constraint (critical):** everything in `honeybee_ph_rhino/` must run under **IronPython 2.7** (Rhino's GHPython interpreter). `scripts/` is normal Python 3 — that distinction matters. Apply the **ironpython-27-compatibility** skill; repo specifics in `context/CODING_STANDARDS.md`.
 
 Data flow: GH components (here) build a `honeybee_ph` model → `PHX` serializes it → exports to PHPP (`.xlsx`) or WUFI-Passive (`.xml`).
 

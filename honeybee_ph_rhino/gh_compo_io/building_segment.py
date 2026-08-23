@@ -15,7 +15,13 @@ except ImportError as e:
 
 try:
     from honeybee_ph import phi, phius, site
-    from honeybee_ph.bldg_segment import BldgSegment, PhVentilationSummerBypassMode, PhWindExposureType, SetPoints, SummerVentilation
+    from honeybee_ph.bldg_segment import (
+        BldgSegment,
+        PhVentilationSummerBypassMode,
+        PhWindExposureType,
+        SetPoints,
+        SummerVentilation,
+    )
     from honeybee_ph.properties.room import RoomPhProperties
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph:\n\t{}".format(e))
@@ -127,7 +133,9 @@ class GHCompo_BuildingSegment(object):
         # -- Handle older API for summer-ventilation and hrv-bypass mode
         if isinstance(_summer_ventilation_, int) or isinstance(_summer_ventilation_, str):
             self.summer_ventilation = SummerVentilation()
-            self.summer_ventilation.summer_bypass_mode = PhVentilationSummerBypassMode(input_to_int(_summer_ventilation_) or 4)
+            self.summer_ventilation.summer_bypass_mode = PhVentilationSummerBypassMode(
+                input_to_int(_summer_ventilation_) or 4
+            )
         elif _summer_ventilation_ is not None:
             self.summer_ventilation = _summer_ventilation_
         else:
