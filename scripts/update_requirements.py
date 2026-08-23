@@ -82,7 +82,7 @@ def main():
                 re.IGNORECASE,
             )
             if pattern.match(stripped):
-                new_line = "{}>={}" .format(pypi_name, updates[flag_name])
+                new_line = "{}>={}".format(pypi_name, updates[flag_name])
                 new_lines.append(new_line)
                 print("  {} -> {}".format(stripped, new_line))
                 updated = True

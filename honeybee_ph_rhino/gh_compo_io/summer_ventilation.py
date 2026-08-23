@@ -3,14 +3,17 @@
 
 """GHCompo Interface: HBPH - Create Summer Ventilation."""
 
-
 from honeybee_ph_utils.input_tools import input_to_int
+
 from honeybee_ph_rhino import gh_io
 from honeybee_ph_rhino.gh_compo_io import ghio_validators
 
-
 try:
-    from honeybee_ph.bldg_segment import PhVentilationSummerBypassMode, SummerVentilation, PhSummerVentilationExtractSystemControl
+    from honeybee_ph.bldg_segment import (
+        PhSummerVentilationExtractSystemControl,
+        PhVentilationSummerBypassMode,
+        SummerVentilation,
+    )
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph:\n\t{}".format(e))
 
@@ -20,23 +23,24 @@ class GHCompo_CreateSummerVentilation(object):
     nighttime_minimum_indoor_temp_C = ghio_validators.UnitDegreeC("nighttime_minimum_indoor_temp_C")
     nighttime_extract_system_fan_power_wh_m3 = ghio_validators.UnitWH_M3("nighttime_extract_system_fan_power_wh_m3")
     nighttime_extract_system_heat_fraction = ghio_validators.FloatPercentage("nighttime_extract_system_heat_fraction")
-    
-    def __init__(self, 
-                 _IGH,     
-                 _ventilation_system_ach,
-                _ventilation_system_summer_bypass_mode,
-                _daytime_extract_system_ach,
-                _daytime_extract_system_fan_power_wh_m3,
-                _daytime_window_ach,
-                _nighttime_extract_system_ach,
-                _nighttime_extract_system_fan_power_wh_m3, 
-                _nighttime_extract_system_heat_fraction,
-                _nighttime_extract_system_control,
-                _nighttime_window_ach,
-                _nighttime_minimum_indoor_temp_C,
-                *args, 
-                **kwargs 
-            ):
+
+    def __init__(
+        self,
+        _IGH,
+        _ventilation_system_ach,
+        _ventilation_system_summer_bypass_mode,
+        _daytime_extract_system_ach,
+        _daytime_extract_system_fan_power_wh_m3,
+        _daytime_window_ach,
+        _nighttime_extract_system_ach,
+        _nighttime_extract_system_fan_power_wh_m3,
+        _nighttime_extract_system_heat_fraction,
+        _nighttime_extract_system_control,
+        _nighttime_window_ach,
+        _nighttime_minimum_indoor_temp_C,
+        *args,
+        **kwargs
+    ):
         self.IGH = _IGH
         self.ventilation_system_ach = _ventilation_system_ach
         self.ventilation_system_summer_bypass_mode = _ventilation_system_summer_bypass_mode or "4"
@@ -49,7 +53,7 @@ class GHCompo_CreateSummerVentilation(object):
         self.nighttime_extract_system_control = _nighttime_extract_system_control or "1"
         self.nighttime_window_ach = _nighttime_window_ach or 0.0
         self.nighttime_minimum_indoor_temp_C = _nighttime_minimum_indoor_temp_C or 22.0
-    
+
     @property
     def ventilation_system_summer_bypass_mode(self):
         # type: () -> PhVentilationSummerBypassMode
@@ -85,6 +89,6 @@ class GHCompo_CreateSummerVentilation(object):
             self.nighttime_extract_system_heat_fraction,
             self.nighttime_extract_system_control.value,
             self.nighttime_window_ach,
-            self.nighttime_minimum_indoor_temp_C
+            self.nighttime_minimum_indoor_temp_C,
         )
         return obj

@@ -62,7 +62,7 @@ class GHCompo_CreateSupportiveDevice(object):
         _norm_energy_demand_W,
         _annual_period_operation_khrs,
         _ihg_utilization_factor,
-        _ihg_usage_profile
+        _ihg_usage_profile,
     ):
         # type: (gh_io.IGH, str, int, int, bool, float, float, float, Optional[int]) -> None
         self.IGH = _IGH

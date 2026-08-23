@@ -3,7 +3,6 @@
 
 """GHCompo Interface: HBPH - Shading Factor Settings - LBT Rad."""
 
-
 try:
     from typing import Any, Optional
 except ImportError:
