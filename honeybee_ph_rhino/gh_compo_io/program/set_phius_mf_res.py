@@ -30,6 +30,11 @@ except ImportError as e:
     raise ImportError("\nFailed to import honeybee_energy_ph:\n\t{}".format(e))
 
 try:
+    from honeybee_ph_standards.programtypes.default_elec_equip import ph_default_equip
+except ImportError as e:
+    raise ImportError("\nFailed to import honeybee_ph_standards:\n\t{}".format(e))
+
+try:
     from ph_gh_component_io import gh_io
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_rhino:\n\t{}".format(e))
@@ -53,7 +58,7 @@ def build_mel(total_mel, number_of_rooms):
     # type: (float, int) -> ph_equipment.PhCustomAnnualMEL
     """Build the Phius-MF-MEL object."""
 
-    mel_obj = ph_equipment.PhCustomAnnualMEL()
+    mel_obj = ph_equipment.PhCustomAnnualMEL(_defaults=ph_default_equip["PhCustomAnnualMEL"]["PHIUS"])
     mel_obj.display_name = "Phius-MF-MEL"
     mel_obj.energy_demand = total_mel / number_of_rooms
     mel_obj.comment = "MEL_Dwelling"
@@ -65,7 +70,7 @@ def build_lighting_int(total_lighting_int, number_of_rooms):
     # type: (float, int) -> ph_equipment.PhCustomAnnualLighting
     """Build the Phius-MF-Int-Lighting object."""
 
-    lighting_obj = ph_equipment.PhCustomAnnualLighting()
+    lighting_obj = ph_equipment.PhCustomAnnualLighting(_defaults=ph_default_equip["PhCustomAnnualLighting"]["PHIUS"])
     lighting_obj.display_name = "Phius-MF-Int-Lighting"
     lighting_obj.energy_demand = total_lighting_int / number_of_rooms
     lighting_obj.comment = "LIGHTS_Int_Dwelling"
@@ -77,7 +82,7 @@ def build_lighting_ext(total_lighting_ext, number_of_rooms):
     # type: (float, int) -> ph_equipment.PhCustomAnnualLighting
     """Build the Phius-MF-Ext-Lighting object."""
 
-    lighting_obj = ph_equipment.PhCustomAnnualLighting()
+    lighting_obj = ph_equipment.PhCustomAnnualLighting(_defaults=ph_default_equip["PhCustomAnnualLighting"]["PHIUS"])
     lighting_obj.display_name = "Phius-MF-Ext-Lighting"
     lighting_obj.energy_demand = total_lighting_ext / number_of_rooms
     lighting_obj.comment = "LIGHTS_Ext_Dwelling"
@@ -90,7 +95,7 @@ def build_lighting_garage(total_lighting_garage, number_of_rooms):
     # type: (float, int) -> ph_equipment.PhCustomAnnualLighting
     """Build the Phius-MF-Garage-Lighting object."""
 
-    lighting_obj = ph_equipment.PhCustomAnnualLighting()
+    lighting_obj = ph_equipment.PhCustomAnnualLighting(_defaults=ph_default_equip["PhCustomAnnualLighting"]["PHIUS"])
     lighting_obj.display_name = "Phius-MF-Garage-Lighting"
     lighting_obj.energy_demand = total_lighting_garage / number_of_rooms
     lighting_obj.comment = "LIGHTS_Garage"
