@@ -18,22 +18,18 @@
 | C | `ph-tools.github.io/honeybee_grasshopper_ph/` | **GitHub Pages** (from this repo) | `PH-Tools/honeybee_grasshopper_ph` `docs/` folder | Hugo 0.124.1 | Install guide, quick start, learn more, contact for GH plugin |
 | D | `ph-tools.github.io/CarbonCheck/` | **GitHub Pages** (from CarbonCheck repo) | `PH-Tools/CarbonCheck` | Unknown | CarbonCheck landing page |
 
-### 1.2 Dreamhost Account Details (Confirmed 2026-04-23)
+### 1.2 Registration and Hosting (Confirmed 2026-04-23)
 
 **Domain registration**: `passivehousetools.com` is **registered through Dreamhost**.  
 **Registration expiry**: 2027-01-04  
-**Hosting plan**: Shared Unlimited (server: `iad-shared-68-05`, US-East Ashburn, Virginia)  
-**Traffic**: ~1,103 visits (at time of check)
+**Hosting**: a paid Dreamhost shared-hosting plan serves the current static site; it can be
+canceled after the migration while keeping the registration.
 
-**Other domains on this Dreamhost account** (for awareness):
-| Domain | Plan | Notes |
-|--------|------|-------|
-| `bldgtyp.com` | Shared Unlimited | "Transfer Registration" shown — may be registered elsewhere |
-| `chrismaybuilders.com` | Shared Unlimited | Expires 2026-12-10 |
-| `passivehouse.tools` | Redirect | Currently goes nowhere — intended to redirect to passivehousetools.com but never configured |
-| `passivehousetools.com` | Shared Unlimited | **This domain** — expires 2027-01-04 |
-| `ph-nav.com` | DNS Only | Expires 2026-06-23 |
-| `ph-switch.com` | DNS Only | Expires 2026-08-05 |
+Related: `passivehouse.tools` is registered as a redirect but currently goes nowhere — it
+was intended to redirect to `passivehousetools.com` and never got configured.
+
+Account-level details (server, plan tier, traffic, the full domain inventory) live in Ed's
+private notes, not in this public repo.
 
 ### 1.3 DNS Records (Confirmed 2026-04-23)
 
@@ -116,7 +112,7 @@ Both sites share the same bldgtyp design tokens (fonts, colors, spacing, graph-p
 | `ftp` | A | 173.236.255.61 | Dreamhost hosting artifact — no longer needed |
 | `ssh` | A | 173.236.255.61 | Dreamhost hosting artifact — no longer needed |
 
-**Dreamhost hosting plan**: After DNS cutover is confirmed working (Phase 6), the "Shared Unlimited" hosting plan for `passivehousetools.com` can be canceled. **Keep the domain registration** — it expires 2027-01-04 and should be renewed. Dreamhost allows keeping a domain registered as "DNS Only" without a hosting plan (similar to `ph-nav.com` and `ph-switch.com` on the same account).
+**Dreamhost hosting plan**: After DNS cutover is confirmed working (Phase 6), the "Shared Unlimited" hosting plan for `passivehousetools.com` can be canceled. **Keep the domain registration** — it expires 2027-01-04 and should be renewed. Dreamhost allows keeping a domain registered as "DNS Only" without a hosting plan (already proven on other bldgtyp domains).
 
 ### 2.3 Landing Page Content (`passivehousetools.com`)
 
@@ -269,7 +265,7 @@ https://github.com/bldgtyp/branding
 - [x] **1.8** Add a branded `404.astro` page (Astro convention: `src/pages/404.astro`). GitHub Pages will serve this for any missing route. Should show PH-Tools branding with a link back to home.
 - [ ] **1.9** **Analytics** (optional but recommended): add lightweight, privacy-friendly analytics. Options:
   - **GitHub Pages traffic** (free, built-in): Settings > Traffic gives basic page views. No code needed, but very limited.
-  - **Plausible** or **Umami** (self-hosted or cloud): lightweight script tag, no cookies, GDPR-friendly. Replaces the ~1,103 visit/month visibility that Dreamhost currently provides.
+  - **Plausible** or **Umami** (self-hosted or cloud): lightweight script tag, no cookies, GDPR-friendly. Replaces the basic traffic visibility that Dreamhost currently provides.
   - Decision: pick one before launch. Can always add later.
 - [ ] **1.10** **SEO**: If PH-Tools has a Google Search Console account, note that the property will need to be re-verified for `passivehousetools.com` after DNS cutover (or add it as a new property alongside the old one). Check with Ed whether Search Console is set up.
 - [x] **1.11** Review all migrated content — check links, images, formatting
@@ -357,7 +353,7 @@ https://github.com/bldgtyp/branding
 | DNS cutover breaks `docs.passivehousetools.com` | High — developer docs go down | The docs subdomain uses its own CNAME (ph-docs repo). Changing the apex domain DNS should not affect it. Verify in Phase 3.8. |
 | Org-level Pages repo breaks CarbonCheck subpath | **Medium** — `ph-tools.github.io/CarbonCheck/` stops working | When `PH-Tools.github.io` repo exists and serves the org root, GitHub *may* redirect or interfere with project-level Pages at subpaths. This is a known GitHub Pages gotcha. **Must test in Phase 2.5** before proceeding to DNS cutover. If CarbonCheck breaks, options: (a) CarbonCheck gets its own custom subdomain (e.g., `carboncheck.passivehousetools.com`), or (b) CarbonCheck docs migrate into ph-docs as a spoke, or (c) CarbonCheck content is embedded in the landing page. |
 | HTTPS cert provisioning delay | **Medium** — site works on HTTP but not HTTPS, or shows cert warning | GitHub won't issue a TLS cert until DNS propagation is complete and ownership is verified. Phase 3.5 may need to be retried hours after Phase 3.3. Do not advertise the new URL until HTTPS is confirmed working. |
-| Dreamhost "DNS Only" may not support custom A records | **Medium** — can't point domain to GitHub Pages after downgrading hosting | Dreamhost's DNS-Only mode for `ph-nav.com` and `ph-switch.com` is already on this account, but verify those have custom records. If DNS-Only doesn't support A records, alternatives: (a) keep the cheapest hosting tier, (b) move DNS management to Cloudflare (free tier) while keeping Dreamhost as registrar, (c) transfer domain to a registrar with better DNS (e.g., Cloudflare Registrar). **Test in Phase 6.2 — do the downgrade and immediately verify DNS resolution before deleting anything.** |
+| Dreamhost "DNS Only" may not support custom A records | **Medium** — can't point domain to GitHub Pages after downgrading hosting | Dreamhost's DNS-Only mode is already in use on other bldgtyp domains, but verify those have custom records. If DNS-Only doesn't support A records, alternatives: (a) keep the cheapest hosting tier, (b) move DNS management to Cloudflare (free tier) while keeping Dreamhost as registrar, (c) transfer domain to a registrar with better DNS (e.g., Cloudflare Registrar). **Test in Phase 6.2 — do the downgrade and immediately verify DNS resolution before deleting anything.** |
 | Dreamhost hosting removal affects DNS | Low — domain stops resolving | Dreamhost supports "DNS Only" mode (already used for ph-nav.com, ph-switch.com). Downgrade hosting plan, don't cancel the domain. DNS records are managed separately from hosting. |
 | Deleting `docs/` doesn't shrink repo clone size | **Low** — repo stays ~75MB in git history | Deleting files from the working tree removes them going forward but 57MB of PDFs remain in git history. This is fine — the repo is private enough that clone speed isn't a concern. If it becomes a problem later, `git filter-repo` or BFG can rewrite history, but that's a destructive operation that affects all clones. **Decision: accept the history bloat, don't rewrite.** |
 | Old URLs in the wild (links to `ph-tools.github.io/honeybee_grasshopper_ph/`) | Low — broken bookmarks | Phase 5.8 deploys meta-refresh redirect pages at all old paths. Old URLs will redirect to the new domain indefinitely. |
