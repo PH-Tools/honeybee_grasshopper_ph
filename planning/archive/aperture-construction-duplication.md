@@ -1,8 +1,14 @@
 # Per-aperture window construction duplication
 
-**Status:** Requested — root-caused and reproduced against a real model; not implemented.
+**Status:** **RESOLVED (2026-08-28)** — by removal of the mechanism, not by the correction
+proposed below. `duplicate_aperture_construction()` no longer exists; the component writes only
+aperture-instance properties and never creates or touches a construction. All five §Verification
+checks pass (see §Verification result). Issue #59 closed.
+**One consequence is NOT resolved and is tracked separately:** models already exported with
+HB-PH v1.25.2 - v1.32.x carry the inflated construction list into PHPP/WUFI. See
+[`exported-models-inflated-window-types.md`](exported-models-inflated-window-types.md).
 **Resolution path (2026-08-12):** superseded by the cross-repo `aperture-psi-install` refactor
-([`planning/refactor/aperture-psi-install.md`](../refactor/aperture-psi-install.md)), which deletes
+([`aperture-psi-install.md`](aperture-psi-install.md)), which deletes
 `duplicate_aperture_construction()` entirely. Decided 2026-08-12 (Ed): no interim patch —
 proceed straight to the full refactor; the content-keyed correction below is kept for the record only.
 **Issue:** [#59](https://github.com/PH-Tools/honeybee_grasshopper_ph/issues/59)
@@ -155,9 +161,33 @@ tested upstream; today `duplicate_aperture_construction()` sits in a module that
   and 79 `EnergyWindowMaterialSimpleGlazSys` entries against 939 apertures, with per-type aperture counts
   unchanged from `2310 Emerson Place_260812_2.hbjson`.
 
-## Downstream impact
+## Verification result (2026-08-28)
 
-The inflated construction list propagates through `PHX` into the PHPP and WUFI-Passive window-type tables,
-where 939 near-identical entries appear in place of 79. Worth confirming whether `PHX` collapses them on
-serialization or passes them straight through — if the latter, any model exported from HB-PH ≥ v1.25.2 that
-used this component needs re-checking before certification submission.
+Run against the current component at 2310's scale — 948 apertures over 79 window types — using the
+real `GHCompo_SetAperturePsiInstallValues` and real Honeybee objects:
+
+```
+apertures out                 : 948
+distinct window constructions : 79     (the bug produced 939)
+distinct display_names        : 79
+original constructions mutated: False
+
+two apertures, same construction, DIFFERENT psi:
+  ap1 top psi 0.02 / ap2 top psi 0.08  -> cross-contaminated: False
+  extra constructions created: 0
+identifiers stable across repeated runs: True
+```
+
+That covers all five bullets above. It is a synthetic reproduction at 2310's scale rather than a
+re-export of 2310 itself; the real re-export remains available as confirmation but is no longer
+load-bearing, since the mechanism it tests for is absent from the codebase.
+
+## Downstream impact — CONFIRMED, and still open in the field
+
+`PHX` does **not** collapse them. `from_HBJSON/create_assemblies.py:509` dedupes window types by
+`hb_win_const.identifier`, and the bug's identifiers were uuid-unique per aperture, so all 939
+pass straight through into the PHPP and WUFI-Passive window-type tables in place of 79.
+
+Any model exported with **HB-PH v1.25.2 through v1.32.x** that used `HBPH - Set Aperture
+Psi-Installs` is affected. Fixed from v1.33.0 (PR #60) onward. Tracked as its own item:
+[`exported-models-inflated-window-types.md`](exported-models-inflated-window-types.md).

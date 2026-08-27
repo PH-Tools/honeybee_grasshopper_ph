@@ -8,7 +8,8 @@ This README is the index — scan or grep it instead of opening every file.
 
 | Item | Component | Status | Issue | Doc |
 |------|-----------|--------|-------|-----|
-| Per-aperture window construction duplication | `HBPH - Set Aperture Psi-Installs` | **Requested** — root-caused, not implemented | [#59](https://github.com/PH-Tools/honeybee_grasshopper_ph/issues/59) | [`aperture-construction-duplication.md`](aperture-construction-duplication.md) |
+| Already-exported models carry inflated window-type tables | (no component — field remediation) | **Open** — #59's downstream half; affects v1.25.2-v1.32.x exports | [#59](https://github.com/PH-Tools/honeybee_grasshopper_ph/issues/59) | [`exported-models-inflated-window-types.md`](exported-models-inflated-window-types.md) |
+| ~~Per-aperture window construction duplication~~ | `HBPH - Set Aperture Psi-Installs` | **Resolved 2026-08-28** — archived | [#59](https://github.com/PH-Tools/honeybee_grasshopper_ph/issues/59) | [`../archive/aperture-construction-duplication.md`](../archive/aperture-construction-duplication.md) |
 
 ## Conventions
 

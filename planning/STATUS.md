@@ -2,15 +2,13 @@
 
 Master index of tracked planning work in honeybee_grasshopper_ph.
 
-_Last updated: 2026-08-25_
+_Last updated: 2026-08-28_
 
 ## Active / current work
 
 | Item | Kind | Status | Pointer |
 |------|------|--------|---------|
-| Consume PHN per-edge Psi-Install data | Feature (in `honeybee_grasshopper_ph_plus`) | **Complete** (2026-08-28) — shipped as HBPH+ PR #10; consuming it added a keyed-collection input to this repo's `Set Aperture Psi-Installs` (PR #71). Confirmed via METr | [`archive/phn-psi-install-per-edge/`](https://github.com/PH-Tools/honeybee_grasshopper_ph_plus/tree/main/planning/archive/phn-psi-install-per-edge) |
-| Aperture-level Psi-Install (Install Types) | Refactor (cross-repo) | **Effectively complete** (2026-08-28) — canvas work, .ghuser regeneration and release pins all done; #59 / #51 closed. Only the confirmatory 2310 re-export check is left, and the duplication mechanism it tests for no longer exists in the code | [`refactor/aperture-psi-install.md`](refactor/aperture-psi-install.md) |
-| Per-aperture window construction duplication | Bug fix | **Fix implemented** (2026-08-12) — `duplicate_aperture_construction()` deleted in the refactor; #59 closes after Ed's canvas step + 2310 verification | [`bugs/aperture-construction-duplication.md`](bugs/aperture-construction-duplication.md) |
+| Already-exported models carry inflated window-type tables | Field remediation (no code change) | **Open** — #59's confirmed downstream half. PHX dedupes window types by identifier, so the bug's uuid-unique ids passed all 939 through to PHPP/WUFI. Affects models exported with v1.25.2-v1.32.x that used `Set Aperture Psi-Installs`; 2310 confirmed | [`bugs/exported-models-inflated-window-types.md`](bugs/exported-models-inflated-window-types.md) |
 | Phius MF custom MEL/Lighting export `reference_quantity = 2` | Bug fix (cross-repo; **fix landed here**, packet owned by `honeybee_ph`) | **Merged** (2026-08-25, PR #69) — the six MF MEL/lighting builders now construct from `ph_default_equip[...]["PHIUS"]` so `reference_quantity = 5`. Remaining: canvas re-export confirming `<ReferenceQuantity>5</ReferenceQuantity>` in the WUFI XML and `"refQ": 5` in the METr JSON, then release. See the packet §10 for the open WUFI import question | [`honeybee_ph/planning/archive/phius-mf-custom-load-reference-quantity/`](https://github.com/PH-Tools/honeybee_ph/blob/main/planning/archive/phius-mf-custom-load-reference-quantity/README.md) |
 | Set Occupancy list padding | Bug fix | **Requested** — reproduced; not implemented | [`occupancy-list-padding.md`](occupancy-list-padding.md) |
 | Decouple "Dwelling" from `Room.zone` | Refactor (cross-repo) | **Code implemented** — remaining: manual component retirement, `ladybug_tools` install, 2613 re-run | [`dwelling-zone-decoupling.md`](dwelling-zone-decoupling.md) |
@@ -20,6 +18,9 @@ _Last updated: 2026-08-25_
 
 | Item | Kind | Status | Pointer |
 |------|------|--------|---------|
+| Aperture-level Psi-Install (Install Types) | Refactor (cross-repo) | **Complete** (2026-08-28) — released v1.33.0; PHN per-edge client and the keyed-collection input followed (#71). Construction-count check verified at 2310 scale | [`archive/aperture-psi-install.md`](archive/aperture-psi-install.md) |
+| Per-aperture window construction duplication (#59) | Bug fix | **Resolved** (2026-08-28) — mechanism deleted rather than patched; 948 apertures / 79 types now yield 79 constructions. Field impact tracked separately (see Active) | [`archive/aperture-construction-duplication.md`](archive/aperture-construction-duplication.md) |
+| Consume PHN per-edge Psi-Install data | Feature (in `honeybee_grasshopper_ph_plus`) | **Complete** (2026-08-28) — HBPH+ PR #10; consuming it added the keyed-collection input here (PR #71). Confirmed via METr | [`HBPH+ archive/phn-psi-install-per-edge/`](https://github.com/PH-Tools/honeybee_grasshopper_ph_plus/tree/main/planning/archive/phn-psi-install-per-edge) |
 | Re-point default-space creation at upstream honeybee-ph factory | Refactor (cross-repo) | **Complete** — released v1.28.1 with generated `honeybee-ph>=1.33.36` pin; meter, foot, multi-floor, host, and round-trip canvas checks pass | [`archive/space-from-room-factory/`](archive/space-from-room-factory/README.md) |
 
 ## Cross-repo work
@@ -32,7 +33,7 @@ Blocked on the `honeybee_ph` primary shipping and its pinned release.
 |------|-----|------|
 | `honeybee_ph` | `planning/archive/aperture-psi-install/` | Primary — **complete, archived** (v1.33.33) |
 | `PHX` | `planning/archive/aperture-psi-install/` | **Complete, archived** (v1.56.73) — PHPP per-row write; WUFI/METr variant synthesis |
-| `honeybee_grasshopper_ph` | [`refactor/aperture-psi-install.md`](refactor/aperture-psi-install.md) | Components; deletes the bug-#59 mechanism |
+| `honeybee_grasshopper_ph` | [`archive/aperture-psi-install.md`](archive/aperture-psi-install.md) | **Complete, archived** (v1.33.0) — components; deleted the bug-#59 mechanism |
 | `ph-navigator-v2` | `planning/features_v1.1/aperture-psi-install/upstream-alignment.md` | Phase-07 GH-client mapping |
 | `honeybee_grasshopper_ph_plus` | `planning/archive/phn-psi-install-per-edge/` | **Complete, archived** (2026-08-28) — the PHN per-edge client |
 

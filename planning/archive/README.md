@@ -6,6 +6,8 @@ This README is the index — scan or grep it instead of guessing dates.
 
 | Item | Kind | Completed | Summary | Folder |
 |------|------|-----------|---------|--------|
+| Aperture-level Psi-Install (Install Types) | Refactor (cross-repo) | 2026-08-28 | `PhApertureInstallType` per-edge on the Aperture; deletes the bug-#59 construction-duplication mechanism. Released v1.33.0; PHN per-edge client and keyed-collection input followed in #71 | [`aperture-psi-install.md`](aperture-psi-install.md) |
+| Per-aperture window construction duplication (#59) | Bug | 2026-08-28 | 939 constructions for 79 types. Resolved by removing the mechanism, not patching it; verified at 2310 scale. Field impact on already-exported models tracked in `bugs/exported-models-inflated-window-types.md` | [`aperture-construction-duplication.md`](aperture-construction-duplication.md) |
 | Re-point default-space creation at upstream honeybee-ph factory | Refactor (cross-repo) | 2026-08-14 | Delegated default Space construction to `Space.from_room`; released v1.28.1 with generated upstream pin; meter, foot, multi-floor, host, and round-trip canvas checks pass. | [`space-from-room-factory/`](space-from-room-factory/README.md) |
 
 ## Conventions

@@ -12,20 +12,24 @@ it required teaching **this** repo's `HBPH - Set Aperture Psi-Installs` a keyed-
 collection input alongside its DataTree (PR #71) — branch-index matching cannot
 express per-window values against a flat aperture list. Confirmed end-to-end through
 a METr export placing Psi=0 on mulled edges.
-**Remaining:** steps 1-3 of §4 DONE 2026-08-12. Release-pin bumps DONE
-(`requirements.txt` now pins honeybee-ph>=1.33.56, PHX>=1.56.95 — both well past the
-PR-#87 / PR-#80 releases). #59 and honeybee_ph #51 both CLOSED. **Left: the project
-2310 re-export verification only** (939 apertures ⇒ 79 window constructions). That is
-now confirmatory rather than load-bearing: `duplicate_aperture_construction()` is
-absent from the codebase and the aperture setter contains no construction access at
-all, so the 939-construction outcome is structurally unreachable. Re-open #59 if a
-2310 re-export ever says otherwise.
+**Remaining: none.** Steps 1-3 of §4 DONE 2026-08-12. Release-pin bumps DONE
+(`requirements.txt` pins honeybee-ph>=1.33.56, PHX>=1.56.95 — both past the PR-#87 /
+PR-#80 releases). #59 and honeybee_ph #51 both CLOSED. §4 step 4's construction-count
+check was run 2026-08-28 at 2310's scale against the current component — 948 apertures
+over 79 types produced exactly **79** constructions, with no cross-contamination
+between apertures carrying different psi values and stable identifiers across repeated
+runs. Evidence in `aperture-construction-duplication.md` §"Verification result".
+A literal 2310 re-export remains available as confirmation but is not load-bearing:
+`duplicate_aperture_construction()` is absent from the codebase.
+**One field consequence is tracked separately** and is NOT part of this refactor:
+models exported with v1.25.2 - v1.32.x carry inflated window-type tables into
+PHPP/WUFI — `bugs/exported-models-inflated-window-types.md`.
 **Date:** 2026-08-12
 **Author:** Ed May + Claude
 **Kind:** Cross-repo refactor. This repo holds the user-facing components **and the root cause
 of bug #59** — the per-aperture construction-duplication mechanism, which this refactor deletes.
 **Resolves:** [#59](https://github.com/PH-Tools/honeybee_grasshopper_ph/issues/59)
-(`bugs/aperture-construction-duplication.md`) — by removal of the mechanism, not by patching it.
+(`aperture-construction-duplication.md`) — by removal of the mechanism, not by patching it.
 
 **Companion docs (same slug in each repo):**
 - `honeybee_ph/planning/archive/aperture-psi-install/` — **primary** (complete, archived): data model, resolver, issue #51
@@ -102,7 +106,7 @@ deliberately not implemented — a zero-Ψ value is the "off" state; see primary
 
 This refactor is the fix. When it ships:
 
-- Re-run the §Verification checks in `bugs/aperture-construction-duplication.md` — in
+- Re-run the §Verification checks in `aperture-construction-duplication.md` — in
   particular the 2310 end-to-end: 939 apertures ⇒ **79** window constructions and 79
   `EnergyWindowMaterialSimpleGlazSys`, identifiers stable across repeated exports, original
   constructions never mutated.
