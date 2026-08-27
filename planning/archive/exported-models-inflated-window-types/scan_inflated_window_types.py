@@ -82,9 +82,7 @@ def scan_wufi_xml(path: Path) -> tuple[str, str]:
     except ET.ParseError as e:
         return "unreadable", f"XML parse error ({e})"
     window_types = root.findall(".//WindowType")
-    signature_hits = sum(
-        1 for wt in window_types if (name := wt.findtext("Name")) and UUID_SIGNATURE.search(name)
-    )
+    signature_hits = sum(1 for wt in window_types if (name := wt.findtext("Name")) and UUID_SIGNATURE.search(name))
     detail = f"window_types={len(window_types)} signature_names={signature_hits}"
     return ("AFFECTED" if signature_hits else "clean"), detail
 
@@ -95,9 +93,7 @@ def scan_mwp(path: Path) -> tuple[str, str]:
         raw = path.read_bytes()
     except OSError as e:
         return "unreadable", str(e)
-    signature_hits = sum(
-        1 for run in ASCII_RUN.findall(raw) if UUID_SIGNATURE.search(run.decode("ascii"))
-    )
+    signature_hits = sum(1 for run in ASCII_RUN.findall(raw) if UUID_SIGNATURE.search(run.decode("ascii")))
     detail = f"signature_strings={signature_hits}"
     return ("AFFECTED" if signature_hits else "clean"), detail
 
@@ -108,10 +104,7 @@ SCANNERS = {".hbjson": scan_hbjson, ".xml": scan_wufi_xml, ".mwp": scan_mwp}
 def iter_candidate_files(root: Path, excludes: list[str]) -> Iterator[Path]:
     """Yield scannable files under root, pruning excluded subtrees during the walk."""
     for dirpath, dirnames, filenames in os.walk(root):
-        dirnames[:] = [
-            d for d in dirnames
-            if not any(pattern in os.path.join(dirpath, d) for pattern in excludes)
-        ]
+        dirnames[:] = [d for d in dirnames if not any(pattern in os.path.join(dirpath, d) for pattern in excludes)]
         for filename in filenames:
             path = Path(dirpath, filename)
             if path.suffix.lower() in SCANNERS and not any(p in str(path) for p in excludes):
@@ -123,7 +116,9 @@ def main() -> int:
     parser.add_argument("--root", type=Path, default=Path.home() / "Dropbox", help="tree to scan")
     parser.add_argument("--all", action="store_true", help="also list clean and skipped files")
     parser.add_argument(
-        "--exclude", action="append", default=list(DEFAULT_EXCLUDES),
+        "--exclude",
+        action="append",
+        default=list(DEFAULT_EXCLUDES),
         help="path substring to skip (repeatable); defaults: %(default)s",
     )
     args = parser.parse_args()
