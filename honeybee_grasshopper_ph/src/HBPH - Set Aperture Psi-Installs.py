@@ -26,7 +26,7 @@ window construction - so this component sets aperture-instance data and NEVER du
 the window construction. An edge with no Install Type assigned inherits the psi-install
 value from the construction's PH Frame Element (the type default).
 -
-EM August 12, 2026
+EM August 28, 2026
     Args:
 
         _install_types: (DataTree) The Install Types to assign, in top / right / bottom / left
