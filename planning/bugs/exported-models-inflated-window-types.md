@@ -121,16 +121,17 @@ The session scanner proved the detectors; make it re-runnable and self-documenti
   Four-angle cleanup review applied (ElementTree over regex, walk pruning, single print loop);
   re-run after refactor produced the identical 23.
 
-### Phase 2 — Quarantine markers in the 2310 project folder — [ ] not started
+### Phase 2 — Quarantine markers in the 2310 project folder — ✅ DONE (2026-08-26)
 
 Non-destructive. One marker file, no moves, no renames (Caution 5).
 
-- [ ] Write `~/Dropbox/bldgtyp/2310 {AEA} Emerson Place/13_WUFI/_BUG59-affected-files.md`
-  listing the 23 affected files by folder, stating plainly: do not build the next round from
-  these; use `…_260817` or later; energy results are near-identical but the window-type table
-  is not reviewable. Write it in the client-facing register (John or a certifier may read
-  it): no em-dashes, plain sentences, `de-claudify-copywriting` rules.
-- [ ] Verify: file exists, lists all 23 artifacts, names the clean replacements.
+- [x] Wrote `~/Dropbox/bldgtyp/2310 {AEA} Emerson Place/13_WUFI/_BUG59-affected-files.md`
+  listing the 23 affected files by folder: do not build the next round from these; use
+  `…_260817` or later; energy results near-identical but the table is not reviewable. Written
+  in the client-facing register (no em-dashes, plain sentences); includes the two handoff
+  notes (post-fix type-count doubling is expected; the Round-5 submission question).
+- [x] Verified: file exists, lists all 23 artifacts (3 hbjson + 19 xml + 1 mwp), names the
+  clean replacements (`…_260817`+, current `…_260818.mwp` / `…_260826.mwp`).
 
 ### Phase 3 — Documentation corrections — [ ] not started
 
