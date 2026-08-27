@@ -8,6 +8,7 @@ This README is the index — scan or grep it instead of opening every file.
 
 | Item | Component | Status | Issue | Doc |
 |------|-----------|--------|-------|-----|
+| Short `_num_people` lists padded with the last value, inflating occupant totals | `HBPH - Set Occupancy` | **Requested** — reproduced, not implemented | [#73](https://github.com/PH-Tools/honeybee_grasshopper_ph/issues/73) | [`occupancy-list-padding.md`](occupancy-list-padding.md) |
 | ~~Already-exported models carry inflated window-type tables~~ | (no component — field remediation) | **Complete 2026-08-27** — archived. Only 2310 affected (23 artifacts); detector script, quarantine marker, PHX guard ([PHX #100](https://github.com/PH-Tools/PHX/pull/100)) all shipped; Phius Round-5 handling with Ed | [#59](https://github.com/PH-Tools/honeybee_grasshopper_ph/issues/59) | [`../archive/exported-models-inflated-window-types/`](../archive/exported-models-inflated-window-types/exported-models-inflated-window-types.md) |
 | ~~Per-aperture window construction duplication~~ | `HBPH - Set Aperture Psi-Installs` | **Resolved 2026-08-28** — archived | [#59](https://github.com/PH-Tools/honeybee_grasshopper_ph/issues/59) | [`../archive/aperture-construction-duplication.md`](../archive/aperture-construction-duplication.md) |
 

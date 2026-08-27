@@ -2,6 +2,7 @@
 
 **Status:** Code changes implemented (2026-07-21). Remaining: manual component retirement
 (§8), install to `ladybug_tools/`, and the 2613 re-run.
+**Issue:** [#74](https://github.com/PH-Tools/honeybee_grasshopper_ph/issues/74)
 **Date:** 2026-07-21
 **Author:** Ed May + Claude
 **Kind:** Cross-repo refactor. This repo holds the **root cause** — the only two references

@@ -1,6 +1,7 @@
 # Set Occupancy list padding
 
 **Status:** Requested — reproduced, not implemented
+**Issue:** [#73](https://github.com/PH-Tools/honeybee_grasshopper_ph/issues/73)
 **Opened:** 2026-08-06
 **Component:** `HBPH - Set Occupancy`
 **File:** `honeybee_ph_rhino/gh_compo_io/program/set_res_occupancy.py`

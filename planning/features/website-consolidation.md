@@ -2,6 +2,7 @@
 
 > **Created**: 2026-04-23  
 > **Status**: Planning  
+> **Issue**: [#75](https://github.com/PH-Tools/honeybee_grasshopper_ph/issues/75)  
 > **Goal**: Consolidate PH-Tools web properties into two clean, branded Astro sites sharing the bldgtyp design system.
 
 ---
