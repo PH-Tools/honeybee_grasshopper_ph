@@ -6,7 +6,7 @@ aperture-instance properties and never creates or touches a construction. All fi
 checks pass (see §Verification result). Issue #59 closed.
 **One consequence is NOT resolved and is tracked separately:** models already exported with
 HB-PH v1.25.2 - v1.32.x carry the inflated construction list into PHPP/WUFI. See
-[`exported-models-inflated-window-types.md`](../bugs/exported-models-inflated-window-types.md).
+[`exported-models-inflated-window-types.md`](exported-models-inflated-window-types/exported-models-inflated-window-types.md).
 **Resolution path (2026-08-12):** superseded by the cross-repo `aperture-psi-install` refactor
 ([`aperture-psi-install.md`](aperture-psi-install.md)), which deletes
 `duplicate_aperture_construction()` entirely. Decided 2026-08-12 (Ed): no interim patch —
@@ -118,7 +118,7 @@ the evidence table — it is now a byte-size twin of the buggy `…_260812.hbjso
 window constructions; mtime 2026-08-12 13:44), evidently overwritten by a buggy-machine export
 after the A/B above was recorded. The clean 79-construction comparator on disk today is
 `…_260812_3.hbjson` (12.5 MB, 21:04). The table itself is left as originally recorded. See
-`../bugs/exported-models-inflated-window-types.md` §Scoping result for the full on-disk census.
+`exported-models-inflated-window-types/exported-models-inflated-window-types.md` §Scoping result for the full on-disk census.
 
 ## Proposed correction
 
@@ -197,4 +197,4 @@ pass straight through into the PHPP and WUFI-Passive window-type tables in place
 
 Any model exported with **HB-PH v1.25.2 through v1.32.x** that used `HBPH - Set Aperture
 Psi-Installs` is affected. Fixed from v1.33.0 (PR #60) onward. Tracked as its own item:
-[`exported-models-inflated-window-types.md`](../bugs/exported-models-inflated-window-types.md).
+[`exported-models-inflated-window-types.md`](exported-models-inflated-window-types/exported-models-inflated-window-types.md).

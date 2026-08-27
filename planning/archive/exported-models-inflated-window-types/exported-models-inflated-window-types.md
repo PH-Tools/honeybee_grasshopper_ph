@@ -1,14 +1,16 @@
 # Already-exported models carry inflated window-type tables
 
-**Status:** Remediation complete (2026-08-26) — all four phases done. Awaiting only:
-(a) Ed's confirmation of which .mwp went to the certifier for Round 5, and (b) merge of the
-PHX guard branch (`fix/phpp-components-stale-rows`, [PHX #99](https://github.com/PH-Tools/PHX/issues/99)).
-Code defect itself fixed in v1.33.0. Archive this packet once (a) and (b) close.
+**Status:** Complete (2026-08-27) — all four phases done and merged. This repo's packet
+merged via PR [#72](https://github.com/PH-Tools/honeybee_grasshopper_ph/pull/72); the PHX
+Components stale-row guard merged via [PHX PR #100](https://github.com/PH-Tools/PHX/pull/100)
+(closes [PHX #99](https://github.com/PH-Tools/PHX/issues/99)). Code defect itself fixed in
+v1.33.0. Only `…_260811.mwp` carries the inflation; Ed handles the Phius Round-5
+communication directly.
 **Opened:** 2026-08-28
 **Kind:** Remediation of existing project files, plus one optional PHX hardening change
 (Phase 4). Nothing in this repo needs code changes.
 **Origin:** the confirmed downstream half of
-[`aperture-construction-duplication.md`](../archive/aperture-construction-duplication.md)
+[`aperture-construction-duplication.md`](../aperture-construction-duplication.md)
 ([#59](https://github.com/PH-Tools/honeybee_grasshopper_ph/issues/59)).
 
 ## What happened
@@ -182,6 +184,6 @@ lists verified against `shape_model.py` / `component_frame.py` / `component_vent
 ## Verification that the fix holds
 
 Recorded in
-[`aperture-construction-duplication.md`](../archive/aperture-construction-duplication.md)
+[`aperture-construction-duplication.md`](../aperture-construction-duplication.md)
 §"Verification result": 948 apertures over 79 types now produce exactly 79 constructions,
 with no cross-contamination between apertures carrying different psi values.
