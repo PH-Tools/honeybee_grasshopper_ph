@@ -37,6 +37,14 @@ EM August 12, 2026
             zero-value Install Type to an edge to model 'no install thermal bridge' (ie: at
             a party-wall or a buried jamb). Branches are matched to the '_hb_apertures'
             branches wherever possible.
+            -
+            ALTERNATIVELY, supply a single keyed collection (anything dict-like) whose
+            keys are Aperture names and whose values are the 4-item [top, right, bottom,
+            left] list for that Aperture - for example the 'install_types_' output of
+            'HBPH+ - PH-Nav Get Apertures'. Each Aperture is then matched to the
+            collection BY NAME rather than by branch position, so the Aperture tree can
+            be grafted or flattened however you like. Apertures not found in the
+            collection are passed through unchanged and reported as a warning.
 
         _hb_apertures: (DataTree[Aperture]) The Honeybee-Apertures to assign the per-edge
             Install Types to.
