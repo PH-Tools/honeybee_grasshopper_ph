@@ -8,7 +8,7 @@ This README is the index — scan or grep it instead of opening every file.
 
 | Item | Component | Status | Issue | Doc |
 |------|-----------|--------|-------|-----|
-| Already-exported models carry inflated window-type tables | (no component — field remediation) | **Open** — #59's downstream half; affects v1.25.2-v1.32.x exports | [#59](https://github.com/PH-Tools/honeybee_grasshopper_ph/issues/59) | [`exported-models-inflated-window-types.md`](exported-models-inflated-window-types.md) |
+| Already-exported models carry inflated window-type tables | (no component — field remediation) | **Scoped, remediation underway** (2026-08-26) — only 2310 affected (23 artifacts, Aug 11-12); detector script (`scan_inflated_window_types.py`) + quarantine marker done; remaining: PHX stale-row guard, Round-5 submission confirmation | [#59](https://github.com/PH-Tools/honeybee_grasshopper_ph/issues/59) | [`exported-models-inflated-window-types.md`](exported-models-inflated-window-types.md) |
 | ~~Per-aperture window construction duplication~~ | `HBPH - Set Aperture Psi-Installs` | **Resolved 2026-08-28** — archived | [#59](https://github.com/PH-Tools/honeybee_grasshopper_ph/issues/59) | [`../archive/aperture-construction-duplication.md`](../archive/aperture-construction-duplication.md) |
 
 ## Conventions

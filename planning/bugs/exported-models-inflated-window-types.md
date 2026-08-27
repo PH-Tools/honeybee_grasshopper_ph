@@ -133,17 +133,18 @@ Non-destructive. One marker file, no moves, no renames (Caution 5).
 - [x] Verified: file exists, lists all 23 artifacts (3 hbjson + 19 xml + 1 mwp), names the
   clean replacements (`…_260817`+, current `…_260818.mwp` / `…_260826.mwp`).
 
-### Phase 3 — Documentation corrections — [ ] not started
+### Phase 3 — Documentation corrections — ✅ DONE except final status flip (2026-08-26)
 
-- [ ] Append a dated correction note to
-  `planning/archive/aperture-construction-duplication.md` §Evidence: the on-disk
-  `…_260812_2.hbjson` no longer matches the table (overwritten by a buggy export); the clean
-  comparator today is `…_260812_3.hbjson`. Do not rewrite the original table.
-- [ ] Update `planning/STATUS.md` if it carries a row for this bug: scoped, single project,
-  remediation pending only Ed's Round-5 submission confirmation.
+- [x] Appended the dated correction note to
+  `planning/archive/aperture-construction-duplication.md` §Evidence (original table left as
+  recorded; on-disk clean comparator is `…_260812_3.hbjson`).
+- [x] Updated `planning/STATUS.md` and `planning/bugs/README.md` rows: scoped, single
+  project, remediation underway; remaining items named.
+- [x] Also repaired the archive-move link rot: both archived docs' references to this file
+  now point at `../bugs/…` (they broke when the packet moved to `archive/`).
 - [ ] Flip this doc's Status line to "Remediation complete — awaiting Ed's confirmation of
-  the Round 5 submission vintage" once Phases 1-2 and 4 are done.
-- [ ] Verify: links resolve, statuses consistent across the three documents.
+  the Round 5 submission vintage" once Phase 4 is done.
+- [x] Verify: links resolve, statuses consistent across the three documents.
 
 ### Phase 4 — PHX guard against stale Components rows — [ ] not started
 

@@ -23,7 +23,7 @@ A literal 2310 re-export remains available as confirmation but is not load-beari
 `duplicate_aperture_construction()` is absent from the codebase.
 **One field consequence is tracked separately** and is NOT part of this refactor:
 models exported with v1.25.2 - v1.32.x carry inflated window-type tables into
-PHPP/WUFI — `bugs/exported-models-inflated-window-types.md`.
+PHPP/WUFI — `../bugs/exported-models-inflated-window-types.md`.
 **Date:** 2026-08-12
 **Author:** Ed May + Claude
 **Kind:** Cross-repo refactor. This repo holds the user-facing components **and the root cause
