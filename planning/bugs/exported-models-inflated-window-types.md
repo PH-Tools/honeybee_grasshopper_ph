@@ -1,6 +1,9 @@
 # Already-exported models carry inflated window-type tables
 
-**Status:** Open — scoped (2026-08-26), remediation phased below. Code defect fixed in v1.33.0.
+**Status:** Remediation complete (2026-08-26) — all four phases done. Awaiting only:
+(a) Ed's confirmation of which .mwp went to the certifier for Round 5, and (b) merge of the
+PHX guard branch (`fix/phpp-components-stale-rows`, [PHX #99](https://github.com/PH-Tools/PHX/issues/99)).
+Code defect itself fixed in v1.33.0. Archive this packet once (a) and (b) close.
 **Opened:** 2026-08-28
 **Kind:** Remediation of existing project files, plus one optional PHX hardening change
 (Phase 4). Nothing in this repo needs code changes.
@@ -146,25 +149,27 @@ Non-destructive. One marker file, no moves, no renames (Caution 5).
   the Round 5 submission vintage" once Phase 4 is done.
 - [x] Verify: links resolve, statuses consistent across the three documents.
 
-### Phase 4 — PHX guard against stale Components rows — [ ] not started
+### Phase 4 — PHX guard against stale Components rows — ✅ DONE (2026-08-26)
 
-Repo: `PHX`, new branch `fix/phpp-components-stale-rows`. Spec written by Claude, built via
-`codex-implementation`, reviewed by Claude. Default behavior must not change (Caution 2).
+Repo: `PHX`, branch `fix/phpp-components-stale-rows` (commit `1422eda` + STATUS row).
+Tracked as [PHX #99](https://github.com/PH-Tools/PHX/issues/99). Spec by Claude, built by
+codex/gpt-5.5, reviewed line-by-line by Claude (shape attribute names and row-model column
+lists verified against `shape_model.py` / `component_frame.py` / `component_vent.py`).
 
-- [ ] In `PHX/PHPP/sheet_io/io_components.py`: after `write_glazings()` / `write_frames()` /
-  `write_ventilators()` write their N rows, detect non-empty rows remaining between row N+1
-  and the end of that section's own range, and emit a clear warning through the existing
-  logging/print channel naming the sheet, section, and row numbers ("stale rows from a
-  previous export — clear them or they will sit alongside the new data"). Never touch other
-  sections.
-- [ ] Add an opt-in `clear_stale: bool = False` parameter to the three write methods that
-  blanks those detected rows when explicitly requested. Do not plumb it further up the API
-  unless it falls out naturally — the warning is the deliverable; the flag is the escape
-  hatch.
-- [ ] Tests in PHX's suite: writing fewer rows than previously present warns and (with the
-  flag) clears only within the section; writing with a clean sheet stays silent; other
-  sections untouched.
-- [ ] Verify: PHX test suite green; Claude reviews the codex diff against this spec.
+- [x] The three writers block-read the section tail after writing (with the xlwings-#1924
+  length-guard + per-cell fallback) and warn once per section via `xl.output`, naming
+  worksheet, section, and stale rows.
+- [x] Keyword-only `clear_stale: bool = False` blanks only the input columns each section's
+  row model writes, batched by contiguous row/column groups; formula columns never touched.
+  Not plumbed into `PHPPConnection`.
+- [x] Tests: `tests/test_PHPP/test_sheet_io/test_io_components_stale_rows.py` — real
+  `EN_10_6` shape + fake-XL framework; warn/clear/clean-sheet cases for all three sections.
+- [x] Verified: full PHX suite green (1086 passed, 3 skipped) including the
+  `tests/test_xl_replay` golden-state invariant; black clean.
+- Known limitation (accepted): detection ends at `section_last_entry_row`, which is
+  contiguous-fill based — a stale block separated from the written block by hand-cleared
+  rows is not seen. The actual hazard (a shrinking export leaves a contiguous tail) is
+  fully covered.
 
 ## Out of scope (recorded, not planned)
 
