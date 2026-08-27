@@ -105,18 +105,21 @@ Branch: `fix/bug59-field-remediation` (this repo, docs + scanner). Phase 4 gets 
 branch in `PHX`. Phases 1-3 touch no repo code; Phase 4 is the only code change and follows
 the spec → codex build → Claude review model.
 
-### Phase 1 — Durable detector script — [ ] not started
+### Phase 1 — Durable detector script — ✅ DONE (2026-08-26)
 
 The session scanner proved the detectors; make it re-runnable and self-documenting.
 
-- [ ] Add `planning/bugs/scan_inflated_window_types.py` (PEP 723 header, `uv run`, CPython —
-  this is repo tooling, not deployed Rhino code, so the IronPython rules do not apply).
-  Capabilities: scan a directory tree for `.hbjson` (construction-count + uuid-signature
-  detector), `.xml` (WindowType count), and `.mwp` (strings signature) files; print one row
-  per file with verdict. Default root `~/Dropbox`, `--root` to override; exclude
-  `bldgtyp-00` and `.dropbox.cache` by default.
-- [ ] Verify: run it and confirm it reproduces exactly the affected-artifact table above
-  (3 hbjson + 19 xml + 1 mwp flagged, nothing else).
+- [x] Added `planning/bugs/scan_inflated_window_types.py` (PEP 723 header, `uv run`, CPython —
+  repo tooling, not deployed Rhino code, so the IronPython rules do not apply). Scans a tree
+  for `.hbjson` (construction-count + uuid-signature detector), `.xml` (ElementTree walk of
+  `WindowType/Name`, gated on a `<WUFIplusProject>` header sniff), and `.mwp` (ASCII-run
+  signature) files. Default root `~/Dropbox`; `--root`, `--all`, `--exclude` flags; exit 1
+  when anything is flagged. Excluded subtrees are pruned during the walk, not filtered after.
+- [x] Verified: reproduces exactly the affected-artifact table above — 2665 files scanned,
+  **23 AFFECTED** (3 hbjson + 19 xml + 1 mwp), 1953 clean, 640 non-WUFI xml skipped, 49
+  unreadable (non-JSON OpenStudio `.hbjson` artifacts, labeled rather than silently skipped).
+  Four-angle cleanup review applied (ElementTree over regex, walk pruning, single print loop);
+  re-run after refactor produced the identical 23.
 
 ### Phase 2 — Quarantine markers in the 2310 project folder — [ ] not started
 
