@@ -307,6 +307,32 @@ class FloatMax24(Validated):
         return new_value
 
 
+class Boolean(Validated):
+    """A boolean value."""
+
+    def validate(self, name, new_value, old_value):
+        if new_value is None:
+            if old_value is not None:
+                return old_value
+            if self.default is not None:
+                return self.default
+            return False
+
+        if isinstance(new_value, bool):
+            return new_value
+
+        # could include validators for int / float here but python and GH will resolve them to True
+
+        if isinstance(new_value, str):  # accept other notations of True/False values from string
+            value = new_value.strip().lower()
+            if value in ("true", "yes", "y", "on", "1"):
+                return True
+            if value in ("false", "no", "n", "off", "0"):
+                return False
+
+        raise TypeError("Error: input for '{}' must be a boolean value.".format(name))
+
+
 # --- Unit converters ---------------------------------------------------------
 
 

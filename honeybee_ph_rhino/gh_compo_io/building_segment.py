@@ -48,11 +48,13 @@ class _SetPoints(object):
 
     winter = ghio_validators.UnitDegreeC("winter", default=20.0)
     summer = ghio_validators.UnitDegreeC("summer", default=25.0)
+    mechanical_cooling = ghio_validators.Boolean("mechanical_cooling", default=False)
 
-    def __init__(self, _winter, _summer):
-        # type: (str, str) -> None
+    def __init__(self, _winter, _summer, _mechanical_cooling):
+        # type: (str, str, bool) -> None
         self.winter = _winter
         self.summer = _summer
+        self.mechanical_cooling = _mechanical_cooling
 
     def __str__(self):
         return "{}()".format(self.__class__.__name__)
@@ -89,6 +91,7 @@ class GHCompo_BuildingSegment(object):
         _phi_certification,
         _winter_set_temp,
         _summer_set_temp,
+        _mechanical_cooling,
         _mech_room_temp,
         _hb_rooms,
         _non_combustible_materials=False,
@@ -106,7 +109,7 @@ class GHCompo_BuildingSegment(object):
         self.phius_certification = _phius_certification or phius.PhiusCertification()
         self.phi_certification = _phi_certification or phi.PhiCertification()
         self.hb_rooms = _hb_rooms
-        self.set_points = _SetPoints(_winter_set_temp, _summer_set_temp)
+        self.set_points = _SetPoints(_winter_set_temp, _summer_set_temp, _mechanical_cooling)
         self.mech_room_temp = _mech_room_temp
         self.thermal_bridges = {}
         self.non_combustible_materials = _non_combustible_materials or False
@@ -188,6 +191,9 @@ class GHCompo_BuildingSegment(object):
         obj = SetPoints()
         obj.winter = self.set_points.winter
         obj.summer = self.set_points.summer
+        obj.mechanical_cooling = (
+            self.set_points.mechanical_cooling or False
+        )  # not sure why it needed or False to not default to None
         return obj
 
     def _create_tb_dict(self):

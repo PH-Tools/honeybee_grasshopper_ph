@@ -69,6 +69,8 @@ EM April 13, 2026
         winter_set_temp_: default = 20C [68F]
         
         summer_set_temp_: default = 25C [77F]
+
+        mechanical_cooling_: (bool) Default=False. Set True if the building has mechanical cooling.
         
         mech_room_temp_: default = 20C [68F] Supply in cases where the HRV/ERV is located 
             'outside' the normal conditioned space. For instance on the roof, or in a semi-
@@ -136,6 +138,7 @@ gh_compo_interface = gh_compo_io.GHCompo_BuildingSegment(
         phi_certification_,
         winter_set_temp_,
         summer_set_temp_,
+        mechanical_cooling_,
         mech_room_temp_,
         _hb_rooms,
         non_combustible_materials_,
