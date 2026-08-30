@@ -1,14 +1,17 @@
 # planning/bugs/ — reproduced defects awaiting a fix
 
-One file per defect, flat by slug. A doc lands here once the defect is **reproduced and root-caused** — a
-suspicion belongs in an issue, not here. Each doc must carry enough evidence that the next agent can go
+One file per defect, flat by slug. **Issue-only is the default**: most defects live entirely in their
+GitHub issue (report, root cause, fix, acceptance criteria) and never get a doc here. A doc lands here
+only when the reproduced-and-root-caused evidence is too heavy for the issue or cannot be public. A
+suspicion belongs in an issue either way. Each doc must carry enough evidence that the next agent can go
 straight to the fix without re-deriving the diagnosis.
 
 This README is the index — scan or grep it instead of opening every file.
 
 | Item | Component | Status | Issue | Doc |
 |------|-----------|--------|-------|-----|
-| Per-aperture window construction duplication | `HBPH - Set Aperture Psi-Installs` | **Requested** — root-caused, not implemented | [#59](https://github.com/PH-Tools/honeybee_grasshopper_ph/issues/59) | [`aperture-construction-duplication.md`](aperture-construction-duplication.md) |
+| ~~Already-exported models carry inflated window-type tables~~ | (no component — field remediation) | **Complete 2026-08-27** — archived. Only 2310 affected (23 artifacts); detector script, quarantine marker, PHX guard ([PHX #100](https://github.com/PH-Tools/PHX/pull/100)) all shipped; Phius Round-5 handling with Ed | [#59](https://github.com/PH-Tools/honeybee_grasshopper_ph/issues/59) | [`../archive/exported-models-inflated-window-types/`](../archive/exported-models-inflated-window-types/exported-models-inflated-window-types.md) |
+| ~~Per-aperture window construction duplication~~ | `HBPH - Set Aperture Psi-Installs` | **Resolved 2026-08-28** — archived | [#59](https://github.com/PH-Tools/honeybee_grasshopper_ph/issues/59) | [`../archive/aperture-construction-duplication.md`](../archive/aperture-construction-duplication.md) |
 
 ## Conventions
 
