@@ -99,6 +99,7 @@ jobs:
           python3 scripts/update_installer_ghx.py \
             --honeybee-ph=${{ steps.versions.outputs.honeybee_ph }} \
             --phx=${{ steps.versions.outputs.PHX }} \
+            --ph-units=${{ steps.versions.outputs.PH_units }} \
             --release-version=${{ steps.bump.outputs.new_version }}
 
       # ---------------------------------------------------------------
