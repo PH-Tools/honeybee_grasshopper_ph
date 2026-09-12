@@ -33,7 +33,7 @@ model. Only Honeybee Faces with boundary conditions of "Outdoors", "Ground" and
 -
 Use this before passing the honeybee-rooms on to the 'HB Model' component.
 -
-EM April 13, 2026
+EM Sept 12, 2026
     Args:
         segment_name_: Name for the building-segment
                
