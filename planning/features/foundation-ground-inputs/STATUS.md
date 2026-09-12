@@ -13,9 +13,10 @@ Branch: `feat/foundation-ground-inputs-79`
 |-------|-------|--------|
 | 1 | Worker inputs | Implemented on branch |
 | 2 | Canvas verification and UserObject | Implemented on branch |
-| 3 | PR and release | Scoped |
+| 3 | PR and release | In review ([PR #80](https://github.com/PH-Tools/honeybee_grasshopper_ph/pull/80)) |
 
-**Next step:** Phase 3: push the branch and open the PR (`Closes #79`, default-corrections table).
+**Next step:** Ed merges PR #80 and runs the release orchestrator; then add the default-corrections table
+to the GitHub Release body and archive this packet.
 
 ## Decisions
 
