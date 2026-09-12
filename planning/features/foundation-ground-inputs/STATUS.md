@@ -12,10 +12,10 @@ Branch: `feat/foundation-ground-inputs-79`
 | Phase | Title | Status |
 |-------|-------|--------|
 | 1 | Worker inputs | Implemented on branch |
-| 2 | Canvas verification and UserObject | In progress |
+| 2 | Canvas verification and UserObject | Implemented on branch |
 | 3 | PR and release | Scoped |
 
-**Next step:** Phase 2, step 1 (confirm deployed packages), then the canvas walkthrough with Ed.
+**Next step:** Phase 3: push the branch and open the PR (`Closes #79`, default-corrections table).
 
 ## Decisions
 
@@ -71,3 +71,11 @@ Branch: `feat/foundation-ground-inputs-79`
   Exposure primary. Decoded: 14 `InputParam` entries (was 12); embedded wrapper code identical to
   `src/HBPH - Create Foundation.py`. Update util copied it into the repo; no `src/*.py` changed, and every
   other installed `.ghuser` is byte-identical to the repo.
+- **Phase 2, step 6 A and B (2026-09-12):** fresh component from the rebuilt `.ghuser`, `_type=4`.
+  Unconnected: `wind_velocity_at_10m_m_s` 4.0, `wind_shield_factor` 0.05, both interior-wall fields 0.0.
+  Set: `12 ft2` to 1.114836, `0.3` to 0.3, `10 mph` to 4.4704, shield factor 0.1. Back-compat: the old
+  12-node component ran the new worker with `_type=2` without error (step 2).
+- **Phase 2, step 6 C (2026-09-12):** HB Room + Add Foundations dumped with HB Dump Objects. The file holds
+  one `PhVentedCrawlspace` at `properties/ph/ph_foundations/0` with 1.114836 / 0.3 / 4.4704 / 0.1.
+  `Room.from_dict` reload gives the same four values; `to_dict` of the reloaded foundation equals the
+  file dict.
