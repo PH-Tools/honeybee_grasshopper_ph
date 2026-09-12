@@ -41,12 +41,15 @@ def update_requirements_text(text, updates):
     """Given the raw UserText string from the GHX panel, update version pins.
 
     Each line looks like:  honeybee-ph>=1.32.0
-    We match by package name and replace the version.
+    We match by package name and replace the version. A package that is passed
+    in but has no line in the panel yet is added, so the installer pip-installs
+    it directly instead of relying on another package's (older) minimum.
     """
     # The GHX XML stores ">" as "&gt;" inside element text.
     # We need to preserve that encoding.
     lines = text.split("\n")
     new_lines = []
+    found = set()
     for line in lines:
         stripped = line.strip()
         if not stripped:
@@ -60,11 +63,19 @@ def update_requirements_text(text, updates):
         for flag_name, pypi_name in KNOWN_PACKAGES.items():
             if flag_name in updates and normalized.lower().startswith(pypi_name.lower()):
                 new_lines.append("{}&gt;={}".format(pypi_name, updates[flag_name]))
+                found.add(flag_name)
                 updated = True
                 break
 
         if not updated:
             new_lines.append(line)
+
+    # Add the missing packages above any trailing blank lines
+    missing = ["{}&gt;={}".format(KNOWN_PACKAGES[f], v) for f, v in updates.items() if f not in found]
+    insert_at = len(new_lines)
+    while insert_at > 0 and not new_lines[insert_at - 1].strip():
+        insert_at -= 1
+    new_lines[insert_at:insert_at] = missing
 
     return "\n".join(new_lines)
 
