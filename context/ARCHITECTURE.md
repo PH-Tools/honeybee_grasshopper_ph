@@ -37,13 +37,16 @@ Domain subpackages under `gh_compo_io/` group related workers:
 
 ## `.ghuser` files and the export step
 
-`honeybee_grasshopper_ph/user_objects/*.ghuser` are the compiled binaries users install; `src/*.py` are the human-readable source of the same components. **You cannot edit `.ghuser` from here** — they are regenerated *inside Grasshopper* by running `src/__HBPH__Util_Update_GHCompos.py`, which exports both the `.ghuser` and `.py` for every component on the canvas.
+`honeybee_grasshopper_ph/user_objects/*.ghuser` are the compiled binaries users install; `src/*.py` are the human-readable source of the same components. **You cannot edit `.ghuser` from here** — they are regenerated *inside Grasshopper* by running `src/__HBPH__Util_Update_GHCompos.py`. The util does not export what is on the canvas: it instantiates every `.ghuser` from the **installed** `UserObjects/honeybee_grasshopper_ph/` folder, copies those files into `user_objects/`, and writes each component's embedded code to `src/*.py`. A changed component must first be saved over its installed `.ghuser` (File → Create User Object, same Name, Category `HB-PH`, and SubCategory as the existing file).
+
+A component whose input groups are built at runtime (`gh_io.setup_component_inputs`) only needs a rebuilt `.ghuser` when a group's largest index exceeds the saved node count; renamed or retyped inputs need no rebuild.
 
 The round-trip:
 
 ```
-edit worker in gh_compo_io/  →  (if I/O changed) edit the GHPython component in Grasshopper
-  →  run the update util on the canvas  →  commit regenerated src/*.py + user_objects/*.ghuser
+edit worker in gh_compo_io/  →  (if the node count must grow) add nodes on the canvas
+  →  Create User Object over the installed .ghuser  →  run the update util
+  →  commit regenerated src/*.py + user_objects/*.ghuser
 ```
 
 ## Where the boundary is

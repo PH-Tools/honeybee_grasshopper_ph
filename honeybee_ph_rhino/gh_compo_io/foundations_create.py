@@ -148,6 +148,20 @@ inputs_unheated_basement.update(
             _description="(float) The ACH of the basement space. Typical=0.5 ACH",
             _type_hint=Component.NewFloatHint(),
         ),
+        12: ComponentInput(
+            _name="interior_wall_to_heated_area_m2",
+            _description="(float) PHPP 10 only. The area (m2) of the interior wall between this foundation zone "
+            "and the heated part of the building.",
+            _type_hint=Component.NewStrHint(),
+            _target_unit="M2",
+        ),
+        13: ComponentInput(
+            _name="interior_wall_to_heated_u_value",
+            _description="(float) PHPP 10 only. The U-Value (W/m2k) of the interior wall between this foundation "
+            "zone and the heated part of the building.",
+            _type_hint=Component.NewStrHint(),
+            _target_unit="W/M2K",
+        ),
     }
 )
 
@@ -194,6 +208,20 @@ inputs_slab_on_grade.update(
             _description="(float) The thermal conductivity (W/mk) of the perimeter insulation.",
             _type_hint=Component.NewStrHint(),
             _target_unit="W/MK",
+        ),
+        9: ComponentInput(
+            _name="interior_wall_to_heated_area_m2",
+            _description="(float) PHPP 10 only. The area (m2) of the interior wall between this foundation zone "
+            "and the heated part of the building.",
+            _type_hint=Component.NewStrHint(),
+            _target_unit="M2",
+        ),
+        10: ComponentInput(
+            _name="interior_wall_to_heated_u_value",
+            _description="(float) PHPP 10 only. The U-Value (W/m2k) of the interior wall between this foundation "
+            "zone and the heated part of the building.",
+            _type_hint=Component.NewStrHint(),
+            _target_unit="W/M2K",
         ),
     }
 )
@@ -242,6 +270,32 @@ inputs_vented_crawlspace.update(
             _description="(float) The U-Value (W/m2k) of the crawlspace wall.",
             _type_hint=Component.NewStrHint(),
             _target_unit="W/M2K",
+        ),
+        9: ComponentInput(
+            _name="interior_wall_to_heated_area_m2",
+            _description="(float) PHPP 10 only. The area (m2) of the interior wall between this foundation zone "
+            "and the heated part of the building.",
+            _type_hint=Component.NewStrHint(),
+            _target_unit="M2",
+        ),
+        10: ComponentInput(
+            _name="interior_wall_to_heated_u_value",
+            _description="(float) PHPP 10 only. The U-Value (W/m2k) of the interior wall between this foundation "
+            "zone and the heated part of the building.",
+            _type_hint=Component.NewStrHint(),
+            _target_unit="W/M2K",
+        ),
+        11: ComponentInput(
+            _name="wind_velocity_at_10m_m_s",
+            _description="(float) Average site wind velocity (m/s) at 10m height. Default: 4.0 (the PHPP value).",
+            _type_hint=Component.NewStrHint(),
+            _target_unit="M/S",
+        ),
+        12: ComponentInput(
+            _name="wind_shield_factor",
+            _description="(float) Wind-shield factor for the crawlspace ventilation openings. Default: 0.05 "
+            "(the PHPP value). See PHPP manual Table 12 for protected / average / exposed site guidance.",
+            _type_hint=Component.NewFloatHint(),
         ),
     }
 )
