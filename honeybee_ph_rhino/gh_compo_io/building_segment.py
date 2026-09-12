@@ -48,11 +48,13 @@ class _SetPoints(object):
 
     winter = ghio_validators.UnitDegreeC("winter", default=20.0)
     summer = ghio_validators.UnitDegreeC("summer", default=25.0)
+    mechanical_cooling = ghio_validators.Boolean("mechanical_cooling", default=False)
 
-    def __init__(self, _winter, _summer):
-        # type: (str, str) -> None
+    def __init__(self, _winter, _summer, _mechanical_cooling):
+        # type: (str, str, bool) -> None
         self.winter = _winter
         self.summer = _summer
+        self.mechanical_cooling = _mechanical_cooling
 
     def __str__(self):
         return "{}()".format(self.__class__.__name__)
@@ -94,10 +96,11 @@ class GHCompo_BuildingSegment(object):
         _non_combustible_materials=False,
         _summer_ventilation_=None,
         _wind_exposure_type="1",
+        _mechanical_cooling=False,
         *args,
         **kwargs
     ):
-        # type: (gh_io.IGH, str, int, int, site.Site, List, List, phius.PhiusCertification, phi.PhiCertification, str, str, str, List[room.Room], bool, str | None | SummerVentilation, str, *Any, **Any) -> None
+        # type: (gh_io.IGH, str, int, int, site.Site, List, List, phius.PhiusCertification, phi.PhiCertification, str, str, str, List[room.Room], bool, str | None | SummerVentilation, str, bool, *Any, **Any) -> None
         self.IGH = _IGH
         self._display_name = _segment_name or "_unnamed_bldg_segment_"
         self.num_floor_levels = _num_floor_levels
@@ -106,7 +109,7 @@ class GHCompo_BuildingSegment(object):
         self.phius_certification = _phius_certification or phius.PhiusCertification()
         self.phi_certification = _phi_certification or phi.PhiCertification()
         self.hb_rooms = _hb_rooms
-        self.set_points = _SetPoints(_winter_set_temp, _summer_set_temp)
+        self.set_points = _SetPoints(_winter_set_temp, _summer_set_temp, _mechanical_cooling)
         self.mech_room_temp = _mech_room_temp
         self.thermal_bridges = {}
         self.non_combustible_materials = _non_combustible_materials or False
@@ -188,6 +191,7 @@ class GHCompo_BuildingSegment(object):
         obj = SetPoints()
         obj.winter = self.set_points.winter
         obj.summer = self.set_points.summer
+        obj.mechanical_cooling = self.set_points.mechanical_cooling
         return obj
 
     def _create_tb_dict(self):

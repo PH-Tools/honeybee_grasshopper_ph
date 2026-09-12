@@ -33,7 +33,7 @@ model. Only Honeybee Faces with boundary conditions of "Outdoors", "Ground" and
 -
 Use this before passing the honeybee-rooms on to the 'HB Model' component.
 -
-EM April 13, 2026
+EM Sept 12, 2026
     Args:
         segment_name_: Name for the building-segment
                
@@ -69,6 +69,8 @@ EM April 13, 2026
         winter_set_temp_: default = 20C [68F]
         
         summer_set_temp_: default = 25C [77F]
+
+        mechanical_cooling_: (bool) Default=False. Set True if the building has mechanical cooling.
         
         mech_room_temp_: default = 20C [68F] Supply in cases where the HRV/ERV is located 
             'outside' the normal conditioned space. For instance on the roof, or in a semi-
@@ -141,6 +143,7 @@ gh_compo_interface = gh_compo_io.GHCompo_BuildingSegment(
         non_combustible_materials_,
         _summer_ventilation_,
         _exposure_type_,
+        mechanical_cooling_,
 )
 hb_rooms_, hbph_segment = gh_compo_interface.run()
 
