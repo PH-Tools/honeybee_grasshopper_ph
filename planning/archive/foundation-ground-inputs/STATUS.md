@@ -1,6 +1,6 @@
 ---
 DATE: 2026-09-12
-STATUS: In progress
+STATUS: Complete
 AUTHOR: Ed May / Claude
 ISSUE: https://github.com/PH-Tools/honeybee_grasshopper_ph/issues/79
 ---
@@ -11,12 +11,13 @@ Branch: `feat/foundation-ground-inputs-79`
 
 | Phase | Title | Status |
 |-------|-------|--------|
-| 1 | Worker inputs | Implemented on branch |
-| 2 | Canvas verification and UserObject | Implemented on branch |
-| 3 | PR and release | Merged to main ([PR #80](https://github.com/PH-Tools/honeybee_grasshopper_ph/pull/80), 2026-09-12); release pending |
+| 1 | Worker inputs | Complete |
+| 2 | Canvas verification and UserObject | Complete |
+| 3 | PR and release | Complete ([PR #80](https://github.com/PH-Tools/honeybee_grasshopper_ph/pull/80), released v1.38.0 2026-09-12) |
 
-**Next step:** Ed runs the release orchestrator; then add the default-corrections table to the GitHub
-Release body and archive this packet.
+**Outcome:** released in Honeybee-PH v1.38.0; the four default corrections are in the v1.38.0 Release
+notes. The same release is the first installer to pin `PH-units` directly (PR #81). Follow-up: typed `0`
+on numeric inputs is ignored (separate issue).
 
 ## Decisions
 
