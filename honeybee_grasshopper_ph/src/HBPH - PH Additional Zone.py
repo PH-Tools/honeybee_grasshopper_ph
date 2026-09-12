@@ -37,7 +37,23 @@ EM January 7, 2026
             attached zone. 
 
         _monthly_outdoor_air_drybulb_temps_C: (list[float]) A list of 12 outdoor drybulb air temperatures.
-            
+            Not required when 'heating_demand_factor_' is connected.
+
+        heating_demand_factor_: (float) Optional. The PHPP heating-demand temperature reduction
+            factor. When connected, it replaces the Phius TRF calculation. Not range-limited.
+
+        heating_load_factor_: (float) Optional. The PHPP heating-load temperature reduction factor.
+            Unconnected, the heating-demand factor is used. No PHPP/WUFI export effect until PHX#65.
+
+        cooling_demand_factor_: (float) Optional. The PHPP cooling-demand temperature reduction factor.
+            Unconnected, the heating-demand factor is used. No PHPP/WUFI export effect until PHX#65.
+
+        cooling_load_factor_: (float) Optional. The PHPP cooling-load temperature reduction factor.
+            Unconnected, the heating-demand factor is used. No PHPP/WUFI export effect until PHX#65.
+
+        passive_cooling_factor_: (float) Optional. The PHPP passive-cooling temperature reduction factor.
+            Unconnected, the heating-demand factor is used. No PHPP/WUFI export effect until PHX#65.
+
     Returns:
         bc_: (PhAdditionalZone) A new Boundary-Condition object which can be applied to one or 
             more surfaces using the standard Honeybee components such as 'HB Properties by Guide Surface'.
@@ -90,5 +106,10 @@ gh_compo_interface = gh_compo_io.GHCompo_AdditionalZone(
         _attached_zone_name,
         _attached_zone_temp_C,
         _monthly_outdoor_air_drybulb_temps_C,
+        heating_demand_factor_,
+        heating_load_factor_,
+        cooling_demand_factor_,
+        cooling_load_factor_,
+        passive_cooling_factor_,
     )
 bc_ = gh_compo_interface.run()

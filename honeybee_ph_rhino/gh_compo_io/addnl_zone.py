@@ -42,12 +42,36 @@ AVERAGE_TEMP_C_INSIDE = 20.0
 class GHCompo_AdditionalZone(object):
     attached_zone_temp_C = ghio_validators.UnitDegreeC("attached_zone_temp_C", default=4.444)
 
-    def __init__(self, _IGH, _attached_zone_name, _attached_zone_temp_C, _monthly_outdoor_air_drybulb_temps_C):
-        # type: (gh_io.IGH, str, float, list[float]) -> None
+    # -- PHPP v10 reduction factors. An unconnected input stays None (0.0 is a real factor),
+    # -- and user-entered values are never range-clamped: PHI accepts factors above 1 and below 0.
+    heating_demand_factor = ghio_validators.Float("heating_demand_factor")
+    heating_load_factor = ghio_validators.Float("heating_load_factor")
+    cooling_demand_factor = ghio_validators.Float("cooling_demand_factor")
+    cooling_load_factor = ghio_validators.Float("cooling_load_factor")
+    passive_cooling_factor = ghio_validators.Float("passive_cooling_factor")
+
+    def __init__(
+        self,
+        _IGH,
+        _attached_zone_name,
+        _attached_zone_temp_C,
+        _monthly_outdoor_air_drybulb_temps_C,
+        _heating_demand_factor=None,
+        _heating_load_factor=None,
+        _cooling_demand_factor=None,
+        _cooling_load_factor=None,
+        _passive_cooling_factor=None,
+    ):
+        # type: (gh_io.IGH, str, float, list[float], float | None, float | None, float | None, float | None, float | None) -> None
         self.IGH = _IGH
         self.attached_zone_name = _attached_zone_name
         self.attached_zone_temp_C = _attached_zone_temp_C
         self.monthly_outdoor_air_drybulb_temps_C = _monthly_outdoor_air_drybulb_temps_C
+        self.heating_demand_factor = _heating_demand_factor
+        self.heating_load_factor = _heating_load_factor
+        self.cooling_demand_factor = _cooling_demand_factor
+        self.cooling_load_factor = _cooling_load_factor
+        self.passive_cooling_factor = _passive_cooling_factor
         self.zone_type = "Unheated space"
 
     @property
@@ -105,8 +129,10 @@ class GHCompo_AdditionalZone(object):
     @property
     def temp_reduction_factor(self):
         # type: () -> float
-        """The temperature reduction factor for the additional zone."""
+        """The heating-demand temperature reduction factor: the user input if given, otherwise calculated."""
 
+        if self.heating_demand_factor is not None:
+            return self.heating_demand_factor
         return max((self.attached_zone_temp_C - AVERAGE_TEMP_C_INSIDE) / self.slope, 0)
 
     @property
@@ -116,9 +142,7 @@ class GHCompo_AdditionalZone(object):
 
         if not self.attached_zone_name:
             return False
-        if not self.attached_zone_temp_C:
-            return False
-        if not self.monthly_outdoor_air_drybulb_temps_C:
+        if self.heating_demand_factor is None and not self.monthly_outdoor_air_drybulb_temps_C:
             return False
         return True
 
@@ -127,6 +151,19 @@ class GHCompo_AdditionalZone(object):
         """Print log messages for the user."""
 
         print("Attached Zone Temp: {:.2f} deg-C".format(self.attached_zone_temp_C))
+        for label, factor in (
+            ("heating_load_factor", self.heating_load_factor),
+            ("cooling_demand_factor", self.cooling_demand_factor),
+            ("cooling_load_factor", self.cooling_load_factor),
+            ("passive_cooling_factor", self.passive_cooling_factor),
+        ):
+            if factor is not None:
+                print("{} = {:.3f}".format(label, factor))
+
+        if self.heating_demand_factor is not None:
+            print("temp_reduction_factor = {:.3f} (user input)".format(self.heating_demand_factor))
+            return
+
         print(
             "Average Monthly Outdoor Air Drybulb Temps: {:.2f} deg-C".format(
                 self.average_monthly_outdoor_air_drybulb_temps_C
@@ -160,4 +197,9 @@ class GHCompo_AdditionalZone(object):
             zone_name=self.attached_zone_name,
             zone_type=self.zone_type,
             temperature_reduction_factor=self.temp_reduction_factor,
+            heating_load_reduction_factor=self.heating_load_factor,
+            cooling_demand_reduction_factor=self.cooling_demand_factor,
+            cooling_load_reduction_factor=self.cooling_load_factor,
+            passive_cooling_reduction_factor=self.passive_cooling_factor,
+            adjacent_zone_temperature_c=self.attached_zone_temp_C,
         )
