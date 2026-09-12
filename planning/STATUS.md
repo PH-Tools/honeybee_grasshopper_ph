@@ -2,12 +2,13 @@
 
 Master index of tracked planning work in honeybee_grasshopper_ph.
 
-_Last updated: 2026-08-28_
+_Last updated: 2026-09-12_
 
 ## Active / current work
 
 | Item | Kind | Status | Issue | Pointer |
 |------|------|--------|-------|---------|
+| Foundation: PHPP 10 Ground inputs | Feature (upstream `honeybee_ph` #123 / `PHX` #121, #122 released) | **In progress** | [#79](https://github.com/PH-Tools/honeybee_grasshopper_ph/issues/79) | [`features/foundation-ground-inputs/`](features/foundation-ground-inputs/README.md) |
 | Phius MF custom MEL/Lighting export `reference_quantity = 2` | Bug fix (cross-repo; **fix landed here**, packet owned by `honeybee_ph`) | **Merged** (2026-08-25, PR #69) — the six MF MEL/lighting builders now construct from `ph_default_equip[...]["PHIUS"]` so `reference_quantity = 5`. Remaining: canvas re-export confirming `<ReferenceQuantity>5</ReferenceQuantity>` in the WUFI XML and `"refQ": 5` in the METr JSON, then release. See the packet §10 for the open WUFI import question | [#76](https://github.com/PH-Tools/honeybee_grasshopper_ph/issues/76) | [`honeybee_ph/planning/archive/phius-mf-custom-load-reference-quantity/`](https://github.com/PH-Tools/honeybee_ph/blob/main/planning/archive/phius-mf-custom-load-reference-quantity/README.md) |
 | Set Occupancy list padding | Bug fix | **Requested** — reproduced; not implemented | [#73](https://github.com/PH-Tools/honeybee_grasshopper_ph/issues/73) | issue-only (full evidence in #73) |
 | Decouple "Dwelling" from `Room.zone` | Refactor (cross-repo) | **Code implemented** — remaining: manual component retirement, `ladybug_tools` install, 2613 re-run | [#74](https://github.com/PH-Tools/honeybee_grasshopper_ph/issues/74) | [`refactor/dwelling-zone-decoupling.md`](refactor/dwelling-zone-decoupling.md) |
