@@ -51,3 +51,23 @@ Branch: `feat/foundation-ground-inputs-79`
   stale `honeybee_ph` (dist-info 1.33.56; `foundations.py` lacks the fields). The upstream merges did not
   pass through the fsdeploy Edit hook. Content differs in 4 honeybee_ph-repo files and 11 PHX files.
   Full `--sync-repo` not used: it would also delete empty Rhino-only `cli/` and `constructions/` dirs.
+- **Phase 2, step 1 re-check (2026-09-12, after Ed's update):** Rhino has `honeybee_ph` 1.33.64 and PHX
+  1.56.107 (latest PyPI); no content difference against the local repos for the five honeybee_ph packages
+  or PHX. The update installed the Honeybee-PH v1.37.0 release, which overwrote the branch worker; the
+  branch `foundations_create.py` was copied back and matches. `ph_units` is still 1.5.35 (missing
+  PH_units #6, a CPython dataclass-shim fix; no effect on the canvas). Installed Create Foundation
+  `.ghuser` is byte-identical to the repo copy.
+- **Phase 2, step 2 (2026-09-12):** a fresh component with `_type=2` shows 12 input nodes, all names
+  correct through `basement_ventilation_ach`. Below the 14 needed, so the `.ghuser` gets 2 more nodes.
+  The update util copies `.ghuser` files from the installed `UserObjects/honeybee_grasshopper_ph/`
+  folder into the repo (it does not export from the canvas), so the rebuilt User Object is saved there
+  first. Pre-change installed `.ghuser` backed up (sha1 `f3f58e67`).
+- **Phase 2, step 3 (2026-09-12):** two nodes added on the canvas (14 total). Node names match the issue
+  for `_type` 2 (12, 13 interior wall), 4 (9 to 12, node 13 `-`), 3 (9, 10, then `-`), and 1 (unchanged
+  heated-basement inputs, 7 to 13 `-`). `wind_shield_factor` tooltip reads `(Type hint: float)`.
+- **Phase 2, steps 4 and 5 (2026-09-12):** User Object saved over the installed
+  `honeybee_grasshopper_ph/HBPH - Create Foundation.ghuser` (sha1 `909ca8f3`, 6308 bytes; was
+  `f3f58e67`, 4151). Metadata unchanged: Name, NickName, Category `HB-PH`, SubCategory `01 | Model`,
+  Exposure primary. Decoded: 14 `InputParam` entries (was 12); embedded wrapper code identical to
+  `src/HBPH - Create Foundation.py`. Update util copied it into the repo; no `src/*.py` changed, and every
+  other installed `.ghuser` is byte-identical to the repo.
