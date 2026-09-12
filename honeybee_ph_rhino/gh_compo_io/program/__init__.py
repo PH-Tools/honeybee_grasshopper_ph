@@ -1,6 +1,4 @@
 # --
-from honeybee_ph_rhino.gh_compo_io.program._deprecated_.add_elec_equip import GHCompo_AddElecEquip
-from honeybee_ph_rhino.gh_compo_io.program._deprecated_.phius_MF_calc import GHCompo_CalcPhiusMFLoads
 from honeybee_ph_rhino.gh_compo_io.program.add_process_equip import GHCompo_AddProcessEquip
 from honeybee_ph_rhino.gh_compo_io.program.create_elec_equip import GHCompo_CreateElecEquip
 from honeybee_ph_rhino.gh_compo_io.program.create_operating_period import GHCompo_CreateOccPeriod
