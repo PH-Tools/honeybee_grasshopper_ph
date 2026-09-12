@@ -321,7 +321,8 @@ class Boolean(Validated):
         if isinstance(new_value, bool):
             return new_value
 
-        # could include validators for int / float here but python and GH will resolve them to True
+        if isinstance(new_value, (int, float)):
+            return bool(new_value)
 
         if isinstance(new_value, str):  # accept other notations of True/False values from string
             value = new_value.strip().lower()
@@ -330,7 +331,7 @@ class Boolean(Validated):
             if value in ("false", "no", "n", "off", "0"):
                 return False
 
-        raise TypeError("Error: input for '{}' must be a boolean value.".format(name))
+        raise ValueError("Error: input for '{}' must be a boolean value.".format(name))
 
 
 # --- Unit converters ---------------------------------------------------------

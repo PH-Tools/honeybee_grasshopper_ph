@@ -138,12 +138,12 @@ gh_compo_interface = gh_compo_io.GHCompo_BuildingSegment(
         phi_certification_,
         winter_set_temp_,
         summer_set_temp_,
-        mechanical_cooling_,
         mech_room_temp_,
         _hb_rooms,
         non_combustible_materials_,
         _summer_ventilation_,
         _exposure_type_,
+        mechanical_cooling_,
 )
 hb_rooms_, hbph_segment = gh_compo_interface.run()
 

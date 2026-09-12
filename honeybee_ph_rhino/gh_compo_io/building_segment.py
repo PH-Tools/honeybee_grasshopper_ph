@@ -91,16 +91,16 @@ class GHCompo_BuildingSegment(object):
         _phi_certification,
         _winter_set_temp,
         _summer_set_temp,
-        _mechanical_cooling,
         _mech_room_temp,
         _hb_rooms,
         _non_combustible_materials=False,
         _summer_ventilation_=None,
         _wind_exposure_type="1",
+        _mechanical_cooling=False,
         *args,
         **kwargs
     ):
-        # type: (gh_io.IGH, str, int, int, site.Site, List, List, phius.PhiusCertification, phi.PhiCertification, str, str, str, List[room.Room], bool, str | None | SummerVentilation, str, *Any, **Any) -> None
+        # type: (gh_io.IGH, str, int, int, site.Site, List, List, phius.PhiusCertification, phi.PhiCertification, str, str, str, List[room.Room], bool, str | None | SummerVentilation, str, bool, *Any, **Any) -> None
         self.IGH = _IGH
         self._display_name = _segment_name or "_unnamed_bldg_segment_"
         self.num_floor_levels = _num_floor_levels
@@ -191,9 +191,7 @@ class GHCompo_BuildingSegment(object):
         obj = SetPoints()
         obj.winter = self.set_points.winter
         obj.summer = self.set_points.summer
-        obj.mechanical_cooling = (
-            self.set_points.mechanical_cooling or False
-        )  # not sure why it needed or False to not default to None
+        obj.mechanical_cooling = self.set_points.mechanical_cooling
         return obj
 
     def _create_tb_dict(self):
