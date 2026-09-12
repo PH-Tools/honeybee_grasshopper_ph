@@ -105,12 +105,25 @@ jobs:
       # ---------------------------------------------------------------
       # Commit all changes, tag, and push
       # ---------------------------------------------------------------
+      # main can move while this job runs (a PR merged after checkout), so
+      # rebase onto the current tip before tagging, and push branch + tag
+      # atomically so a rejected push never leaves an orphan tag.
       - name: Commit and tag
+        env:
+          TAG: v${{ steps.bump.outputs.new_version }}
         run: |
           git add -A
-          git commit -m "release: Honeybee-PH v${{ steps.bump.outputs.new_version }} [skip ci]"
-          git tag "v${{ steps.bump.outputs.new_version }}"
-          git push --follow-tags
+          git commit -m "release: Honeybee-PH $TAG [skip ci]"
+          for attempt in 1 2 3; do
+            git pull --rebase origin main
+            git tag -f "$TAG"
+            if git push --atomic origin HEAD:main "refs/tags/$TAG"; then
+              exit 0
+            fi
+            echo "Push rejected (attempt $attempt); main moved, retrying"
+            sleep 5
+          done
+          exit 1
 
       # ---------------------------------------------------------------
       # Create a GitHub Release (users see this)
