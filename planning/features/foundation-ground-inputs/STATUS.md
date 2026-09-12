@@ -47,3 +47,7 @@ Branch: `feat/foundation-ground-inputs-79`
   unchanged; unconnected inputs keep `0.0` / `4.0` / `0.05`; `"12 ft2"` to 1.11484 m2, `"10 mph"` to
   4.4704 m/s, shield factor arrives as float `0.1`; `to_dict` / `PhFoundationFactory.from_dict` round
   trip equal for all three classes. IronPython 2.7 by inspection: no f-strings or annotations.
+- **Phase 2, step 1 (2026-09-12):** Rhino's `ladybug_tools` site-packages has the new worker but a
+  stale `honeybee_ph` (dist-info 1.33.56; `foundations.py` lacks the fields). The upstream merges did not
+  pass through the fsdeploy Edit hook. Content differs in 4 honeybee_ph-repo files and 11 PHX files.
+  Full `--sync-repo` not used: it would also delete empty Rhino-only `cli/` and `constructions/` dirs.
