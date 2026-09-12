@@ -360,7 +360,8 @@ dormant at `dev=False` and only raises when dev mode is enabled.
 **Decision (2026-07-21):** retire `HBPH - Create Program - Single Family Home`; keep
 `HBPH - Set Residential Program` as canonical. **Ed removes the old component manually in
 Grasshopper.** Repo-side follow-up: drop its `.ghuser` and `src/*.py` from distribution and
-de-register it, following the existing `gh_compo_io/program/_deprecated_/` convention.
+de-register it, as #84 did for `Add PH Equipment` (delete the `src/*.py`, `.ghuser`, and
+`_component_info_.py` entry; its backend class stays, since `Set Residential Program` uses it).
 
 Note this component is **not** redundant with `HBPH - Add Process Equipment` — see §2.1.
 They serve different destinations (hourly E+ sim vs static WUFI/PHPP export) and both stay.

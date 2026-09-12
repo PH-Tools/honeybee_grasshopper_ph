@@ -285,12 +285,6 @@ COMPONENT_PARAMS = {
         "Category": CATEGORY,
         "SubCategory": 1,
     },
-    "HBPH - Add PH Equipment": {
-        "NickName": "Add PH Equipment",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 1,
-    },
     # -- Programs
     "HBPH - Set Res Occupancy": {
         "NickName": "Set Res Occupancy",
@@ -300,12 +294,6 @@ COMPONENT_PARAMS = {
     },
     "HBPH - Get Occupancy": {
         "NickName": "Get Occupancy",
-        "Message": RELEASE_VERSION,
-        "Category": CATEGORY,
-        "SubCategory": 1,
-    },
-    "HBPH - Phius MF Res Calculator": {
-        "NickName": "Phius MF Res Calc",
         "Message": RELEASE_VERSION,
         "Category": CATEGORY,
         "SubCategory": 1,
