@@ -27,11 +27,13 @@ except ImportError as e:
 
 
 class GHCompo_WriteToPHPP(object):
-    def __init__(self, _IGH, _hb_json_file, _activate_variants, _write):
-        # type: (gh_io.IGH, str, str, bool) -> None
+    def __init__(self, _IGH, _hb_json_file, _activate_variants, _write, _clear_stale=False):
+        # type: (gh_io.IGH, str, str, bool, Optional[bool]) -> None
         self.IGH = _IGH
         self.hb_json_file = _hb_json_file
         self.activate_variants = _activate_variants or "False"
+        # -- Off unless explicitly set True: clearing removes rows a user may have entered.
+        self.clear_stale = "True" if str(_clear_stale).strip().lower() == "true" else "False"
         self.write = _write or False
 
     def os_name(self, _os_name):
@@ -49,7 +51,7 @@ class GHCompo_WriteToPHPP(object):
         if self.write and self.hb_json_file:
             hb_python_site_packages = honeybee.config.folders.python_package_path
             stdout, stderr = run.write_hbjson_to_phpp(
-                self.hb_json_file, hb_python_site_packages, self.activate_variants
+                self.hb_json_file, hb_python_site_packages, self.activate_variants, self.clear_stale
             )
             self.check_for_verification_version_warning(stdout)
         else:

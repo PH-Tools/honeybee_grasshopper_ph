@@ -46,7 +46,13 @@ EM October 2, 2022
             early design phase. Note that if activated, any inputs will get overwritten
             when the connection to the 'Variants' worksheet is made.
             Note: Args must be strings, not actual boolean True/False.
-            
+
+        _clear_stale: (bool) Default=False. Set True to blank leftover rows from a
+            previous export below the last row written in the PHPP 'Components'
+            (glazing, frames, ventilators) and 'Additional Vent' (rooms, ventilation
+            units, ducts) lists. Only input cells are cleared; formula cells are never
+            touched. Leave False to keep any rows entered by hand.
+
         _write: (bool) Set True to run the PHPP writer.
             
     Returns:
@@ -91,5 +97,6 @@ gh_compo_interface = gh_compo_io.GHCompo_WriteToPHPP(
         _hbjson_file,
         _activate_variants,
         _write,
+        _clear_stale,
 )
 gh_compo_interface.run()
