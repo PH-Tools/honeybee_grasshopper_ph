@@ -96,7 +96,7 @@ gh_compo_interface = gh_compo_io.GHCompo_WriteToPHPP(
         IGH,
         _hbjson_file,
         _activate_variants,
-        _clear_stale,
         _write,
+        _clear_stale,
 )
 gh_compo_interface.run()

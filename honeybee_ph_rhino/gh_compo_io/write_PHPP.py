@@ -27,8 +27,8 @@ except ImportError as e:
 
 
 class GHCompo_WriteToPHPP(object):
-    def __init__(self, _IGH, _hb_json_file, _activate_variants, _clear_stale, _write):
-        # type: (gh_io.IGH, str, str, Optional[bool], bool) -> None
+    def __init__(self, _IGH, _hb_json_file, _activate_variants, _write, _clear_stale=False):
+        # type: (gh_io.IGH, str, str, bool, Optional[bool]) -> None
         self.IGH = _IGH
         self.hb_json_file = _hb_json_file
         self.activate_variants = _activate_variants or "False"
