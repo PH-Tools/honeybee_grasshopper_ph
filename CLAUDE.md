@@ -23,7 +23,7 @@ Full context index: `context/README.md`.
 
 1. **IronPython 2.7 in `honeybee_ph_rhino/`.** No f-strings/`pathlib`/modern stdlib. Never bare `import typing` — nest in `try/except ImportError: pass` and use type *comments*, not annotations. Wrap third-party imports in `try/except` that re-raises a helpful `ImportError`. Route all Rhino/GH API calls through `gh_io.IGH`, never import Rhino APIs into a worker.
 2. **Every component needs a registry entry.** Adding/renaming a component requires an entry in `honeybee_ph_rhino/_component_info_.py` (`COMPONENT_PARAMS`) or `set_component_params()` raises `ComponentNameError`.
-3. **`.ghuser` files are regenerated inside Grasshopper**, not editable here — run `src/__HBPH__Util_Update_GHCompos.py` on the canvas, then commit the regenerated `src/*.py` + `user_objects/*.ghuser`. See `context/ARCHITECTURE.md`.
+3. **`src/*.py` is a scrape, never a source.** The GHPython components in Grasshopper are the source of truth; `src/__HBPH__Util_Update_GHCompos.py` overwrites every `src/*.py` from them. Never edit, format, or revert `src/`; commit whatever the scrape produces. A change to a component's own script is delivered as paste-ready code for Ed to put into the component, followed by the `.ghuser` export and the scrape. See `context/ARCHITECTURE.md`.
 4. **Do not hand-edit versions.** `RELEASE_VERSION`, `requirements.txt` pins, and `hbph_installer.ghx` are auto-updated by the release orchestrator (`.github/workflows/release.yml`). Pushing to `main` does not release.
 5. **`docs/` is a generated Hugo site** (deployed by `.github/workflows/hugo.yml`) — do not hand-edit or index it.
 6. **Tests live upstream.** There are no tests in this repo; the worker suite is in `honeybee_ph`.
