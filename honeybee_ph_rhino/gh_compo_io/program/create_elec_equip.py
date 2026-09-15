@@ -46,7 +46,20 @@ def _normalize_input_value(_attr_name, _input_value, _current_value):
         if not stripped_value or stripped_value.lower() == "none":
             return False, None
 
-    is_numeric_attr = isinstance(_current_value, (int, float)) and not isinstance(_current_value, bool)
+    if isinstance(_current_value, bool):
+        # -- Apply the value itself: a truth test would drop an explicit False.
+        if isinstance(_input_value, STRING_TYPES):
+            text_value = _input_value.strip().lower()
+            if text_value in ("true", "1"):
+                return True, True
+            if text_value in ("false", "0"):
+                return True, False
+        elif isinstance(_input_value, (bool, int, float)) and _input_value in (0, 1):
+            return True, bool(_input_value)
+        msg = "Error: Input '{}' with value '{}' cannot be converted to bool.".format(_attr_name, _input_value)
+        raise Exception(msg)
+
+    is_numeric_attr = isinstance(_current_value, (int, float))
     if is_numeric_attr:
         try:
             if isinstance(_current_value, float):
