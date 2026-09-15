@@ -29,6 +29,41 @@ try:
 except ImportError as e:
     raise ImportError("\nFailed to import honeybee_ph_utils:\n\t{}".format(e))
 
+try:
+    STRING_TYPES = (basestring,)  # noqa: F821
+except NameError:
+    STRING_TYPES = (str,)
+
+
+def _normalize_input_value(_attr_name, _input_value, _current_value):
+    # type: (str, object, object) -> tuple[bool, object]
+    """Normalize a component input for assignment to an equipment attribute."""
+    if _input_value is None:
+        return False, None
+
+    if isinstance(_input_value, STRING_TYPES):
+        stripped_value = _input_value.strip()
+        if not stripped_value or stripped_value.lower() == "none":
+            return False, None
+
+    is_numeric_attr = isinstance(_current_value, (int, float)) and not isinstance(_current_value, bool)
+    if is_numeric_attr:
+        try:
+            if isinstance(_current_value, float):
+                return True, float(_input_value)
+
+            float_value = float(_input_value)
+            if not float_value.is_integer():
+                raise ValueError
+            return True, int(float_value)
+        except (TypeError, ValueError, OverflowError):
+            msg = "Error: Input '{}' with value '{}' cannot be converted to {}.".format(
+                _attr_name, _input_value, type(_current_value).__name__
+            )
+            raise Exception(msg)
+
+    return bool(_input_value), _input_value
+
 
 # -----------------------------------------------------------------------------
 # -- Setup the component input node groups
@@ -352,9 +387,12 @@ class GHCompo_CreateElecEquip(object):
                 continue
 
             input_val = self.input_dict.get(attr_name)
-            if input_val:
-                print("Setting attribute '{}' to '{}' [{}]".format(attr_name, input_val, type(input_val)))
-                setattr(_equipment_obj, attr_name, input_val)
+            should_set, normalized_val = _normalize_input_value(
+                attr_name, input_val, getattr(_equipment_obj, attr_name)
+            )
+            if should_set:
+                print("Setting attribute '{}' to '{}' [{}]".format(attr_name, normalized_val, type(normalized_val)))
+                setattr(_equipment_obj, attr_name, normalized_val)
 
         return _equipment_obj
 
