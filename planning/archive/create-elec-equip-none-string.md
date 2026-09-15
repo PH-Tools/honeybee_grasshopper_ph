@@ -1,6 +1,6 @@
 ---
 DATE: 2026-09-14
-STATUS: Merged to main (PR #95, 2026-09-15) — canvas check in Rhino pending
+STATUS: Complete (2026-09-15) — merged PR #95, released v1.41.0, canvas-verified; text source unresolved
 AUTHOR: Claude (for Ed May)
 ISSUE: https://github.com/PH-Tools/honeybee_grasshopper_ph/issues/94
 ---
@@ -38,9 +38,15 @@ Downstream readers that do arithmetic on the field fail with a `TypeError`.
 
 ## Not verified
 
-The exact canvas path that produced the string. `energy_demand` is declared
-with a float type hint, which should reject the text `"None"`. A GH-side
-reproduction still needs Rhino.
+Where the production string came from. On the canvas it cannot enter through
+`energy_demand`: Grasshopper's float type hint rejects typed text (`None`,
+`abc`) with "Type conversion failed from Text to float" before the worker
+runs, and an unconnected input arrives as Python `None`, which was always
+skipped. Remaining candidates, unverified: an older copy of the component in
+the project's `.gh` whose `energy_demand` hint is not float (GH stores hints
+per input in the file), or an edit made outside Grasshopper. No code path in
+`honeybee_ph` (`PhEquipment.to_dict` copies the value), `honeybee_grasshopper_ph`
+or `PHX` stringifies `energy_demand`.
 
 ## Proposed correction
 
@@ -66,3 +72,16 @@ The worker must stay IronPython 2.7-safe. There is no I/O change, so no
   `"None"` leaves the default, `"12.5"` → `12.5`, `"abc"` raises.
 - A canvas check by Ed after the fsdeploy: the HBJSON has no string in
   numeric equipment fields.
+
+### Canvas result (Ed, 2026-09-15)
+
+Values injected into `input_values_dict` inside the component script, which
+bypasses the input type hints and reaches the worker directly:
+
+| Injected | Result |
+|---|---|
+| default (nothing wired) | HBJSON dryer: every numeric field a number; no string anywhere |
+| `energy_demand = None` | skipped; `energy_demand` stays `0.0` |
+| `energy_demand = "None"` (text, the #94 route) | skipped; preview `energy_demand ::: 0.0` |
+| `abc` via a Panel | blocked by Grasshopper's float hint before the worker |
+| `in_conditioned_space = False` | **ignored**; preview reads `True` — pre-existing, filed as [#96](https://github.com/PH-Tools/honeybee_grasshopper_ph/issues/96) |
