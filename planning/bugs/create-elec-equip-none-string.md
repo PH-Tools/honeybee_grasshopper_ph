@@ -1,6 +1,6 @@
 ---
 DATE: 2026-09-14
-STATUS: Implemented on branch
+STATUS: Merged to main (PR #95, 2026-09-15) — canvas check in Rhino pending
 AUTHOR: Claude (for Ed May)
 ISSUE: https://github.com/PH-Tools/honeybee_grasshopper_ph/issues/94
 ---
