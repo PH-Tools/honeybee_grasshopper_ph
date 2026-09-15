@@ -92,7 +92,8 @@ inputs_base = {
     ),
     4: ComponentInput(
         _name="quantity",
-        _description="(int) The total number of appliances / pieces of equipment included.",
+        _description="(int) default=1, The number of units of this appliance / piece of equipment. The "
+        "'energy_demand' is the value for a single unit, so the total is 'energy_demand' x 'quantity'.",
         _type_hint=Component.NewStrHint(),
     ),
     5: ComponentInput(
