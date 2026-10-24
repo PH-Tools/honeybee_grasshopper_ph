@@ -3,8 +3,6 @@
 
 """GHCompo Interface: HBPH - Create PH Equipment."""
 
-from copy import copy  # Use copy so that specific equipments can overwrite base with their own hints
-
 try:
     from typing import Type
 except ImportError:
@@ -81,175 +79,246 @@ def _normalize_input_value(_attr_name, _input_value, _current_value):
 # -----------------------------------------------------------------------------
 # -- Setup the component input node groups
 
-inputs_base = {
-    2: ComponentInput(
-        _name="comment",
-        _description="(str) User defined comment / note.",
-        _type_hint=Component.NewStrHint(),
-    ),
-    3: ComponentInput(
-        _name="reference_quantity", _description="() some WUFI stuff.", _type_hint=Hints.GH_IntegerHint_CS()
-    ),
-    4: ComponentInput(
-        _name="quantity",
-        _description="(int) default=1, The number of units of this appliance / piece of equipment. The "
-        "'energy_demand' is the value for a single unit, so the total is 'energy_demand' x 'quantity'.",
-        _type_hint=Component.NewStrHint(),
-    ),
-    5: ComponentInput(
-        _name="in_conditioned_space",
-        _description="(bool) default=True, Set False if the appliance is outside and the waste heat from the appliance does not count towards internal-gains in the space.",
-        _type_hint=Hints.GH_BooleanHint_CS(),
-    ),
-    6: ComponentInput(
-        _name="reference_energy_norm",
-        _description="() some other WUFI stuff.",
-        _type_hint=Hints.GH_IntegerHint_CS(),
-    ),
-    7: ComponentInput(
-        _name="energy_demand",
-        _description="(float) usually kWh/yr",
-        _type_hint=Component.NewFloatHint(),
-    ),
-    8: ComponentInput(
-        _name="energy_demand_per_use",
-        _description="(float) usually kWh/use",
-        _type_hint=Component.NewFloatHint(),
-    ),
-    9: ComponentInput(
-        _name="combined_energy_factor",
-        _description="(float)",
-        _type_hint=Component.NewFloatHint(),
-    ),
-}
+# -- Each input's '_name' is the equipment attribute it sets (the value-lookup key) and must not
+# -- change. The '_nickname' is the canvas label. WUFI-Passive and METr read 'energy_demand' through
+# -- 'reference_energy_norm'; PHPP ignores both and reads 'energy_demand_per_use' instead.
 
-inputs_dishwasher = copy(inputs_base)
+REF_QUANTITY_CODES = (
+    "1-PH-case occupants, 2-Zone occupants, 3-Bedrooms, 4-PH-case units, 5-User defined, "
+    "6-PH-case floor area, 7-Zone floor area, 8-n.a."
+)
+
+
+def _base_inputs(_ref_quantities, _norm, _energy_demand, _energy_per_use):
+    # type: (str, str, str, str) -> dict[int, ComponentInput]
+    """Return the common input nodes, with the type-specific text for the slots whose meaning varies."""
+    return {
+        2: ComponentInput(
+            _name="comment",
+            _nickname="comment",
+            _description="(str) Note shown in WUFI-Passive and METr ('Comment'). Not used by PHPP.",
+            _type_hint=Component.NewStrHint(),
+        ),
+        3: ComponentInput(
+            _name="reference_quantity",
+            _nickname="ref_quantity",
+            _description="(int) WUFI/METr 'Reference quantity': what the energy demand is scaled by. "
+            "Codes: {}.\nFor this type use: {}.\nNot used by PHPP.".format(REF_QUANTITY_CODES, _ref_quantities),
+            _type_hint=Hints.GH_IntegerHint_CS(),
+        ),
+        4: ComponentInput(
+            _name="quantity",
+            _nickname="quantity",
+            _description="(int) default=1. WUFI/METr 'Quantity': the number of units of this appliance. "
+            "The 'energy_demand' is the value for a single unit, so the total is 'energy_demand' x 'quantity'. "
+            "Not used by PHPP.",
+            _type_hint=Component.NewStrHint(),
+        ),
+        5: ComponentInput(
+            _name="in_conditioned_space",
+            _nickname="in_conditioned_space",
+            _description="(bool) default=True. WUFI/METr 'In conditioned space' and the PHPP 'inside' column. "
+            "Set False if the appliance is outside and its waste heat does not count as an internal gain.",
+            _type_hint=Hints.GH_BooleanHint_CS(),
+        ),
+        6: ComponentInput(
+            _name="reference_energy_norm",
+            _nickname="norm_reference",
+            _description="(int) WUFI/METr 'Energy demand (norm) reference': the period the 'energy_demand' "
+            "is given for. For this type: {}.\nNot used by PHPP.".format(_norm),
+            _type_hint=Hints.GH_IntegerHint_CS(),
+        ),
+        7: ComponentInput(
+            _name="energy_demand",
+            _nickname="energy_demand",
+            _description=_energy_demand,
+            _type_hint=Component.NewFloatHint(),
+        ),
+        8: ComponentInput(
+            _name="energy_demand_per_use",
+            _nickname="energy_per_use_PHPP",
+            _description=_energy_per_use,
+            _type_hint=Component.NewFloatHint(),
+        ),
+        9: ComponentInput(
+            _name="combined_energy_factor",
+            _nickname="CEF",
+            _description="(float) WUFI/METr 'CEF - Combined energy factor'. Used by the clothes dryer only.",
+            _type_hint=Component.NewFloatHint(),
+        ),
+    }
+
+
+WATER_CONNECTION = ComponentInput(
+    _name="water_connection",
+    _nickname="water_connection",
+    _description="WUFI/METr 'Water connection' and the PHPP connection selector. Input either -\n"
+    ' "1-DHW Connection"\n "2-Cold Water Connection"',
+    _type_hint=Component.NewStrHint(),
+)
+
+inputs_dishwasher = _base_inputs(
+    "1, 2 or 5",
+    "2-Year",
+    "(float) kWh/yr per unit. WUFI/METr 'Annual energy use rating'. Phius default: 269.",
+    "(float) kWh/use. PHPP only; WUFI/METr ignore it. PHI default: 1.1.",
+)
 inputs_dishwasher.update(
     {
         10: ComponentInput(
             _name="capacity_type",
-            _description='Input "1-Standard" or ',
+            _nickname="capacity_type",
+            _description="WUFI/METr 'Dishwasher capacity, preselection'. Input \"1-Standard\".",
             _type_hint=Component.NewStrHint(),
         ),
-        11: ComponentInput(_name="capacity", _description="(float)", _type_hint=Component.NewFloatHint()),
-        12: ComponentInput(
-            _name="water_connection",
-            _description='Input either -\n "1-DHW Connection"\n "2-Cold Water Connection"',
-            _type_hint=Component.NewStrHint(),
+        11: ComponentInput(
+            _name="capacity",
+            _nickname="capacity",
+            _description="(float) WUFI/METr 'Dishwasher capacity, in place settings'. Default: 12.",
+            _type_hint=Component.NewFloatHint(),
         ),
+        12: WATER_CONNECTION,
     }
 )
 
-inputs_clothes_washer = copy(inputs_base)
+inputs_clothes_washer = _base_inputs(
+    "1, 2 or 5",
+    "2-Year",
+    "(float) kWh/yr per unit. WUFI/METr 'Annual energy use'. Phius default: 120.",
+    "(float) kWh/use. PHPP only; WUFI/METr ignore it. PHI default: 1.1.",
+)
 inputs_clothes_washer.update(
     {
-        10: ComponentInput(_name="capacity", _description="", _type_hint=Component.NewFloatHint()),
-        11: ComponentInput(
-            _name="modified_energy_factor",
-            _description="",
+        10: ComponentInput(
+            _name="capacity",
+            _nickname="capacity",
+            _description="(float) m3. WUFI/METr 'Capacity of clothes washer' (shown in ft3 in IP). "
+            "Default: 0.1274 m3 (4.5 ft3).",
             _type_hint=Component.NewFloatHint(),
         ),
-        12: ComponentInput(
-            _name="water_connection",
-            _description='Input either -\n "1-DHW Connection"\n "2-Cold Water Connection"',
-            _type_hint=Component.NewStrHint(),
+        11: ComponentInput(
+            _name="modified_energy_factor",
+            _nickname="MEF",
+            _description="(float) WUFI/METr 'MEF - Modified energy factor'. Default: 2.7.",
+            _type_hint=Component.NewFloatHint(),
         ),
+        12: WATER_CONNECTION,
         13: ComponentInput(
             _name="utilization_factor",
-            _description="",
+            _nickname="utilization_factor",
+            _description="(float) WUFI/METr 'Utilization factor'. Default: 1.0.",
             _type_hint=Component.NewFloatHint(),
         ),
     }
 )
 
-inputs_clothes_dryer = copy(inputs_base)
+inputs_clothes_dryer = _base_inputs(
+    "1, 2 or 5",
+    "2-CEF (enter the value in 'CEF')",
+    "Not used by the clothes dryer: WUFI/METr read 'CEF', PHPP reads 'energy_per_use_PHPP'.",
+    "(float) kWh/use. PHPP only; WUFI/METr ignore it. PHI default: 3.5.",
+)
+inputs_clothes_dryer[9] = ComponentInput(
+    _name="combined_energy_factor",
+    _nickname="CEF",
+    _description="(float) lb/kWh. WUFI/METr 'CEF - Combined energy factor'. Phius default: 3.93.",
+    _type_hint=Component.NewFloatHint(),
+)
 inputs_clothes_dryer.update(
     {
         10: ComponentInput(
             _name="dryer_type",
-            _description='Input either -\n "1-CLOTHES LINE"\n "2-DRYING CLOSET (COLD!)"\n "3-DRYING CLOSET (COLD!) IN EXTRACT AIR"\n "4-CONDENSATION DRYER"\n "5-ELECTRIC EXHAUST AIR DRYER"\n "6-GAS EXHAUST AIR DRYER"\n ',
+            _nickname="dryer_type",
+            _description="WUFI/METr 'Type of laundry-dryer' and the PHPP dryer selector. Input either -\n"
+            ' "1-CLOTHES LINE"\n "2-DRYING CLOSET (COLD!)"\n "3-DRYING CLOSET (COLD!) IN EXTRACT AIR"\n'
+            ' "4-CONDENSATION DRYER"\n "5-ELECTRIC EXHAUST AIR DRYER"\n "6-GAS EXHAUST AIR DRYER"',
             _type_hint=Component.NewStrHint(),
         ),
-        11: ComponentInput(_name="gas_consumption", _description="", _type_hint=Component.NewFloatHint()),
+        11: ComponentInput(
+            _name="gas_consumption",
+            _nickname="gas_consumption",
+            _description="(float) WUFI/METr 'Gas consumption'. Gas dryers (type 6) only.",
+            _type_hint=Component.NewFloatHint(),
+        ),
         12: ComponentInput(
             _name="gas_efficiency_factor",
-            _description="",
+            _nickname="gas_CEF",
+            _description="(float) WUFI/METr 'CEF - Gas'. Gas dryers (type 6) only. " "Default: 2.67.",
             _type_hint=Component.NewFloatHint(),
         ),
         13: ComponentInput(
             _name="field_utilization_factor_type",
-            _description="",
+            _nickname="field_utilization_factor_type",
+            _description="(int) WUFI/METr 'Field utilization factor, preselection'. 1-Timer controls (default).",
             _type_hint=Component.NewFloatHint(),
         ),
         14: ComponentInput(
             _name="field_utilization_factor",
-            _description="",
+            _nickname="field_utilization_factor",
+            _description="(float) WUFI/METr 'Field utilization factor'. Default: 1.18.",
             _type_hint=Component.NewFloatHint(),
         ),
     }
 )
 
-inputs_refrigerator = copy(inputs_base)
-inputs_refrigerator.update({})
+_fridge_args = (
+    "4 or 5",
+    "1-Day or 2-Year",
+    "(float) kWh per day (norm 1) or per year (norm 2), per unit. WUFI/METr 'Energy demand (rated)'.",
+    "(float) kWh/day. PHPP only; WUFI/METr ignore it.",
+)
+inputs_refrigerator = _base_inputs(*_fridge_args)
+inputs_freezer = _base_inputs(*_fridge_args)
+inputs_fridge_freezer = _base_inputs(*_fridge_args)
 
-inputs_freezer = copy(inputs_base)
-inputs_freezer.update({})
-
-inputs_fridge_freezer = copy(inputs_base)
-inputs_fridge_freezer.update({})
-
-inputs_cooktop = copy(inputs_base)
+inputs_cooktop = _base_inputs(
+    "1, 2 or 5",
+    "1-Use",
+    "(float) kWh/use. WUFI/METr 'Energy demand (rated)'. Phius default: 0.2.",
+    "(float) kWh/use. PHPP only; WUFI/METr ignore it. PHI default: 0.25.",
+)
 inputs_cooktop.update(
     {
         10: ComponentInput(
             _name="cooktop_type",
-            _description='Input either -\n "1-ELECTRICITY"\n "2-NATURAL GAS"\n "3-LPG",',
+            _nickname="cooktop_type",
+            _description="WUFI/METr 'Cooking with' and the PHPP cooking selector. Input either -\n"
+            ' "1-ELECTRICITY"\n "2-NATURAL GAS"\n "3-LPG"',
             _type_hint=Component.NewStrHint(),
         ),
     }
 )
 
-input_Phius_MEL = copy(inputs_base)
-input_Phius_MEL.update({})
+_phius_calculated = "(float) default=0. WUFI/METr derive this Phius load from the 'ref_quantity'."
+input_Phius_MEL = _base_inputs("3 or 5", "not used", _phius_calculated, "Not used.")
 
-inputs_Phius_Lighting_Int = copy(inputs_base)
-inputs_Phius_Lighting_Int.update(
-    {
-        10: ComponentInput(
-            _name="frac_high_efficiency",
-            _description='The percentage of lighting which is "high efficiency."',
-            _type_hint=Component.NewFloatHint(),
-        ),
-    }
+FRAC_HIGH_EFFICIENCY = ComponentInput(
+    _name="frac_high_efficiency",
+    _nickname="frac_high_efficiency",
+    _description="(float) 0.0-1.0, default=1.0. The fraction of the lighting that is high efficiency "
+    "(WUFI/METr 'Fraction of high efficiency').",
+    _type_hint=Component.NewFloatHint(),
 )
 
+inputs_Phius_Lighting_Int = _base_inputs("6, 7 or 5", "not used", _phius_calculated, "Not used.")
+inputs_Phius_Lighting_Int.update({10: FRAC_HIGH_EFFICIENCY})
 
-inputs_Phius_Lighting_Ext = copy(inputs_base)
-inputs_Phius_Lighting_Ext.update(
-    {
-        10: ComponentInput(
-            _name="frac_high_efficiency",
-            _description='The percentage of lighting which is "high efficiency."',
-            _type_hint=Component.NewFloatHint(),
-        ),
-    }
+inputs_Phius_Lighting_Ext = _base_inputs("6, 7 or 5", "not used", _phius_calculated, "Not used.")
+inputs_Phius_Lighting_Ext.update({10: FRAC_HIGH_EFFICIENCY})
+
+inputs_Phius_Lighting_Garage = _base_inputs("8", "not used", _phius_calculated, "Not used.")
+inputs_Phius_Lighting_Garage.update({10: FRAC_HIGH_EFFICIENCY})
+
+_custom_args = (
+    "5",
+    "not used",
+    "(float) kWh/yr per unit. WUFI/METr get 'energy_demand' x 'quantity' on a single line; "
+    "PHPP gets the same total on its annual row.",
+    "Not used.",
 )
-
-
-inputs_Phius_Lighting_Garage = copy(inputs_base)
-inputs_Phius_Lighting_Garage.update(
-    {
-        10: ComponentInput(
-            _name="frac_high_efficiency",
-            _description='The percentage of lighting which is "high efficiency."',
-            _type_hint=Component.NewFloatHint(),
-        ),
-    }
-)
-
-inputs_Custom_Elec = copy(inputs_base)
-inputs_Custom_Lighting = copy(inputs_base)
-inputs_Custom_MEL = copy(inputs_base)
+inputs_Custom_Elec = _base_inputs(*_custom_args)
+inputs_Custom_Lighting = _base_inputs(*_custom_args)
+inputs_Custom_MEL = _base_inputs(*_custom_args)
 
 inputs_phius_defaults = {}
 inputs_phi_defaults = {}
