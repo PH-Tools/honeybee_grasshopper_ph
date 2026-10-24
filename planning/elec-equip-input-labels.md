@@ -54,7 +54,7 @@ appliance row. The honeybee-ph defaults show it: the Phius dishwasher sets
 | `reference_quantity` | `ReferenceQuantity` | `refQ` / Reference quantity | not read |
 | `quantity` | `Quantity` | `quantity` / Quantity | not read (annual rows: demand × quantity) |
 | `in_conditioned_space` | `InConditionedSpace` | `inCondSp` / In conditioned space | "inside" column: dishwasher, washer, dryer, freezer; annual rows as a fraction |
-| `reference_energy_norm` | `ReferenceEnergyDemandNorm` (index into that device's dropdown) | `refED` / Energy demand (norm) reference. Translated for fridge types; fixed for dishwasher (Year), washer (Year), dryer (CEF) | not read |
+| `reference_energy_norm` | `ReferenceEnergyDemandNorm` (index into that device's dropdown) | `refED` / Energy demand (norm) reference. Translated for fridge types; fixed for dishwasher (Year), washer (Year); dryer per type in METr (3 yearly energy for 1–3, 4 CEF for 4/5/7, 9 CEF-gas for 6) | not read |
 | `energy_demand` | `EnergyDemandNorm` | `enDrY` / `enDrD` / `enDY` (the one `refED` points at) | not read for appliances; annual rows (lighting, MEL, custom) use demand × quantity [kWh/yr] |
 | `energy_demand_per_use` | `EnergyDemandNormUse` | `enDrU` | **the appliance demand** for dishwasher, washer, dryer, fridge types, cooktop |
 | `combined_energy_factor` | `CEF_CombinedEnergyFactor` | `CEFef` / CEF - Combined energy factor | not read |
@@ -73,7 +73,7 @@ things.
 |---|---|---|---|
 | 1 dishwasher | 2 = Year | kWh/yr | kWh/use |
 | 2 clothes washer | 2 = Year | kWh/yr | kWh/use |
-| 3 clothes dryer | 2 = CEF (reads `combined_energy_factor`) | not used | kWh/use |
+| 3 clothes dryer | 2 = CEF (reads `combined_energy_factor`). METr `refED` is set per dryer type by PHX (see `dryer_type`) | not used | kWh/use |
 | 4/5/6 fridge, freezer, combo | 1 = Day, 2 = Year | kWh/day or kWh/yr | kWh/day |
 | 7 cooking | 1 = Use | kWh/use | kWh/use |
 | 13–16 Phius MEL / lighting | n/a | to verify: WUFI/METr may compute these from the reference quantity | annual row, kWh/yr |
@@ -89,7 +89,7 @@ things.
 | washer | `capacity` | `CapacityClothesWasher` | Capacity of clothes washer [m³; ft³ in IP] | — |
 | washer | `modified_energy_factor` | `MEF_ModifiedEnergyFactor` | MEF - Modified energy factor | — |
 | washer | `utilization_factor` | `UtilizationFactor` | (utilization factor) | — |
-| dryer | `dryer_type` | `Dryer_Choice` | Type of laundry dryer | dryer selector |
+| dryer | `dryer_type` | `Dryer_Choice` (1–6; 7 is written as 4) | Type of laundry dryer: 1 Clothesline, 2 Drying closet (cold), 3 Drying closet (cold) at exhaust, 4 Ventless: Condensation, 5 Vented: Electric, 6 Vented: Natural Gas, 7 Ventless: Heat Pump | dryer selector (1–6; 7 is written as 4) |
 | dryer | `gas_consumption` | `GasConsumption` | Gas consumption | gas row (type 6) |
 | dryer | `gas_efficiency_factor` | `EfficiencyFactorGas` | CEF - Combined energy factor (gas) | — |
 | dryer | `field_utilization_factor_type` | `FieldUtilizationFactorPreselection` | Field utilization factor, preselection (1 Timer controls) | — |
@@ -170,8 +170,9 @@ even for a PHI project (`phius_default()` for any single type); say so in the hi
 4. **Hints that would change canvas coercion** (out of scope unless Ed says): `quantity` uses a
    string hint for an int attribute; `field_utilization_factor_type` uses a float hint for an
    int; `frac_high_efficiency` says "percentage" but the default is the fraction 1.0.
-5. METr's dryer list has a 7th type (Ventless: Heat Pump) that honeybee-ph's `PhClothesDryerType`
-   does not offer.
+5. ~~METr's dryer list has a 7th type (Ventless: Heat Pump) that honeybee-ph's `PhClothesDryerType`
+   does not offer.~~ Resolved by PHX#160: `"7-HEAT PUMP DRYER"` (honeybee-ph 1.33.68) reaches METr
+   as 7 and WUFI/PHPP as 4, with a warning.
 
 ## 5. Verification
 
