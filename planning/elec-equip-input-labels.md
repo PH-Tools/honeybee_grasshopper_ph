@@ -1,6 +1,6 @@
 ---
 DATE: 2026-10-24
-STATUS: Implemented on branch (option B, canvas-verified 2026-10-24; docstrings drafted, not yet pasted)
+STATUS: Implemented on branch (option B, canvas-verified; docstrings pasted and scraped 2026-10-24)
 AUTHOR: Ed May (with Claude)
 ISSUE: none yet. Draft issue text at the end, for Ed's wording review before posting.
 ---

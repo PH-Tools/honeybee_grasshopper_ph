@@ -20,40 +20,44 @@
 # @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 #
 """
-Add new PH Equipment (Appliances) to the HB-Rooms. 
+Add new PH Equipment (Appliances) to the HB-Rooms.
 -
-Note that ALL of the equipment input will be added to ALL of the Honeybee-Rooms. 
-This may not always be what you want, and so if you want to add equipment ONLY 
-to certain rooms (ie: add a Cooktopto ONLY the Kitchen), then break up your 
+Note that ALL of the equipment input will be added to ALL of the Honeybee-Rooms.
+This may not always be what you want, and so if you want to add equipment ONLY
+to certain rooms (ie: add a Cooktop to ONLY the Kitchen), then break up your
 Rooms accordingly and only pass in the relevant Honeybee-Room(s).
 -
-EM January 28, 2025
+WUFI-Passive, METr and PHPP read the equipment's own values (set them with the
+"Create PH Equipment" component). The '_num_bedrooms', '_num_occupants' and
+'_num_dwellings' inputs below only size the Honeybee / EnergyPlus process load.
+-
+EM October 24, 2026
     Args:
+        _equipment: (list[str | PhEquipment]) The equipment to add to the Honeybee-Rooms.
+            Input either PH-Equipment from the "Create PH Equipment" component, or a
+            type string to add a default: "1-dishwasher", "2-clothes_washer", ...
+            "100" adds the full Phius default set, "200" the full PHI default set.
+            Note: a single type string always builds the Phius default for that
+            type, even on a PHI project. Use "Create PH Equipment" for PHI values.
 
-        _equipment: (list[str | PHEquipment]) A List of new HBPH 'Equipment' to add 
-            to the Honeybee Rooms. If a string is input (ie: "1-Dishwasher") a default
-            ph-equipment of that type will be added. If you wish to input detailed
-            equipment with specific values, use the "Create PH Equipment" component 
-            to create that equipment and add it here.
+        _num_bedrooms: (float) The TOTAL number of bedrooms in the Honeybee-Rooms input.
+            Used ONLY to size the Honeybee / EnergyPlus process load. WUFI-Passive and
+            METr take the bedroom count from the rooms' PH occupancy data instead.
 
-        _num_bedrooms: (float) Enter the TOTAL number of bedrooms represented
-            by the Honeybee-Rooms input. This is use to determine the total Phius
-            appliance, lighting, and Misc. Electrical loads. 
+        _num_occupants: (float) The TOTAL number of occupants in the Honeybee-Rooms input.
+            Used ONLY to size the Honeybee / EnergyPlus process load. WUFI-Passive and
+            METr take the occupant count from the rooms' PH occupancy data instead.
 
-        _num_occupants: (float) Enter the TOTAL number of occupants represented
-            by the Honeybee-Rooms input. This is use to determine the total Phius
-            appliance, lighting, and Misc. Electrical loads. 
+        _num_dwellings: (float) default=1. The TOTAL number of dwelling units in the
+            Honeybee-Rooms input ('1' for a single-family home or non-residential).
+            Used ONLY to size the Honeybee / EnergyPlus process load. WUFI-Passive and
+            METr take the dwelling-unit count from the rooms' PH occupancy data instead.
 
-        _num_dwellings: (float) default=1. Enter the TOTAL number of dwellings
-            represented by the Honeybee-Rooms input. For single-family home and
-            non-residential, enter '1' or leave empty. For Multi-Unit (apartment)
-            buildings, enter the TOTAL number of dwellings. This values is used 
-            to calculate Phius lighting and Misc. Electrical loads.
+        _hb_rooms: (list[Room]) The Honeybee-Rooms to add the PH-Equipment to.
 
-        _hb_rooms: (list[Room]) A list of HB-Rooms to add the PH-Equuipment to.
-        
     Returns:
-        hb_rooms_: The HB-Rooms with the .... added to them.
+        hb_rooms_: The Honeybee-Rooms with the PH-Equipment added as Honeybee
+            process loads.
 """
 
 import scriptcontext as sc

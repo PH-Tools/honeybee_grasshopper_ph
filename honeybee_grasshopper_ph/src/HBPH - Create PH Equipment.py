@@ -20,10 +20,14 @@
 # @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 #
 """
-Create a new detailed Passive House style equipment which can be added to the 
+Create a new detailed Passive House style equipment which can be added to the
 honeybee Rooms.
 -
-EM March 4, 2025
+The inputs change with the '_type'. Hover over each input to see which WUFI-Passive /
+METr field it sets and its unit. WUFI-Passive and METr read 'energy_demand' (in the
+period set by 'norm_reference'); PHPP reads 'energy_per_use_PHPP' instead.
+-
+EM October 24, 2026
     Args:
         _type: (str) Input either -
 1-dishwasher,
@@ -43,10 +47,12 @@ EM March 4, 2025
 100-PhiUS_Defaults,
 200-Phi_Defaults,
 
-        _display_name: (str) Optional display name
-    
+        display_name: (str) Optional name in the Honeybee model only. WUFI-Passive,
+            METr and PHPP do not show it; use 'comment' for a note that reaches
+            WUFI-Passive and METr.
+
     Returns:
-        equipment_: (list[PhEquipment]) New HBPH Electric Equipment which can be added to one 
+        equipment_: (list[PhEquipment]) New HBPH Electric Equipment which can be added to one
             or more Honeybee-Rooms using the "HBPH - Add Process Equipment" component.
 """
 
