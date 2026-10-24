@@ -509,13 +509,15 @@ class ComponentInput:
         _access=0,
         _type_hint=Component.NoChangeHint(),
         _target_unit=None,
+        _nickname=None,
     ):
-        # type: (str, str, int, Component.NoChangeHint, Optional[str]) -> None
+        # type: (str, str, int, Component.NoChangeHint, Optional[str], Optional[str]) -> None
         self.name = _name
         self.description = _description
         self.access = _access  # 0='item, 1='list', 2='tree'
         self.type_hint = _type_hint
         self.target_unit = _target_unit
+        self.nickname = _nickname  # Canvas label; 'name' stays the value-lookup key
 
     def __str__(self):
         return "{}(name={})".format(
@@ -591,7 +593,7 @@ def setup_component_inputs(IGH, _input_dict, _start_i=1, _end_i=20):
 
         try:
             input_node = IGH.ghenv.Component.Params.Input[input_num]
-            input_node.NickName = input_item.name
+            input_node.NickName = getattr(input_item, "nickname", None) or input_item.name
             input_node.Name = input_item.name
             input_node.Description = input_item.description
             input_node.Access = IGH.Grasshopper.Kernel.GH_ParamAccess(input_item.access)
