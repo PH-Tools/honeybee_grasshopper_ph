@@ -230,8 +230,13 @@ inputs_clothes_dryer.update(
             _name="dryer_type",
             _nickname="dryer_type",
             _description="WUFI/METr 'Type of laundry-dryer' and the PHPP dryer selector. Input either -\n"
-            ' "1-CLOTHES LINE"\n "2-DRYING CLOSET (COLD!)"\n "3-DRYING CLOSET (COLD!) IN EXTRACT AIR"\n'
-            ' "4-CONDENSATION DRYER"\n "5-ELECTRIC EXHAUST AIR DRYER"\n "6-GAS EXHAUST AIR DRYER"',
+            ' "1-CLOTHES LINE" (METr: Clothesline)\n'
+            ' "2-DRYING CLOSET (COLD!)" (METr: Drying closet (cold))\n'
+            ' "3-DRYING CLOSET (COLD!) IN EXTRACT AIR" (METr: Drying closet (cold) at exhaust)\n'
+            ' "4-CONDENSATION DRYER" (METr: Ventless: Condensation)\n'
+            ' "5-ELECTRIC EXHAUST AIR DRYER" (METr: Vented: Electric)\n'
+            ' "6-GAS EXHAUST AIR DRYER" (METr: Vented: Natural Gas)\n'
+            ' "7-HEAT PUMP DRYER" (METr: Ventless: Heat Pump). METr only; WUFI and PHPP receive 4.',
             _type_hint=Component.NewStrHint(),
         ),
         11: ComponentInput(
